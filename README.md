@@ -306,7 +306,12 @@ Skip the step where he installs "mmd_tools" in the video below, it's not needed 
 ## Changelogs
   
 #### 0.20.0
-
+- Removed Patreon and removed supporters tab fully. I done this because the original project is dead.
+- Change the discord link to go to the github wiki, i going to put up some basic things on there at somepoint.
+- Added in credits that i maintaining this version.
+- Updated MMD tools to the latest version.
+- Added 3.0 Eye Tracking by Mysteryem
+- Fix for Unselect all being called too many times.
   
 #### 0.19.3 
 - Fix for update loop.
