@@ -263,11 +263,6 @@ There are a lot of perks like having your name inside the plugin!
    </details>
 *More to come!*
 
-## Discord
-Join our Discord to report errors, suggestions and make comments!
-
-**Discord: https://discord.gg/f8yZGnv**
-
 ## Requirements
  - Blender **2.79** or **2.80** or above (run as administrator is recommended)
    - mmd_tools is **not required**! Cats comes pre-installed with it!
