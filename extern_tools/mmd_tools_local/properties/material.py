@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import bpy
-from mmd_tools import utils
-from mmd_tools.core import material
-from mmd_tools.core.material import FnMaterial
-from mmd_tools.core.model import Model
+from mmd_tools_local import utils
+from mmd_tools_local.core import material
+from mmd_tools_local.core.material import FnMaterial
+from mmd_tools_local.core.model import Model
 
 
 def _updateAmbientColor(prop, context):

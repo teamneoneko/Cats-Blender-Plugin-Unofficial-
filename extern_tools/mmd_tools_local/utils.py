@@ -3,7 +3,7 @@ import re
 import os
 
 import bpy
-from mmd_tools.bpyutils import SceneOp
+from mmd_tools_local.bpyutils import SceneOp
 
 ## 指定したオブジェクトのみを選択状態かつアクティブにする
 def selectAObject(obj):

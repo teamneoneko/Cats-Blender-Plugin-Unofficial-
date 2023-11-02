@@ -3,8 +3,8 @@
 import time
 
 import bpy
-from mmd_tools.core import model
-from mmd_tools.core.sdef import FnSDEF
+from mmd_tools_local.core import model
+from mmd_tools_local.core.sdef import FnSDEF
 
 
 class MMDToolsSceneSetupPanel(bpy.types.Panel):
@@ -242,4 +242,3 @@ class MMDToolsModelSetupPanel(bpy.types.Panel):
         grid = col.grid_flow(row_major=True)
         grid.row(align=True).operator('mmd_tools.global_translation_popup', text='(Experimental) Global Translation')
         grid.row(align=True).operator('mmd_tools.change_mmd_ik_loop_factor', text='Change MMD IK Loop Factor')
-        grid.row(align=True).operator('mmd_tools.clean_duplicated_material_morphs')

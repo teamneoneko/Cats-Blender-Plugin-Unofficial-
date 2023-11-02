@@ -3,7 +3,7 @@
 import bpy
 from bpy.types import Panel
 
-from mmd_tools.core.material import FnMaterial
+from mmd_tools_local.core.material import FnMaterial
 
 
 ICON_FILE_FOLDER = 'FILE_FOLDER'

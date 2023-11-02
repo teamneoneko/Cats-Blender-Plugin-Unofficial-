@@ -2,7 +2,6 @@
 import os
 import copy
 import logging
-import math
 import shutil
 import time
 
@@ -11,17 +10,17 @@ import bpy
 import bmesh
 
 from collections import OrderedDict
-from mmd_tools.core import pmx
-from mmd_tools.core.bone import FnBone
-from mmd_tools.core.material import FnMaterial
-from mmd_tools.core.morph import FnMorph
-from mmd_tools.core.translations import FnTranslations
-from mmd_tools.core.sdef import FnSDEF
-from mmd_tools.core.vmd.importer import BoneConverter, BoneConverterPoseMode
-from mmd_tools import bpyutils
-from mmd_tools.utils import saferelpath
-from mmd_tools.bpyutils import matmul
-from mmd_tools.operators.misc import MoveObject
+from mmd_tools_local.core import pmx
+from mmd_tools_local.core.bone import FnBone
+from mmd_tools_local.core.material import FnMaterial
+from mmd_tools_local.core.morph import FnMorph
+from mmd_tools_local.core.translations import FnTranslations
+from mmd_tools_local.core.sdef import FnSDEF
+from mmd_tools_local.core.vmd.importer import BoneConverter, BoneConverterPoseMode
+from mmd_tools_local import bpyutils
+from mmd_tools_local.utils import saferelpath
+from mmd_tools_local.bpyutils import matmul
+from mmd_tools_local.operators.misc import MoveObject
 
 
 class _Vertex:
@@ -317,7 +316,7 @@ class __PmxExporter:
         else:
             return cls.__countBoneDepth(bone.parent) + 1
 
-    def __exportBones(self, root, meshes):
+    def __exportBones(self, meshes):
         """ Export bones.
         Returns:
             A dictionary to map Blender bone names to bone indices of the pmx.model instance.
@@ -382,31 +381,14 @@ class __PmxExporter:
                 boneMap[bone] = pmx_bone
                 r[bone.name] = len(pmx_bones) - 1
 
-                if (
-                    pmx_bone.parent is not None
-                    and (
-                        bone.use_connect
-                        or (
-                            not pmx_bone.isMovable
-                            and math.isclose(0.0, (bone.head - pmx_bone.parent.tail).length)
-                        )
-                    )
-                    and p_bone.parent.mmd_bone.is_tip
-                ):
-                    logging.debug(' * fix location of bone %s, parent %s is tip', bone.name, pmx_bone.parent.name)
-                    pmx_bone.location = boneMap[pmx_bone.parent].location
+                if bone.use_connect and p_bone.parent.mmd_bone.is_tip:
+                    logging.debug(' * fix location of bone %s, parent %s is tip', bone.name, bone.parent.name)
+                    pmx_bone.location = boneMap[bone.parent].location
 
                 # a connected child bone is preferred
                 pmx_bone.displayConnection = None
                 for child in bone.children:
-                    if (
-                        child.use_connect
-                        or bool(child.get('mmd_bone_use_connect'))
-                        or (
-                            all(pose_bones[child.name].lock_location)
-                            and math.isclose(0.0, (child.head - bone.tail).length)
-                        )
-                    ):
+                    if child.use_connect:
                         pmx_bone.displayConnection = child
                         break
                 if not pmx_bone.displayConnection:
@@ -445,7 +427,7 @@ class __PmxExporter:
                 pmx_bones.append(pmx_bone)
 
             self.__model.bones = pmx_bones
-        self.__exportIK(root, r)
+        self.__exportIK(r)
         return r
 
     def __exportIKLinks(self, pose_bone, count, bone_map, ik_links, custom_bone):
@@ -491,13 +473,13 @@ class __PmxExporter:
         return self.__exportIKLinks(pose_bone.parent, count - 1, bone_map, ik_links + [ik_link], custom_bone)
 
 
-    def __exportIK(self, root, bone_map):
+    def __exportIK(self, bone_map):
         """ Export IK constraints
          @param bone_map the dictionary to map Blender bone names to bone indices of the pmx.model instance.
         """
         pmx_bones = self.__model.bones
         arm = self.__armature
-        ik_loop_factor = root.mmd_root.ik_loop_factor
+        ik_loop_factor = max(arm.get('mmd_ik_loop_factor', 1), 1)
         pose_bones = arm.pose.bones
 
         ik_target_custom_map = {getattr(b.constraints.get('mmd_ik_target_custom', None), 'subtarget', None):b for b in pose_bones if not b.is_mmd_shadow_bone}
@@ -1286,7 +1268,7 @@ class __PmxExporter:
         if self.__translate_in_presets:
             self.__translate_armature(root)
 
-        nameMap = self.__exportBones(root, meshes)
+        nameMap = self.__exportBones(meshes)
 
         mesh_data = [self.__loadMeshData(i, nameMap) for i in meshes]
         self.__exportMeshes(mesh_data, nameMap)

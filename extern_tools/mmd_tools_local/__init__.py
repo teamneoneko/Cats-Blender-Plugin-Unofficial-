@@ -3,8 +3,8 @@
 bl_info = {
     "name": "mmd_tools",
     "author": "sugiany",
-    "version": (2, 9, 2),
-    "blender": (2, 93, 0),
+    "version": (2, 3, 0),
+    "blender": (2, 83, 0),
     "location": "View3D > Sidebar > MMD Tools Panel",
     "description": "Utility tools for MMD model editing. (UuuNyaa's forked version)",
     "warning": "",
@@ -14,15 +14,17 @@ bl_info = {
     "category": "Object",
 }
 
-MMD_TOOLS_VERSION = '.'.join(map(str,bl_info['version']))
-
 import bpy
+import logging
 
-from mmd_tools import auto_load
+logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+
+from mmd_tools_local import auto_load
 auto_load.init()
 
-from mmd_tools import operators
-from mmd_tools import properties
+from mmd_tools_local import operators
+from mmd_tools_local import properties
+
 
 def menu_func_import(self, _context):
     self.layout.operator(operators.fileio.ImportPmx.bl_idname, text='MikuMikuDance Model (.pmd, .pmx)', icon='OUTLINER_OB_ARMATURE')
@@ -64,33 +66,17 @@ def panel_view3d_shading(self, context):
 
 @bpy.app.handlers.persistent
 def load_handler(_dummy):
-    from mmd_tools.core.sdef import FnSDEF
+    from mmd_tools_local.core.sdef import FnSDEF
     FnSDEF.clear_cache()
     FnSDEF.register_driver_function()
 
-    from mmd_tools.core.material import MigrationFnMaterial
+    from mmd_tools_local.core.material import MigrationFnMaterial
     MigrationFnMaterial.update_mmd_shader()
-
-    from mmd_tools.core.morph import MigrationFnMorph
-    MigrationFnMorph.update_mmd_morph()
-
-    from mmd_tools.core.camera import MigrationFnCamera
-    MigrationFnCamera.update_mmd_camera()
-
-    from mmd_tools.core.model import MigrationFnModel
-    MigrationFnModel.update_mmd_ik_loop_factor()
-    MigrationFnModel.update_mmd_tools_version()
-
-@bpy.app.handlers.persistent
-def save_pre_handler(_dummy):
-    from mmd_tools.core.morph import MigrationFnMorph
-    MigrationFnMorph.compatible_with_old_version_mmd_tools()
 
 def register():
     auto_load.register()
     properties.register()
     bpy.app.handlers.load_post.append(load_handler)
-    bpy.app.handlers.save_pre.append(save_pre_handler)
     bpy.types.VIEW3D_MT_object.append(menu_view3d_object)
     bpy.types.VIEW3D_MT_select_object.append(menu_view3d_select_object)
     bpy.types.VIEW3D_MT_pose.append(menu_view3d_pose_context_menu)
@@ -100,7 +86,7 @@ def register():
     bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
     bpy.types.VIEW3D_MT_armature_add.append(menu_func_armature)
 
-    from mmd_tools.m17n import translation_dict
+    from mmd_tools_local.m17n import translation_dict
     bpy.app.translations.register(bl_info['name'], translation_dict)
 
     operators.addon_updater.register_updater(bl_info, __file__)
@@ -119,7 +105,6 @@ def unregister():
     bpy.types.VIEW3D_MT_select_object.remove(menu_view3d_select_object)
     bpy.types.VIEW3D_MT_object.remove(menu_view3d_object)
     bpy.app.handlers.load_post.remove(load_handler)
-    bpy.app.handlers.save_pre.remove(save_pre_handler)
     properties.unregister()
     auto_load.unregister()
 

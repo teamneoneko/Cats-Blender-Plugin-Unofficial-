@@ -3,9 +3,9 @@
 from typing import Dict, List, Tuple
 
 import bpy
-from mmd_tools.core.translations import (FnTranslations,
+from mmd_tools_local.core.translations import (FnTranslations,
                                          MMDTranslationElementType)
-from mmd_tools.translations import DictionaryEnum
+from mmd_tools_local.translations import DictionaryEnum
 
 MMD_TRANSLATION_ELEMENT_TYPE_ENUM_ITEMS = [
     (MMDTranslationElementType.BONE.name, MMDTranslationElementType.BONE.value, 'Bones', 1),

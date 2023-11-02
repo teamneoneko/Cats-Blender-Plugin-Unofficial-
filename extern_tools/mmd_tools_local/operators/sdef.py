@@ -4,8 +4,8 @@ from typing import Set
 import bpy
 from bpy.types import Operator
 
-from mmd_tools.core.model import FnModel
-from mmd_tools.core.sdef import FnSDEF
+from mmd_tools_local.core.model import FnModel
+from mmd_tools_local.core.sdef import FnSDEF
 
 def _get_target_objects(context):
     root_objects: Set[bpy.types.Object] = set()

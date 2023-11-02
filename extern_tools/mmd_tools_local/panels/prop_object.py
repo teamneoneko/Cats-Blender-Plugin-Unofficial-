@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import bpy
-import mmd_tools.core.model as mmd_model
+import mmd_tools_local.core.model as mmd_model
 
 
 class _PanelBase(object):

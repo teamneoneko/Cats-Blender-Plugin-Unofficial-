@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import bpy
-from mmd_tools.core.bone import FnBone
+from mmd_tools_local.core.bone import FnBone
 
 
 def _updateMMDBoneAdditionalTransform(prop, context):

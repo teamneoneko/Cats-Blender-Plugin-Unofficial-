@@ -5,12 +5,12 @@ import re
 import bpy
 from bpy.types import Operator
 
-from mmd_tools import utils
-from mmd_tools.bpyutils import ObjectOp
-from mmd_tools.core import model as mmd_model
-from mmd_tools.core.morph import FnMorph
-from mmd_tools.core.material import FnMaterial
-from mmd_tools.core.bone import FnBone
+from mmd_tools_local import utils
+from mmd_tools_local.bpyutils import ObjectOp
+from mmd_tools_local.core import model as mmd_model
+from mmd_tools_local.core.morph import FnMorph
+from mmd_tools_local.core.material import FnMaterial
+from mmd_tools_local.core.bone import FnBone
 
 
 class SelectObject(Operator):
@@ -204,7 +204,7 @@ class JoinMeshes(Operator):
             return { 'CANCELLED' }
         active_mesh = meshes_list[0]
 
-        from mmd_tools import bpyutils
+        from mmd_tools_local import bpyutils
         bpyutils.select_object(active_mesh, objects=meshes_list)
 
         # Store the current order of the materials
@@ -260,21 +260,54 @@ class ChangeMMDIKLoopFactor(Operator):
         min=1,
         soft_max=10,
         max=100,
-    )
+        options={'SKIP_SAVE'},
+        )
 
     @classmethod
     def poll(cls, context):
-        return mmd_model.FnModel.find_root(context.active_object) is not None
+        obj = context.active_object
+        return obj and obj.type == 'ARMATURE'
 
     def invoke(self, context, event):
-        root_object = mmd_model.FnModel.find_root(context.active_object)
-        self.mmd_ik_loop_factor = root_object.mmd_root.ik_loop_factor
+        arm = context.active_object
+        self.mmd_ik_loop_factor = max(arm.get('mmd_ik_loop_factor', 1), 1)
         vm = context.window_manager
         return vm.invoke_props_dialog(self)
 
     def execute(self, context):
-        root_object = mmd_model.FnModel.find_root(context.active_object)
-        mmd_model.FnModel.change_mmd_ik_loop_factor(root_object, self.mmd_ik_loop_factor)
+        arm = context.active_object
+
+        old_factor = max(arm.get('mmd_ik_loop_factor', 1), 1)
+        new_factor = arm['mmd_ik_loop_factor'] = self.mmd_ik_loop_factor
+
+        # Reference: https://developer.blender.org/rB8b9a3b94fc148d
+        if hasattr(arm, 'id_properties_ui'):
+            ui_data = arm.id_properties_ui('mmd_ik_loop_factor')
+            ui_data.update(
+                min=1,
+                soft_min=1,
+                soft_max=10,
+                max=100,
+                description='Scaling factor of MMD IK loop',
+                )
+        else:
+            from rna_prop_ui import rna_idprop_ui_prop_get
+            prop = rna_idprop_ui_prop_get(arm, 'mmd_ik_loop_factor', create=True)
+            prop['min'] = 1
+            prop['soft_min'] = 1
+            prop['soft_max'] = 10
+            prop['max'] = 100
+            prop['description'] = 'Scaling factor of MMD IK loop'
+
+        if new_factor == old_factor:
+            return { 'FINISHED' }
+        for b in arm.pose.bones:
+            for c in b.constraints:
+                if c.type != 'IK':
+                    continue
+                iterations = int(c.iterations * new_factor / old_factor)
+                self.report({ 'INFO' }, 'Update %s of %s: %d -> %d'%(c.name, b.name, c.iterations, iterations))
+                c.iterations = iterations
         return { 'FINISHED' }
 
 class RecalculateBoneRoll(Operator):

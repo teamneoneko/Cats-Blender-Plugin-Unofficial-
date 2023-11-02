@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import itertools
 from operator import itemgetter
 from typing import Dict, List, Optional, Set
 
 import bmesh
 import bpy
-from mmd_tools.bpyutils import activate_layer_collection, find_user_layer_collection
-from mmd_tools.core.model import FnModel, Model
+from mmd_tools_local.core.model import FnModel, Model
 
 
 class MessageException(Exception):
@@ -68,8 +66,7 @@ class ModelJoinByBonesOperator(bpy.types.Operator):
         if parent_root_object is None or len(child_root_objects) == 0:
             raise MessageException("No MMD Models selected")
 
-        with activate_layer_collection(parent_root_object):
-            FnModel.join_models(parent_root_object, child_root_objects)
+        FnModel.join_models(parent_root_object, child_root_objects)
 
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.armature.parent_set(type='OFFSET')
@@ -244,14 +241,6 @@ class ModelSeparateByBonesOperator(bpy.types.Operator):
             'object': separate_model.jointGroupObject(),
             'selected_editable_objects': [separate_model.jointGroupObject(), *separate_joints],
         }, type='OBJECT', keep_transform=True)
-
-        # move separate objects to new collection
-        mmd_layer_collection = find_user_layer_collection(mmd_root_object)
-        separate_layer_collection = find_user_layer_collection(separate_root_object)
-        if mmd_layer_collection.name != separate_layer_collection.name:
-            for separate_object in itertools.chain(separate_mesh_objects, separate_rigid_bodies, separate_joints):
-                separate_layer_collection.collection.objects.link(separate_object)
-                mmd_layer_collection.collection.objects.unlink(separate_object)
 
         FnModel.copy_mmd_root(
             separate_root_object,

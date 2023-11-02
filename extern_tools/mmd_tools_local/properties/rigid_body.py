@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import bpy
-from mmd_tools import bpyutils
-from mmd_tools.core import rigid_body
-from mmd_tools.core.model import FnModel, getRigidBodySize
+from mmd_tools_local import bpyutils
+from mmd_tools_local.core import rigid_body
+from mmd_tools_local.core.model import FnModel, getRigidBodySize
 
 
 def _updateCollisionGroup(prop, context):

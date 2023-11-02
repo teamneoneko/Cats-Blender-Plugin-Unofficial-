@@ -5,9 +5,9 @@ import os
 from typing import Optional
 
 import bpy
-from mmd_tools.bpyutils import addon_preferences
-from mmd_tools.core.exceptions import MaterialNotFoundError
-from mmd_tools.core.shader import _NodeGroupUtils
+from mmd_tools_local.bpyutils import addon_preferences
+from mmd_tools_local.core.exceptions import MaterialNotFoundError
+from mmd_tools_local.core.shader import _NodeGroupUtils
 
 SPHERE_MODE_OFF    = 0
 SPHERE_MODE_MULT   = 1

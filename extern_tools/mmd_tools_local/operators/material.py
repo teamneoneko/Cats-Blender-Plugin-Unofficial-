@@ -4,10 +4,10 @@ import bpy
 from bpy.types import Operator
 from bpy.props import StringProperty, BoolProperty
 
-from mmd_tools import cycles_converter
-from mmd_tools.core.material import FnMaterial
-from mmd_tools.core.exceptions import MaterialNotFoundError
-from mmd_tools.core.shader import _NodeGroupUtils
+from mmd_tools_local import cycles_converter
+from mmd_tools_local.core.material import FnMaterial
+from mmd_tools_local.core.exceptions import MaterialNotFoundError
+from mmd_tools_local.core.shader import _NodeGroupUtils
 
 class ConvertMaterialsForCycles(Operator):
     bl_idname = 'mmd_tools.convert_materials_for_cycles'
@@ -229,7 +229,7 @@ class EdgePreviewSetup(Operator):
         )
 
     def execute(self, context):
-        from mmd_tools.core.model import Model
+        from mmd_tools_local.core.model import Model
         root = Model.findRoot(context.active_object)
         if root is None:
             self.report({'ERROR'}, 'Select a MMD model')
@@ -240,7 +240,7 @@ class EdgePreviewSetup(Operator):
             for obj in rig.meshes():
                 self.__clean_toon_edge(obj)
         else:
-            from mmd_tools.bpyutils import Props
+            from mmd_tools_local.bpyutils import Props
             scale = 0.2*getattr(rig.rootObject(), Props.empty_display_size)
             counts = sum(self.__create_toon_edge(obj, scale) for obj in rig.meshes())
             self.report({'INFO'}, 'Created %d toon edge(s)'%counts)
