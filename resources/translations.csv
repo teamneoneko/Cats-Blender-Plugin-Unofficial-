@@ -147,6 +147,14 @@ EyeTrackingPanel.warn.assignEyes2,      to the eyes in Unity!,      ユニティ
 VisemePanel.label,Visemes,バイセム,립싱크(Visemes)
 VisemePanel.error.noMesh,No meshes found!,メッシュが見つかりません!,메쉬가 발견되지 않음!
 BoneRootPanel.label,Bone Parenting,ボーンの子育て,본 부모설정
+Av3EyeTrackingPanel.info1,Eye tracking is set up in Unity,Unityでアイトラッキングを設定する,시선 추적은 Unity에서 설정됩니다.
+Av3EyeTrackingPanel.info2,Rotate eyes up to simplify setup,目を上に回転させてセットアップを簡素化,눈을 위로 회전시켜 설정을 단순화하세요
+Av3EyeTrackingRotateEyeBones.label,Rotate eye bones,目のボーンを回転させる,눈 뼈를 회전
+Av3EyeTrackingRotateEyeBones.desc,Rotate eye bones to point straight up with zero roll. This simplifies setting up VRChat Avatars 3.0 eye tracking in Unity,目のボーンを回転させて、ロールをゼロにして真っ直ぐ上を向くようにします。これにより、Unity での VRChat Avatars 3.0 アイトラッキングのセットアップが簡素化されます.,롤이 0인 상태에서 눈 뼈가 똑바로 위를 향하도록 회전합니다. 이는 Unity에서 VRChat Avatars 3.0 시선 추적 설정을 단순화합니다.
+Av3EyeTrackingRotateEyeBones.poll.noBones,No bones,骨がない,뼈가 없다
+Av3EyeTrackingRotateEyeBones.poll.notInCurrentEditMode,"{armature} is not in the current Edit mode, either exit the current Edit mode or open {armature} in Edit mode","{armature} は現在の編集モードではありません。現在の編集モードを終了するか、編集モードで {armature} を開いてください.","{armature}가 현재 편집 모드에 있지 않습니다. 현재 편집 모드를 종료하거나 편집 모드에서 {armature}를 엽니다."
+Av3EyeTrackingRotateEyeBones.info.noChanges,"Eye bones are already rotated for VRChat, no changes were made.","目のボーンは VRChat 用にすでに回転されており、変更は加えられません.","VRChat에서는 눈 뼈가 이미 회전되어 있어 변경 사항이 없습니다."
+Av3EyeTrackingRotateEyeBones.success,Eye bones rotated.,目の骨が回転しました.,눈뼈가 회전했습니다.
 OptimizePanel.label,Optimization,最適化,최적화
 OptimizePanel.atlasDesc,A greatly improved Atlas Generator.,アトラスジェネレータを大幅に改良。,텍스처들을 결합시켜주는 더욱 향상된 아틀라스 생성기입니다.
 OptimizePanel.atlasAuthor,Made by Shotariya,shotaryiaによって作られた,제작자: Shotariya
