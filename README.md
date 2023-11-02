@@ -1,4 +1,4 @@
-# Cats Blender Plugin (0.19.4) Development Branch.
+# Cats Blender Plugin (0.20.0) Development Branch.
 
 ## This is the development branch, it's possible there is issues with this version, please use the main branch if you want a stable version.
 
@@ -263,7 +263,11 @@ There are a lot of perks like having your name inside the plugin!
    **Apply Shape Key as Basis**
    - Applies the selected shape key as the new Basis and creates a reverted shape key from the selected one.
    </details>
-*More to come!*
+
+#### Avatars 3.0 Eye Tracking Panel
+Rotate eye bones so they point straight up and have zero roll, simplifying the eye-tracking setup in Unity for VRChat.
+This feature was a pull request by Mysteryem on the original Cats project so i ported it over.
+Original request https://github.com/absolute-quantum/cats-blender-plugin/pull/599
 
 ## Requirements
  - Blender **2.79** or **2.80** or above (run as administrator is recommended)
