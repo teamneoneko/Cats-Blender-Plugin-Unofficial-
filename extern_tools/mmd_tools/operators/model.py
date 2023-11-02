@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import bpy
-import mmd_tools_local.core.model as mmd_model
+import mmd_tools.core.model as mmd_model
 from bpy.types import Operator
-from mmd_tools_local.bpyutils import SceneOp, activate_layer_collection
-from mmd_tools_local.core.bone import FnBone
+from mmd_tools.bpyutils import SceneOp, activate_layer_collection
+from mmd_tools.core.bone import FnBone
 
 
 class MorphSliderSetup(Operator):
@@ -172,6 +172,34 @@ class SetupBoneLocalAxes(Operator):
             FnBone.load_bone_local_axes(arm, enable=(self.type=='LOAD'))
         return {'FINISHED'}
 
+class AddMissingVertexGroupsFromBones(Operator):
+    bl_idname = 'mmd_tools.add_missing_vertex_groups_from_bones'
+    bl_label = 'Add Missing Vertex Groups from Bones'
+    bl_description = 'Add the missing vertex groups to the selected mesh'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    search_in_all_meshes: bpy.props.BoolProperty(
+        name='Search in all meshes',
+        description='Search for vertex groups in all meshes',
+        default=False,
+    )
+
+    @classmethod
+    def poll(cls, context: bpy.types.Context):
+        return mmd_model.FnModel.find_root(context.active_object) is not None
+
+    def execute(self, context: bpy.types.Context):
+        active_object: bpy.types.Object = context.active_object
+        root_object = mmd_model.FnModel.find_root(active_object)
+
+        bone_order_mesh_object = mmd_model.FnModel.find_bone_order_mesh_object(root_object)
+        if bone_order_mesh_object is None:
+            return {'CANCELLED'}
+
+        mmd_model.FnModel.add_missing_vertex_groups_from_bones(root_object, bone_order_mesh_object, self.search_in_all_meshes)
+
+        return {'FINISHED'}
+
 class CreateMMDModelRoot(Operator):
     bl_idname = 'mmd_tools.create_mmd_model_root_object'
     bl_label = 'Create a MMD Model Root Object'
@@ -316,7 +344,7 @@ class ConvertToMMDModel(Operator):
                     continue
                 pose_bone.lock_location = (True, True, True)
 
-        from mmd_tools_local.core.material import FnMaterial
+        from mmd_tools.core.material import FnMaterial
         FnMaterial.set_nodes_are_readonly(not self.convert_material_nodes)
         try:
             for m in {x for mesh in meshes for x in mesh.data.materials if x}:
@@ -333,7 +361,7 @@ class ConvertToMMDModel(Operator):
                     mmd_material.edge_color = line_color[:3] + [max(line_color[3], self.edge_alpha_min)]
         finally:
             FnMaterial.set_nodes_are_readonly(False)
-        from mmd_tools_local.operators.display_item import DisplayItemQuickSetup
+        from mmd_tools.operators.display_item import DisplayItemQuickSetup
         DisplayItemQuickSetup.load_bone_groups(root.mmd_root, armature)
         rig.initialDisplayFrames(reset=False) # ensure default frames
         DisplayItemQuickSetup.load_facial_items(root.mmd_root)
@@ -391,7 +419,7 @@ class AssembleAll(Operator):
             rig = mmd_model.Model(root_object)
 
             rig.applyAdditionalTransformConstraints()
-            rig.build(1.5, 1e-06)
+            rig.build()
             rig.morph_slider.bind()
 
             bpy.ops.mmd_tools.sdef_bind({'selected_objects': [active_object]})

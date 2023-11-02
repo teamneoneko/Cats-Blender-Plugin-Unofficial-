@@ -2,7 +2,7 @@
 
 from bpy.types import Panel
 
-from mmd_tools_local.core.lamp import MMDLamp
+from mmd_tools.core.lamp import MMDLamp
 
 class MMDLampPanel(Panel):
     bl_idname = 'OBJECT_PT_mmd_tools_light'

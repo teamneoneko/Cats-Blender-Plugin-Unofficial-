@@ -147,6 +147,14 @@ EyeTrackingPanel.warn.assignEyes2,      to the eyes in Unity!,      ユニティ
 VisemePanel.label,Visemes,バイセム,립싱크(Visemes)
 VisemePanel.error.noMesh,No meshes found!,メッシュが見つかりません!,메쉬가 발견되지 않음!
 BoneRootPanel.label,Bone Parenting,ボーンの子育て,본 부모설정
+Av3EyeTrackingPanel.info1,Eye tracking is set up in Unity,Unityでアイトラッキングを設定する,시선 추적은 Unity에서 설정됩니다.
+Av3EyeTrackingPanel.info2,Rotate eyes up to simplify setup,目を上に回転させてセットアップを簡素化,눈을 위로 회전시켜 설정을 단순화하세요
+Av3EyeTrackingRotateEyeBones.label,Rotate eye bones,目のボーンを回転させる,눈 뼈를 회전
+Av3EyeTrackingRotateEyeBones.desc,Rotate eye bones to point straight up with zero roll. This simplifies setting up VRChat Avatars 3.0 eye tracking in Unity,目のボーンを回転させて、ロールをゼロにして真っ直ぐ上を向くようにします。これにより、Unity での VRChat Avatars 3.0 アイトラッキングのセットアップが簡素化されます.,롤이 0인 상태에서 눈 뼈가 똑바로 위를 향하도록 회전합니다. 이는 Unity에서 VRChat Avatars 3.0 시선 추적 설정을 단순화합니다.
+Av3EyeTrackingRotateEyeBones.poll.noBones,No bones,骨がない,뼈가 없다
+Av3EyeTrackingRotateEyeBones.poll.notInCurrentEditMode,"{armature} is not in the current Edit mode, either exit the current Edit mode or open {armature} in Edit mode","{armature} は現在の編集モードではありません。現在の編集モードを終了するか、編集モードで {armature} を開いてください.","{armature}가 현재 편집 모드에 있지 않습니다. 현재 편집 모드를 종료하거나 편집 모드에서 {armature}를 엽니다."
+Av3EyeTrackingRotateEyeBones.info.noChanges,"Eye bones are already rotated for VRChat, no changes were made.","目のボーンは VRChat 用にすでに回転されており、変更は加えられません.","VRChat에서는 눈 뼈가 이미 회전되어 있어 변경 사항이 없습니다."
+Av3EyeTrackingRotateEyeBones.success,Eye bones rotated.,目の骨が回転しました.,눈뼈가 회전했습니다.
 OptimizePanel.label,Optimization,最適化,최적화
 OptimizePanel.atlasDesc,A greatly improved Atlas Generator.,アトラスジェネレータを大幅に改良。,텍스처들을 결합시켜주는 더욱 향상된 아틀라스 생성기입니다.
 OptimizePanel.atlasAuthor,Made by Shotariya,shotaryiaによって作られた,제작자: Shotariya
@@ -175,11 +183,6 @@ UpdaterPanel.label,Settings & Updates,設定と更新,세팅 & 업데이트
 UpdaterPanel.name,Settings:,設定:,세팅:
 UpdaterPanel.requireRestart1,Restart required.,再起動が必要.,재시작이 필요합니다.
 UpdaterPanel.requireRestart2,Some changes require a Blender restart.,一部の変更では、ブレンダーの再起動が必要です.,일부 변경은 블렌더를 다시 시작해야합니다.
-SupporterPanel.label,Supporters,支持者,후원자들
-SupporterPanel.desc,Do you like this plugin and want to support us?,このプラグインが好きで、私たちをサポートしたいですか?,이 플로그인이 도움 되었나요? 저희를 후원해주신다면 정말 기쁠 것입니다!
-SupporterPanel.thanks,Thanks to our awesome supporters! <3,私たちの素晴らしいサポーターに感謝!<3,저희 멋진 후원자분들께 정말로 감사드립니다! <3
-SupporterPanel.missingName1,Is your name missing?,あなたの名前は見つかりませんか?,당신의 이름이 빠졌나요?
-SupporterPanel.missingName2,Please contact us in our discord!,私たちのDiscordで私達にお問い合わせください!,부디 우리 디스코드 서버에 연락주시기 바랍니다!
 CreditsPanel.label,Credits,クレジット,
 CreditsPanel.desc1,Cats Blender Plugin (,,
 CreditsPanel.desc2,Created by Hotox and GiveMeAllYourCats,HotoxとGiveMeAllYourCatsによって作成,멋진 VRChat 커뮤니티를 위해서
@@ -187,7 +190,8 @@ CreditsPanel.desc3,For the awesome VRChat community <3,素晴らしいVRChatコ�
 CreditsPanel.desc4,Special thanks to:,特別な感謝: ShotariyaとNeitri,다음 분들께 특별한 감사를 전합니다:
 CreditsPanel.descContributors,"Feilen, Jordo, Ruubick, 989onan, triazo,","Feilen、Jordo、Ruubick、989onan、triazo、","Feilen, Jordo, Ruubick, 989onan, triazo,"
 CreditsPanel.descContributors2,"Shotariya and Neitri","ShotariyaとNeitri","Shotariya와 Neitri"
-CreditsPanel.desc5,Do you need help or found a bug?,助けが必要ですか、バグを見つけましたか?,도움이 필요하시거나 혹시 버그를 찾으셨나요?
+CreditsPanel.desc5,Unoffical Maintainer - Yusarina,非公式メンテナ - Yusarina,비공식 유지관리자 - Yusarina
+CreditsPanel.desc6,Do you need help or found a bug?,助けが必要ですか、バグを見つけましたか?,도움이 필요하시거나 혹시 버그를 찾으셨나요?
 FixArmature.label,Fix Model,モデル修正,모델 고치기
 FixArmature.desc,"Automatically:
 - Reparents bones
@@ -466,9 +470,9 @@ ProtectionTutorialButton.success,Documentation,,
 ForumButton.label,Go to the Forums,フォーラムに移動する,포럼으로 가기
 ForumButton.URL,https://vrcat.club/threads/cats-blender-plugin.6/,,
 ForumButton.success,Forum opened.,,
-DiscordButton.label,Join our Discord,Discordサーバーに参加する,디스코드에 가입하기
-DiscordButton.URL,https://discord.gg/f8yZGnv,,
-DiscordButton.success,Discord opened.,,
+HelpButton.label,Need Help?,ウィキを参照してください,우리 위키를 참조하세요
+HelpButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki,,
+HelpButton.success,Github opened.,,
 PatchnotesButton.label,Latest Patchnotes,最新のパッチノート,최신 패치노트
 PatchnotesButton.URL,https://github.com/michaeldegroot/cats-blender-plugin/releases,,
 PatchnotesButton.success,Patchnotes opened.,,

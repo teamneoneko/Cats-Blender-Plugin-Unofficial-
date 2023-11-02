@@ -5,7 +5,7 @@ import bpy
 from bpy.types import Operator
 from mathutils import Matrix
 
-from mmd_tools_local.bpyutils import matmul
+from mmd_tools.bpyutils import matmul
 
 
 class _SetShadingBase:
