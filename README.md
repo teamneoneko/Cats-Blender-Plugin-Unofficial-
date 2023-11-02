@@ -1,4 +1,4 @@
-# Cats Blender Plugin (0.19.4) Development Branch.
+# Cats Blender Plugin (0.20.0) Development Branch.
 
 ## This is the development branch, it's possible there is issues with this version, please use the main branch if you want a stable version.
 
