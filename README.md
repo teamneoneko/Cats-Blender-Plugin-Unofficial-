@@ -1,4 +1,6 @@
-# Cats Blender Plugin (0.19.2)
+# Cats Blender Plugin (0.19.4) Development Branch.
+
+## This is the development branch, it's possible there is issues with this version, please use the main branch if you want a stable version.
 
 This Plugin was originally by absolute-quantum [click here](https://github.com/michaeldegroot/cats-blender-plugin/) to view the original github for the project.
 
