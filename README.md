@@ -411,12 +411,5 @@ Read the full changelog [here](https://github.com/michaeldegroot/cats-blender-pl
 
 
 ## Feedback
-Do you love this plugin or have you found a bug?
-Post a response in the bug reports, or send your feedback to the official discord server of the plugin for real-time communication: https://discord.gg/f8yZGnv
-look for people with the developer role in the discord! ;)
+Please open an issue if you need to leave feedback.
 
-
-## Support us
-If you enjoy how this plugin saves you countless hours of work consider supporting us through Patreon:
-
-[![](https://i.imgur.com/BFIald5.png)](https://www.patreon.com/catsblenderplugin)
