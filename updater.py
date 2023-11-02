@@ -233,7 +233,7 @@ class ConfirmUpdatePanel(bpy.types.Operator):
         if confirm_update_to == 'latest':
             version_str = latest_version_str
         elif confirm_update_to == 'dev':
-            version_str = 'Development'
+            version_str = 'Dev'
 
         col.separator()
         row = col.row(align=True)
