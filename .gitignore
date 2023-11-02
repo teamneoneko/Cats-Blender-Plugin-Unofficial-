@@ -1,0 +1,22 @@
+__pycache__
+cats blender plugin_updater
+cats_updater
+.idea
+*.pyc
+.cache
+tmp
+*.blend
+*.blend1
+CATS Bake
+tests/armatures/*.png
+resources/downloads
+resources/settings.json
+resources/dictionary_google.json
+resources/google-response.txt
+resources/google-response-readable.txt
+resources/ignore_version.txt
+resources/no_auto_ver_check.txt
+resources/icons/supporters/**
+resources/supporters.json
+.coverage
+mmd_tools_local2
