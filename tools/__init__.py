@@ -22,10 +22,10 @@ if "bpy" not in locals():
     from . import settings
     from . import scale
     from . import shapekey
-    from . import supporter
     from . import translate
     from . import translations
     from . import viseme
+    from . import supporter
 else:
     # print('RELOAD TOOLS!!')
     import importlib
@@ -48,7 +48,7 @@ else:
     importlib.reload(settings)
     importlib.reload(scale)
     importlib.reload(shapekey)
-    importlib.reload(supporter)
     importlib.reload(translate)
     importlib.reload(translations)
     importlib.reload(viseme)
+    importlib.reload(supporter)

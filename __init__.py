@@ -6,10 +6,10 @@ bl_info = {
     'author': 'GiveMeAllYourCats & Hotox',
     'location': 'View 3D > Tool Shelf > CATS',
     'description': 'A tool designed to shorten steps needed to import and optimize models into VRChat',
-    'version': (0, 19, 0),  # Has to be (x, x, x) not [x, x, x]!! Only change this version and the dev branch var right before publishing the new update!
+    'version': (0, 19, 3),  # Has to be (x, x, x) not [x, x, x]!! Only change this version and the dev branch var right before publishing the new update!
     'blender': (2, 80, 0),
     'wiki_url': 'https://github.com/michaeldegroot/cats-blender-plugin',
-    'tracker_url': 'https://github.com/michaeldegroot/cats-blender-plugin/issues',
+    'tracker_url': 'https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/issues',
     'warning': '',
 }
 dev_branch = True
@@ -289,7 +289,7 @@ def register():
 
     # Register Scene types
     extentions.register()
-
+    
     # Load supporter and settings icons and buttons
     tools.supporter.load_other_icons()
     tools.supporter.load_supporters()

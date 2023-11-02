@@ -317,7 +317,6 @@ def load_other_icons():
     # load a preview thumbnail of a file and store in the previews collection
     pcoll.load('heart1', os.path.join(icons_other_dir, 'heart1.png'), 'IMAGE')
     pcoll.load('discord1', os.path.join(icons_other_dir, 'discord1.png'), 'IMAGE')
-    pcoll.load('help1', os.path.join(icons_other_dir, 'help1.png'), 'IMAGE')
     pcoll.load('cats1', os.path.join(icons_other_dir, 'cats1.png'), 'IMAGE')
     pcoll.load('empty', os.path.join(icons_other_dir, 'empty.png'), 'IMAGE')
     pcoll.load('UP_ARROW', os.path.join(icons_other_dir, 'blender_up_arrow.png'), 'IMAGE')
