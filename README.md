@@ -17,7 +17,7 @@ All the hours long processes of fixing your models are compressed into a few fun
 So if you enjoy how this plugin saves you countless hours of work consider supporting us through Patreon.
 There are a lot of perks like having your name inside the plugin!
 
-#### Download here: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/master.zip)
+#### Download here: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/dev.zip)
 
 ## Features (Click to Expand)
  - <details><summary>Creating lip syncing</summary>
