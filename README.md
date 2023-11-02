@@ -1,4 +1,10 @@
-# Cats Blender Plugin (0.19.1)
+# Cats Blender Plugin (0.19.2)
+
+This Plugin was originally by absolute-quantum [click here](https://github.com/michaeldegroot/cats-blender-plugin/) to view the original github for the project.
+
+I decided to maintain this plugin myself because the original one was abandoned a long time ago and it does not seem to be being picked up. The community was maintaining it but updates are slow. Though i will not be introducing any new features I am going to try and keep the plugin updated to the best of my abilty. 
+
+# What is cat's?
 
 A tool designed to shorten steps needed to import and optimize models into VRChat.
 Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
@@ -9,9 +15,7 @@ All the hours long processes of fixing your models are compressed into a few fun
 So if you enjoy how this plugin saves you countless hours of work consider supporting us through Patreon.
 There are a lot of perks like having your name inside the plugin!
 
-[![](https://i.imgur.com/BFIald5.png)](https://www.patreon.com/catsblenderplugin)
-
-#### Download here: [Cats Blender Plugin](https://github.com/michaeldegroot/cats-blender-plugin/archive/master.zip)
+#### Download here: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/master.zip)
 
 ## Features (Click to Expand)
  - <details><summary>Creating lip syncing</summary>
@@ -148,11 +152,6 @@ There are a lot of perks like having your name inside the plugin!
      - Select the bone you want to attach the mesh to in the panel
      - Press the "Attach Mesh" button -> Done!
 
-   ##### Support us:
-   - We worked hard on this feature. If you like it consider supporting us, it helps a lot!
-
-   [![](https://i.imgur.com/BFIald5.png)](https://www.patreon.com/catsblenderplugin)
-
    </details>
 
  - <details><summary>Translating shape keys, bones, materials and meshes. Fixing and joining/separation of meshes.</summary>
@@ -264,18 +263,13 @@ There are a lot of perks like having your name inside the plugin!
    </details>
 *More to come!*
 
-## Discord
-Join our Discord to report errors, suggestions and make comments!
-
-**Discord: https://discord.gg/f8yZGnv**
-
 ## Requirements
  - Blender **2.79** or **2.80** or above (run as administrator is recommended)
    - mmd_tools is **not required**! Cats comes pre-installed with it!
      - If you have custom Python installed which Blender might use, you need to have Numpy installed
 
 ## Installation
- - Download the plugin: **[Cats Blender Plugin](https://github.com/michaeldegroot/cats-blender-plugin/archive/master.zip)**
+ - Download the plugin: **[Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/master.zip)**
    - **Important: Do NOT extract the downloaded zip! You will need the zip file during installation!**
  - Install the addon in blender like so:
    - *This shows Blender 2.79. In Blender 2.80+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there.*
@@ -306,6 +300,9 @@ Skip the step where he installs "mmd_tools" in the video below, it's not needed 
 
 ---
 ## Changelogs
+
+#### 0.19.2
+- Updated for Blender 3.6
 
 #### 0.19.1
 - Fixed Google Translate error (you aren't banned by Google)
@@ -414,12 +411,5 @@ Read the full changelog [here](https://github.com/michaeldegroot/cats-blender-pl
 
 
 ## Feedback
-Do you love this plugin or have you found a bug?
-Post a response in the bug reports, or send your feedback to the official discord server of the plugin for real-time communication: https://discord.gg/f8yZGnv
-look for people with the developer role in the discord! ;)
+Please open an issue if you need to leave feedback.
 
-
-## Support us
-If you enjoy how this plugin saves you countless hours of work consider supporting us through Patreon:
-
-[![](https://i.imgur.com/BFIald5.png)](https://www.patreon.com/catsblenderplugin)
