@@ -1,4 +1,4 @@
-# Cats Blender Plugin (0.19.2)
+# Cats Blender Plugin (0.19.3)
 
 This Plugin was originally by absolute-quantum [click here](https://github.com/michaeldegroot/cats-blender-plugin/) to view the original github for the project.
 
