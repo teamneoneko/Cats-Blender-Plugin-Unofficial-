@@ -257,16 +257,6 @@ def update_settings_core(self, context):
 
     return settings_changed_tmp
 
-
-def set_last_supporter_update(last_supporter_update):
-    settings_data['last_supporter_update'] = last_supporter_update
-    save_settings()
-
-
-def get_last_supporter_update():
-    return settings_data.get('last_supporter_update')
-
-
 def get_use_custom_mmd_tools():
     return settings_data.get('use_custom_mmd_tools')
 

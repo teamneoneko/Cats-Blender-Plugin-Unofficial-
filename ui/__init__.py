@@ -15,7 +15,6 @@ if "bpy" not in locals():
     from . import eye_tracking
     from . import copy_protection
     from . import settings_updates
-    from . import supporter
     from . import credits
 else:
     # print('RELOAD UI!!')
@@ -32,5 +31,4 @@ else:
     importlib.reload(eye_tracking)
     importlib.reload(copy_protection)
     importlib.reload(settings_updates)
-    importlib.reload(supporter)
     importlib.reload(credits)

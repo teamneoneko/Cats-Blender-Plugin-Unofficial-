@@ -40,9 +40,9 @@ class _NodeTreeUtils:
         if fac is not None:
             node.inputs['Fac'].default_value = fac
         if color1 is not None:
-            node.inputs[0].default_value = color1
+            node.inputs['Color1'].default_value = color1
         if color2 is not None:
-            node.inputs[1].default_value = color2
+            node.inputs['Color2'].default_value = color2
         return node
 
 
@@ -74,23 +74,23 @@ class _NodeGroupUtils(_NodeTreeUtils):
                 for s in n.outputs:
                     s.hide = not s.is_linked
 
-    def new_input_socket(self, io_name, socket, default_val=None, min_max=None):
-        self.__new_io(self.shader.inputs, self.node_input.outputs, io_name, socket, default_val, min_max)
+    def new_input_socket(self, io_name, socket, default_val=None, min_max=None, socket_type=None):
+        self.__new_io(self.shader.inputs, self.node_input.outputs, io_name, socket, default_val, min_max, socket_type)
 
-    def new_output_socket(self, io_name, socket, default_val=None, min_max=None):
-        self.__new_io(self.shader.outputs, self.node_output.inputs, io_name, socket, default_val, min_max)
+    def new_output_socket(self, io_name, socket, default_val=None, min_max=None, socket_type=None):
+        self.__new_io(self.shader.outputs, self.node_output.inputs, io_name, socket, default_val, min_max, socket_type)
 
-    def __new_io(self, shader_io, io_sockets, io_name, socket, default_val=None, min_max=None):
+    def __new_io(self, shader_io, io_sockets, io_name, socket, default_val=None, min_max=None, socket_type=None):
         if io_name not in io_sockets:
-            shader_io.new(type=socket.bl_idname, name=io_name)
+            idname = socket_type or socket.bl_idname
+            shader_io.new(type=idname, name=io_name)
             if not min_max:
-                idname = socket.bl_idname
                 if idname.endswith('Factor') or io_name.endswith('Alpha'):
                     shader_io[io_name].min_value, shader_io[io_name].max_value = 0, 1
                 elif idname.endswith('Float') or idname.endswith('Vector'):
                     shader_io[io_name].min_value, shader_io[io_name].max_value = -10, 10
-
-        self.links.new(io_sockets[io_name], socket)
+        if socket is not None:
+            self.links.new(io_sockets[io_name], socket)
         if default_val is not None:
             shader_io[io_name].default_value = default_val
         if min_max is not None:
@@ -223,135 +223,104 @@ class _MaterialMorph:
             links.new(prev_node.outputs['Edge A'], shader.inputs['Alpha'])
         return shader
 
-    _LEGACY_MODE = '-' if bpy.app.version < (2, 75, 0) else ''
-
     @classmethod
     def __get_shader(cls, morph_type):
-        group_name = 'MMDMorph' + cls._LEGACY_MODE + morph_type
+        group_name = 'MMDMorph' + morph_type
         shader = bpy.data.node_groups.get(group_name, None) or bpy.data.node_groups.new(name=group_name, type='ShaderNodeTree')
         if len(shader.nodes):
             return shader
 
         ng = _NodeGroupUtils(shader)
-        nodes, links = ng.nodes, ng.links
+        links = ng.links
 
         use_mul = (morph_type == 'Mul')
 
-        def __value_to_color_wrap(out_value, pos):
-            if cls._LEGACY_MODE: # for viewport
-                node_wrap = ng.new_node('ShaderNodeCombineRGB', pos)
-                links.new(out_value, node_wrap.inputs[0])
-                links.new(out_value, node_wrap.inputs[1])
-                links.new(out_value, node_wrap.inputs[2])
-                return node_wrap.outputs[0]
-            return out_value
-
         ############################################################################
-        node_input = ng.new_node('NodeGroupInput', (-4, 0))
-        node_output = ng.new_node('NodeGroupOutput', (5, 0))
-
-        node_invert = ng.new_math_node('SUBTRACT', (-3, 1), value1=1.0)
-        node_dummy_vec = ng.new_node('ShaderNodeVectorMath', (-3, -6))
-        default_vector = (use_mul,)*len(node_dummy_vec.inputs[0].default_value)
-
-        ng.new_input_socket('Fac', node_invert.inputs[1], 0)
-
-        out_color = __value_to_color_wrap(node_input.outputs['Fac'], (-3, 2))
-        if use_mul:
-            out_color_inv = __value_to_color_wrap(node_invert.outputs[0], (-2, 2))
-        else:
-            nodes.remove(node_invert)
-            del node_invert
-
-        def __new_io_vector_wrap(io_name, pos):
-            if cls._LEGACY_MODE: # for cycles
-                node_wrap = ng.new_vector_math_node('ADD', pos, vector2=(0, 0, 0))
-                ng.new_input_socket(io_name, node_wrap.inputs[0], default_vector)
-                return node_wrap.outputs[0]
-            ng.new_input_socket(io_name, node_dummy_vec.inputs[0], default_vector)
-            return node_input.outputs[io_name]
+        node_input = ng.new_node('NodeGroupInput', (-3, 0))
+        ng.new_input_socket('Fac', None, 0, socket_type='NodeSocketFloat')
+        ng.new_node('NodeGroupOutput', (3, 0))
 
         def __blend_color_add(id_name, pos, tag=''):
-            # ColorMul = Color1 * (Fac * Color2 + (1 - Fac))
-            # ColorAdd = Color1 + Fac * Color2
-            if use_mul:
-                node_mul = ng.new_mix_node('MULTIPLY', (pos[0]+1, pos[1]), fac=1.0)
-                node_blend = ng.new_mix_node('ADD', (pos[0]+2, pos[1]), fac=1.0)
-                links.new(out_color_inv, node_blend.inputs['Color1'])
-                links.new(node_mul.outputs['Color'], node_blend.inputs['Color2'])
-            else:
-                node_mul = node_blend = ng.new_mix_node('MULTIPLY', (pos[0]+1, pos[1]), fac=1.0)
+            # MA_RAMP_MULT: ColorMul = Color1 * (Fac * Color2 + (1 - Fac))
+            # MA_RAMP_ADD:  ColorAdd = Color1 + Fac * Color2
+            # https://github.com/blender/blender/blob/594f47ecd2d5367ca936cf6fc6ec8168c2b360d0/source/blender/blenkernel/intern/material.c#L1400
+            node_mix = ng.new_mix_node('MULTIPLY' if use_mul else 'ADD', (pos[0]+1, pos[1]))
+            links.new(node_input.outputs['Fac'], node_mix.inputs['Fac'])
+            ng.new_input_socket('%s1'%id_name+tag, node_mix.inputs['Color1'])
+            ng.new_input_socket('%s2'%id_name+tag, node_mix.inputs['Color2'], socket_type='NodeSocketVector')
+            ng.new_output_socket(id_name+tag, node_mix.outputs['Color'])
+            return node_mix
 
-            node_final = ng.new_mix_node('MULTIPLY' if use_mul else 'ADD', (pos[0]+2+use_mul, pos[1]), fac=1.0)
-
-            out_vector1 = __new_io_vector_wrap('%s1'%id_name+tag, (pos[0]+1.5+use_mul, pos[1]+0.1))
-            out_vector2 = __new_io_vector_wrap('%s2'%id_name+tag, (pos[0]+0.5, pos[1]-0.1))
-            links.new(out_vector1, node_final.inputs['Color1'])
-            links.new(out_vector2, node_mul.inputs['Color2'])
-            links.new(out_color, node_mul.inputs['Color1'])
-            links.new(node_blend.outputs['Color'], node_final.inputs['Color2'])
-
-            ng.new_output_socket(id_name+tag, node_final.outputs['Color'])
-            return node_final
-
-        def __blend_value_add(id_name, pos, tag=''):
-            # ValueMul = Value1 * (Fac * Value2 + (1 - Fac))
-            # ValueAdd = Value1 + Fac * Value2
-            if use_mul:
-                node_mul = ng.new_math_node('MULTIPLY', (pos[0]+1, pos[1]))
-                node_blend = ng.new_math_node('ADD', (pos[0]+2, pos[1]))
-                links.new(node_invert.outputs['Value'], node_blend.inputs[0])
-                links.new(node_mul.outputs['Value'], node_blend.inputs[1])
-            else:
-                node_mul = node_blend = ng.new_math_node('MULTIPLY', (pos[0]+1, pos[1]))
-
-            node_final = ng.new_math_node('MULTIPLY' if use_mul else 'ADD', (pos[0]+2+use_mul, pos[1]))
-
-            ng.new_input_socket('%s1'%id_name+tag, node_final.inputs[0], use_mul)
-            ng.new_input_socket('%s2'%id_name+tag, node_mul.inputs[1], use_mul)
-            ng.new_output_socket(id_name+tag, node_final.outputs['Value'])
-
-            links.new(node_input.outputs['Fac'], node_mul.inputs[0])
-            links.new(node_blend.outputs['Value'], node_final.inputs[1])
-            return node_final
-
-        def __blend_tex_color(id_name, pos, node_tex_rgb, node_tex_a):
+        def __blend_tex_color(id_name, pos, node_tex_rgb, node_tex_a_output):
             # Tex Color = tex_rgb * tex_a + (1 - tex_a)
             # : tex_rgb = TexRGB * ColorMul + ColorAdd
             # : tex_a = TexA * ValueMul + ValueAdd
-            node_inv = ng.new_math_node('SUBTRACT', (pos[0], pos[1]-0.5), value1=1.0)
-            node_mul = ng.new_mix_node('MULTIPLY', (pos[0], pos[1]), fac=1.0)
-            node_blend = ng.new_mix_node('ADD', (pos[0]+1, pos[1]), fac=1.0)
+            if id_name != 'Sphere':
+                node_mix = ng.new_mix_node('MULTIPLY', pos, color1=(1,1,1,1))
+                links.new(node_tex_a_output, node_mix.inputs[0])
+                links.new(node_tex_rgb.outputs['Color'], node_mix.inputs[2])
+                ng.new_output_socket(id_name+' Tex', node_mix.outputs[0])
+            else:
+                node_inv = ng.new_math_node('SUBTRACT', (pos[0], pos[1]-0.25), value1=1.0)
+                node_scale = ng.new_vector_math_node('SCALE', (pos[0], pos[1]))
+                node_add = ng.new_vector_math_node('ADD', (pos[0]+1, pos[1]))
 
-            out_tex_a = __value_to_color_wrap(node_tex_a.outputs[0], (pos[0]-0.5, pos[1]-0.1))
-            out_tex_a_inv = __value_to_color_wrap(node_inv.outputs[0], (pos[0]+0.5, pos[1]-0.1))
+                links.new(node_tex_a_output, node_inv.inputs[1])
+                links.new(node_tex_rgb.outputs['Color'], node_scale.inputs[0])
+                links.new(node_tex_a_output, node_scale.inputs['Scale'])
+                links.new(node_scale.outputs[0], node_add.inputs[0])
+                links.new(node_inv.outputs[0], node_add.inputs[1])
 
-            links.new(node_tex_a.outputs['Value'], node_inv.inputs[1])
-            links.new(node_tex_rgb.outputs['Color'], node_mul.inputs['Color1'])
-            links.new(out_tex_a, node_mul.inputs['Color2'])
-            links.new(node_mul.outputs['Color'], node_blend.inputs['Color1'])
-            links.new(out_tex_a_inv, node_blend.inputs['Color2'])
+                ng.new_output_socket(id_name+' Tex', node_add.outputs[0], socket_type='NodeSocketColor')
+                ng.new_output_socket(id_name+' Tex Add', node_scale.outputs[0], socket_type='NodeSocketColor')
 
-            ng.new_output_socket(id_name+' Tex', node_blend.outputs['Color'])
-            if id_name == 'Sphere':
-                ng.new_output_socket(id_name+' Tex Add', node_mul.outputs['Color'])
+        def __add_sockets(id_name, input1, input2, output, tag=''):
+            ng.new_input_socket(f'{id_name}1{tag}', input1, use_mul)
+            ng.new_input_socket(f'{id_name}2{tag}', input2, use_mul)
+            ng.new_output_socket(f'{id_name}{tag}', output)
 
         pos_x = -2
-        __blend_color_add('Ambient', (pos_x, 1.5))
-        __blend_color_add('Diffuse', (pos_x, 1))
-        __blend_color_add('Specular', (pos_x, 0.5))
-        __blend_value_add('Reflect', (pos_x, 0))
-        __blend_value_add('Alpha', (pos_x, -0.5))
-        __blend_color_add('Edge', (pos_x, -1), ' RGB')
-        __blend_value_add('Edge', (pos_x, -1.5), ' A')
-        for id_name, dy in zip(('Base', 'Toon', 'Sphere'), (0, 1, 2)):
-            node_tex_rgb = __blend_color_add(id_name, (pos_x, -2-dy), ' RGB')
-            node_tex_a = __blend_value_add(id_name, (pos_x, -2.5-dy), ' A')
-            __blend_tex_color(id_name, (pos_x+4+use_mul, -2-dy), node_tex_rgb, node_tex_a)
+        __blend_color_add('Ambient', (pos_x, +0.5))
+        __blend_color_add('Diffuse', (pos_x, +0.0))
+        __blend_color_add('Specular', (pos_x, -0.5))
 
-        nodes.remove(node_dummy_vec)
-        del node_dummy_vec
+        combine_reflect1_alpha1_edge1 = ng.new_node('ShaderNodeCombineRGB', (-2, -1.5))
+        combine_reflect2_alpha2_edge2 = ng.new_node('ShaderNodeCombineRGB', (-2, -1.75))
+        separate_reflect_alpha_edge = ng.new_node('ShaderNodeSeparateRGB', (pos_x+2, -1.5))
+
+        __add_sockets('Reflect', combine_reflect1_alpha1_edge1.inputs[0], combine_reflect2_alpha2_edge2.inputs[0], separate_reflect_alpha_edge.outputs[0])
+        __add_sockets('Alpha', combine_reflect1_alpha1_edge1.inputs[1], combine_reflect2_alpha2_edge2.inputs[1], separate_reflect_alpha_edge.outputs[1])
+
+        __blend_color_add('Edge', (pos_x, -1.0), ' RGB')
+        __add_sockets('Edge', combine_reflect1_alpha1_edge1.inputs[2], combine_reflect2_alpha2_edge2.inputs[2], separate_reflect_alpha_edge.outputs[2], tag=' A')
+
+        node_mix = ng.new_mix_node('MULTIPLY' if use_mul else 'ADD', (pos_x+1, -1.5))
+        links.new(node_input.outputs['Fac'], node_mix.inputs[0])
+        links.new(combine_reflect1_alpha1_edge1.outputs[0], node_mix.inputs[1])
+        links.new(combine_reflect2_alpha2_edge2.outputs[0], node_mix.inputs[2])
+        links.new(node_mix.outputs[0], separate_reflect_alpha_edge.inputs[0])
+
+        combine_base1a_toon1a_sphere1a = ng.new_node('ShaderNodeCombineRGB', (-2, -2.0))
+        combine_base2a_toon2a_sphere2a = ng.new_node('ShaderNodeCombineRGB', (-2, -2.25))
+        separate_basea_toona_spherea = ng.new_node('ShaderNodeSeparateRGB', (pos_x+2, -2.0))
+
+        node_mix = ng.new_mix_node('MULTIPLY' if use_mul else 'ADD', (pos_x+1, -2.0))
+        links.new(node_input.outputs['Fac'], node_mix.inputs[0])
+        links.new(combine_base1a_toon1a_sphere1a.outputs[0], node_mix.inputs[1])
+        links.new(combine_base2a_toon2a_sphere2a.outputs[0], node_mix.inputs[2])
+        links.new(node_mix.outputs[0], separate_basea_toona_spherea.inputs[0])
+
+        base_rgb = __blend_color_add('Base', (pos_x, -2.5), ' RGB')
+        __add_sockets('Base', combine_base1a_toon1a_sphere1a.inputs[0], combine_base2a_toon2a_sphere2a.inputs[0], separate_basea_toona_spherea.outputs[0], tag=' A')
+        __blend_tex_color('Base', (pos_x+3, -2.5), base_rgb, separate_basea_toona_spherea.outputs[0])
+
+        toon_rgb = __blend_color_add('Toon', (pos_x, -3.0), ' RGB')
+        __add_sockets('Toon', combine_base1a_toon1a_sphere1a.inputs[1], combine_base2a_toon2a_sphere2a.inputs[1], separate_basea_toona_spherea.outputs[1], tag=' A')
+        __blend_tex_color('Toon', (pos_x+3, -3.0), toon_rgb, separate_basea_toona_spherea.outputs[1])
+
+        sphere_rgb = __blend_color_add('Sphere', (pos_x, -3.5), ' RGB')
+        __add_sockets('Sphere', combine_base1a_toon1a_sphere1a.inputs[2], combine_base2a_toon2a_sphere2a.inputs[2], separate_basea_toona_spherea.outputs[2], tag=' A')
+        __blend_tex_color('Sphere', (pos_x+3, -3.5), sphere_rgb, separate_basea_toona_spherea.outputs[2])
 
         ng.hide_nodes()
         return ng.shader
-

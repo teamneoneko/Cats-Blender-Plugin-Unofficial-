@@ -19,15 +19,15 @@ class ForumButton(bpy.types.Operator):
 
 
 @register_wrap
-class DiscordButton(bpy.types.Operator):
-    bl_idname = 'cats_credits.discord'
-    bl_label = t('DiscordButton.label')
+class HelpButton(bpy.types.Operator):
+    bl_idname = 'cats_credits.help'
+    bl_label = t('HelpButton.label')
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
     def execute(self, context):
-        webbrowser.open(t('DiscordButton.URL'))
+        webbrowser.open(t('HelpButton.URL'))
 
-        self.report({'INFO'}, t('DiscordButton.success'))
+        self.report({'INFO'}, t('HelpButton.success'))
         return {'FINISHED'}
 
 

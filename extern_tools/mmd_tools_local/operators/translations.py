@@ -2,13 +2,13 @@
 from typing import TYPE_CHECKING
 
 import bpy
-from mmd_tools_local.core.model import FnModel, Model
-from mmd_tools_local.core.translations import (MMD_DATA_TYPE_TO_HANDLERS,
+from mmd_tools.core.model import FnModel, Model
+from mmd_tools.core.translations import (MMD_DATA_TYPE_TO_HANDLERS,
                                          FnTranslations)
-from mmd_tools_local.translations import DictionaryEnum
+from mmd_tools.translations import DictionaryEnum
 
 if TYPE_CHECKING:
-    from mmd_tools_local.properties.translations import (MMDTranslation,
+    from mmd_tools.properties.translations import (MMDTranslation,
                                                    MMDTranslationElement,
                                                    MMDTranslationElementIndex)
 

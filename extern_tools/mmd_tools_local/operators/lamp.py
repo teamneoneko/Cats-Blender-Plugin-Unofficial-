@@ -3,7 +3,7 @@
 from bpy.props import FloatProperty
 from bpy.types import Operator
 
-from mmd_tools_local.core.lamp import MMDLamp
+from mmd_tools.core.lamp import MMDLamp
 
 class ConvertToMMDLamp(Operator):
     bl_idname = 'mmd_tools.convert_to_mmd_lamp'
