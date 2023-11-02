@@ -3,16 +3,22 @@
 import itertools
 import logging
 import time
-from typing import Any, Dict, Iterable, List, Optional, Set, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Optional, Set, Union
 
 import bpy
 import idprop
 import mathutils
-from mmd_tools_local import bpyutils
-from mmd_tools_local.bpyutils import Props, SceneOp, matmul
-from mmd_tools_local.core import rigid_body
-from mmd_tools_local.core.bone import FnBone, MigrationFnBone
-from mmd_tools_local.core.morph import FnMorph
+import rna_prop_ui
+from mmd_tools import MMD_TOOLS_VERSION, bpyutils
+from mmd_tools.bpyutils import Props, SceneOp, matmul
+from mmd_tools.core import rigid_body
+from mmd_tools.core.bone import FnBone, MigrationFnBone
+from mmd_tools.core.morph import FnMorph
+from mmd_tools.core.rigid_body import MODE_DYNAMIC, MODE_DYNAMIC_BONE, MODE_STATIC
+
+if TYPE_CHECKING:
+    from properties.rigid_body import MMDRigidBody
+    from properties.morph import MaterialMorphData
 
 
 class InvalidRigidSettingException(ValueError):
@@ -92,13 +98,13 @@ class FnModel:
     def copy_mmd_root(destination_root_object: bpy.types.Object, source_root_object: bpy.types.Object, overwrite: bool = True, replace_name2values: Dict[str,Dict[Any,Any]] = dict()):
         _copy_property(destination_root_object.mmd_root, source_root_object.mmd_root, overwrite=overwrite, replace_name2values=replace_name2values)
 
-    @classmethod
-    def find_root(cls, obj: bpy.types.Object) -> Optional[bpy.types.Object]:
+    @staticmethod
+    def find_root(obj: bpy.types.Object) -> Optional[bpy.types.Object]:
         if not obj:
             return None
         if obj.mmd_type == 'ROOT':
             return obj
-        return cls.find_root(obj.parent)
+        return FnModel.find_root(obj.parent)
 
     @staticmethod
     def find_armature(root) -> Optional[bpy.types.Object]:
@@ -115,6 +121,15 @@ class FnModel:
     @staticmethod
     def find_temporary_group(root) -> Optional[bpy.types.Object]:
         return next(filter(lambda o: o.type == 'EMPTY' and o.mmd_type == 'TEMPORARY_GRP_OBJ', root.children), None)
+
+    @classmethod
+    def find_bone_order_mesh_object(cls, root_object: bpy.types.Object) -> Optional[bpy.types.Object]:
+        armature_object = cls.find_armature(root_object)
+        if armature_object is None:
+            return None
+
+        # TODO consistency issue
+        return next(filter(lambda o: o.type == 'MESH' and 'mmd_bone_order_override' in o.modifiers, armature_object.children), None)
 
     @classmethod
     def all_children(cls, obj: bpy.types.Object) -> Iterable[bpy.types.Object]:
@@ -135,6 +150,10 @@ class FnModel:
     @classmethod
     def child_meshes(cls, obj: bpy.types.Object) -> Iterable[bpy.types.Object]:
         return cls.filtered_children(lambda x: x.type == 'MESH' and x.mmd_type == 'NONE', obj)
+
+    @staticmethod
+    def is_root_object(obj):
+        return obj and obj.mmd_type == 'ROOT'
 
     @staticmethod
     def is_rigid_body_object(obj):
@@ -194,13 +213,26 @@ class FnModel:
                 'selected_editable_objects': [child_armature_object],
             }, location=True, rotation=True, scale=True)
 
-            # replace mesh armature modifier.object
-            mesh: bpy.types.Object
-            for mesh in FnModel.child_meshes(child_armature_object):
-                bpy.ops.object.transform_apply({
-                    'active_object': mesh,
-                    'selected_editable_objects': [mesh],
-                }, location=True, rotation=True, scale=True)
+            # Disconnect mesh dependencies because transform_apply fails when mesh data are multiple used.
+            related_meshes: Dict[MaterialMorphData, bpy.types.Mesh] = {}
+            for material_morph in child_root_object.mmd_root.material_morphs:
+                for material_morph_data in material_morph.data:
+                    if material_morph_data.related_mesh_data is not None:
+                        related_meshes[material_morph_data] = material_morph_data.related_mesh_data
+                        material_morph_data.related_mesh_data = None
+            try:
+                # replace mesh armature modifier.object
+                mesh: bpy.types.Object
+                for mesh in FnModel.child_meshes(child_armature_object):
+                    bpy.ops.object.transform_apply({
+                        'active_object': mesh,
+                        'selected_editable_objects': [mesh],
+                    }, location=True, rotation=True, scale=True)
+            finally:
+                # Restore mesh dependencies
+                for material_morph in child_root_object.mmd_root.material_morphs:
+                    for material_morph_data in material_morph.data:
+                        material_morph_data.related_mesh_data = related_meshes.get(material_morph_data, None)
 
             # join armatures
             bpy.ops.object.join({
@@ -288,6 +320,78 @@ class FnModel:
             if add_armature_modifier:
                 FnModel._add_armature_modifier(mesh_object, armature_object)
 
+    @staticmethod
+    def add_missing_vertex_groups_from_bones(root_object: bpy.types.Object, mesh_object: bpy.types.Object, search_in_all_meshes: bool):
+        vertex_group_names: Set[str] = set()
+
+        search_meshes = FnModel.child_meshes(root_object) if search_in_all_meshes else [mesh_object]
+
+        for search_mesh in search_meshes:
+            vertex_group_names.update(search_mesh.vertex_groups.keys())
+
+        armature_object = FnModel.find_armature(root_object)
+
+        pose_bone: bpy.types.PoseBone
+        for pose_bone in armature_object.pose.bones:
+            pose_bone_name = pose_bone.name
+
+            if pose_bone_name in vertex_group_names:
+                continue
+
+            if pose_bone_name.startswith('_'):
+                continue
+
+            mesh_object.vertex_groups.new(name=pose_bone_name)
+
+    @staticmethod
+    def change_mmd_ik_loop_factor(root_object: bpy.types.Object, new_ik_loop_factor: int):
+        mmd_root = root_object.mmd_root
+        old_ik_loop_factor = mmd_root.ik_loop_factor
+
+        if new_ik_loop_factor == old_ik_loop_factor:
+            return
+
+        armature_object = FnModel.find_armature(root_object)
+        for pose_bone in armature_object.pose.bones:
+            constraint: bpy.types.KinematicConstraint
+            for constraint in (c for c in pose_bone.constraints if c.type == 'IK'):
+                iterations = int(constraint.iterations * new_ik_loop_factor / old_ik_loop_factor)
+                logging.info('Update %s of %s: %d -> %d', constraint.name, pose_bone.name, constraint.iterations, iterations)
+                constraint.iterations = iterations
+
+        mmd_root.ik_loop_factor = new_ik_loop_factor
+
+        return
+
+class MigrationFnModel:
+    """Migration Functions for old MMD models broken by bugs or issues"""
+
+    @classmethod
+    def update_mmd_ik_loop_factor(cls):
+        for armature_object in bpy.data.objects:
+            if armature_object.type != 'ARMATURE':
+                continue
+
+            if 'mmd_ik_loop_factor' not in armature_object:
+                return
+
+            FnModel.find_root(armature_object).mmd_root.ik_loop_factor = max(armature_object['mmd_ik_loop_factor'], 1)
+            del armature_object['mmd_ik_loop_factor']
+
+    @staticmethod
+    def update_mmd_tools_version():
+        for root_object in bpy.data.objects:
+            if root_object.type != 'EMPTY':
+                continue
+
+            if not FnModel.is_root_object(root_object):
+                continue
+
+            if 'mmd_tools_version' in root_object:
+                continue
+
+            root_object['mmd_tools_version'] = '2.8.0'
+
 
 # SUPPORT_UNTIL: 4.3 LTS
 def isRigidBodyObject(obj):
@@ -326,6 +430,7 @@ class Model:
         root.mmd_type = 'ROOT'
         root.mmd_root.name = name
         root.mmd_root.name_e = name_e
+        root['mmd_tools_version'] = MMD_TOOLS_VERSION
         setattr(root, Props.empty_display_size, scale/0.2)
         scene.link_object(root)
 
@@ -739,13 +844,10 @@ class Model:
         """
         Helper method to list all materials in all meshes
         """
-        material_list = []
+        materials = {} # Use dict instead of set to guarantee preserve order
         for mesh in self.meshes():
-            for mat in mesh.data.materials:
-                if mat not in material_list:
-                    # control the case of a material shared among different meshes
-                    material_list.append(mat)
-        return material_list
+            materials.update((slot.material,0) for slot in mesh.material_slots if slot.material is not None)
+        return list(materials.keys())
 
     def renameBone(self, old_bone_name, new_bone_name):
         if old_bone_name == new_bone_name:
@@ -764,7 +866,7 @@ class Model:
             if old_bone_name in mesh.vertex_groups:
                 mesh.vertex_groups[old_bone_name].name = new_bone_name
 
-    def build(self, non_collision_distance_scale, collision_margin):
+    def build(self, non_collision_distance_scale = 1.5, collision_margin = 1e-06):
         rigidbody_world_enabled = rigid_body.setRigidBodyWorldEnabled(False)
         if self.__root.mmd_root.is_built:
             self.clean()
@@ -774,6 +876,7 @@ class Model:
         logging.info('****************************************')
         start_time = time.time()
         self.__preBuild()
+        self.disconnectPhysicsBones()
         self.buildRigids(non_collision_distance_scale, collision_margin)
         self.buildJoints()
         self.__postBuild()
@@ -821,6 +924,7 @@ class Model:
             self.__restoreTransforms(i)
 
         self.__removeTemporaryObjects()
+        self.connectPhysicsBones()
 
         arm = self.armature()
         if arm is not None:  # update armature
@@ -1169,3 +1273,41 @@ class Model:
             return
         MigrationFnBone.fix_mmd_ik_limit_override(arm)
         FnBone.apply_additional_transformation(arm)
+
+    def __editPhysicsBones(self, editor: Callable[[bpy.types.EditBone], None], target_modes: Set[str]):
+        armature_object = self.armature()
+
+        armature: bpy.types.Armature
+        with bpyutils.edit_object(armature_object) as armature:
+            edit_bones = armature.edit_bones
+            rigid_body_object: bpy.types.Object
+            for rigid_body_object in self.rigidBodies():
+                mmd_rigid: MMDRigidBody = rigid_body_object.mmd_rigid
+                if mmd_rigid.type not in target_modes:
+                    continue
+
+                bone_name: str = mmd_rigid.bone
+                edit_bone = edit_bones.get(bone_name)
+                if edit_bone is None:
+                    continue
+
+                editor(edit_bone)
+
+    def disconnectPhysicsBones(self):
+        def editor(edit_bone: bpy.types.EditBone):
+            rna_prop_ui.rna_idprop_ui_create(edit_bone, 'mmd_bone_use_connect', default=edit_bone.use_connect)
+            edit_bone.use_connect = False
+
+        self.__editPhysicsBones(editor, {str(MODE_DYNAMIC)})
+
+    def connectPhysicsBones(self):
+        def editor(edit_bone: bpy.types.EditBone):
+            mmd_bone_use_connect_str: Optional[str] = edit_bone.get('mmd_bone_use_connect')
+            if mmd_bone_use_connect_str is None:
+                return
+
+            if not edit_bone.use_connect: # wasn't it overwritten?
+                edit_bone.use_connect = bool(mmd_bone_use_connect_str)
+            del edit_bone['mmd_bone_use_connect']
+
+        self.__editPhysicsBones(editor, {str(MODE_STATIC), str(MODE_DYNAMIC), str(MODE_DYNAMIC_BONE)})

@@ -4,7 +4,7 @@ import os
 
 import bpy
 
-from mmd_tools_local import operators
+from mmd_tools import operators
 
 
 def _get_update_candidate_branches(_, __):

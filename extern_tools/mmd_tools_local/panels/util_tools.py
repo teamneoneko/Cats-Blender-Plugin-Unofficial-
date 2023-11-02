@@ -3,11 +3,11 @@
 import bpy
 from bpy.types import Panel, UIList
 
-from mmd_tools_local.bpyutils import SceneOp
-from mmd_tools_local.core.model import Model
-from mmd_tools_local.panels.tool import TRIA_UP_BAR, TRIA_DOWN_BAR
-from mmd_tools_local.panels.tool import _layout_split
-from mmd_tools_local.panels.tool import _PanelBase
+from mmd_tools.bpyutils import SceneOp
+from mmd_tools.core.model import FnModel, Model
+from mmd_tools.panels.tool import TRIA_UP_BAR, TRIA_DOWN_BAR
+from mmd_tools.panels.tool import _layout_split
+from mmd_tools.panels.tool import _PanelBase
 
 
 ICON_APPEND_MOVE, ICON_APPEND_ROT, ICON_APPEND_MOVE_ROT = 'IPO_LINEAR', 'IPO_EXPO', 'IPO_QUAD'
@@ -288,6 +288,16 @@ class MMD_TOOLS_UL_ModelBones(UIList):
             layout.alignment = 'CENTER'
             layout.label(text="", icon_value=icon)
 
+class MMDBoneOrderMenu(bpy.types.Menu):
+    bl_idname = 'OBJECT_MT_mmd_tools_bone_order_menu'
+    bl_label = 'Bone Order Menu'
+
+    def draw(self, _context):
+        layout = self.layout
+        layout.operator('object.vertex_group_sort', text='Sort by Bone Hierarchy', icon='BONE_DATA').sort_type='BONE_HIERARCHY'
+        layout.separator()
+        layout.operator('mmd_tools.add_missing_vertex_groups_from_bones', icon='PRESET_NEW')
+
 class MMDBoneOrder(_PanelBase, Panel):
     bl_idname = 'OBJECT_PT_mmd_tools_bone_order'
     bl_label = 'Bone Order'
@@ -297,22 +307,22 @@ class MMDBoneOrder(_PanelBase, Panel):
     def draw(self, context):
         layout = self.layout
         active_obj = context.active_object
-        root = Model.findRoot(active_obj)
+        root = FnModel.find_root(active_obj)
         if root is None:
             layout.label(text='Select a MMD Model')
             return
 
-        armature = Model(root).armature()
+        armature = FnModel.find_armature(root)
         if armature is None:
             layout.label(text='The armature object of active MMD model can\'t be found', icon='ERROR')
             return
 
-        bone_order_object = next((i for i in armature.children if 'mmd_bone_order_override' in i.modifiers), None) #TODO consistency issue
-        bone_count = MMD_TOOLS_UL_ModelBones.update_bone_tables(armature, bone_order_object)
+        bone_order_mesh_object = FnModel.find_bone_order_mesh_object(root)
+        bone_count = MMD_TOOLS_UL_ModelBones.update_bone_tables(armature, bone_order_mesh_object)
 
         col = layout.column(align=True)
         row = col.row()
-        if bone_order_object is None:
+        if bone_order_mesh_object is None:
             row.template_list("MMD_TOOLS_UL_ModelBones", "",
                               armature.pose, 'bones',
                               root.vertex_groups, 'active_index')
@@ -320,13 +330,19 @@ class MMDBoneOrder(_PanelBase, Panel):
             col.label(text='No mesh object with "mmd_bone_order_override" modifier', icon='ERROR')
         else:
             row.template_list("MMD_TOOLS_UL_ModelBones", "",
-                              bone_order_object, 'vertex_groups',
-                              bone_order_object.vertex_groups, 'active_index')
+                              bone_order_mesh_object, 'vertex_groups',
+                              bone_order_mesh_object.vertex_groups, 'active_index')
+
+            tb = row.column()
+            tb.enabled = bone_order_mesh_object == active_obj
+            tb1 = tb.column(align=True)
+            tb1.menu('OBJECT_MT_mmd_tools_bone_order_menu', text='', icon='DOWNARROW_HLT')
+            tb.separator()
+            tb1 = tb.column(align=True)
+            tb1.operator('object.vertex_group_move', text='', icon='TRIA_UP').direction = 'UP'
+            tb1.operator('object.vertex_group_move', text='', icon='TRIA_DOWN').direction = 'DOWN'
+
             row = col.row()
             row.operator('mmd_tools.object_select', text='(%d) %s'%(bone_count, armature.name), icon='OUTLINER_OB_ARMATURE', emboss=False).name = armature.name
             row.label(icon='BACK')
-            row.operator('mmd_tools.object_select', text=bone_order_object.name, icon='OBJECT_DATA', emboss=False).name = bone_order_object.name
-            if bone_order_object == active_obj:
-                row = row.row(align=True)
-                row.operator('object.vertex_group_move', text='', icon='TRIA_UP').direction = 'UP'
-                row.operator('object.vertex_group_move', text='', icon='TRIA_DOWN').direction = 'DOWN'
+            row.operator('mmd_tools.object_select', text=bone_order_mesh_object.name, icon='OBJECT_DATA', emboss=False).name = bone_order_mesh_object.name

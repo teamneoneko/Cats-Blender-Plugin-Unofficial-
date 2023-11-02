@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import bpy
 import logging
-from mmd_tools_local.core.shader import _NodeGroupUtils
+from mmd_tools.core.shader import _NodeGroupUtils
 
 def __switchToCyclesRenderEngine():
     if bpy.context.scene.render.engine != 'CYCLES':

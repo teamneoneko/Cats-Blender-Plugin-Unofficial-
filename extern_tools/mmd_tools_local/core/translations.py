@@ -7,14 +7,14 @@ from enum import Enum
 from typing import TYPE_CHECKING, Callable, Dict, Optional, Set, Tuple
 
 import bpy
-from mmd_tools_local.core.model import FnModel, Model
-from mmd_tools_local.translations import DictionaryEnum
-from mmd_tools_local.utils import convertLRToName, convertNameToLR
+from mmd_tools.core.model import FnModel, Model
+from mmd_tools.translations import DictionaryEnum
+from mmd_tools.utils import convertLRToName, convertNameToLR
 
 if TYPE_CHECKING:
-    from mmd_tools_local.properties.morph import _MorphBase
-    from mmd_tools_local.properties.root import MMDRoot
-    from mmd_tools_local.properties.translations import (MMDTranslation,
+    from mmd_tools.properties.morph import _MorphBase
+    from mmd_tools.properties.root import MMDRoot
+    from mmd_tools.properties.translations import (MMDTranslation,
                                                    MMDTranslationElement,
                                                    MMDTranslationElementIndex)
 

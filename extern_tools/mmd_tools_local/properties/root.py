@@ -2,14 +2,14 @@
 """ MMDモデルパラメータ用Prop
 """
 import bpy
-import mmd_tools_local.core.model as mmd_model
-from mmd_tools_local import utils
-from mmd_tools_local.bpyutils import SceneOp
-from mmd_tools_local.core.material import FnMaterial
-from mmd_tools_local.core.sdef import FnSDEF
-from mmd_tools_local.properties.morph import (BoneMorph, GroupMorph, MaterialMorph,
+import mmd_tools.core.model as mmd_model
+from mmd_tools import utils
+from mmd_tools.bpyutils import SceneOp, activate_layer_collection
+from mmd_tools.core.material import FnMaterial
+from mmd_tools.core.sdef import FnSDEF
+from mmd_tools.properties.morph import (BoneMorph, GroupMorph, MaterialMorph,
                                         UVMorph, VertexMorph)
-from mmd_tools_local.properties.translations import MMDTranslation
+from mmd_tools.properties.translations import MMDTranslation
 
 
 def __driver_variables(id_data, path, index=-1):
@@ -133,8 +133,9 @@ def _toggleVisibilityOfJoints(self, context):
 def _toggleVisibilityOfTemporaryObjects(self, context):
     root = self.id_data
     hide = not self.show_temporary_objects
-    for i in mmd_model.Model(root).temporaryObjects():
-        i.hide = hide
+    with activate_layer_collection(root):
+        for i in mmd_model.Model(root).temporaryObjects():
+            i.hide = hide
     if hide and context.active_object is None:
         SceneOp(context).active_object = root
 
@@ -164,7 +165,9 @@ def _getVisibilityOfMMDRigArmature(prop):
     if prop.id_data.mmd_type != 'ROOT':
         return False
     arm = mmd_model.FnModel.find_armature(prop.id_data)
-    return (arm and not arm.hide)
+    r = arm and not arm.hide
+    # Returning the non-BOOL type will raise a exception in the library override mode.
+    return bool(r)
 
 
 def _setActiveRigidbodyObject(prop, v):
@@ -316,6 +319,15 @@ class MMDRoot(bpy.types.PropertyGroup):
         default='',
     )
 
+    ik_loop_factor: bpy.props.IntProperty(
+        name='MMD IK Loop Factor',
+        description='Scaling factor of MMD IK loop',
+        min=1,
+        soft_max=10,
+        max=100,
+        default=1,
+    )
+
     # TODO: Replace to driver for NLA
     show_meshes: bpy.props.BoolProperty(
         name='Show Meshes',
@@ -463,6 +475,11 @@ class MMDRoot(bpy.types.PropertyGroup):
         min=0,
         set=_setActiveMorph,
         get=_getActiveMorph,
+    )
+    morph_panel_show_settings: bpy.props.BoolProperty(
+        name='Morph Panel Show Settings',
+        description='Show Morph Settings',
+        default=True,
     )
     active_mesh_index: bpy.props.IntProperty(
         name='Active Mesh',

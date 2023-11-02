@@ -1,78 +1,122 @@
 # -*- coding: utf-8 -*-
 
-import bpy
 import math
+from typing import Optional
 
-from mmd_tools_local.bpyutils import Props, SceneOp
+import bpy
+from mmd_tools.bpyutils import Props, SceneOp
+
+class FnCamera:
+    @staticmethod
+    def find_root(obj: bpy.types.Object) -> Optional[bpy.types.Object]:
+        if obj is None:
+            return None
+        if FnCamera.is_mmd_camera_root(obj):
+            return obj
+        if obj.parent is not None and FnCamera.is_mmd_camera_root(obj.parent):
+            return obj.parent
+        return None
+
+    @staticmethod
+    def is_mmd_camera(obj: bpy.types.Object) -> bool:
+        return obj.type == 'CAMERA' and FnCamera.find_root(obj.parent) is not None
+
+    @staticmethod
+    def is_mmd_camera_root(obj: bpy.types.Object) -> bool:
+        return obj.type == 'EMPTY' and obj.mmd_type == 'CAMERA'
+
+    @staticmethod
+    def add_drivers(camera_object: bpy.types.Object):
+        def __add_driver(id_data: bpy.types.ID, data_path: str, expression: str, index:int = -1):
+            d = id_data.driver_add(data_path, index).driver
+            d.type = 'SCRIPTED'
+            if '$empty_distance' in expression:
+                v = d.variables.new()
+                v.name = 'empty_distance'
+                v.type = 'TRANSFORMS'
+                v.targets[0].id = camera_object
+                v.targets[0].transform_type = 'LOC_Y'
+                v.targets[0].transform_space = 'LOCAL_SPACE'
+                expression = expression.replace('$empty_distance', v.name)
+            if '$is_perspective' in expression:
+                v = d.variables.new()
+                v.name = 'is_perspective'
+                v.type = 'SINGLE_PROP'
+                v.targets[0].id_type = 'OBJECT'
+                v.targets[0].id = camera_object.parent
+                v.targets[0].data_path = 'mmd_camera.is_perspective'
+                expression = expression.replace('$is_perspective', v.name)
+            if '$angle' in expression:
+                v = d.variables.new()
+                v.name = 'angle'
+                v.type = 'SINGLE_PROP'
+                v.targets[0].id_type = 'OBJECT'
+                v.targets[0].id = camera_object.parent
+                v.targets[0].data_path = 'mmd_camera.angle'
+                expression = expression.replace('$angle', v.name)
+            if '$sensor_height' in expression:
+                v = d.variables.new()
+                v.name = 'sensor_height'
+                v.type = 'SINGLE_PROP'
+                v.targets[0].id_type = 'CAMERA'
+                v.targets[0].id = camera_object.data
+                v.targets[0].data_path = 'sensor_height'
+                expression = expression.replace('$sensor_height', v.name)
+
+            d.expression = expression
+
+        __add_driver(camera_object.data, 'ortho_scale', '25*abs($empty_distance)/45')
+        __add_driver(camera_object, 'rotation_euler', 'pi if $is_perspective == False and $empty_distance > 1e-5 else 0', index=1)
+        __add_driver(camera_object.data, 'type', 'not $is_perspective')
+        __add_driver(camera_object.data, 'lens', '$sensor_height/tan($angle/2)/2')
+
+    @staticmethod
+    def remove_drivers(camera_object: bpy.types.Object):
+        camera_object.data.driver_remove('ortho_scale')
+        camera_object.driver_remove('rotation_euler')
+        camera_object.data.driver_remove('ortho_scale')
+        camera_object.data.driver_remove('lens')
+
+class MigrationFnCamera:
+    @staticmethod
+    def update_mmd_camera():
+        for camera_object in bpy.data.objects:
+            if camera_object.type != 'CAMERA':
+                continue
+
+            root_object = FnCamera.find_root(camera_object)
+            if root_object is None:
+                # It's not a MMD Camera
+                continue
+
+            FnCamera.remove_drivers(camera_object)
+            FnCamera.add_drivers(camera_object)
 
 class MMDCamera:
     def __init__(self, obj):
-        if obj.type == 'CAMERA':
-            obj = obj.parent
-        if obj and obj.type == 'EMPTY' and obj.mmd_type == 'CAMERA':
-            self.__emptyObj = getattr(obj, 'original', obj)
-        else:
+        root_object = FnCamera.find_root(obj)
+        if root_object is None:
             raise ValueError('%s is not MMDCamera'%str(obj))
 
+        self.__emptyObj = getattr(root_object, 'original', obj)
 
     @staticmethod
-    def isMMDCamera(obj):
-        if obj.type == 'CAMERA':
-            obj = obj.parent
-        return obj and obj.type == 'EMPTY' and obj.mmd_type == 'CAMERA'
+    def isMMDCamera(obj: bpy.types.Object) -> bool:
+        return FnCamera.find_root(obj) is not None
 
     @staticmethod
-    def addDrivers(cameraObj):
-        def __add_ortho_driver(id_data, data_path, expression, index=-1):
-            d = id_data.driver_add(data_path, index)
-            d.driver.type = 'SCRIPTED'
-            if '$dis' in expression:
-                var = d.driver.variables.new()
-                var.name = 'camera_dis'
-                var.type = 'TRANSFORMS'
-                target = var.targets[0]
-                target.id = cameraObj
-                target.transform_type = 'LOC_Y'
-                target.transform_space = 'LOCAL_SPACE'
-                expression = expression.replace('$dis', var.name)
-            if '$type' in expression:
-                var = d.driver.variables.new()
-                var.name = 'camera_type'
-                var.type = 'SINGLE_PROP'
-                target = var.targets[0]
-                target.id_type = 'OBJECT'
-                target.id = cameraObj
-                target.data_path = 'data.type'
-                expression = expression.replace('$type', var.name)
-            d.driver.expression = expression
-        __add_ortho_driver(cameraObj.data, 'ortho_scale', '25*(-$dis if $dis<0 else $dis)/45')
-        __add_ortho_driver(cameraObj, 'rotation_euler', 'pi if $type == 1 and $dis > 1e-5 else 0', index=1)
+    def addDrivers(cameraObj: bpy.types.Object):
+        FnCamera.add_drivers(cameraObj)
 
     @staticmethod
-    def removeDrivers(cameraObj):
+    def removeDrivers(cameraObj: bpy.types.Object):
         if cameraObj.type != 'CAMERA':
             return
-        cameraObj.data.driver_remove('ortho_scale')
-        cameraObj.driver_remove('rotation_euler')
+        FnCamera.remove_drivers(cameraObj)
 
     @staticmethod
-    def __focus_object_get(cameraObj):
-        camera = cameraObj.data
-        data = getattr(camera, 'dof', camera)
-        return data.focus_object if hasattr(data, 'focus_object') else data.dof_object
-
-    @staticmethod
-    def __focus_object_set(cameraObj, focus):
-        camera = cameraObj.data
-        data = getattr(camera, 'dof', camera)
-        if hasattr(data, 'focus_object'):
-            data.focus_object = focus
-        else:
-            data.dof_object = focus
-
-    @staticmethod
-    def convertToMMDCamera(cameraObj, scale=1.0):
-        if MMDCamera.isMMDCamera(cameraObj):
+    def convertToMMDCamera(cameraObj: bpy.types.Object, scale=1.0):
+        if FnCamera.is_mmd_camera(cameraObj):
             return MMDCamera(cameraObj)
 
         empty = bpy.data.objects.new(name='MMD_Camera', object_data=None)
@@ -90,8 +134,8 @@ class MMDCamera:
         cameraObj.lock_location = (True, False, True)
         cameraObj.lock_rotation = (True, True, True)
         cameraObj.lock_scale = (True, True, True)
-        MMDCamera.__focus_object_set(cameraObj, empty)
-        MMDCamera.addDrivers(cameraObj)
+        cameraObj.data.dof.focus_object = empty
+        FnCamera.add_drivers(cameraObj)
 
         empty.location = (0, 0, 10*scale)
         empty.rotation_mode = 'YXZ'
@@ -119,16 +163,17 @@ class MMDCamera:
 
         _target_override_func = None
         if cameraTarget is None:
-            _target_override_func = lambda camObj: MMDCamera.__focus_object_get(camObj) or camObj
+            _target_override_func = lambda camObj: camObj.data.dof.focus_object or camObj
 
         action_name = mmd_cam_root.name
         parent_action = bpy.data.actions.new(name=action_name)
         distance_action = bpy.data.actions.new(name=action_name+'_dis')
-        MMDCamera.removeDrivers(mmd_cam)
+        FnCamera.remove_drivers(mmd_cam)
 
         from math import atan
+
         from mathutils import Matrix, Vector
-        from mmd_tools_local.bpyutils import matmul
+        from mmd_tools.bpyutils import matmul
 
         render = scene.render
         factor = (render.resolution_y*render.pixel_aspect_y)/(render.resolution_x*render.pixel_aspect_x)
@@ -188,7 +233,7 @@ class MMDCamera:
             for kp in (x, y, z, rx, ry, rz, fov, dis):
                 kp.interpolation = 'LINEAR'
 
-        MMDCamera.addDrivers(mmd_cam)
+        FnCamera.add_drivers(mmd_cam)
         mmd_cam_root.animation_data_create().action = parent_action
         mmd_cam.animation_data_create().action = distance_action
         scene.frame_set(frame_current)

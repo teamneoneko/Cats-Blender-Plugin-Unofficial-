@@ -3,11 +3,11 @@
 import logging
 
 import bpy
-from mmd_tools_local.properties.bone import MMDBone, _mmd_ik_toggle_update
-from mmd_tools_local.properties.camera import MMDCamera
-from mmd_tools_local.properties.material import MMDMaterial
-from mmd_tools_local.properties.rigid_body import MMDJoint, MMDRigidBody
-from mmd_tools_local.properties.root import MMDRoot
+from mmd_tools.properties.bone import MMDBone, _mmd_ik_toggle_update
+from mmd_tools.properties.camera import MMDCamera
+from mmd_tools.properties.material import MMDMaterial
+from mmd_tools.properties.rigid_body import MMDJoint, MMDRigidBody
+from mmd_tools.properties.root import MMDRoot
 
 __properties = {
     bpy.types.Object: {
@@ -64,6 +64,34 @@ def __set_hide(prop, value):
 
 
 def __patch(properties):  # temporary patching, should be removed in the future
+    def __patch_override(prop: bpy.props._PropertyDeferred):
+        """Apply recursively for each mmd_tools property class annotations
+
+        # Hint for bpy.props._PropertyDeferred class
+        p = bpy.props.IntProperty(name='abc123')
+        assert isinstance(p, bpy.props._PropertyDeferred)
+        assert p.function == bpy.props.IntProperty
+        assert p.keywords == {'name': 'abc123'}
+        """
+        prop.keywords.setdefault('override', set()).add('LIBRARY_OVERRIDABLE')
+
+        if prop.function.__name__ not in {'PointerProperty', 'CollectionProperty'}:
+            return
+
+        prop_type = prop.keywords['type']
+        # The __annotations__ cannot be inherited. Manually search for base classes.
+        for inherited_type in [prop_type, *prop_type.__bases__]:
+            if not inherited_type.__module__.startswith('mmd_tools.properties'):
+                continue
+            for annotation in inherited_type.__annotations__.values():
+                if not isinstance(annotation, bpy.props._PropertyDeferred):
+                    continue
+                __patch_override(annotation)
+
+    for props in properties.values():
+        for prop in props.values():
+            __patch_override(prop)
+
     prop_obj = properties.setdefault(bpy.types.Object, {})
 
     prop_obj['select'] = bpy.props.BoolProperty(

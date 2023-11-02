@@ -5,9 +5,9 @@ import logging
 import bpy
 from mathutils import Matrix
 
-from mmd_tools_local import bpyutils
-from mmd_tools_local.core import vmd
-from mmd_tools_local.core import vpd
+from mmd_tools import bpyutils
+from mmd_tools.core import vmd
+from mmd_tools.core import vpd
 
 
 class VPDImporter:

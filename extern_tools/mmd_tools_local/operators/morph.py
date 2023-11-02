@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import bpy
+import mmd_tools.core.model as mmd_model
 from bpy.types import Operator
-from mathutils import Vector, Quaternion
+from mathutils import Quaternion, Vector
+from mmd_tools import bpyutils, utils
+from mmd_tools.core.exceptions import DivisionError, MaterialNotFoundError
+from mmd_tools.core.material import FnMaterial
+from mmd_tools.core.morph import FnMorph
+from mmd_tools.utils import ItemMoveOp, ItemOp
 
-from mmd_tools_local import bpyutils
-from mmd_tools_local import utils
-from mmd_tools_local.utils import ItemOp, ItemMoveOp
-from mmd_tools_local.core.material import FnMaterial
-from mmd_tools_local.core.morph import FnMorph
-from mmd_tools_local.core.exceptions import MaterialNotFoundError, DivisionError
-import mmd_tools_local.core.model as mmd_model
 
 #Util functions
 def divide_vector_components(vec1, vec2):
@@ -428,7 +427,7 @@ class ViewBoneMorph(Operator):
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
     def execute(self, context):
-        from mmd_tools_local.bpyutils import matmul
+        from mmd_tools.bpyutils import matmul
         obj = context.active_object
         root = mmd_model.Model.findRoot(obj)
         mmd_root=root.mmd_root
@@ -731,3 +730,19 @@ class ApplyUVMorph(Operator):
         meshObj.select = selected
         return { 'FINISHED' }
 
+
+class CleanDuplicatedMaterialMorphs(bpy.types.Operator):
+    bl_idname = 'mmd_tools.clean_duplicated_material_morphs'
+    bl_label = 'Clean Duplicated Material Morphs'
+    bl_description = 'Clean duplicated material morphs'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return mmd_model.Model.findRoot(context.active_object) is not None
+
+    def execute(self, context: bpy.types.Context):
+        mmd_root_object = mmd_model.FnModel.find_root(context.active_object)
+        FnMorph.clean_duplicated_material_morphs(mmd_root_object)
+
+        return { 'FINISHED' }
