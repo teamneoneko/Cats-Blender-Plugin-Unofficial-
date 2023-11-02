@@ -1,6 +1,4 @@
-# Cats Blender Plugin (0.20.0) Development Branch.
-
-## This is the development branch, it's possible there is issues with this version, please use the main branch if you want a stable version.
+# Cats Blender Plugin (0.20.0).
 
 This Plugin was originally by absolute-quantum [click here](https://github.com/michaeldegroot/cats-blender-plugin/) to view the original github for the project.
 
@@ -17,7 +15,7 @@ All the hours long processes of fixing your models are compressed into a few fun
 So if you enjoy how this plugin saves you countless hours of work consider supporting us through Patreon.
 There are a lot of perks like having your name inside the plugin!
 
-#### Download here: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/dev.zip)
+#### Download here: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/main.zip)
 
 ## Features (Click to Expand)
  - <details><summary>Creating lip syncing</summary>
@@ -306,6 +304,12 @@ Skip the step where he installs "mmd_tools" in the video below, it's not needed 
 
 ---
 ## Changelogs
+  
+#### 0.20.0
+
+  
+#### 0.19.3 
+- Fix for update loop.
 
 #### 0.19.2
 - Updated for Blender 3.6
