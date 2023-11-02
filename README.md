@@ -1,4 +1,6 @@
-# Cats Blender Plugin (0.19.2)
+# Cats Blender Plugin (0.19.4) Development Branch.
+
+## This is the development branch, it's possible there is issues with this version, please use the main branch if you want a stable version.
 
 This Plugin was originally by absolute-quantum [click here](https://github.com/michaeldegroot/cats-blender-plugin/) to view the original github for the project.
 
@@ -15,7 +17,7 @@ All the hours long processes of fixing your models are compressed into a few fun
 So if you enjoy how this plugin saves you countless hours of work consider supporting us through Patreon.
 There are a lot of perks like having your name inside the plugin!
 
-#### Download here: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/master.zip)
+#### Download here: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/dev.zip)
 
 ## Features (Click to Expand)
  - <details><summary>Creating lip syncing</summary>
