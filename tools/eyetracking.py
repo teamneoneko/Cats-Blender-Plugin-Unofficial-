@@ -25,9 +25,9 @@ class RotateEyeBonesForAv3Button(bpy.types.Operator):
     rotations can be set separately per eye in Unity, however it does simplify setting up the eye-tracking rotations,
     because both eyes can use the same rotations, and it makes it so that (0,0,0) rotation results in the eyes looking
     forward."""
-    bl_idname = "cats_eyes.av3_orient_eye_bones"
-    bl_label = t("Av3EyeTrackingRotateEyeBones.label")
-    bl_description = t("Av3EyeTrackingRotateEyeBones.desc")
+    bl_idname = 'cats_eyes.av3_orient_eye_bones'
+    bl_label = t('Av3EyeTrackingRotateEyeBones.label')
+    bl_description = t('Av3EyeTrackingRotateEyeBones.desc')
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
     @classmethod
