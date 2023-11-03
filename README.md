@@ -6,6 +6,8 @@ This Plugin was originally by absolute-quantum [click here](https://github.com/m
 
 I decided to maintain this plugin myself because the original one was abandoned a long time ago and it does not seem to be being picked up. The community was maintaining it but updates are slow. Though i will not be introducing any new features I am going to try and keep the plugin updated to the best of my abilty. 
 
+Though i have updated bumped the blender version to 3.6.* I do recomend to use 3.5 due to 3.6 being a bit crashy (Though seems to be more stable then it was a few months ago).
+
 # What is cat's?
 
 A tool designed to shorten steps needed to import and optimize models into VRChat.
