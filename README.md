@@ -1,4 +1,4 @@
-# Cats Blender Plugin (0.20.0) DEVLOPMENT VERSION.
+# Cats Blender Plugin (0.20.1) DEVLOPMENT VERSION.
 
 #### THIS VERSION IS A DEVLOPMENT VERSION NOT INTENDED FOR PRODUCTION USE, THIS VERSION MAY BREAK FROM TIME TO TIME WHILE I WORK ON IT.
 
@@ -306,10 +306,19 @@ Skip the step where he installs "mmd_tools" in the video below, it's not needed 
 
 ---
 ## Changelogs
+
+#### 0.20.1
+- Update MMD Tools to latest version.
+- Change patchlog link to correct github.
   
 #### 0.20.0
 
-  
+- Removed Patreon and removed supporters tab fully. I done this because the original project is dead.
+- Change the discord link to go to the github wiki, i going to put up some basic things on there at somepoint.
+- Added in credits that i maintaining this version.
+- Added 3.0 Eye Tracking by Mysteryem
+- Fix for Unselect all being called too many times.
+
 #### 0.19.3 
 - Fix for update loop.
 
