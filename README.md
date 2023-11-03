@@ -310,6 +310,7 @@ Skip the step where he installs "mmd_tools" in the video below, it's not needed 
 #### 0.20.1
 - Update MMD Tools to latest version.
 - Change patchlog link to correct github.
+- Updated Wiki link.
   
 #### 0.20.0
 
