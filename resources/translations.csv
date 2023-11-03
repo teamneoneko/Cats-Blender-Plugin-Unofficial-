@@ -474,7 +474,7 @@ HelpButton.label,Need Help?,ウィキを参照してください,우리 위키�
 HelpButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki,,
 HelpButton.success,Github opened.,,
 PatchnotesButton.label,Latest Patchnotes,最新のパッチノート,최신 패치노트
-PatchnotesButton.URL,https://github.com/michaeldegroot/cats-blender-plugin/releases,,
+PatchnotesButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases,,
 PatchnotesButton.success,Patchnotes opened.,,
 ScanButton.label,Scan for decimation models,デシメーション モデルのスキャン,버텍스 줄일 모델 검색
 ScanButton.desc,Separates the mesh.,,
