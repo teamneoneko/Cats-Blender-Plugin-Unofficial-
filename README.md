@@ -1,8 +1,12 @@
-# Cats Blender Plugin (0.20.0).
+# Cats Blender Plugin (0.20.1) DEVLOPMENT VERSION.
+
+#### THIS VERSION IS A DEVLOPMENT VERSION NOT INTENDED FOR PRODUCTION USE, THIS VERSION MAY BREAK FROM TIME TO TIME WHILE I WORK ON IT.
 
 This Plugin was originally by absolute-quantum [click here](https://github.com/michaeldegroot/cats-blender-plugin/) to view the original github for the project.
 
-I decided to maintain this plugin myself because the original one was abandoned a long time ago and it does not seem to be being picked up. The community was maintaining it but updates are slow. Though i will not be introducing any new features I am going to try and keep the plugin updated to the best of my abilty. 
+I decided to maintain this plugin myself because the original one was abandoned by it's author a long time ago and this does not seem like it's going to change anytime soon. However the community was maintaining it but updates are slow. Though i will most likely not be introducing any new features I am going to try and keep the plugin updated to the best of my abilty. 
+
+Though i have bumped the blender version to 3.6.* I do recomend to use 3.5 due to 3.6 being a bit crashy (Though seems to be more stable then it was a few months ago).
 
 # What is cat's?
 
@@ -15,7 +19,7 @@ All the hours long processes of fixing your models are compressed into a few fun
 So if you enjoy how this plugin saves you countless hours of work consider supporting us through Patreon.
 There are a lot of perks like having your name inside the plugin!
 
-#### Download here: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/main.zip)
+#### Download here: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/dev.zip)
 
 ## Features (Click to Expand)
  - <details><summary>Creating lip syncing</summary>
@@ -304,15 +308,20 @@ Skip the step where he installs "mmd_tools" in the video below, it's not needed 
 
 ---
 ## Changelogs
+
+#### 0.20.1
+- Update MMD Tools to latest version.
+- Change patchlog link to correct github.
+- Updated Wiki link.
   
 #### 0.20.0
+
 - Removed Patreon and removed supporters tab fully. I done this because the original project is dead.
 - Change the discord link to go to the github wiki, i going to put up some basic things on there at somepoint.
 - Added in credits that i maintaining this version.
-- Updated MMD tools to the latest version.
 - Added 3.0 Eye Tracking by Mysteryem
 - Fix for Unselect all being called too many times.
-  
+
 #### 0.19.3 
 - Fix for update loop.
 

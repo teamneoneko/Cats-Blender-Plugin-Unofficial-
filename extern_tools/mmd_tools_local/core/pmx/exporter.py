@@ -1238,8 +1238,8 @@ class __PmxExporter:
         self.__model = pmx.Model()
         self.__model.name = 'test'
         self.__model.name_e = 'test eng'
-        self.__model.comment = 'exported by mmd_tools'
-        self.__model.comment_e = 'exported by mmd_tools'
+        self.__model.comment = 'exported by mmd_tools_local'
+        self.__model.comment_e = 'exported by mmd_tools_local'
 
         if root is not None:
             self.__model.name = root.mmd_root.name or root.name

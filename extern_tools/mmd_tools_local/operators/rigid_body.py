@@ -5,14 +5,13 @@ from typing import Dict
 
 import bpy
 import mmd_tools_local.core.model as mmd_model
-from bpy.types import Operator
 from mmd_tools_local import utils
-from mmd_tools_local.bpyutils import Props
+from mmd_tools_local.bpyutils import Props, activate_layer_collection
 from mmd_tools_local.core import rigid_body
 
 
-class SelectRigidBody(Operator):
-    bl_idname = 'mmd_tools.rigid_body_select'
+class SelectRigidBody(bpy.types.Operator):
+    bl_idname = 'mmd_tools_local.rigid_body_select'
     bl_label = 'Select Rigid Body'
     bl_description = 'Select similar rigidbody objects which have the same property values with active rigidbody object'
     bl_options = {'REGISTER', 'UNDO'}
@@ -78,8 +77,8 @@ class SelectRigidBody(Operator):
 
         return { 'FINISHED' }
 
-class AddRigidBody(Operator):
-    bl_idname = 'mmd_tools.rigid_body_add'
+class AddRigidBody(bpy.types.Operator):
+    bl_idname = 'mmd_tools_local.rigid_body_add'
     bl_label = 'Add Rigid Body'
     bl_description = 'Add Rigid Bodies to selected bones'
     bl_options = {'REGISTER', 'UNDO', 'PRESET', 'INTERNAL'}
@@ -263,8 +262,8 @@ class AddRigidBody(Operator):
         vm = context.window_manager
         return vm.invoke_props_dialog(self)
 
-class RemoveRigidBody(Operator):
-    bl_idname = 'mmd_tools.rigid_body_remove'
+class RemoveRigidBody(bpy.types.Operator):
+    bl_idname = 'mmd_tools_local.rigid_body_remove'
     bl_label = 'Remove Rigid Body'
     bl_description = 'Deletes the currently selected Rigid Body'
     bl_options = {'REGISTER', 'UNDO'}
@@ -283,7 +282,7 @@ class RemoveRigidBody(Operator):
         return { 'FINISHED' } 
 
 class RigidBodyBake(bpy.types.Operator):
-    bl_idname = 'mmd_tools.ptcache_rigid_body_bake'
+    bl_idname = 'mmd_tools_local.ptcache_rigid_body_bake'
     bl_label = 'Bake'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
@@ -298,7 +297,7 @@ class RigidBodyBake(bpy.types.Operator):
         return {'FINISHED'}
 
 class RigidBodyDeleteBake(bpy.types.Operator):
-    bl_idname = 'mmd_tools.ptcache_rigid_body_delete_bake'
+    bl_idname = 'mmd_tools_local.ptcache_rigid_body_delete_bake'
     bl_label = 'Delete Bake'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
@@ -312,8 +311,8 @@ class RigidBodyDeleteBake(bpy.types.Operator):
 
         return {'FINISHED'}
 
-class AddJoint(Operator): 
-    bl_idname = 'mmd_tools.joint_add'
+class AddJoint(bpy.types.Operator): 
+    bl_idname = 'mmd_tools_local.joint_add'
     bl_label = 'Add Joint'
     bl_description = 'Add Joint(s) to selected rigidbody objects'
     bl_options = {'REGISTER', 'UNDO', 'PRESET', 'INTERNAL'}
@@ -445,8 +444,8 @@ class AddJoint(Operator):
         vm = context.window_manager
         return vm.invoke_props_dialog(self)
 
-class RemoveJoint(Operator):
-    bl_idname = 'mmd_tools.joint_remove'
+class RemoveJoint(bpy.types.Operator):
+    bl_idname = 'mmd_tools_local.joint_remove'
     bl_label = 'Remove Joint'
     bl_description = 'Deletes the currently selected Joint'
     bl_options = {'REGISTER', 'UNDO'}
@@ -464,8 +463,8 @@ class RemoveJoint(Operator):
             utils.selectAObject(root)
         return { 'FINISHED' }
 
-class UpdateRigidBodyWorld(Operator):
-    bl_idname = 'mmd_tools.rigid_body_world_update'
+class UpdateRigidBodyWorld(bpy.types.Operator):
+    bl_idname = 'mmd_tools_local.rigid_body_world_update'
     bl_label = 'Update Rigid Body World'
     bl_description = 'Update rigid body world and references of rigid body constraint according to current scene objects (experimental)'
     bl_options = {'REGISTER', 'UNDO'}
@@ -474,15 +473,6 @@ class UpdateRigidBodyWorld(Operator):
     def __get_rigid_body_world_objects():
         rigid_body.setRigidBodyWorldEnabled(True)
         rbw = bpy.context.scene.rigidbody_world
-        if bpy.app.version < (2, 80, 0):
-            if not rbw.group:
-                rbw.group = bpy.data.groups.new('RigidBodyWorld')
-                rbw.group.use_fake_user = True
-            if not rbw.constraints:
-                rbw.constraints = bpy.data.groups.new('RigidBodyConstraints')
-                rbw.constraints.use_fake_user = True
-            return rbw.group.objects, rbw.constraints.objects
-
         if not rbw.collection:
             rbw.collection = bpy.data.collections.new('RigidBodyWorld')
             rbw.collection.use_fake_user = True
@@ -497,12 +487,12 @@ class UpdateRigidBodyWorld(Operator):
         return rbw.collection.objects, rbw.constraints.objects
 
     def execute(self, context):
-        scene_objs = (bpy.context.scene.objects,)
-        scene_objs += tuple({x.dupli_group.objects for x in scene_objs[0] if x.dupli_type == 'GROUP' and x.dupli_group}) if bpy.app.version < (2, 80, 0)\
-            else tuple({x.instance_collection.objects for x in scene_objs[0] if x.instance_type == 'COLLECTION' and x.instance_collection})
+        scene = context.scene
+        scene_objs = set(scene.objects)
+        scene_objs.union(o for x in scene.objects if x.instance_type == 'COLLECTION' and x.instance_collection for o in x.instance_collection.objects)
 
         def _update_group(obj, group):
-            if any((obj in x.values()) for x in scene_objs):
+            if obj in scene_objs:
                 if obj not in group.values():
                     group.link(obj)
                 return True
@@ -517,25 +507,49 @@ class UpdateRigidBodyWorld(Operator):
             if getattr(obj, 'override_library', None):
                 yield from _references(obj.override_library.reference)
 
-        _find_root = mmd_model.Model.findRoot
+        _find_root = mmd_model.FnModel.find_root
+        need_rebuild_physics = scene.rigidbody_world is None or scene.rigidbody_world.collection is None or scene.rigidbody_world.constraints is None
         rb_objs, rbc_objs = self.__get_rigid_body_world_objects()
         objects = bpy.data.objects
         table = {}
 
-        for i in (x for x in objects if x.rigid_body):
-            if _update_group(i, rb_objs):
-                rb_map = table.setdefault(_find_root(i), {})
-                if i in rb_map: # means rb_map[i] will replace i
-                    rb_objs.unlink(i)
-                    continue
-                for r in _references(i):
-                    rb_map[r] = i
+        # Perhaps due to a bug in Blender,
+        # when bpy.ops.rigidbody.world_remove(),
+        # Object.rigid_body are removed,
+        # but Object.rigid_body_constraint are retained.
+        # Therefore, it must be checked with Object.mmd_type.
+        for i in (x for x in objects if x.mmd_type == 'RIGID_BODY'):
+            if not _update_group(i, rb_objs):
+                continue
+
+            rb_map = table.setdefault(_find_root(i), {})
+            if i in rb_map: # means rb_map[i] will replace i
+                rb_objs.unlink(i)
+                continue
+            for r in _references(i):
+                rb_map[r] = i
+
+            # TODO Modify mmd_rigid to allow recovery of the remaining rigidbody parameters.
+            # mass, friction, restitution, linear_dumping, angular_dumping
 
         for i in (x for x in objects if x.rigid_body_constraint):
-            if _update_group(i, rbc_objs):
-                rbc, root = i.rigid_body_constraint, _find_root(i)
-                rb_map = table.get(root, {})
-                rbc.object1 = rb_map.get(rbc.object1, rbc.object1)
-                rbc.object2 = rb_map.get(rbc.object2, rbc.object2)
+            if not _update_group(i, rbc_objs):
+                continue
+
+            rbc, root = i.rigid_body_constraint, _find_root(i)
+            rb_map = table.get(root, {})
+            rbc.object1 = rb_map.get(rbc.object1, rbc.object1)
+            rbc.object2 = rb_map.get(rbc.object2, rbc.object2)
+
+        if need_rebuild_physics:
+            for root in scene.objects:
+                if root.mmd_type != 'ROOT':
+                    continue
+                if not root.mmd_root.is_built:
+                    continue
+                with activate_layer_collection(root):
+                    mmd_model.Model(root).build()
+                    # After rebuild. First play. Will be crash!
+                    # But saved it before. Reload after crash. The play can be work.
 
         return { 'FINISHED' }

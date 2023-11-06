@@ -11,7 +11,7 @@ import mmd_tools_local.core.model as mmd_model
 
 
 class AddDisplayItemFrame(Operator):
-    bl_idname = 'mmd_tools.display_item_frame_add'
+    bl_idname = 'mmd_tools_local.display_item_frame_add'
     bl_label = 'Add Display Item Frame'
     bl_description = 'Add a display item frame to the list'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -28,7 +28,7 @@ class AddDisplayItemFrame(Operator):
         return {'FINISHED'}
 
 class RemoveDisplayItemFrame(Operator):
-    bl_idname = 'mmd_tools.display_item_frame_remove'
+    bl_idname = 'mmd_tools_local.display_item_frame_remove'
     bl_label = 'Remove Display Item Frame'
     bl_description = 'Remove active display item frame from the list'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -50,7 +50,7 @@ class RemoveDisplayItemFrame(Operator):
         return {'FINISHED'}
 
 class MoveDisplayItemFrame(Operator, ItemMoveOp):
-    bl_idname = 'mmd_tools.display_item_frame_move'
+    bl_idname = 'mmd_tools_local.display_item_frame_move'
     bl_label = 'Move Display Item Frame'
     bl_description = 'Move active display item frame up/down in the list'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -70,7 +70,7 @@ class MoveDisplayItemFrame(Operator, ItemMoveOp):
         return {'FINISHED'}
 
 class AddDisplayItem(Operator):
-    bl_idname = 'mmd_tools.display_item_add'
+    bl_idname = 'mmd_tools_local.display_item_add'
     bl_label = 'Add Display Item'
     bl_description = 'Add a display item to the list'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -113,7 +113,7 @@ class AddDisplayItem(Operator):
         frame.active_item = index
 
 class RemoveDisplayItem(Operator):
-    bl_idname = 'mmd_tools.display_item_remove'
+    bl_idname = 'mmd_tools_local.display_item_remove'
     bl_label = 'Remove Display Item'
     bl_description = 'Remove display item(s) from the list'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -141,7 +141,7 @@ class RemoveDisplayItem(Operator):
         return {'FINISHED'}
 
 class MoveDisplayItem(Operator, ItemMoveOp):
-    bl_idname = 'mmd_tools.display_item_move'
+    bl_idname = 'mmd_tools_local.display_item_move'
     bl_label = 'Move Display Item'
     bl_description = 'Move active display item up/dowm in the list'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -157,7 +157,7 @@ class MoveDisplayItem(Operator, ItemMoveOp):
         return {'FINISHED'}
 
 class FindDisplayItem(Operator):
-    bl_idname = 'mmd_tools.display_item_find'
+    bl_idname = 'mmd_tools_local.display_item_find'
     bl_label = 'Find Display Item'
     bl_description = 'Find the display item of active bone or morph'
     bl_options = {'INTERNAL'}
@@ -205,7 +205,7 @@ class FindDisplayItem(Operator):
                     return
 
 class SelectCurrentDisplayItem(Operator):
-    bl_idname = 'mmd_tools.display_item_select_current'
+    bl_idname = 'mmd_tools_local.display_item_select_current'
     bl_label = 'Select Current Display Item'
     bl_description = 'Select the bone or morph assigned to the display item'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -232,7 +232,7 @@ class SelectCurrentDisplayItem(Operator):
         return {'FINISHED'}
 
 class DisplayItemQuickSetup(Operator):
-    bl_idname = 'mmd_tools.display_item_quick_setup'
+    bl_idname = 'mmd_tools_local.display_item_quick_setup'
     bl_label = 'Display Item Quick Setup'
     bl_description = 'Quick setup display items'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}

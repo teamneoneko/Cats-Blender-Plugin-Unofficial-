@@ -5,7 +5,7 @@ from bpy.types import Panel
 from mmd_tools_local.core.lamp import MMDLamp
 
 class MMDLampPanel(Panel):
-    bl_idname = 'OBJECT_PT_mmd_tools_light'
+    bl_idname = 'OBJECT_PT_mmd_tools_local_light'
     bl_label = 'MMD Light Tools'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -30,5 +30,5 @@ class MMDLampPanel(Panel):
             c.prop(lamp.data, 'color')
             c.prop(lamp, 'location', text='Light Source')
         else:
-            layout.operator('mmd_tools.convert_to_mmd_lamp', text='Convert')
+            layout.operator('mmd_tools_local.convert_to_mmd_lamp', text='Convert')
 

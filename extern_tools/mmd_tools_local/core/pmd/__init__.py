@@ -596,10 +596,10 @@ class Model:
 def load(path):
     with FileReadStream(path) as fs:
         logging.info('****************************************')
-        logging.info(' mmd_tools.pmd module')
+        logging.info(' mmd_tools_local.pmd module')
         logging.info('----------------------------------------')
         logging.info(' Start load model data form a pmd file')
-        logging.info('            by the mmd_tools.pmd modlue.')
+        logging.info('            by the mmd_tools_local.pmd modlue.')
         logging.info('')
 
         model = Model()
@@ -611,6 +611,6 @@ def load(path):
 
         logging.info(' Finish loading.')
         logging.info('----------------------------------------')
-        logging.info(' mmd_tools.pmd module')
+        logging.info(' mmd_tools_local.pmd module')
         logging.info('****************************************')
         return model

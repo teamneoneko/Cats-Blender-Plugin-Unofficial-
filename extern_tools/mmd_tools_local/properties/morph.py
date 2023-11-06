@@ -102,6 +102,8 @@ def _get_bone(prop):
     root = prop.id_data
     fnModel = FnModel(root)
     arm = fnModel.armature()
+    if arm is None:
+        return ''
     fnBone = FnBone.from_bone_id(arm, bone_id)
     if not fnBone:
         return ''
@@ -112,6 +114,12 @@ def _set_bone(prop, value):
     root = prop.id_data
     fnModel = FnModel(root)
     arm = fnModel.armature()
+
+    # Load the library_override file. This function is triggered when loading, but the arm obj cannot be found.
+    # The arm obj is exist, but the relative relationship has not yet been established.
+    if arm is None:
+        return
+
     if value not in arm.pose.bones.keys():
         prop['bone_id'] = -1
         return
@@ -179,45 +187,47 @@ class BoneMorph(_MorphBase, bpy.types.PropertyGroup):
 
 
 def _get_material(prop):
-    mat_id = prop.get('material_id', -1)
-    if mat_id < 0:
-        return ''
-    fnMat = FnMaterial.from_material_id(mat_id)
-    if not fnMat:
-        return ''
-    return fnMat.material.name
+    mat_p = prop.get('material_data', None)
+    if mat_p is not None:
+        return mat_p.name
+    return ''
 
 
 def _set_material(prop, value):
-    if value not in bpy.data.materials.keys():
+    if value not in bpy.data.materials:
+        prop['material_data'] = None
         prop['material_id'] = -1
-        return
-    mat = bpy.data.materials[value]
-    fnMat = FnMaterial(mat)
-    prop['material_id'] = fnMat.material_id
+    else:
+        mat = bpy.data.materials[value]
+        fnMat = FnMaterial(mat)
+        prop['material_data'] = mat
+        prop['material_id'] = fnMat.material_id
 
 
 def _set_related_mesh(prop, value):
     rig = FnModel(prop.id_data)
-    if rig.findMesh(value):
-        prop['related_mesh'] = value
+    mesh = rig.findMesh(value)
+    if mesh is not None:
+        prop['related_mesh_data'] = mesh.data
     else:
-        prop['related_mesh'] = ''
+        prop['related_mesh_data'] = None
 
 
 def _get_related_mesh(prop):
-    return prop.get('related_mesh', '')
+    mesh_p = prop.get('related_mesh_data', None)
+    if mesh_p is not None:
+        return mesh_p.name
+    return ''
 
 
 def _update_material_morph_data(prop, context):
     if not prop.name.startswith('mmd_bind'):
         return
     from mmd_tools_local.core.shader import _MaterialMorph
-    mat_id = prop.get('material_id', -1)
-    if mat_id >= 0:
-        mat = getattr(FnMaterial.from_material_id(mat_id), 'material', None)
+    mat = prop['material_data']
+    if mat is not None:
         _MaterialMorph.update_morph_inputs(mat, prop)
-    elif mat_id == -1:
+    else:
         for mat in FnModel(prop.id_data).materials():
             _MaterialMorph.update_morph_inputs(mat, prop)
 
@@ -231,6 +241,12 @@ class MaterialMorphData(bpy.types.PropertyGroup):
         set=_set_related_mesh,
         get=_get_related_mesh,
     )
+
+    related_mesh_data: bpy.props.PointerProperty(
+        name='Related Mesh Data',
+        type=bpy.types.Mesh,
+    )
+
     offset_type: bpy.props.EnumProperty(
         name='Offset Type',
         description='Select offset type',
@@ -240,6 +256,7 @@ class MaterialMorphData(bpy.types.PropertyGroup):
         ],
         default='ADD'
     )
+
     material: bpy.props.StringProperty(
         name='Material',
         description='Target material',
@@ -250,6 +267,11 @@ class MaterialMorphData(bpy.types.PropertyGroup):
     material_id: bpy.props.IntProperty(
         name='Material ID',
         default=-1,
+    )
+
+    material_data: bpy.props.PointerProperty(
+        name='Material Data',
+        type=bpy.types.Material,
     )
 
     diffuse_color: bpy.props.FloatVectorProperty(

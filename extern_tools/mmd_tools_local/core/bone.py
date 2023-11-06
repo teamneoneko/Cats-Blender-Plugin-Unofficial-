@@ -418,9 +418,9 @@ class _AT_ShadowBoneCreate:
         shadow_p_bone.is_mmd_shadow_bone = True
         shadow_p_bone.mmd_shadow_bone_type = 'SHADOW'
 
-        if 'mmd_tools_at_dummy' not in shadow_p_bone.constraints:
+        if 'mmd_tools_local_at_dummy' not in shadow_p_bone.constraints:
             c = shadow_p_bone.constraints.new('COPY_TRANSFORMS')
-            c.name = 'mmd_tools_at_dummy'
+            c.name = 'mmd_tools_local_at_dummy'
             c.target = dummy_p_bone.id_data
             c.subtarget = dummy_p_bone.name
             c.target_space = 'POSE'

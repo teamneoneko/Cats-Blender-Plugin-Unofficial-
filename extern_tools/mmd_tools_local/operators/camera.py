@@ -8,7 +8,7 @@ from bpy.types import Operator
 from mmd_tools_local.core.camera import MMDCamera
 
 class ConvertToMMDCamera(Operator):
-    bl_idname = 'mmd_tools.convert_to_mmd_camera'
+    bl_idname = 'mmd_tools_local.convert_to_mmd_camera'
     bl_label = 'Convert to MMD Camera'
     bl_description = 'Create a camera rig for MMD'
     bl_options = {'REGISTER', 'UNDO'}

@@ -14,7 +14,7 @@ from mmd_tools_local.core.bone import FnBone
 
 
 class SelectObject(Operator):
-    bl_idname = 'mmd_tools.object_select'
+    bl_idname = 'mmd_tools_local.object_select'
     bl_label = 'Select Object'
     bl_description = 'Select the object'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -31,7 +31,7 @@ class SelectObject(Operator):
         return {'FINISHED'}
 
 class MoveObject(Operator, utils.ItemMoveOp):
-    bl_idname = 'mmd_tools.object_move'
+    bl_idname = 'mmd_tools_local.object_move'
     bl_label = 'Move Object'
     bl_description = 'Move active object up/down in the list'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -91,7 +91,7 @@ class MoveObject(Operator, utils.ItemMoveOp):
         return __MovableList(objects)
 
 class CleanShapeKeys(Operator):
-    bl_idname = 'mmd_tools.clean_shape_keys'
+    bl_idname = 'mmd_tools_local.clean_shape_keys'
     bl_label = 'Clean Shape Keys'
     bl_description = 'Remove unused shape keys of selected mesh objects'
     bl_options = {'REGISTER', 'UNDO'}
@@ -129,7 +129,7 @@ class CleanShapeKeys(Operator):
         return {'FINISHED'}
 
 class SeparateByMaterials(Operator):
-    bl_idname = 'mmd_tools.separate_by_materials'
+    bl_idname = 'mmd_tools_local.separate_by_materials'
     bl_label = 'Separate By Materials'
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -147,7 +147,7 @@ class SeparateByMaterials(Operator):
     def __separate_by_materials(self, obj):
         utils.separateByMaterials(obj)
         if self.clean_shape_keys:
-            bpy.ops.mmd_tools.clean_shape_keys()
+            bpy.ops.mmd_tools_local.clean_shape_keys()
 
     def execute(self, context):
         obj = context.active_object
@@ -155,8 +155,8 @@ class SeparateByMaterials(Operator):
         if root is None:
             self.__separate_by_materials(obj)
         else:
-            bpy.ops.mmd_tools.clear_temp_materials()
-            bpy.ops.mmd_tools.clear_uv_morph_view()
+            bpy.ops.mmd_tools_local.clear_temp_materials()
+            bpy.ops.mmd_tools_local.clear_uv_morph_view()
 
             # Store the current material names
             rig = mmd_model.Model(root)
@@ -175,7 +175,7 @@ class SeparateByMaterials(Operator):
         return {'FINISHED'}
 
 class JoinMeshes(Operator):
-    bl_idname = 'mmd_tools.join_meshes'
+    bl_idname = 'mmd_tools_local.join_meshes'
     bl_label = 'Join Meshes'
     bl_description = 'Join the Model meshes into a single one'
     bl_options = {'REGISTER', 'UNDO'}
@@ -193,8 +193,8 @@ class JoinMeshes(Operator):
             self.report({ 'ERROR' }, 'Select a MMD model')
             return { 'CANCELLED' }
 
-        bpy.ops.mmd_tools.clear_temp_materials()
-        bpy.ops.mmd_tools.clear_uv_morph_view()
+        bpy.ops.mmd_tools_local.clear_temp_materials()
+        bpy.ops.mmd_tools_local.clear_uv_morph_view()
 
         # Find all the meshes in mmd_root
         rig = mmd_model.Model(root)
@@ -225,7 +225,7 @@ class JoinMeshes(Operator):
         return { 'FINISHED' }
 
 class AttachMeshesToMMD(Operator):
-    bl_idname = 'mmd_tools.attach_meshes'
+    bl_idname = 'mmd_tools_local.attach_meshes'
     bl_label = 'Attach Meshes to Model'
     bl_description = 'Finds existing meshes and attaches them to the selected MMD model'
     bl_options = {'REGISTER', 'UNDO'}
@@ -249,7 +249,7 @@ class AttachMeshesToMMD(Operator):
         return { 'FINISHED' }
 
 class ChangeMMDIKLoopFactor(Operator):
-    bl_idname = 'mmd_tools.change_mmd_ik_loop_factor'
+    bl_idname = 'mmd_tools_local.change_mmd_ik_loop_factor'
     bl_label = 'Change MMD IK Loop Factor'
     bl_description = "Multiplier for all bones' IK iterations in Blender"
     bl_options = {'REGISTER', 'UNDO'}
@@ -311,7 +311,7 @@ class ChangeMMDIKLoopFactor(Operator):
         return { 'FINISHED' }
 
 class RecalculateBoneRoll(Operator):
-    bl_idname = 'mmd_tools.recalculate_bone_roll'
+    bl_idname = 'mmd_tools_local.recalculate_bone_roll'
     bl_label = 'Recalculate bone roll'
     bl_description = 'Recalculate bone roll for arm related bones'
     bl_options = {'REGISTER', 'UNDO'}

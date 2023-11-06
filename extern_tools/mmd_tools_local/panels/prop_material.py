@@ -12,7 +12,7 @@ if bpy.app.version < (2, 80, 0):
 
 
 class MMDMaterialPanel(Panel):
-    bl_idname = 'MATERIAL_PT_mmd_tools_material'
+    bl_idname = 'MATERIAL_PT_mmd_tools_local_material'
     bl_label = 'MMD Material'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -71,7 +71,7 @@ class MMDMaterialPanel(Panel):
         r.prop(mmd_material, 'edge_weight', slider=True)
 
 class MMDTexturePanel(Panel):
-    bl_idname = 'MATERIAL_PT_mmd_tools_texture'
+    bl_idname = 'MATERIAL_PT_mmd_tools_local_texture'
     bl_label = 'MMD Texture'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -97,12 +97,12 @@ class MMDTexturePanel(Panel):
         if tex:
             if tex.type == 'IMAGE' and tex.image:
                 r.prop(tex.image, 'filepath', text='')
-                r.operator('mmd_tools.material_remove_texture', text='', icon='PANEL_CLOSE')
+                r.operator('mmd_tools_local.material_remove_texture', text='', icon='PANEL_CLOSE')
             else:
-                r.operator('mmd_tools.material_remove_texture', text='Remove', icon='PANEL_CLOSE')
+                r.operator('mmd_tools_local.material_remove_texture', text='Remove', icon='PANEL_CLOSE')
                 r.label(icon='ERROR')
         else:
-            r.operator('mmd_tools.material_open_texture', text='Add', icon=ICON_FILE_FOLDER)
+            r.operator('mmd_tools_local.material_open_texture', text='Add', icon=ICON_FILE_FOLDER)
 
         col = layout.column()
         col.label(text='Sphere Texture:')
@@ -111,12 +111,12 @@ class MMDTexturePanel(Panel):
         if tex:
             if tex.type == 'IMAGE' and tex.image:
                 r.prop(tex.image, 'filepath', text='')
-                r.operator('mmd_tools.material_remove_sphere_texture', text='', icon='PANEL_CLOSE')
+                r.operator('mmd_tools_local.material_remove_sphere_texture', text='', icon='PANEL_CLOSE')
             else:
-                r.operator('mmd_tools.material_remove_sphere_texture', text='Remove', icon='PANEL_CLOSE')
+                r.operator('mmd_tools_local.material_remove_sphere_texture', text='Remove', icon='PANEL_CLOSE')
                 r.label(icon='ERROR')
         else:
-            r.operator('mmd_tools.material_open_sphere_texture', text='Add', icon=ICON_FILE_FOLDER)
+            r.operator('mmd_tools_local.material_open_sphere_texture', text='Add', icon=ICON_FILE_FOLDER)
         col.row(align=True).prop(mmd_material, 'sphere_texture_type', expand=True)
 
         col = layout.column()

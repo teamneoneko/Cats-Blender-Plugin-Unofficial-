@@ -51,7 +51,7 @@ class RigidBodyMaterial:
     @classmethod
     def getMaterial(cls, number):
         number = int(number)
-        material_name = 'mmd_tools_rigid_%d'%(number)
+        material_name = 'mmd_tools_local_rigid_%d'%(number)
         if material_name not in bpy.data.materials:
             mat = bpy.data.materials.new(material_name)
             color = cls.COLORS[number]

@@ -29,10 +29,10 @@ def import_pmd_to_pmx(filepath):
 
     logging.info('')
     logging.info('****************************************')
-    logging.info(' mmd_tools.import_pmd module')
+    logging.info(' mmd_tools_local.import_pmd module')
     logging.info('----------------------------------------')
     logging.info(' Start to convert pmd data into pmx data')
-    logging.info('              by the mmd_tools.pmd modlue.')
+    logging.info('              by the mmd_tools_local.pmd modlue.')
     logging.info('')
 
     pmx_model = pmx.Model()
@@ -356,7 +356,7 @@ def import_pmd_to_pmx(filepath):
 
     logging.info(' Finish converting pmd into pmx.')
     logging.info('----------------------------------------')
-    logging.info(' mmd_tools.import_pmd module')
+    logging.info(' mmd_tools_local.import_pmd module')
     logging.info('****************************************')
 
     return pmx_model

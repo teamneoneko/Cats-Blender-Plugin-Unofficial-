@@ -60,7 +60,7 @@ def _update_types(cls, prop):
         cls.types = types # trigger update
 
 class ImportPmx(Operator, ImportHelper):
-    bl_idname = 'mmd_tools.import_model'
+    bl_idname = 'mmd_tools_local.import_model'
     bl_label = 'Import Model File (.pmd, .pmx)'
     bl_description = 'Import model file(s) (.pmd, .pmx)'
     bl_options = {'REGISTER', 'UNDO', 'PRESET'}
@@ -170,7 +170,7 @@ class ImportPmx(Operator, ImportHelper):
         logger = logging.getLogger()
         logger.setLevel(self.log_level)
         if self.save_log:
-            handler = log_handler(self.log_level, filepath=self.filepath + '.mmd_tools.import.log')
+            handler = log_handler(self.log_level, filepath=self.filepath + '.mmd_tools_local.import.log')
             logger.addHandler(handler)
         try:
             importer_cls = pmx_importer.PMXImporter
@@ -204,7 +204,7 @@ class ImportPmx(Operator, ImportHelper):
         return {'FINISHED'}
 
 class ImportVmd(Operator, ImportHelper):
-    bl_idname = 'mmd_tools.import_vmd'
+    bl_idname = 'mmd_tools_local.import_vmd'
     bl_label = 'Import VMD File (.vmd)'
     bl_description = 'Import a VMD file to selected objects (.vmd)'
     bl_options = {'REGISTER', 'UNDO', 'PRESET'}
@@ -332,7 +332,7 @@ class ImportVmd(Operator, ImportHelper):
         return {'FINISHED'}
 
 class ImportVpd(Operator, ImportHelper):
-    bl_idname = 'mmd_tools.import_vpd'
+    bl_idname = 'mmd_tools_local.import_vpd'
     bl_label = 'Import VPD File (.vpd)'
     bl_description = "Import VPD file(s) to selected rig's pose library (.vpd)"
     bl_options = {'REGISTER', 'UNDO', 'PRESET'}
@@ -427,7 +427,7 @@ class ImportVpd(Operator, ImportHelper):
         return {'FINISHED'}
 
 class ExportPmx(Operator, ExportHelper):
-    bl_idname = 'mmd_tools.export_pmx'
+    bl_idname = 'mmd_tools_local.export_pmx'
     bl_label = 'Export PMX File (.pmx)'
     bl_description = 'Export selected MMD model(s) to PMX file(s) (.pmx)'
     bl_options = {'PRESET'}
@@ -524,7 +524,7 @@ class ExportPmx(Operator, ExportHelper):
         logger = logging.getLogger()
         logger.setLevel(self.log_level)
         if self.save_log:
-            handler = log_handler(self.log_level, filepath=self.filepath + '.mmd_tools.export.log')
+            handler = log_handler(self.log_level, filepath=self.filepath + '.mmd_tools_local.export.log')
             logger.addHandler(handler)
 
         rig = mmd_model.Model(root)
@@ -572,7 +572,7 @@ class ExportPmx(Operator, ExportHelper):
         return {'FINISHED'}
 
 class ExportVmd(Operator, ExportHelper):
-    bl_idname = 'mmd_tools.export_vmd'
+    bl_idname = 'mmd_tools_local.export_vmd'
     bl_label = 'Export VMD File (.vmd)'
     bl_description = 'Export motion data of active object to a VMD file (.vmd)'
     bl_options = {'PRESET'}
@@ -651,7 +651,7 @@ class ExportVmd(Operator, ExportHelper):
         return {'FINISHED'}
 
 class ExportVpd(Operator, ExportHelper):
-    bl_idname = 'mmd_tools.export_vpd'
+    bl_idname = 'mmd_tools_local.export_vpd'
     bl_label = 'Export VPD File (.vpd)'
     bl_description = 'Export to VPD file(s) (.vpd)'
     bl_description = "Export active rig's pose library to VPD file(s) (.vpd)"

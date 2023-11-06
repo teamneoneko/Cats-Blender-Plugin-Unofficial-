@@ -38,7 +38,7 @@ class _PanelBase(object):
         return bpyutils.addon_preferences('enable_mmd_model_production_features', True)
 
 class MMDModelProductionPanel(_PanelBase, Panel):
-    bl_idname = 'OBJECT_PT_mmd_tools_model_production'
+    bl_idname = 'OBJECT_PT_mmd_tools_local_model_production'
     bl_label = 'Model Production'
     bl_context = ''
 
@@ -49,17 +49,17 @@ class MMDModelProductionPanel(_PanelBase, Panel):
         col = layout.column(align=True)
         grid = col.grid_flow(row_major=True)
         row = grid.row(align=True)
-        row.operator('mmd_tools.create_mmd_model_root_object', text='Create Model', icon='OUTLINER_OB_ARMATURE')
-        row.operator('mmd_tools.convert_to_mmd_model', text='Convert Model', icon='ARMATURE_DATA')
+        row.operator('mmd_tools_local.create_mmd_model_root_object', text='Create Model', icon='OUTLINER_OB_ARMATURE')
+        row.operator('mmd_tools_local.convert_to_mmd_model', text='Convert Model', icon='ARMATURE_DATA')
 
         root = mmd_model.Model.findRoot(active_obj)
         row = grid.row(align=True)
         row.enabled = root is not None
-        row.operator('mmd_tools.attach_meshes', text='Attach Meshes', icon='OUTLINER_OB_MESH')
+        row.operator('mmd_tools_local.attach_meshes', text='Attach Meshes', icon='OUTLINER_OB_MESH')
 
         row = grid.row(align=True)
-        row.operator('mmd_tools.translate_mmd_model', text='Translate', icon='HELP')
-        row.operator('mmd_tools.global_translation_popup', text='', icon='WINDOW')
+        row.operator('mmd_tools_local.translate_mmd_model', text='Translate', icon='HELP')
+        row.operator('mmd_tools_local.global_translation_popup', text='', icon='WINDOW')
 
         self.draw_edit(context)
 
@@ -71,25 +71,25 @@ class MMDModelProductionPanel(_PanelBase, Panel):
         separate_row = grid.row(align=True)
         row = separate_row.row(align=True)
         row.operator_context = 'EXEC_DEFAULT'
-        op = row.operator('mmd_tools.model_separate_by_bones', text='Chop', icon='BONE_DATA')
+        op = row.operator('mmd_tools_local.model_separate_by_bones', text='Chop', icon='BONE_DATA')
         op.separate_armature = True
         op.include_descendant_bones = True
         op.boundary_joint_owner = 'DESTINATION'
 
         row = row.row(align=True)
         row.operator_context = 'INVOKE_DEFAULT'
-        op = row.operator('mmd_tools.model_separate_by_bones', text='', icon='WINDOW')
+        op = row.operator('mmd_tools_local.model_separate_by_bones', text='', icon='WINDOW')
 
         row = separate_row.row(align=True)
         row.operator_context = 'EXEC_DEFAULT'
-        op = row.operator('mmd_tools.model_separate_by_bones', text='Peel', icon='MOD_EXPLODE')
+        op = row.operator('mmd_tools_local.model_separate_by_bones', text='Peel', icon='MOD_EXPLODE')
         op.separate_armature = False
         op.include_descendant_bones = False
         op.boundary_joint_owner = 'DESTINATION'
 
         row = grid.row(align=True)
         row.operator_context = 'INVOKE_DEFAULT'
-        row.operator('mmd_tools.model_join_by_bones', text='Join', icon='GROUP_BONE')
+        row.operator('mmd_tools_local.model_join_by_bones', text='Join', icon='GROUP_BONE')
 
 class MMD_ROOT_UL_display_item_frames(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
@@ -192,29 +192,29 @@ class MMD_ROOT_UL_display_items(UIList):
 
 
 class MMDDisplayItemFrameMenu(Menu):
-    bl_idname = 'OBJECT_MT_mmd_tools_display_item_frame_menu'
+    bl_idname = 'OBJECT_MT_mmd_tools_local_display_item_frame_menu'
     bl_label = 'Display Item Frame Menu'
 
     def draw(self, context):
         layout = self.layout
-        layout.operator_enum('mmd_tools.display_item_quick_setup', 'type')
+        layout.operator_enum('mmd_tools_local.display_item_quick_setup', 'type')
         layout.separator()
-        layout.operator('mmd_tools.display_item_frame_move', icon=TRIA_UP_BAR, text='Move To Top').type = 'TOP'
-        layout.operator('mmd_tools.display_item_frame_move', icon=TRIA_DOWN_BAR, text='Move To Bottom').type = 'BOTTOM'
+        layout.operator('mmd_tools_local.display_item_frame_move', icon=TRIA_UP_BAR, text='Move To Top').type = 'TOP'
+        layout.operator('mmd_tools_local.display_item_frame_move', icon=TRIA_DOWN_BAR, text='Move To Bottom').type = 'BOTTOM'
 
 class MMDDisplayItemMenu(Menu):
-    bl_idname = 'OBJECT_MT_mmd_tools_display_item_menu'
+    bl_idname = 'OBJECT_MT_mmd_tools_local_display_item_menu'
     bl_label = 'Display Item Menu'
 
     def draw(self, context):
         layout = self.layout
-        layout.operator('mmd_tools.display_item_remove', text='Delete All', icon='X').all = True
+        layout.operator('mmd_tools_local.display_item_remove', text='Delete All', icon='X').all = True
         layout.separator()
-        layout.operator('mmd_tools.display_item_move', icon=TRIA_UP_BAR, text='Move To Top').type = 'TOP'
-        layout.operator('mmd_tools.display_item_move', icon=TRIA_DOWN_BAR, text='Move To Bottom').type = 'BOTTOM'
+        layout.operator('mmd_tools_local.display_item_move', icon=TRIA_UP_BAR, text='Move To Top').type = 'TOP'
+        layout.operator('mmd_tools_local.display_item_move', icon=TRIA_DOWN_BAR, text='Move To Bottom').type = 'BOTTOM'
 
 class MMDDisplayItemsPanel(_PanelBase, Panel):
-    bl_idname = 'OBJECT_PT_mmd_tools_display_items'
+    bl_idname = 'OBJECT_PT_mmd_tools_local_display_items'
     bl_label = 'Display Panel'
     bl_options = {'DEFAULT_CLOSED'}
 
@@ -236,13 +236,13 @@ class MMDDisplayItemsPanel(_PanelBase, Panel):
             )
         tb = row.column()
         tb1 = tb.column(align=True)
-        tb1.operator('mmd_tools.display_item_frame_add', text='', icon=ICON_ADD)
-        tb1.operator('mmd_tools.display_item_frame_remove', text='', icon=ICON_REMOVE)
-        tb1.menu('OBJECT_MT_mmd_tools_display_item_frame_menu', text='', icon='DOWNARROW_HLT')
+        tb1.operator('mmd_tools_local.display_item_frame_add', text='', icon=ICON_ADD)
+        tb1.operator('mmd_tools_local.display_item_frame_remove', text='', icon=ICON_REMOVE)
+        tb1.menu('OBJECT_MT_mmd_tools_local_display_item_frame_menu', text='', icon='DOWNARROW_HLT')
         tb.separator()
         tb1 = tb.column(align=True)
-        tb1.operator('mmd_tools.display_item_frame_move', text='', icon='TRIA_UP').type = 'UP'
-        tb1.operator('mmd_tools.display_item_frame_move', text='', icon='TRIA_DOWN').type = 'DOWN'
+        tb1.operator('mmd_tools_local.display_item_frame_move', text='', icon='TRIA_UP').type = 'UP'
+        tb1.operator('mmd_tools_local.display_item_frame_move', text='', icon='TRIA_DOWN').type = 'DOWN'
 
         frame = ItemOp.get_by_index(mmd_root.display_item_frames, mmd_root.active_display_item_frame)
         if frame is None:
@@ -258,22 +258,23 @@ class MMDDisplayItemsPanel(_PanelBase, Panel):
             )
         tb = row.column()
         tb1 = tb.column(align=True)
-        tb1.operator('mmd_tools.display_item_add', text='', icon=ICON_ADD)
-        tb1.operator('mmd_tools.display_item_remove', text='', icon=ICON_REMOVE)
-        tb1.menu('OBJECT_MT_mmd_tools_display_item_menu', text='', icon='DOWNARROW_HLT')
+        tb1.operator('mmd_tools_local.display_item_add', text='', icon=ICON_ADD)
+        tb1.operator('mmd_tools_local.display_item_remove', text='', icon=ICON_REMOVE)
+        tb1.menu('OBJECT_MT_mmd_tools_local_display_item_menu', text='', icon='DOWNARROW_HLT')
         tb.separator()
         tb1 = tb.column(align=True)
-        tb1.operator('mmd_tools.display_item_move', text='', icon='TRIA_UP').type = 'UP'
-        tb1.operator('mmd_tools.display_item_move', text='', icon='TRIA_DOWN').type = 'DOWN'
+        tb1.operator('mmd_tools_local.display_item_move', text='', icon='TRIA_UP').type = 'UP'
+        tb1.operator('mmd_tools_local.display_item_move', text='', icon='TRIA_DOWN').type = 'DOWN'
 
         row = col.row()
         r = row.row(align=True)
-        r.operator('mmd_tools.display_item_find', text='Bone', icon='VIEWZOOM').type = 'BONE'
-        r.operator('mmd_tools.display_item_find', text='Morph', icon='VIEWZOOM').type = 'MORPH'
-        row.operator('mmd_tools.display_item_select_current', text='Select')
+        r.operator('mmd_tools_local.display_item_find', text='Bone', icon='VIEWZOOM').type = 'BONE'
+        r.operator('mmd_tools_local.display_item_find', text='Morph', icon='VIEWZOOM').type = 'MORPH'
+        row.operator('mmd_tools_local.display_item_select_current', text='Select')
 
+from mmd_tools_local.properties.morph import MaterialMorph
 
-class MMD_TOOLS_UL_Morphs(UIList):
+class mmd_tools_local_UL_Morphs(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         mmd_root = data
         if self.layout_type in {'DEFAULT'}:
@@ -289,27 +290,28 @@ class MMD_TOOLS_UL_Morphs(UIList):
                 row.label(icon='INFO')
             elif morph_item.morph_type != mmd_root.active_morph_type:
                 row.label(icon='SHAPEKEY_DATA')
+            else:
+                row.label(icon='BLANK1')
+            if isinstance(item, MaterialMorph) and any(not d.material for d in item.data):
+                row.label(icon='TEMP')
         elif self.layout_type in {'COMPACT'}:
             pass
         elif self.layout_type in {'GRID'}:
             layout.alignment = 'CENTER'
             layout.label(text="", icon_value=icon)
 
-class MMD_TOOLS_UL_MaterialMorphOffsets(UIList):
+class mmd_tools_local_UL_MaterialMorphOffsets(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {'DEFAULT'}:
             material = item.material
-            if not material and item.material_id >= 0:
-                layout.label(text='Material ID %d is missing'%item.material_id, translate=False, icon='ERROR')
-            else:
-                layout.label(text=material or 'All Materials', translate=False, icon='MATERIAL')
+            layout.label(text=material or 'All Materials', translate=False, icon='MATERIAL')
         elif self.layout_type in {'COMPACT'}:
             pass
         elif self.layout_type in {'GRID'}:
             layout.alignment = 'CENTER'
             layout.label(text="", icon_value=icon)
 
-class MMD_TOOLS_UL_UVMorphOffsets(UIList):
+class mmd_tools_local_UL_UVMorphOffsets(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {'DEFAULT'}:
             layout.label(text=str(item.index), translate=False, icon='MESH_DATA')
@@ -320,7 +322,7 @@ class MMD_TOOLS_UL_UVMorphOffsets(UIList):
             layout.alignment = 'CENTER'
             layout.label(text="", icon_value=icon)
 
-class MMD_TOOLS_UL_BoneMorphOffsets(UIList):
+class mmd_tools_local_UL_BoneMorphOffsets(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {'DEFAULT'}:
             layout.prop(item, 'bone', text='', emboss=False, icon='BONE_DATA')
@@ -331,7 +333,7 @@ class MMD_TOOLS_UL_BoneMorphOffsets(UIList):
             layout.alignment = 'CENTER'
             layout.label(text="", icon_value=icon)
 
-class MMD_TOOLS_UL_GroupMorphOffsets(UIList):
+class mmd_tools_local_UL_GroupMorphOffsets(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {'DEFAULT'}:
             row = _layout_split(layout, factor=0.5, align=True)
@@ -349,23 +351,25 @@ class MMD_TOOLS_UL_GroupMorphOffsets(UIList):
             layout.label(text="", icon_value=icon)
 
 class MMDMorphMenu(Menu):
-    bl_idname = 'OBJECT_MT_mmd_tools_morph_menu'
+    bl_idname = 'OBJECT_MT_mmd_tools_local_morph_menu'
     bl_label = 'Morph Menu'
 
     def draw(self, context):
         layout = self.layout
-        layout.operator('mmd_tools.morph_remove', text='Delete All', icon='X').all = True
+        layout.operator('mmd_tools_local.morph_remove', text='Delete All', icon='X').all = True
         layout.separator()
-        layout.operator_enum('mmd_tools.morph_slider_setup', 'type')
+        layout.operator('mmd_tools_local.morph_slider_setup', text='Bind morphs to .placeholder', icon='DRIVER').type = 'BIND'
+        layout.operator('mmd_tools_local.morph_slider_setup', text='Unbind morphs from .placeholder', icon='UNLINKED').type = 'UNBIND'
         layout.separator()
-        layout.operator('mmd_tools.morph_copy', icon='COPY_ID')
-        layout.operator('mmd_tools.morph_overwrite_from_active_pose_library', icon='PRESET_NEW')
+        layout.operator('mmd_tools_local.morph_copy', icon='COPY_ID')
+        layout.operator('mmd_tools_local.morph_overwrite_from_active_pose_library', icon='PRESET_NEW')
+        layout.operator('mmd_tools_local.clean_duplicated_material_morphs', icon='TRASH')
         layout.separator()
-        layout.operator('mmd_tools.morph_move', icon=TRIA_UP_BAR, text='Move To Top').type = 'TOP'
-        layout.operator('mmd_tools.morph_move', icon=TRIA_DOWN_BAR, text='Move To Bottom').type = 'BOTTOM'
+        layout.operator('mmd_tools_local.morph_move', icon=TRIA_UP_BAR, text='Move To Top').type = 'TOP'
+        layout.operator('mmd_tools_local.morph_move', icon=TRIA_DOWN_BAR, text='Move To Bottom').type = 'BOTTOM'
 
 class MMDMorphToolsPanel(_PanelBase, Panel):
-    bl_idname = 'OBJECT_PT_mmd_tools_morph_tools'
+    bl_idname = 'OBJECT_PT_mmd_tools_local_morph_tools'
     bl_label = 'Morph Tools'
     bl_options = {'DEFAULT_CLOSED'}
 
@@ -386,28 +390,38 @@ class MMDMorphToolsPanel(_PanelBase, Panel):
         c = col.column(align=True)
         row = c.row()
         row.template_list(
-            "MMD_TOOLS_UL_Morphs", "",
+            "mmd_tools_local_UL_Morphs", "",
             mmd_root, morph_type,
             mmd_root, "active_morph"
             )
         tb = row.column()
         tb1 = tb.column(align=True)
-        tb1.operator('mmd_tools.morph_add', text='', icon=ICON_ADD)
-        tb1.operator('mmd_tools.morph_remove', text='', icon=ICON_REMOVE)
-        tb1.menu('OBJECT_MT_mmd_tools_morph_menu', text='', icon='DOWNARROW_HLT')
+        tb1.operator('mmd_tools_local.morph_add', text='', icon=ICON_ADD)
+        tb1.operator('mmd_tools_local.morph_remove', text='', icon=ICON_REMOVE)
+        tb1.menu('OBJECT_MT_mmd_tools_local_morph_menu', text='', icon='DOWNARROW_HLT')
         tb.separator()
         tb1 = tb.column(align=True)
-        tb1.operator('mmd_tools.morph_move', text='', icon='TRIA_UP').type = 'UP'
-        tb1.operator('mmd_tools.morph_move', text='', icon='TRIA_DOWN').type = 'DOWN'
+        tb1.operator('mmd_tools_local.morph_move', text='', icon='TRIA_UP').type = 'UP'
+        tb1.operator('mmd_tools_local.morph_move', text='', icon='TRIA_DOWN').type = 'DOWN'
 
         morph = ItemOp.get_by_index(getattr(mmd_root, morph_type), mmd_root.active_morph)
         if morph:
             slider = rig.morph_slider.get(morph.name)
             if slider:
                 col.row().prop(slider, 'value')
-            draw_func = getattr(self, '_draw_%s_data'%morph_type[:-7], None)
-            if draw_func:
-                draw_func(context, rig, col, morph)
+
+            row = col.row(align=True)
+            row.prop(
+                mmd_root, 'morph_panel_show_settings',
+                icon='TRIA_DOWN' if mmd_root.morph_panel_show_settings else 'TRIA_RIGHT',
+                icon_only=True,
+                emboss=False,
+            )
+            row.label(text='Morph Settings')
+            if mmd_root.morph_panel_show_settings:
+                draw_func = getattr(self, '_draw_%s_data'%morph_type[:-7], None)
+                if draw_func:
+                    draw_func(context, rig, col, morph)
 
     def _template_morph_offset_list(self, layout, morph, list_type_name):
         row = layout.row()
@@ -418,9 +432,9 @@ class MMDMorphToolsPanel(_PanelBase, Panel):
             )
         tb = row.column()
         tb1 = tb.column(align=True)
-        tb1.operator('mmd_tools.morph_offset_add', text='', icon=ICON_ADD)
-        tb1.operator('mmd_tools.morph_offset_remove', text='', icon=ICON_REMOVE)
-        tb.operator('mmd_tools.morph_offset_remove', text='', icon='X').all = True
+        tb1.operator('mmd_tools_local.morph_offset_add', text='', icon=ICON_ADD)
+        tb1.operator('mmd_tools_local.morph_offset_remove', text='', icon=ICON_REMOVE)
+        tb.operator('mmd_tools_local.morph_offset_remove', text='', icon='X').all = True
         return ItemOp.get_by_index(morph.data, morph.active_data)
 
     def _draw_vertex_data(self, context, rig, col, morph):
@@ -434,16 +448,16 @@ class MMDMorphToolsPanel(_PanelBase, Panel):
             if kb:
                 found = row = col.row(align=True)
                 row.active = not (i.show_only_shape_key or kb.mute)
-                row.operator('mmd_tools.object_select', text=i.name, icon='OBJECT_DATA').name = i.name
+                row.operator('mmd_tools_local.object_select', text=i.name, icon='OBJECT_DATA').name = i.name
                 row.prop(kb, 'value', text=kb.name)
         if 'found' not in locals():
             col.label(text='Not found', icon='INFO')
         else:
-            r.operator('mmd_tools.morph_offset_remove', text='', icon='X').all = True
+            r.operator('mmd_tools_local.morph_offset_remove', text='', icon='X').all = True
 
     def _draw_material_data(self, context, rig, col, morph):
-        col.label(text='Material Offsets (%d)'%len(morph.data))
-        data = self._template_morph_offset_list(col, morph, 'MMD_TOOLS_UL_MaterialMorphOffsets')
+        col.label(text=bpy.app.translations.pgettext_iface('Material Offsets (%d)')%len(morph.data))
+        data = self._template_morph_offset_list(col, morph, 'mmd_tools_local_UL_MaterialMorphOffsets')
         if data is None:
             return
 
@@ -525,8 +539,8 @@ class MMDMorphToolsPanel(_PanelBase, Panel):
         row.operator(operators.morph.ApplyBoneMorph.bl_idname, text='Apply')
         row.operator(operators.morph.ClearBoneMorphView.bl_idname, text='Clear')
 
-        col.label(text='Bone Offsets (%d)'%len(morph.data))
-        data = self._template_morph_offset_list(col, morph, 'MMD_TOOLS_UL_BoneMorphOffsets')
+        col.label(text=bpy.app.translations.pgettext_iface('Bone Offsets (%d)')%len(morph.data))
+        data = self._template_morph_offset_list(col, morph, 'mmd_tools_local_UL_BoneMorphOffsets')
         if data is None:
             return
 
@@ -559,14 +573,14 @@ class MMDMorphToolsPanel(_PanelBase, Panel):
         if morph.data_type == 'VERTEX_GROUP':
             row.prop(morph, 'vertex_group_scale', text='Scale')
         else:
-            row.label(text='UV Offsets (%d)'%len(morph.data))
-            #self._template_morph_offset_list(c, morph, 'MMD_TOOLS_UL_UVMorphOffsets')
+            row.label(text=bpy.app.translations.pgettext_iface('UV Offsets (%d)')%len(morph.data))
+            #self._template_morph_offset_list(c, morph, 'mmd_tools_local_UL_UVMorphOffsets')
         row.prop(morph, 'uv_index')
-        row.operator('mmd_tools.morph_offset_remove', text='', icon='X').all = True
+        row.operator('mmd_tools_local.morph_offset_remove', text='', icon='X').all = True
 
     def _draw_group_data(self, context, rig, col, morph):
-        col.label(text='Group Offsets (%d)'%len(morph.data))
-        item = self._template_morph_offset_list(col, morph, 'MMD_TOOLS_UL_GroupMorphOffsets')
+        col.label(text=bpy.app.translations.pgettext_iface('Group Offsets (%d)')%len(morph.data))
+        item = self._template_morph_offset_list(col, morph, 'mmd_tools_local_UL_GroupMorphOffsets')
         if item is None:
             return
 
@@ -634,7 +648,7 @@ class UL_ObjectsMixIn(object):
             flt_neworder[i_orig] = i_new
         return flt_flags, flt_neworder
 
-class MMD_TOOLS_UL_rigidbodies(UIList, UL_ObjectsMixIn):
+class mmd_tools_local_UL_rigidbodies(UIList, UL_ObjectsMixIn):
     mmd_type = 'RIGID_BODY'
     icon = 'MESH_ICOSPHERE'
     prop_name = 'mmd_rigid'
@@ -647,31 +661,31 @@ class MMD_TOOLS_UL_rigidbodies(UIList, UL_ObjectsMixIn):
             layout.label(icon='BONE_DATA')
 
 class MMDRigidbodySelectMenu(Menu):
-    bl_idname = 'OBJECT_MT_mmd_tools_rigidbody_select_menu'
+    bl_idname = 'OBJECT_MT_mmd_tools_local_rigidbody_select_menu'
     bl_label = 'Rigidbody Select Menu'
 
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
-        layout.operator('mmd_tools.rigid_body_select', text='Select Similar...')
+        layout.operator('mmd_tools_local.rigid_body_select', text='Select Similar...')
         layout.separator()
         layout.operator_context = 'EXEC_DEFAULT'
-        layout.operator_enum('mmd_tools.rigid_body_select', 'properties')
+        layout.operator_enum('mmd_tools_local.rigid_body_select', 'properties')
 
 class MMDRigidbodyMenu(Menu):
-    bl_idname = 'OBJECT_MT_mmd_tools_rigidbody_menu'
+    bl_idname = 'OBJECT_MT_mmd_tools_local_rigidbody_menu'
     bl_label = 'Rigidbody Menu'
 
     def draw(self, context):
         layout = self.layout
         layout.enabled = context.active_object.mmd_type == 'RIGID_BODY'
-        layout.menu('OBJECT_MT_mmd_tools_rigidbody_select_menu', text='Select Similar')
+        layout.menu('OBJECT_MT_mmd_tools_local_rigidbody_select_menu', text='Select Similar')
         layout.separator()
-        layout.operator('mmd_tools.object_move', icon=TRIA_UP_BAR, text='Move To Top').type = 'TOP'
-        layout.operator('mmd_tools.object_move', icon=TRIA_DOWN_BAR, text='Move To Bottom').type = 'BOTTOM'
+        layout.operator('mmd_tools_local.object_move', icon=TRIA_UP_BAR, text='Move To Top').type = 'TOP'
+        layout.operator('mmd_tools_local.object_move', icon=TRIA_DOWN_BAR, text='Move To Bottom').type = 'BOTTOM'
 
 class MMDRigidbodySelectorPanel(_PanelBase, Panel):
-    bl_idname = 'OBJECT_PT_mmd_tools_rigidbody_list'
+    bl_idname = 'OBJECT_PT_mmd_tools_local_rigidbody_list'
     bl_label = 'Rigid Bodies'
     bl_options = {'DEFAULT_CLOSED'}
 
@@ -686,24 +700,24 @@ class MMDRigidbodySelectorPanel(_PanelBase, Panel):
         c = col.column(align=True)
         row = c.row()
         row.template_list(
-            "MMD_TOOLS_UL_rigidbodies",
+            "mmd_tools_local_UL_rigidbodies",
             "",
             SceneOp(context).id_scene, 'objects',
             root.mmd_root, 'active_rigidbody_index',
             )
         tb = row.column()
         tb1 = tb.column(align=True)
-        tb1.operator('mmd_tools.rigid_body_add', text='', icon=ICON_ADD)
-        tb1.operator('mmd_tools.rigid_body_remove', text='', icon=ICON_REMOVE)
-        tb1.menu('OBJECT_MT_mmd_tools_rigidbody_menu', text='', icon='DOWNARROW_HLT')
+        tb1.operator('mmd_tools_local.rigid_body_add', text='', icon=ICON_ADD)
+        tb1.operator('mmd_tools_local.rigid_body_remove', text='', icon=ICON_REMOVE)
+        tb1.menu('OBJECT_MT_mmd_tools_local_rigidbody_menu', text='', icon='DOWNARROW_HLT')
         tb.separator()
         tb1 = tb.column(align=True)
         tb1.enabled = active_obj.mmd_type == 'RIGID_BODY'
-        tb1.operator('mmd_tools.object_move', text='', icon='TRIA_UP').type = 'UP'
-        tb1.operator('mmd_tools.object_move', text='', icon='TRIA_DOWN').type = 'DOWN'
+        tb1.operator('mmd_tools_local.object_move', text='', icon='TRIA_UP').type = 'UP'
+        tb1.operator('mmd_tools_local.object_move', text='', icon='TRIA_DOWN').type = 'DOWN'
 
 
-class MMD_TOOLS_UL_joints(UIList, UL_ObjectsMixIn):
+class mmd_tools_local_UL_joints(UIList, UL_ObjectsMixIn):
     mmd_type = 'JOINT'
     icon = 'CONSTRAINT'
     prop_name = 'mmd_joint'
@@ -718,17 +732,17 @@ class MMD_TOOLS_UL_joints(UIList, UL_ObjectsMixIn):
             layout.label(icon='MESH_CUBE')
 
 class MMDJointMenu(Menu):
-    bl_idname = 'OBJECT_MT_mmd_tools_joint_menu'
+    bl_idname = 'OBJECT_MT_mmd_tools_local_joint_menu'
     bl_label = 'Joint Menu'
 
     def draw(self, context):
         layout = self.layout
         layout.enabled = context.active_object.mmd_type == 'JOINT'
-        layout.operator('mmd_tools.object_move', icon=TRIA_UP_BAR, text='Move To Top').type = 'TOP'
-        layout.operator('mmd_tools.object_move', icon=TRIA_DOWN_BAR, text='Move To Bottom').type = 'BOTTOM'
+        layout.operator('mmd_tools_local.object_move', icon=TRIA_UP_BAR, text='Move To Top').type = 'TOP'
+        layout.operator('mmd_tools_local.object_move', icon=TRIA_DOWN_BAR, text='Move To Bottom').type = 'BOTTOM'
 
 class MMDJointSelectorPanel(_PanelBase, Panel):
-    bl_idname = 'OBJECT_PT_mmd_tools_joint_list'
+    bl_idname = 'OBJECT_PT_mmd_tools_local_joint_list'
     bl_label = 'Joints'
     bl_options = {'DEFAULT_CLOSED'}
 
@@ -744,19 +758,19 @@ class MMDJointSelectorPanel(_PanelBase, Panel):
 
         row = c.row()
         row.template_list(
-            "MMD_TOOLS_UL_joints",
+            "mmd_tools_local_UL_joints",
             "",
             SceneOp(context).id_scene, 'objects',
             root.mmd_root, 'active_joint_index',
             )
         tb = row.column()
         tb1 = tb.column(align=True)
-        tb1.operator('mmd_tools.joint_add', text='', icon=ICON_ADD)
-        tb1.operator('mmd_tools.joint_remove', text='', icon=ICON_REMOVE)
-        tb1.menu('OBJECT_MT_mmd_tools_joint_menu', text='', icon='DOWNARROW_HLT')
+        tb1.operator('mmd_tools_local.joint_add', text='', icon=ICON_ADD)
+        tb1.operator('mmd_tools_local.joint_remove', text='', icon=ICON_REMOVE)
+        tb1.menu('OBJECT_MT_mmd_tools_local_joint_menu', text='', icon='DOWNARROW_HLT')
         tb.separator()
         tb1 = tb.column(align=True)
         tb1.enabled = active_obj.mmd_type == 'JOINT'
-        tb1.operator('mmd_tools.object_move', text='', icon='TRIA_UP').type = 'UP'
-        tb1.operator('mmd_tools.object_move', text='', icon='TRIA_DOWN').type = 'DOWN'
+        tb1.operator('mmd_tools_local.object_move', text='', icon='TRIA_UP').type = 'UP'
+        tb1.operator('mmd_tools_local.object_move', text='', icon='TRIA_DOWN').type = 'DOWN'
 

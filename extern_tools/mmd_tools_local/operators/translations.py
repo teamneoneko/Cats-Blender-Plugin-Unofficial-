@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 class TranslateMMDModel(bpy.types.Operator):
-    bl_idname = 'mmd_tools.translate_mmd_model'
+    bl_idname = 'mmd_tools_local.translate_mmd_model'
     bl_label = 'Translate a MMD Model'
     bl_description = 'Translate Japanese names of a MMD model'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -184,14 +184,14 @@ class TranslateMMDModel(bpy.types.Operator):
 DEFAULT_SHOW_ROW_COUNT = 20
 
 
-class MMD_TOOLS_UL_MMDTranslationElementIndex(bpy.types.UIList):
+class mmd_tools_local_UL_MMDTranslationElementIndex(bpy.types.UIList):
     def draw_item(self, context, layout: bpy.types.UILayout, data, mmd_translation_element_index: 'MMDTranslationElementIndex', icon, active_data, active_propname, index: int):
         mmd_translation_element: 'MMDTranslationElement' = data.translation_elements[mmd_translation_element_index.value]
         MMD_DATA_TYPE_TO_HANDLERS[mmd_translation_element.type].draw_item(layout, mmd_translation_element, index)
 
 
 class RestoreMMDDataReferenceOperator(bpy.types.Operator):
-    bl_idname = 'mmd_tools.restore_mmd_translation_element_name'
+    bl_idname = 'mmd_tools_local.restore_mmd_translation_element_name'
     bl_label = 'Restore this Name'
     bl_options = {'INTERNAL'}
 
@@ -209,7 +209,7 @@ class RestoreMMDDataReferenceOperator(bpy.types.Operator):
 
 
 class GlobalTranslationPopup(bpy.types.Operator):
-    bl_idname = 'mmd_tools.global_translation_popup'
+    bl_idname = 'mmd_tools_local.global_translation_popup'
     bl_label = 'Global Translation Popup'
     bl_options = {'INTERNAL', 'UNDO'}
 
@@ -250,7 +250,7 @@ class GlobalTranslationPopup(bpy.types.Operator):
             row.label(text='', icon='BLANK1')
 
         col.template_list(
-            "MMD_TOOLS_UL_MMDTranslationElementIndex", "",
+            "mmd_tools_local_UL_MMDTranslationElementIndex", "",
             mmd_translation, 'filtered_translation_element_indices',
             mmd_translation, 'filtered_translation_element_indices_active_index',
             rows=DEFAULT_SHOW_ROW_COUNT,
@@ -301,7 +301,7 @@ class GlobalTranslationPopup(bpy.types.Operator):
 
 
 class ExecuteTranslationBatchOperator(bpy.types.Operator):
-    bl_idname = 'mmd_tools.execute_translation_batch'
+    bl_idname = 'mmd_tools_local.execute_translation_batch'
     bl_label = 'Execute Translation Batch'
     bl_options = {'INTERNAL'}
 

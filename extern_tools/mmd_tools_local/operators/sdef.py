@@ -29,7 +29,7 @@ def _get_target_objects(context):
     return selected_objects, root_objects
 
 class ResetSDEFCache(Operator):
-    bl_idname = 'mmd_tools.sdef_cache_reset'
+    bl_idname = 'mmd_tools_local.sdef_cache_reset'
     bl_label = 'Reset MMD SDEF cache'
     bl_description = 'Reset MMD SDEF cache of selected objects and clean unused cache'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -42,7 +42,7 @@ class ResetSDEFCache(Operator):
         return {'FINISHED'}
 
 class BindSDEF(Operator):
-    bl_idname = 'mmd_tools.sdef_bind'
+    bl_idname = 'mmd_tools_local.sdef_bind'
     bl_label = 'Bind SDEF Driver'
     bl_description = 'Bind MMD SDEF data of selected objects'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -84,7 +84,7 @@ class BindSDEF(Operator):
         return {'FINISHED'}
 
 class UnbindSDEF(Operator):
-    bl_idname = 'mmd_tools.sdef_unbind'
+    bl_idname = 'mmd_tools_local.sdef_unbind'
     bl_label = 'Unbind SDEF Driver'
     bl_description = 'Unbind MMD SDEF data of selected objects'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}

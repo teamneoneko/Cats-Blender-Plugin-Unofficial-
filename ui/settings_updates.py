@@ -29,8 +29,6 @@ class UpdaterPanel(ToolPanel, bpy.types.Panel):
         row = col.row(align=True)
         row.prop(context.scene, 'show_mmd_tabs')
         row = col.row(align=True)
-        row.prop(context.scene, 'show_avatar_2_tabs')
-        row = col.row(align=True)
         row.prop(context.scene, 'embed_textures')
 
         col.separator()

@@ -5,7 +5,7 @@ import mmd_tools_local.core.model as mmd_model
 
 
 class MMDRigidPanel(bpy.types.Panel):
-    bl_idname = 'RIGID_PT_mmd_tools_bone'
+    bl_idname = 'RIGID_PT_mmd_tools_local_bone'
     bl_label = 'MMD Rigid Body'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -83,7 +83,7 @@ class MMDRigidPanel(bpy.types.Panel):
 
 
 class MMDJointPanel(bpy.types.Panel):
-    bl_idname = 'JOINT_PT_mmd_tools_bone'
+    bl_idname = 'JOINT_PT_mmd_tools_local_bone'
     bl_label = 'MMD Joint'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'

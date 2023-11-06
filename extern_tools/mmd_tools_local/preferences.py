@@ -75,7 +75,7 @@ class MMDToolsAddonPreferences(bpy.types.AddonPreferences):
             col.scale_y = 2
             col.operator(
                 operators.addon_updater.CheckAddonUpdate.bl_idname,
-                text="Check mmd_tools add-on update",
+                text="Check mmd_tools_local add-on update",
                 icon='FILE_REFRESH'
             )
         else:
@@ -84,7 +84,7 @@ class MMDToolsAddonPreferences(bpy.types.AddonPreferences):
             col = row.column()
             col.operator(
                 operators.addon_updater.CheckAddonUpdate.bl_idname,
-                text="Check mmd_tools add-on update",
+                text="Check mmd_tools_local add-on update",
                 icon='FILE_REFRESH'
             )
             col = row.column()

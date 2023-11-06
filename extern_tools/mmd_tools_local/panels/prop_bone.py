@@ -4,7 +4,7 @@ from bpy.types import Panel
 
 
 class MMDBonePanel(Panel):
-    bl_idname = 'BONE_PT_mmd_tools_bone'
+    bl_idname = 'BONE_PT_mmd_tools_local_bone'
     bl_label = 'MMD Bone Tools'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -63,9 +63,9 @@ class MMDBonePanel(Panel):
         c = layout.column(align=True)
         row = c.row(align=True)
         row.prop(mmd_bone, 'enabled_fixed_axis')
-        row.operator('mmd_tools.bone_fixed_axis_setup', text='', icon='X').type = 'DISABLE'
-        row.operator('mmd_tools.bone_fixed_axis_setup', text='Load').type = 'LOAD'
-        row.operator('mmd_tools.bone_fixed_axis_setup', text='Apply').type = 'APPLY'
+        row.operator('mmd_tools_local.bone_fixed_axis_setup', text='', icon='X').type = 'DISABLE'
+        row.operator('mmd_tools_local.bone_fixed_axis_setup', text='Load').type = 'LOAD'
+        row.operator('mmd_tools_local.bone_fixed_axis_setup', text='Apply').type = 'APPLY'
         row = c.row()
         row.active = mmd_bone.enabled_fixed_axis
         row.column(align=True).prop(mmd_bone, 'fixed_axis', text='')
@@ -73,9 +73,9 @@ class MMDBonePanel(Panel):
         c = layout.column(align=True)
         row = c.row(align=True)
         row.prop(mmd_bone, 'enabled_local_axes')
-        row.operator('mmd_tools.bone_local_axes_setup', text='', icon='X').type = 'DISABLE'
-        row.operator('mmd_tools.bone_local_axes_setup', text='Load').type = 'LOAD'
-        row.operator('mmd_tools.bone_local_axes_setup', text='Apply').type = 'APPLY'
+        row.operator('mmd_tools_local.bone_local_axes_setup', text='', icon='X').type = 'DISABLE'
+        row.operator('mmd_tools_local.bone_local_axes_setup', text='Load').type = 'LOAD'
+        row.operator('mmd_tools_local.bone_local_axes_setup', text='Apply').type = 'APPLY'
         row = c.row()
         row.active = mmd_bone.enabled_local_axes
         row.column(align=True).prop(mmd_bone, 'local_axis_x')

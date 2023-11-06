@@ -13,7 +13,7 @@ translation_dict = {
 
         ("*", "Add-on update"): "アドオン更新",
         ("Operator", "Restart Blender to complete update"): "Blenderを再起動して更新を完了",
-        ("Operator", "Check mmd_tools add-on update"): "mmd_toolsアドオンの更新を確認",
+        ("Operator", "Check mmd_tools_local add-on update"): "mmd_tools_localアドオンの更新を確認",
         ("*", "Update to the latest release version ({})"): "最新バージョンへ更新",
         ("Operator", "No updates are available"): "更新はありません",
         ("*", "(Danger) Manual Update:"): "(危険)手動更新:",
@@ -358,7 +358,7 @@ translation_dict = {
 
         ("*", "Add-on update"): "插件更新",
         ("Operator", "Restart Blender to complete update"): "重新启动Blender以完成更新",
-        ("Operator", "Check mmd_tools add-on update"): "检查mmd_tools插件更新",
+        ("Operator", "Check mmd_tools_local add-on update"): "检查mmd_tools_local插件更新",
         ("*", "Update to the latest release version ({})"): "更新到最新发布版本",
         ("Operator", "No updates are available"): "没有更新",
         ("*", "(Danger) Manual Update:"): "(危险)手动更新:",

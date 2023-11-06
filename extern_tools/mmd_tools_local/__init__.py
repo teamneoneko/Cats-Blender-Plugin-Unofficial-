@@ -1,30 +1,28 @@
 # -*- coding: utf-8 -*-
 
 bl_info = {
-    "name": "mmd_tools",
+    "name": "mmd_tools_local",
     "author": "sugiany",
-    "version": (2, 3, 0),
-    "blender": (2, 83, 0),
+    "version": (2, 9, 2),
+    "blender": (2, 93, 0),
     "location": "View3D > Sidebar > MMD Tools Panel",
     "description": "Utility tools for MMD model editing. (UuuNyaa's forked version)",
     "warning": "",
-    "doc_url": "https://mmd-blender.fandom.com/wiki/MMD_Tools",
-    "wiki_url": "https://mmd-blender.fandom.com/wiki/MMD_Tools",
+    "doc_url": "https://mmd-blender.fandom.com/wiki/mmd_tools",
+    "wiki_url": "https://mmd-blender.fandom.com/wiki/mmd_tools",
     "tracker_url": "https://github.com/UuuNyaa/blender_mmd_tools/issues",
     "category": "Object",
 }
 
-import bpy
-import logging
+mmd_tools_local_VERSION = '.'.join(map(str,bl_info['version']))
 
-logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+import bpy
 
 from mmd_tools_local import auto_load
 auto_load.init()
 
 from mmd_tools_local import operators
 from mmd_tools_local import properties
-
 
 def menu_func_import(self, _context):
     self.layout.operator(operators.fileio.ImportPmx.bl_idname, text='MikuMikuDance Model (.pmd, .pmx)', icon='OUTLINER_OB_ARMATURE')
@@ -41,16 +39,16 @@ def menu_func_armature(self, _context):
 
 def menu_view3d_object(self, _context):
     self.layout.separator()
-    self.layout.operator('mmd_tools.clean_shape_keys')
+    self.layout.operator('mmd_tools_local.clean_shape_keys')
 
 def menu_view3d_select_object(self, _context):
     self.layout.separator()
     self.layout.operator_context = 'EXEC_DEFAULT'
-    operator = self.layout.operator('mmd_tools.rigid_body_select', text='Select MMD Rigid Body')
+    operator = self.layout.operator('mmd_tools_local.rigid_body_select', text='Select MMD Rigid Body')
     operator.properties = set(['collision_group_number', 'shape'])
 
 def menu_view3d_pose_context_menu(self, _context):
-    self.layout.operator('mmd_tools.flip_pose', text='MMD Flip Pose', icon='ARROW_LEFTRIGHT')
+    self.layout.operator('mmd_tools_local.flip_pose', text='MMD Flip Pose', icon='ARROW_LEFTRIGHT')
 
 def panel_view3d_shading(self, context):
     if context.space_data.shading.type != 'SOLID':
@@ -59,10 +57,10 @@ def panel_view3d_shading(self, context):
     col = self.layout.column(align=True)
     col.label(text='MMD Shading Presets')
     row = col.row(align=True)
-    row.operator('mmd_tools.set_glsl_shading', text='GLSL')
-    row.operator('mmd_tools.set_shadeless_glsl_shading', text='Shadeless')
+    row.operator('mmd_tools_local.set_glsl_shading', text='GLSL')
+    row.operator('mmd_tools_local.set_shadeless_glsl_shading', text='Shadeless')
     row = col.row(align=True)
-    row.operator('mmd_tools.reset_shading', text='Reset')
+    row.operator('mmd_tools_local.reset_shading', text='Reset')
 
 @bpy.app.handlers.persistent
 def load_handler(_dummy):
@@ -73,10 +71,26 @@ def load_handler(_dummy):
     from mmd_tools_local.core.material import MigrationFnMaterial
     MigrationFnMaterial.update_mmd_shader()
 
+    from mmd_tools_local.core.morph import MigrationFnMorph
+    MigrationFnMorph.update_mmd_morph()
+
+    from mmd_tools_local.core.camera import MigrationFnCamera
+    MigrationFnCamera.update_mmd_camera()
+
+    from mmd_tools_local.core.model import MigrationFnModel
+    MigrationFnModel.update_mmd_ik_loop_factor()
+    MigrationFnModel.update_mmd_tools_local_version()
+
+@bpy.app.handlers.persistent
+def save_pre_handler(_dummy):
+    from mmd_tools_local.core.morph import MigrationFnMorph
+    MigrationFnMorph.compatible_with_old_version_mmd_tools_local()
+
 def register():
     auto_load.register()
     properties.register()
     bpy.app.handlers.load_post.append(load_handler)
+    bpy.app.handlers.save_pre.append(save_pre_handler)
     bpy.types.VIEW3D_MT_object.append(menu_view3d_object)
     bpy.types.VIEW3D_MT_select_object.append(menu_view3d_select_object)
     bpy.types.VIEW3D_MT_pose.append(menu_view3d_pose_context_menu)
@@ -105,6 +119,7 @@ def unregister():
     bpy.types.VIEW3D_MT_select_object.remove(menu_view3d_select_object)
     bpy.types.VIEW3D_MT_object.remove(menu_view3d_object)
     bpy.app.handlers.load_post.remove(load_handler)
+    bpy.app.handlers.save_pre.remove(save_pre_handler)
     properties.unregister()
     auto_load.unregister()
 

@@ -36,7 +36,7 @@ def _updateShape(prop, context):
 
 def _get_bone(prop):
     obj = prop.id_data
-    relation = obj.constraints.get('mmd_tools_rigid_parent', None)
+    relation = obj.constraints.get('mmd_tools_local_rigid_parent', None)
     if relation:
         arm = relation.target
         bone_name = relation.subtarget
@@ -48,10 +48,10 @@ def _get_bone(prop):
 def _set_bone(prop, value):
     bone_name = value
     obj = prop.id_data
-    relation = obj.constraints.get('mmd_tools_rigid_parent', None)
+    relation = obj.constraints.get('mmd_tools_local_rigid_parent', None)
     if relation is None:
         relation = obj.constraints.new('CHILD_OF')
-        relation.name = 'mmd_tools_rigid_parent'
+        relation.name = 'mmd_tools_local_rigid_parent'
         relation.mute = True
 
     arm = relation.target

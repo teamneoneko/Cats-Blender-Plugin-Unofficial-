@@ -8,20 +8,20 @@ from mmd_tools_local.core.sdef import FnSDEF
 
 
 class MMDToolsSceneSetupPanel(bpy.types.Panel):
-    bl_idname = 'OBJECT_PT_mmd_tools_scene_setup'
+    bl_idname = 'OBJECT_PT_mmd_tools_local_scene_setup'
     bl_label = 'Scene Setup'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'MMD'
 
     __LANGUAGE_MANUAL_URL = {
-        'ja_JP': 'https://mmd-blender.fandom.com/ja/wiki/MMD_Tools/%E3%83%9E%E3%83%8B%E3%83%A5%E3%82%A2%E3%83%AB',
+        'ja_JP': 'https://mmd-blender.fandom.com/ja/wiki/mmd_tools_local/%E3%83%9E%E3%83%8B%E3%83%A5%E3%82%A2%E3%83%AB',
     }
 
     def draw(self, context: bpy.types.Context):
         self.layout.row(align=True).operator(
             'wm.url_open', text='MMD Tools/Manual', icon='URL'
-        ).url = self.__LANGUAGE_MANUAL_URL.get(context.preferences.view.language, 'https://mmd-blender.fandom.com/wiki/MMD_Tools/Manual')
+        ).url = self.__LANGUAGE_MANUAL_URL.get(context.preferences.view.language, 'https://mmd-blender.fandom.com/wiki/mmd_tools_local/Manual')
 
         self.draw_io()
         self.draw_timeline(context)
@@ -31,18 +31,18 @@ class MMDToolsSceneSetupPanel(bpy.types.Panel):
         row = self.layout.row()
         col = row.column(align=True)
         col.label(text='Model:', icon='OUTLINER_OB_ARMATURE')
-        col.operator('mmd_tools.import_model', text='Import')
-        col.operator('mmd_tools.export_pmx', text='Export')
+        col.operator('mmd_tools_local.import_model', text='Import')
+        col.operator('mmd_tools_local.export_pmx', text='Export')
 
         col = row.column(align=True)
         col.label(text='Motion:', icon='ANIM')
-        col.operator('mmd_tools.import_vmd', text='Import')
-        col.operator('mmd_tools.export_vmd', text='Export')
+        col.operator('mmd_tools_local.import_vmd', text='Import')
+        col.operator('mmd_tools_local.export_vmd', text='Export')
 
         col = row.column(align=True)
         col.label(text='Pose:', icon='POSE_HLT')
-        col.operator('mmd_tools.import_vpd', text='Import')
-        col.operator('mmd_tools.export_vpd', text='Export')
+        col.operator('mmd_tools_local.import_vpd', text='Import')
+        col.operator('mmd_tools_local.export_vpd', text='Export')
 
     def draw_timeline(self, context):
         col = self.layout.column(align=True)
@@ -61,7 +61,7 @@ class MMDToolsSceneSetupPanel(bpy.types.Panel):
         row = col.row(align=False)
         row.label(text='Rigid Body Physics:', icon='PHYSICS')
         row.row().operator(
-            'mmd_tools.rigid_body_world_update',
+            'mmd_tools_local.rigid_body_world_update',
             text='Update World',
             icon='NONE' if getattr(rigidbody_world, 'substeps_per_frame', 0) == 1 else 'ERROR'
         )
@@ -81,13 +81,13 @@ class MMDToolsSceneSetupPanel(bpy.types.Panel):
 
             row = col.row(align=True)
             if point_cache.is_baked is True:
-                row.operator("mmd_tools.ptcache_rigid_body_delete_bake", text="Delete Bake")
+                row.operator("mmd_tools_local.ptcache_rigid_body_delete_bake", text="Delete Bake")
             else:
-                row.operator("mmd_tools.ptcache_rigid_body_bake", text="Bake")
+                row.operator("mmd_tools_local.ptcache_rigid_body_bake", text="Bake")
 
 
 class MMDToolsModelSetupPanel(bpy.types.Panel):
-    bl_idname = 'OBJECT_PT_mmd_tools_model_setup'
+    bl_idname = 'OBJECT_PT_mmd_tools_local_model_setup'
     bl_label = 'Model Setup'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -115,7 +115,7 @@ class MMDToolsModelSetupPanel(bpy.types.Panel):
         col = self.layout.column(align=True)
         row = col.row(align=False)
         row.label(text='Visibility:', icon='HIDE_OFF')
-        row.operator('mmd_tools.reset_object_visibility', text='Reset')
+        row.operator('mmd_tools_local.reset_object_visibility', text='Reset')
 
         mmd_root = mmd_root_object.mmd_root
         row = col.row(align=False)
@@ -138,31 +138,31 @@ class MMDToolsModelSetupPanel(bpy.types.Panel):
         grid = col.grid_flow(row_major=True)
 
         row = grid.row(align=True)
-        row.operator('mmd_tools.assemble_all', text='All', icon='SETTINGS')
-        row.operator('mmd_tools.disassemble_all', text='', icon='TRASH')
+        row.operator('mmd_tools_local.assemble_all', text='All', icon='SETTINGS')
+        row.operator('mmd_tools_local.disassemble_all', text='', icon='TRASH')
 
         row = grid.row(align=True)
-        row.operator('mmd_tools.sdef_bind', text='SDEF', icon='MOD_SIMPLEDEFORM')
+        row.operator('mmd_tools_local.sdef_bind', text='SDEF', icon='MOD_SIMPLEDEFORM')
         if len(FnSDEF.g_verts) > 0:
-            row.operator('mmd_tools.sdef_cache_reset', text='', icon='FILE_REFRESH')
-        row.operator('mmd_tools.sdef_unbind', text='', icon='TRASH')
+            row.operator('mmd_tools_local.sdef_cache_reset', text='', icon='FILE_REFRESH')
+        row.operator('mmd_tools_local.sdef_unbind', text='', icon='TRASH')
 
         row = grid.row(align=True)
-        row.operator('mmd_tools.apply_additional_transform', text='Bone', icon='CONSTRAINT_BONE')
-        row.operator('mmd_tools.clean_additional_transform', text='', icon='TRASH')
+        row.operator('mmd_tools_local.apply_additional_transform', text='Bone', icon='CONSTRAINT_BONE')
+        row.operator('mmd_tools_local.clean_additional_transform', text='', icon='TRASH')
 
         row = grid.row(align=True)
-        row.operator('mmd_tools.morph_slider_setup', text='Morph', icon='SHAPEKEY_DATA').type = 'BIND'
-        row.operator('mmd_tools.morph_slider_setup', text='', icon='TRASH').type = 'UNBIND'
+        row.operator('mmd_tools_local.morph_slider_setup', text='Morph', icon='SHAPEKEY_DATA').type = 'BIND'
+        row.operator('mmd_tools_local.morph_slider_setup', text='', icon='TRASH').type = 'UNBIND'
 
         row = grid.row(align=True)
         row.active = getattr(context.scene.rigidbody_world, 'enabled', False)
 
         mmd_root = mmd_root_object.mmd_root
         if not mmd_root.is_built:
-            row.operator('mmd_tools.build_rig', text='Physics', icon='PHYSICS', depress=False)
+            row.operator('mmd_tools_local.build_rig', text='Physics', icon='PHYSICS', depress=False)
         else:
-            row.operator('mmd_tools.clean_rig', text='Physics', icon='PHYSICS', depress=True)
+            row.operator('mmd_tools_local.clean_rig', text='Physics', icon='PHYSICS', depress=True)
 
         row = grid.row(align=True)
         row.prop(mmd_root, 'use_property_driver', text='Property', toggle=True, icon='DRIVER')
@@ -219,8 +219,8 @@ class MMDToolsModelSetupPanel(bpy.types.Panel):
         col = self.layout.column(align=True)
         col.label(text='Mesh:', icon='MESH_DATA')
         grid = col.grid_flow(row_major=True, align=True)
-        grid.row(align=True).operator('mmd_tools.separate_by_materials', text='Separate by Materials', icon='MOD_EXPLODE')
-        grid.row(align=True).operator('mmd_tools.join_meshes', text='Join', icon='MESH_CUBE')
+        grid.row(align=True).operator('mmd_tools_local.separate_by_materials', text='Separate by Materials', icon='MOD_EXPLODE')
+        grid.row(align=True).operator('mmd_tools_local.join_meshes', text='Join', icon='MESH_CUBE')
 
     def draw_material(self, context, mmd_root_object):
         col = self.layout.column(align=True)
@@ -231,14 +231,15 @@ class MMDToolsModelSetupPanel(bpy.types.Panel):
         row.prop(mmd_root_object.mmd_root, 'use_toon_texture', text='Toon Texture', toggle=True, icon='SHADING_RENDERED')
         row.prop(mmd_root_object.mmd_root, 'use_sphere_texture', text='Sphere Texture', toggle=True, icon='MATSPHERE')
         row = grid.row(align=True)
-        row.operator('mmd_tools.edge_preview_setup', text='Edge Preview', icon='ANTIALIASED').action = 'CREATE'
-        row.operator('mmd_tools.edge_preview_setup', text='', icon='TRASH').action = 'CLEAN'
+        row.operator('mmd_tools_local.edge_preview_setup', text='Edge Preview', icon='ANTIALIASED').action = 'CREATE'
+        row.operator('mmd_tools_local.edge_preview_setup', text='', icon='TRASH').action = 'CLEAN'
         row = grid.row(align=True)
-        row.operator('mmd_tools.convert_materials', text='Convert to Blender', icon='BLENDER')
+        row.operator('mmd_tools_local.convert_materials', text='Convert to Blender', icon='BLENDER')
 
     def draw_misc(self, context, mmd_root_object):
         col = self.layout.column(align=True)
         col.label(text='Misc:', icon='TOOL_SETTINGS')
         grid = col.grid_flow(row_major=True)
-        grid.row(align=True).operator('mmd_tools.global_translation_popup', text='(Experimental) Global Translation')
-        grid.row(align=True).operator('mmd_tools.change_mmd_ik_loop_factor', text='Change MMD IK Loop Factor')
+        grid.row(align=True).operator('mmd_tools_local.global_translation_popup', text='(Experimental) Global Translation')
+        grid.row(align=True).operator('mmd_tools_local.change_mmd_ik_loop_factor', text='Change MMD IK Loop Factor')
+        grid.row(align=True).operator('mmd_tools_local.clean_duplicated_material_morphs')

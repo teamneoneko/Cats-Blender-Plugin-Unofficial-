@@ -86,7 +86,7 @@ class MMDDataHandlerABC(ABC):
             row.label(text='', icon='BLANK1')
             return
 
-        op = row.operator('mmd_tools.restore_mmd_translation_element_name', text='', icon='FILE_REFRESH')
+        op = row.operator('mmd_tools_local.restore_mmd_translation_element_name', text='', icon='FILE_REFRESH')
         op.index = index
         op.prop_name = prop_name
         op.restore_value = original_value

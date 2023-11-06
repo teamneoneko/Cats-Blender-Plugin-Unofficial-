@@ -11,7 +11,7 @@ class _PanelBase(object):
 
 
 class MMDModelObjectPanel(_PanelBase, bpy.types.Panel):
-    bl_idname = 'OBJECT_PT_mmd_tools_root_object'
+    bl_idname = 'OBJECT_PT_mmd_tools_local_root_object'
     bl_label = 'MMD Model Information'
 
     @classmethod
@@ -31,5 +31,5 @@ class MMDModelObjectPanel(_PanelBase, bpy.types.Panel):
         c.prop_search(root.mmd_root, 'comment_text', search_data=bpy.data, search_property='texts')
         c.prop_search(root.mmd_root, 'comment_e_text', search_data=bpy.data, search_property='texts')
         c = layout.column()
-        c.operator('mmd_tools.change_mmd_ik_loop_factor', text='Change MMD IK Loop Factor')
-        c.operator('mmd_tools.recalculate_bone_roll', text='Recalculate bone roll')
+        c.operator('mmd_tools_local.change_mmd_ik_loop_factor', text='Change MMD IK Loop Factor')
+        c.operator('mmd_tools_local.recalculate_bone_roll', text='Recalculate bone roll')

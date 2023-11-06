@@ -5,7 +5,7 @@ from bpy.types import Panel
 from mmd_tools_local.core.camera import MMDCamera
 
 class MMDCameraPanel(Panel):
-    bl_idname = 'OBJECT_PT_mmd_tools_camera'
+    bl_idname = 'OBJECT_PT_mmd_tools_local_camera'
     bl_label = 'MMD Camera Tools'
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -38,4 +38,4 @@ class MMDCameraPanel(Panel):
             layout.prop(empty.mmd_camera, 'angle')
             layout.prop(empty.mmd_camera, 'is_perspective')
         else:
-            layout.operator('mmd_tools.convert_to_mmd_camera', text='Convert')
+            layout.operator('mmd_tools_local.convert_to_mmd_camera', text='Convert')

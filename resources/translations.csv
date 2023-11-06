@@ -474,7 +474,7 @@ HelpButton.label,Need Help?,ウィキを参照してください,우리 위키�
 HelpButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki,,
 HelpButton.success,Github opened.,,
 PatchnotesButton.label,Latest Patchnotes,最新のパッチノート,최신 패치노트
-PatchnotesButton.URL,https://github.com/michaeldegroot/cats-blender-plugin/releases,,
+PatchnotesButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases,,
 PatchnotesButton.success,Patchnotes opened.,,
 ScanButton.label,Scan for decimation models,デシメーション モデルのスキャン,버텍스 줄일 모델 검색
 ScanButton.desc,Separates the mesh.,,
@@ -1065,8 +1065,6 @@ Scene.merge_mesh.label,Mesh,メッシュ,메쉬
 Scene.merge_mesh.desc,The mesh with the bones vertex groups,,
 Scene.merge_bone.label,To Merge,マージするには,통합할 부분
 Scene.merge_bone.desc,List of bones that look like they could be merged together to reduce overall bones,,
-Scene.show_avatar_2_tabs.label,Show Avatar 2.0 tools,
-Scene.show_avatar_2_tabs.desc,Show tools specific to legacy versions of the Avatar API
 Scene.show_mmd_tabs.label,Show mmd_tools,,mmd_tools 탭 보이기
 Scene.show_mmd_tabs.desc,"Allows you to hide/show the mmd_tools tabs ""MMD"" and ""Misc""",,
 Scene.embed_textures.label,Embed Textures on Export,エクスポート時にテクスチャを埋め込む,내보낼 때 텍스처 포함

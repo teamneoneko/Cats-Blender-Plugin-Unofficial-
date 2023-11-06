@@ -3,16 +3,16 @@
 bl_info = {
     'name': 'Cats Blender Plugin',
     'category': '3D View',
-    'author': 'GiveMeAllYourCats & Hotox',
+    'author': 'GiveMeAllYourCats & Hotox, Unofficial version maintained by Yusarina',
     'location': 'View 3D > Tool Shelf > CATS',
     'description': 'A tool designed to shorten steps needed to import and optimize models into VRChat',
     'version': (0, 20, 0),  # Has to be (x, x, x) not [x, x, x]!! Only change this version and the dev branch var right before publishing the new update!
     'blender': (2, 80, 0),
-    'wiki_url': 'https://github.com/michaeldegroot/cats-blender-plugin',
+    'wiki_url': 'https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki',
     'tracker_url': 'https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/issues',
     'warning': '',
 }
-dev_branch = False
+dev_branch = True
 
 import os
 import sys
@@ -73,15 +73,6 @@ from .tools.translations import t
 # In google_trans.py comment out everything that has to do with urllib3
 # This is done because 3.5 doesn't have urllib3 by default and it is only used
 # to suppress debug logs in the console
-# Done
-
-# How to update googletrans:  (outdated since a new googletrans is used Todo remove this)
-# in the gtoken.py on line 57 update this line to include "verify=False":
-# r = self.session.get(self.host, verify=False)
-# In client.py on line 42 remove the Hyper part, it's not faster at all!
-# Just comment it out.
-# Also see pull request for TKK change
-# Also wm progress in client.py
 # Done
 
 # How to set up PyCharm with Blender:

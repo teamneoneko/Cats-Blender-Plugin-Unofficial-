@@ -10,7 +10,7 @@ from mmd_tools_local.core.exceptions import MaterialNotFoundError
 from mmd_tools_local.core.shader import _NodeGroupUtils
 
 class ConvertMaterialsForCycles(Operator):
-    bl_idname = 'mmd_tools.convert_materials_for_cycles'
+    bl_idname = 'mmd_tools_local.convert_materials_for_cycles'
     bl_label = 'Convert Materials For Cycles'
     bl_description = 'Convert materials of selected objects for Cycles.'
     bl_options = {'REGISTER', 'UNDO'}
@@ -50,7 +50,7 @@ class ConvertMaterialsForCycles(Operator):
         return {'FINISHED'}
 
 class ConvertMaterials(Operator):
-    bl_idname = 'mmd_tools.convert_materials'
+    bl_idname = 'mmd_tools_local.convert_materials'
     bl_label = 'Convert Materials'
     bl_description = 'Convert materials of selected objects.'
     bl_options = {'REGISTER', 'UNDO'}
@@ -110,7 +110,7 @@ class _OpenTextureBase(object):
         return {'RUNNING_MODAL'}
 
 class OpenTexture(Operator, _OpenTextureBase):
-    bl_idname = 'mmd_tools.material_open_texture'
+    bl_idname = 'mmd_tools_local.material_open_texture'
     bl_label = 'Open Texture'
     bl_description = 'Create main texture of active material'
 
@@ -123,7 +123,7 @@ class OpenTexture(Operator, _OpenTextureBase):
 class RemoveTexture(Operator):
     """ Create a texture for mmd model material.
     """
-    bl_idname = 'mmd_tools.material_remove_texture'
+    bl_idname = 'mmd_tools_local.material_remove_texture'
     bl_label = 'Remove Texture'
     bl_description = 'Remove main texture of active material'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -137,7 +137,7 @@ class RemoveTexture(Operator):
 class OpenSphereTextureSlot(Operator, _OpenTextureBase):
     """ Create a texture for mmd model material.
     """
-    bl_idname = 'mmd_tools.material_open_sphere_texture'
+    bl_idname = 'mmd_tools_local.material_open_sphere_texture'
     bl_label = 'Open Sphere Texture'
     bl_description = 'Create sphere texture of active material'
 
@@ -150,7 +150,7 @@ class OpenSphereTextureSlot(Operator, _OpenTextureBase):
 class RemoveSphereTexture(Operator):
     """ Create a texture for mmd model material.
     """
-    bl_idname = 'mmd_tools.material_remove_sphere_texture'
+    bl_idname = 'mmd_tools_local.material_remove_sphere_texture'
     bl_label = 'Remove Sphere Texture'
     bl_description = 'Remove sphere texture of active material'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -162,7 +162,7 @@ class RemoveSphereTexture(Operator):
         return {'FINISHED'}
 
 class MoveMaterialUp(Operator):
-    bl_idname = 'mmd_tools.move_material_up'
+    bl_idname = 'mmd_tools_local.move_material_up'
     bl_label = 'Move Material Up'
     bl_description = 'Moves selected material one slot up'
     bl_options = {'REGISTER', 'UNDO'}
@@ -188,7 +188,7 @@ class MoveMaterialUp(Operator):
         return { 'FINISHED' }
 
 class MoveMaterialDown(Operator):
-    bl_idname = 'mmd_tools.move_material_down'
+    bl_idname = 'mmd_tools_local.move_material_down'
     bl_label = 'Move Material Down'
     bl_description = 'Moves the selected material one slot down'
     bl_options = {'REGISTER', 'UNDO'}
@@ -213,7 +213,7 @@ class MoveMaterialDown(Operator):
         return { 'FINISHED' }
 
 class EdgePreviewSetup(Operator):
-    bl_idname = 'mmd_tools.edge_preview_setup'
+    bl_idname = 'mmd_tools_local.edge_preview_setup'
     bl_label = 'Edge Preview Setup'
     bl_description = 'Preview toon edge settings of active model using "Solidify" modifier'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}

@@ -48,27 +48,27 @@ class _SetShadingBase:
 
 
 class SetGLSLShading(Operator, _SetShadingBase):
-    bl_idname = 'mmd_tools.set_glsl_shading'
+    bl_idname = 'mmd_tools_local.set_glsl_shading'
     bl_label = 'GLSL View'
     bl_description = 'Use GLSL shading with additional lighting'
 
     _shading_mode = 'GLSL'
 
 class SetShadelessGLSLShading(Operator, _SetShadingBase):
-    bl_idname = 'mmd_tools.set_shadeless_glsl_shading'
+    bl_idname = 'mmd_tools_local.set_shadeless_glsl_shading'
     bl_label = 'Shadeless GLSL View'
     bl_description = 'Use only toon shading'
 
     _shading_mode = 'SHADELESS'
 
 class ResetShading(Operator, _SetShadingBase):
-    bl_idname = 'mmd_tools.reset_shading'
+    bl_idname = 'mmd_tools_local.reset_shading'
     bl_label = 'Reset View'
     bl_description = 'Reset to default Blender shading'
 
 
 class FlipPose(Operator):
-    bl_idname = 'mmd_tools.flip_pose'
+    bl_idname = 'mmd_tools_local.flip_pose'
     bl_label = 'Flip Pose'
     bl_description = 'Apply the current pose of selected bones to matching bone on opposite side of X-Axis.'
     bl_options = {'REGISTER', 'UNDO'}

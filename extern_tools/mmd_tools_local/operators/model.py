@@ -8,7 +8,7 @@ from mmd_tools_local.core.bone import FnBone
 
 
 class MorphSliderSetup(Operator):
-    bl_idname = 'mmd_tools.morph_slider_setup'
+    bl_idname = 'mmd_tools_local.morph_slider_setup'
     bl_label = 'Morph Slider Setup'
     bl_description = 'Translate MMD morphs of selected object into format usable by Blender'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -41,7 +41,7 @@ class MorphSliderSetup(Operator):
         return {'FINISHED'}
 
 class CleanRiggingObjects(Operator):
-    bl_idname = 'mmd_tools.clean_rig'
+    bl_idname = 'mmd_tools_local.clean_rig'
     bl_label = 'Clean Rig'
     bl_description = 'Delete temporary physics objects of selected object and revert physics to default MMD state'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -54,7 +54,7 @@ class CleanRiggingObjects(Operator):
         return {'FINISHED'}
 
 class BuildRig(Operator):
-    bl_idname = 'mmd_tools.build_rig'
+    bl_idname = 'mmd_tools_local.build_rig'
     bl_label = 'Build Rig'
     bl_description = 'Translate physics of selected object into format usable by Blender'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -85,7 +85,7 @@ class BuildRig(Operator):
         return {'FINISHED'}
 
 class CleanAdditionalTransformConstraints(Operator):
-    bl_idname = 'mmd_tools.clean_additional_transform'
+    bl_idname = 'mmd_tools_local.clean_additional_transform'
     bl_label = 'Clean Additional Transform'
     bl_description = 'Delete shadow bones of selected object and revert bones to default MMD state'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -99,7 +99,7 @@ class CleanAdditionalTransformConstraints(Operator):
         return {'FINISHED'}
 
 class ApplyAdditionalTransformConstraints(Operator):
-    bl_idname = 'mmd_tools.apply_additional_transform'
+    bl_idname = 'mmd_tools_local.apply_additional_transform'
     bl_label = 'Apply Additional Transform'
     bl_description = 'Translate appended bones of selected object for Blender'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -113,7 +113,7 @@ class ApplyAdditionalTransformConstraints(Operator):
         return {'FINISHED'}
 
 class SetupBoneFixedAxes(Operator):
-    bl_idname = 'mmd_tools.bone_fixed_axis_setup'
+    bl_idname = 'mmd_tools_local.bone_fixed_axis_setup'
     bl_label = 'Setup Bone Fixed Axis'
     bl_description = 'Setup fixed axis of selected bones'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -143,7 +143,7 @@ class SetupBoneFixedAxes(Operator):
         return {'FINISHED'}
 
 class SetupBoneLocalAxes(Operator):
-    bl_idname = 'mmd_tools.bone_local_axes_setup'
+    bl_idname = 'mmd_tools_local.bone_local_axes_setup'
     bl_label = 'Setup Bone Local Axes'
     bl_description = 'Setup local axes of each bone'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
@@ -172,8 +172,36 @@ class SetupBoneLocalAxes(Operator):
             FnBone.load_bone_local_axes(arm, enable=(self.type=='LOAD'))
         return {'FINISHED'}
 
+class AddMissingVertexGroupsFromBones(Operator):
+    bl_idname = 'mmd_tools_local.add_missing_vertex_groups_from_bones'
+    bl_label = 'Add Missing Vertex Groups from Bones'
+    bl_description = 'Add the missing vertex groups to the selected mesh'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    search_in_all_meshes: bpy.props.BoolProperty(
+        name='Search in all meshes',
+        description='Search for vertex groups in all meshes',
+        default=False,
+    )
+
+    @classmethod
+    def poll(cls, context: bpy.types.Context):
+        return mmd_model.FnModel.find_root(context.active_object) is not None
+
+    def execute(self, context: bpy.types.Context):
+        active_object: bpy.types.Object = context.active_object
+        root_object = mmd_model.FnModel.find_root(active_object)
+
+        bone_order_mesh_object = mmd_model.FnModel.find_bone_order_mesh_object(root_object)
+        if bone_order_mesh_object is None:
+            return {'CANCELLED'}
+
+        mmd_model.FnModel.add_missing_vertex_groups_from_bones(root_object, bone_order_mesh_object, self.search_in_all_meshes)
+
+        return {'FINISHED'}
+
 class CreateMMDModelRoot(Operator):
-    bl_idname = 'mmd_tools.create_mmd_model_root_object'
+    bl_idname = 'mmd_tools_local.create_mmd_model_root_object'
     bl_label = 'Create a MMD Model Root Object'
     bl_description = 'Create a MMD model root object with a basic armature'
     bl_options = {'REGISTER', 'UNDO'}
@@ -204,7 +232,7 @@ class CreateMMDModelRoot(Operator):
         return vm.invoke_props_dialog(self)
 
 class ConvertToMMDModel(Operator):
-    bl_idname = 'mmd_tools.convert_to_mmd_model'
+    bl_idname = 'mmd_tools_local.convert_to_mmd_model'
     bl_label = 'Convert to a MMD Model'
     bl_description = 'Convert active armature with its meshes to a MMD model (experimental)'
     bl_options = {'REGISTER', 'UNDO'}
@@ -340,7 +368,7 @@ class ConvertToMMDModel(Operator):
         root.mmd_root.active_display_item_frame = 0
 
 class ResetObjectVisibility(bpy.types.Operator):
-    bl_idname = 'mmd_tools.reset_object_visibility'
+    bl_idname = 'mmd_tools_local.reset_object_visibility'
     bl_label = 'Reset Object Visivility'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
@@ -379,7 +407,7 @@ class ResetObjectVisibility(bpy.types.Operator):
         return {'FINISHED'}
 
 class AssembleAll(Operator):
-    bl_idname = 'mmd_tools.assemble_all'
+    bl_idname = 'mmd_tools_local.assemble_all'
     bl_label = 'Assemble All'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
@@ -391,10 +419,10 @@ class AssembleAll(Operator):
             rig = mmd_model.Model(root_object)
 
             rig.applyAdditionalTransformConstraints()
-            rig.build(1.5, 1e-06)
+            rig.build()
             rig.morph_slider.bind()
 
-            bpy.ops.mmd_tools.sdef_bind({'selected_objects': [active_object]})
+            bpy.ops.mmd_tools_local.sdef_bind({'selected_objects': [active_object]})
             root_object.mmd_root.use_property_driver = True
 
             SceneOp(context).active_object = active_object
@@ -402,7 +430,7 @@ class AssembleAll(Operator):
         return {'FINISHED'}
 
 class DisassembleAll(Operator):
-    bl_idname = 'mmd_tools.disassemble_all'
+    bl_idname = 'mmd_tools_local.disassemble_all'
     bl_label = 'Disassemble All'
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
@@ -414,7 +442,7 @@ class DisassembleAll(Operator):
             rig = mmd_model.Model(root_object)
 
             root_object.mmd_root.use_property_driver = False
-            bpy.ops.mmd_tools.sdef_unbind({'selected_objects': [active_object]})
+            bpy.ops.mmd_tools_local.sdef_unbind({'selected_objects': [active_object]})
             rig.morph_slider.unbind()
             rig.clean()
             rig.cleanAdditionalTransformConstraints()

@@ -380,7 +380,7 @@ class AddonUpdaterManager:
 
 
 class CheckAddonUpdate(bpy.types.Operator):
-    bl_idname = "mmd_tools.check_addon_update"
+    bl_idname = "mmd_tools_local.check_addon_update"
     bl_label = "Check Update"
     bl_description = "Check Add-on Update"
     bl_options = {'INTERNAL'}
@@ -392,7 +392,7 @@ class CheckAddonUpdate(bpy.types.Operator):
         return {'FINISHED'}
 
 class UpdateAddon(bpy.types.Operator):
-    bl_idname = "mmd_tools.update_addon"
+    bl_idname = "mmd_tools_local.update_addon"
     bl_label = "Update"
     bl_description = "Update Add-on"
     bl_options = {'INTERNAL'}
@@ -412,12 +412,12 @@ class UpdateAddon(bpy.types.Operator):
 def register_updater(bl_info, init_py_file):
     config = AddonUpdaterConfig()
     config.owner = 'UuuNyaa'
-    config.repository = 'blender_mmd_tools'
+    config.repository = 'blender_mmd_tools_local'
     config.current_addon_path = os.path.dirname(os.path.realpath(init_py_file))
     config.branches = ['main']
     config.addon_directory = os.path.dirname(config.current_addon_path)
     config.min_release_version = (1, 0, 0)
-    config.default_target_addon_path = 'mmd_tools'
+    config.default_target_addon_path = 'mmd_tools_local'
     config.target_addon_path = {}
     updater = AddonUpdaterManager.get_instance()
     updater.init(bl_info, config)

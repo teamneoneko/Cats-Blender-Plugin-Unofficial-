@@ -486,12 +486,6 @@ def register():
         default=True,
         update=Common.toggle_mmd_tabs_update
     )
-    Scene.show_avatar_2_tabs = BoolProperty(
-        name=t('Scene.show_avatar_2_tabs.label'),
-        description=t('Scene.show_avatar_2_tabs.desc'),
-        default=False,
-        update=Translations.update_ui
-    )
     Scene.embed_textures = BoolProperty(
         name=t('Scene.embed_textures.label'),
         description=t('Scene.embed_textures.desc'),
