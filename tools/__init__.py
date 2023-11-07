@@ -26,6 +26,7 @@ if "bpy" not in locals():
     from . import translations
     from . import viseme
     from . import supporter
+    from . import tuxedo
 else:
     # print('RELOAD TOOLS!!')
     import importlib
@@ -52,3 +53,4 @@ else:
     importlib.reload(translations)
     importlib.reload(viseme)
     importlib.reload(supporter)
+    importlib.reload(tuxedo)

@@ -6,7 +6,7 @@ bl_info = {
     'author': 'GiveMeAllYourCats & Hotox, Unofficial version maintained by Yusarina',
     'location': 'View 3D > Tool Shelf > CATS',
     'description': 'A tool designed to shorten steps needed to import and optimize models into VRChat',
-    'version': (0, 20, 0),  # Has to be (x, x, x) not [x, x, x]!! Only change this version and the dev branch var right before publishing the new update!
+    'version': (0, 20, 1),  # Has to be (x, x, x) not [x, x, x]!! Only change this version and the dev branch var right before publishing the new update!
     'blender': (2, 80, 0),
     'wiki_url': 'https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki',
     'tracker_url': 'https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/issues',
@@ -43,6 +43,8 @@ if not is_reloading:
     import mmd_tools_local
     if find_spec("imscale") and find_spec("imscale.immersive_scaler"):
         import imscale.immersive_scaler as imscale
+    if find_spec("tuxedo") and find_spec("tuxedo.tuxedoexternal"):
+        import tuxedo.tuxedoexternal as tuxedo
     from . import updater
     from . import tools
     from . import ui
@@ -53,6 +55,8 @@ else:
     importlib.reload(mmd_tools_local)
     if 'imscale' in vars():
         importlib.reload(imscale)
+    if 'tuxedo' in vars():
+        importlib.reload(tuxedo)
     importlib.reload(tools)
     importlib.reload(ui)
     importlib.reload(extentions)
@@ -178,8 +182,8 @@ def remove_corrupted_files():
 
 
 def check_unsupported_blender_versions():
-    # Don't allow Blender versions older than 2.79
-    if bpy.app.version < (2, 79):
+    # Don't allow Blender versions older than 2.8
+    if bpy.app.version < (2, 8):
         unregister()
         sys.tracebacklimit = 0
         raise ImportError(t('Main.error.unsupportedVersion'))
@@ -264,6 +268,14 @@ def register():
             imscale.register()
         except ModuleNotFoundError:
             pass
+            
+    # Register tuxedo if it's loaded
+    if find_spec("tuxedo") and find_spec("tuxedo.tuxedoexternal"):
+        import tuxedo.tuxedoexternal as tuxedo
+        try:
+            tuxedo.register()
+        except ModuleNotFoundError:
+            pass
 
     # Register all classes
     count = 0
@@ -345,6 +357,14 @@ def unregister():
         import imscale.immersive_scaler as imscale
         try:
             imscale.unregister()
+        except ModuleNotFoundError:
+            pass
+            
+    # Unload tuxedo
+    if find_spec("tuxedo") and find_spec("tuxedo.tuxedoexternal"):
+        import tuxedo.tuxedoexternal as tuxedo
+        try:
+            tuxedo.unregister()
         except ModuleNotFoundError:
             pass
 

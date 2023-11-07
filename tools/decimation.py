@@ -364,7 +364,7 @@ class AutoDecimateButton(bpy.types.Operator):
 
 
 @register_wrap
-class AutoDecimatePresetGood(bpy.types.Operator):
+class AutoDecimatePresetGoodCats(bpy.types.Operator):
     bl_idname = 'cats_decimation.preset_good'
     bl_label = t('DecimationPanel.preset.good.label')
     bl_description = t('DecimationPanel.preset.good.description')
@@ -376,7 +376,7 @@ class AutoDecimatePresetGood(bpy.types.Operator):
 
 
 @register_wrap
-class AutoDecimatePresetExcellent(bpy.types.Operator):
+class AutoDecimatePresetExcellentCats(bpy.types.Operator):
     bl_idname = 'cats_decimation.preset_excellent'
     bl_label = t('DecimationPanel.preset.excellent.label')
     bl_description = t('DecimationPanel.preset.excellent.description')
@@ -388,7 +388,7 @@ class AutoDecimatePresetExcellent(bpy.types.Operator):
 
 
 @register_wrap
-class AutoDecimatePresetQuest(bpy.types.Operator):
+class AutoDecimatePresetQuestCats(bpy.types.Operator):
     bl_idname = 'cats_decimation.preset_quest'
     bl_label = t('DecimationPanel.preset.quest.label')
     bl_description = t('DecimationPanel.preset.quest.description')
