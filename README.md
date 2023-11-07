@@ -1,6 +1,8 @@
-# Cats Blender Plugin (0.20.1) DEVLOPMENT VERSION.
+# Cats Blender Plugin (0.30.0) DEVLOPMENT VERSION.
 
 #### THIS VERSION IS A DEVLOPMENT VERSION NOT INTENDED FOR PRODUCTION USE, THIS VERSION MAY BREAK FROM TIME TO TIME WHILE I WORK ON IT.
+
+#### ATTENTION FROM VERSION 0.30.0 THIS VERSION OF CATS WILL NO LONGER SUPPORT BLENDER 2.79.
 
 This Plugin was originally by absolute-quantum [click here](https://github.com/michaeldegroot/cats-blender-plugin/) to view the original github for the project.
 
