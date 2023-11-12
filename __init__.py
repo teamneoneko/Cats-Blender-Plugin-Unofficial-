@@ -178,8 +178,8 @@ def remove_corrupted_files():
 
 
 def check_unsupported_blender_versions():
-    # Don't allow Blender versions older than 2.79
-    if bpy.app.version < (2, 79):
+    # Don't allow Blender versions older than 2.8
+    if bpy.app.version < (2, 8):
         unregister()
         sys.tracebacklimit = 0
         raise ImportError(t('Main.error.unsupportedVersion'))
@@ -346,7 +346,7 @@ def unregister():
         try:
             imscale.unregister()
         except ModuleNotFoundError:
-            pass
+            pass 
 
     # Unload all classes in reverse order
     count = 0

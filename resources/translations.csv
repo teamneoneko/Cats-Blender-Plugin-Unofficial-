@@ -490,10 +490,10 @@ This means that this shape key is no longer decimation safe!",,
 RemoveMeshButton.label,Remove Mesh,,
 RemoveMeshButton.desc,"Removes the selected mesh from the whitelist.
 This means that this mesh will be decimated.",,
-AutoDecimateButton.label,Quick Decimation,,버텍스 줄이기(Decimation)
-AutoDecimateButton.desc,"This will automatically decimate your model while preserving the shape keys.
+AutoDecimateCatsButton.label,Quick Decimation,,버텍스 줄이기(Decimation)
+AutoDecimateCatsButton.desc,"This will automatically decimate your model while preserving the shape keys.
 You should manually remove unimportant meshes first.",,
-AutoDecimateButton.error.noMesh,No meshes found!,,메쉬가 발견되지 않음!
+AutoDecimateCatsButton.error.noMesh,No meshes found!,,메쉬가 발견되지 않음!
 decimate.cantDecimateWithSettings,This model can not be decimated to {number} tris with the specified settings.,,
 decimate.safeTryOptions,"Try to use Custom, Half or Full Decimation.",,
 decimate.halfTryOptions,Try to use Custom or Full Decimation.,,

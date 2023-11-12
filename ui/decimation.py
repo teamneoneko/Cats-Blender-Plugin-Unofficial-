@@ -12,7 +12,7 @@ from ..tools.register import register_wrap
 from ..tools.translations import t
 
 @register_wrap
-class AutoDecimatePresetGood(bpy.types.Operator):
+class AutoDecimatePresetGoodCats(bpy.types.Operator):
     bl_idname = 'cats_decimation.preset_good'
     bl_label = t('DecimationPanel.preset.good.label')
     bl_description = t('DecimationPanel.preset.good.description')
@@ -23,7 +23,7 @@ class AutoDecimatePresetGood(bpy.types.Operator):
         return {'FINISHED'}
 
 @register_wrap
-class AutoDecimatePresetExcellent(bpy.types.Operator):
+class AutoDecimatePresetExcellentCats(bpy.types.Operator):
     bl_idname = 'cats_decimation.preset_excellent'
     bl_label = t('DecimationPanel.preset.excellent.label')
     bl_description = t('DecimationPanel.preset.excellent.description')
@@ -34,7 +34,7 @@ class AutoDecimatePresetExcellent(bpy.types.Operator):
         return {'FINISHED'}
 
 @register_wrap
-class AutoDecimatePresetQuest(bpy.types.Operator):
+class AutoDecimatePresetQuestCats(bpy.types.Operator):
     bl_idname = 'cats_decimation.preset_quest'
     bl_label = t('DecimationPanel.preset.quest.label')
     bl_description = t('DecimationPanel.preset.quest.description')
@@ -151,12 +151,12 @@ class DecimationPanel(ToolPanel, bpy.types.Panel):
         row = col.row(align=True)
         row.prop(context.scene, 'decimation_retain_separated_meshes', expand=True)
         row = col.row(align=True)
-        row.operator(Decimation.AutoDecimatePresetGood.bl_idname)
-        row.operator(Decimation.AutoDecimatePresetExcellent.bl_idname)
-        row.operator(Decimation.AutoDecimatePresetQuest.bl_idname)
+        row.operator(Decimation.AutoDecimatePresetGoodCats.bl_idname)
+        row.operator(Decimation.AutoDecimatePresetExcellentCats.bl_idname)
+        row.operator(Decimation.AutoDecimatePresetQuestCats.bl_idname)
         row = col.row(align=True)
         row.prop(context.scene, 'max_tris')
         col.separator()
         row = col.row(align=True)
         row.scale_y = 1.2
-        row.operator(Decimation.AutoDecimateButton.bl_idname, icon='MOD_DECIM')
+        row.operator(Decimation.AutoDecimateButtonCats.bl_idname, icon='MOD_DECIM')

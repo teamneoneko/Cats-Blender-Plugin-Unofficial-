@@ -1,4 +1,6 @@
-# Cats Blender Plugin (0.20.1)
+# Cats Blender Plugin (0.30.0).
+
+#### ATTENTION FROM VERSION 0.30.0 THIS VERSION OF CATS WILL NO LONGER SUPPORT BLENDER 2.79.
 
 This Plugin was originally by absolute-quantum [click here](https://github.com/michaeldegroot/cats-blender-plugin/) to view the original github for the project.
 
@@ -6,7 +8,7 @@ I decided to maintain this plugin myself because the original one was abandoned 
 
 Though i have bumped the blender version to 3.6.* I do recomend to use 3.5 due to 3.6 being a bit crashy (Though seems to be more stable then it was a few months ago).
 
-# What is cat's?
+# What is Cat's?
 
 A tool designed to shorten steps needed to import and optimize models into VRChat.
 Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
@@ -270,12 +272,12 @@ This feature was a pull request by Mysteryem on the original Cats project so i p
 Original request https://github.com/absolute-quantum/cats-blender-plugin/pull/599
 
 ## Requirements
- - Blender **2.79** or **2.80** or above (run as administrator is recommended)
+ - Blender **2.80** or above (run as administrator is recommended)
    - mmd_tools is **not required**! Cats comes pre-installed with it!
      - If you have custom Python installed which Blender might use, you need to have Numpy installed
 
 ## Installation
- - Download the plugin: **[Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/master.zip)**
+ - Download the plugin: **[Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/dev.zip)**
    - **Important: Do NOT extract the downloaded zip! You will need the zip file during installation!**
  - Install the addon in blender like so:
    - *This shows Blender 2.79. In Blender 2.80+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there.*
@@ -307,6 +309,11 @@ Skip the step where he installs "mmd_tools" in the video below, it's not needed 
 ---
 ## Changelogs
 
+#### 0.30.0
+- Cats no longer supports blender versions older then 2.8, this means I dropped support for 2.79.
+- Change to some internal classes which seem to conflict with Tuxedo, hopefully this fixes issues if you have both plugins.
+- Bug fixes.
+
 #### 0.20.1
 - Updated MMD Tools to latest version.
 - Change patchlog link to correct github.
@@ -329,7 +336,6 @@ Skip the step where he installs "mmd_tools" in the video below, it's not needed 
 
 #### 0.19.1
 - Fixed Google Translate error (you aren't banned by Google)
-
 
 #### 0.19.0
 - **Fully compatible with Blender 2.93**
@@ -370,68 +376,12 @@ Skip the step where he installs "mmd_tools" in the video below, it's not needed 
   - Misc: Updated defaults to be in line with updated Quest limits.
 
 
-#### 0.18.0
-- **Added Bake Panel!**
-  - This is a non-destructive way to produce an optimized variant of (almost) any avatar!
-  - Full credit goes to **feilen**! Thanks so much for this awesome feature <3
-  - Check out the wiki for more information: https://github.com/GiveMeAllYourCats/cats-blender-plugin/wiki/Bake
-- **Added Smart Decimation!**
-  - This lets you decimate without loosing any shapekeys!
-  - Full credit goes to **feilen**! Tons of thanks for this awesome feature as well <3
-- **Added Japanese translation!**
-  - Cats is now almost fully translated into Japanese
-  - To use it simply change your Blender language to Japanese and then restart Blender
-  - Full credit goes to **Jordo** and **Ruuubick**! Thank you so much <3
-  - If you want to help translating Cats into any language, please us know!
-- **General:**
-  - Cats is now fully compatible with Blender 2.90 and 2.91
-  - Added "Show mmd_tools tabs" option to Settings
-    - This allows you show and hide the "MMD" and "Misc" tabs added by the mmd_tools plugin
-  - Added button to "Start/Stop Pose Mode" which starts/stops pose mode without resetting the current pose
-  - Changed link to a new vrm importer since the old one dropped support
-  - Fixed Google Translations no longer working
-  - Fixed bug in "Apply as Rest Pose" and "Pose to Shape Key" in Blender 2.90
-  - More fixes for Blender 2.90
-  - NOTE: Using Cats in Blender 2.90+ on Ubuntu might cause Blender to crash on load (caused by mmd_tools)
-    - To fix this use a Blender version prior to 2.90 or try updating your drivers
-
-#### 0.17.0
-- **Cats is now fully compatible with Blender 2.83!**
-  - *It was compatible with 2.82 all long*
-- **Fix Model:**
-  - Added "Keep Twist Bones" option to Fix Model
-    - This will keep any bone containing 'Twist'
-  - Added "Fix MMD Twist Bones" option to Fix Model
-    - This will apply a fix to make the MMD arm twist bones usable **(Thanks Rokk!)**
-    - You do not need to enable "Keep Twist Bones" for this to work
-  - Added "Remove Rigidbodies and Joints" option to Fix Model
-    - This is solely intended for our non-VRChat users
-  - Added compatibility to more models
-  - Disabling the option "Remove Zero Weight Bones" now also keeps unused vertex groups
-- **Importer:**
-  - Imported meshes from VRM files now get automatically parented to their armature
-  - Imported armatures now always show their bones in front and in wire mode
-  - Fixed export warning being empty
-  - Fixed importer error when the FBX importer was not enabled
-  - Fixed importer error when a zip file contained another zip file
-  - When importing a model, objects of a new scene now only get deleted if all three of them are present
-- **Custom Model Creation:**
-  - Added "Remove Zero Weight Bones" option to Merge Armatures
-- **Decimation:**
-  - Added "Remove Doubles" option
-- **General:**
-  - Fixed some bugs
-  - Fixed objects getting unhidden when doing any cats operation in 2.80+
-  - Updated mmd_tools
-
-Read the full changelog [here](https://github.com/michaeldegroot/cats-blender-plugin/releases).
+Read the full changelog for the original Cat's here. [here](https://github.com/michaeldegroot/cats-blender-plugin/releases).
+Read the full changelog for this version Cat's here. [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases).
 
 ## Roadmap
- - MOAR updates on the armature code
- - Texture translation should have an option to rename the filename also
- - Manual bone selection button for root bones
- - Full body tracking proportion adjustments
-
+ - Adding Tuxedo Support.
+ - Bug Fixes.
 
 ## Feedback
 Please open an issue if you need to leave feedback.
