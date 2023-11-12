@@ -119,7 +119,7 @@ class RemoveMeshButton(bpy.types.Operator):
 
 
 @register_wrap
-class AutoDecimateButton(bpy.types.Operator):
+class AutoDecimateButtonCats(bpy.types.Operator):
     bl_idname = 'cats_decimation.auto_decimate'
     bl_label = t('AutoDecimateButton.label')
     bl_description = t('AutoDecimateButton.desc')

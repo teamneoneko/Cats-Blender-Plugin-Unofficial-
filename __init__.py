@@ -43,8 +43,6 @@ if not is_reloading:
     import mmd_tools_local
     if find_spec("imscale") and find_spec("imscale.immersive_scaler"):
         import imscale.immersive_scaler as imscale
-    if find_spec("tuxedo") and find_spec("tuxedo.tuxedoexternal"):
-        import tuxedo.tuxedoexternal as tuxedo
     from . import updater
     from . import tools
     from . import ui
@@ -55,8 +53,6 @@ else:
     importlib.reload(mmd_tools_local)
     if 'imscale' in vars():
         importlib.reload(imscale)
-    if 'tuxedo' in vars():
-        importlib.reload(tuxedo)
     importlib.reload(tools)
     importlib.reload(ui)
     importlib.reload(extentions)
@@ -268,14 +264,6 @@ def register():
             imscale.register()
         except ModuleNotFoundError:
             pass
-            
-    # Register tuxedo if it's loaded
-    if find_spec("tuxedo") and find_spec("tuxedo.tuxedoexternal"):
-        import tuxedo.tuxedoexternal as tuxedo
-        try:
-            tuxedo.register()
-        except ModuleNotFoundError:
-            pass
 
     # Register all classes
     count = 0
@@ -358,15 +346,7 @@ def unregister():
         try:
             imscale.unregister()
         except ModuleNotFoundError:
-            pass
-            
-    # Unload tuxedo
-    if find_spec("tuxedo") and find_spec("tuxedo.tuxedoexternal"):
-        import tuxedo.tuxedoexternal as tuxedo
-        try:
-            tuxedo.unregister()
-        except ModuleNotFoundError:
-            pass
+            pass 
 
     # Unload all classes in reverse order
     count = 0

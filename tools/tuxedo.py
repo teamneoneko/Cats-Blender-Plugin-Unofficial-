@@ -10,7 +10,7 @@ from .translations import t
 
 @register_wrap
 class EnableTuxedo(bpy.types.Operator):
-    bl_idname = 'cats_tuxedo.enable_tuxedoexternal'
+    bl_idname = 'cats_tuxedo.enable_tuxedo_blenderplugin'
     bl_label = t('EnableTuxedo.label')
     bl_description = t('EnableTuxedo.desc')
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}

@@ -21,9 +21,9 @@ def check_for_tuxedo():
     draw_tuxedo_ui = None
 
     # Check if using tuxedo shipped with cats
-    if find_spec("tuxedo") and find_spec("tuxedo.tuxedoexternal"):
-        import tuxedo.tuxedoexternal as tuxedo
-        draw_tuxedo_ui = tuxedo.ui.draw_ui
+    if find_spec("tuxedo") and find_spec("tuxedo.tuxedo_blenderplugin"):
+        import tuxedo.tuxedo_blenderplugin as tuxedo
+        draw_tuxedo_ui = tuxedo.ui.draw
         return
 
     # Check if it's present in blender anyway (installed separately)
@@ -78,8 +78,6 @@ class TuxedoPanel(ToolPanel, bpy.types.Panel):
             check_for_tuxedo()
             return None
 
-        # Currently, instructions for an old version are the same as
-        # it not being installed - a manual install either way.
         if old_tuxedo_version:
             box = layout.box()
             col = box.column(align=True)
@@ -116,7 +114,6 @@ class TuxedoPanel(ToolPanel, bpy.types.Panel):
 
             check_for_tuxedo()
             return None
-
 
         # tuxedo = __import__('tuxedo')
         return draw_tuxedo_ui(context, layout)
