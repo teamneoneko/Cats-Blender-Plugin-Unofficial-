@@ -313,8 +313,8 @@ Skip the step where he installs "mmd_tools" in the video below, it's not needed 
 
 #### 0.30.0
 - Cats no longer supports blender versions older then 2.8, this means I dropped support for 2.79.
-- Added Support for Tuxedo.
-- Change to some internal classes to stop conflicts with Tuxedo.
+- Change to some internal classes which seem to conflict with Tuxedo, hopefully this fixes issues if you have both plugins.
+- Bug fixes.
 
 #### 0.20.1
 - Update MMD Tools to latest version.
