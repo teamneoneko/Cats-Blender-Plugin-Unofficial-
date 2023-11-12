@@ -1,6 +1,4 @@
-# Cats Blender Plugin (0.30.0) DEVLOPMENT VERSION.
-
-#### THIS VERSION IS A DEVLOPMENT VERSION NOT INTENDED FOR PRODUCTION USE, THIS VERSION MAY BREAK FROM TIME TO TIME WHILE I WORK ON IT.
+# Cats Blender Plugin (0.30.0).
 
 #### ATTENTION FROM VERSION 0.30.0 THIS VERSION OF CATS WILL NO LONGER SUPPORT BLENDER 2.79.
 
@@ -21,7 +19,7 @@ All the hours long processes of fixing your models are compressed into a few fun
 So if you enjoy how this plugin saves you countless hours of work consider supporting us through Patreon.
 There are a lot of perks like having your name inside the plugin!
 
-#### Download here: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/dev.zip)
+#### Download here: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/main.zip)
 
 ## Features (Click to Expand)
  - <details><summary>Creating lip syncing</summary>
@@ -317,9 +315,10 @@ Skip the step where he installs "mmd_tools" in the video below, it's not needed 
 - Bug fixes.
 
 #### 0.20.1
-- Update MMD Tools to latest version.
+- Updated MMD Tools to latest version.
 - Change patchlog link to correct github.
 - Updated Wiki link.
+- Removed all VRC SDK 2.0 stuff, SDK2 is now completely obsolete and should not be used anyway.
   
 #### 0.20.0
 
