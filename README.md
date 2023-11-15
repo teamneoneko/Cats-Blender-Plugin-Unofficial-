@@ -272,7 +272,7 @@ If installed correctly you should see cat's in your 3D View on your side bar (Th
 
 ## Help
 
-If you need help with Cat's you can check the wiki [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/refs/heads/dev.zip).
+If you need help with Cat's you can check the wiki [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki).
 You can also see the the following video tutorials as well (Please note these videos may become outdated over time).
 
 [![VRCHAT Avatar Setup - Blender CATS Plugin](https://i.ytimg.com/vi/2fJMaxbBewg/0.jpg)](https://www.youtube.com/watch?v=2fJMaxbBewg)
