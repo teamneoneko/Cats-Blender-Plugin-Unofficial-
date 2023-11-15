@@ -1,5 +1,7 @@
 # Cats Blender Plugin (0.30.0).
 
+If you want a cats version that supports Blender 4.0 check out the dev branch version [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/dev) This version won't be released on the main branch unto i have tested it more and fixed some small issues.
+
 #### ATTENTION FROM VERSION 0.30.0 THIS VERSION OF CATS WILL NO LONGER SUPPORT BLENDER 2.79.
 
 This Plugin was originally by absolute-quantum [click here](https://github.com/michaeldegroot/cats-blender-plugin/) to view the original github for the project.
