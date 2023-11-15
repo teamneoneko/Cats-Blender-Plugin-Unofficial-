@@ -121,8 +121,8 @@ class RemoveMeshButton(bpy.types.Operator):
 @register_wrap
 class AutoDecimateButtonCats(bpy.types.Operator):
     bl_idname = 'cats_decimation.auto_decimate'
-    bl_label = t('AutoDecimateButton.label')
-    bl_description = t('AutoDecimateButton.desc')
+    bl_label = t('AutoDecimateCatsButton.label')
+    bl_description = t('AutoDecimateCatsButton.desc')
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
     armature_name = bpy.props.StringProperty(
