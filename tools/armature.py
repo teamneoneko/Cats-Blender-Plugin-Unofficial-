@@ -496,11 +496,11 @@ class FixArmature(bpy.types.Operator):
 
         # Remove Bone Groups
         if version_3_6_or_older():
-          for group in armature.pose.bone_groups:
-          armature.pose.bone_groups.remove(group)
+            for group in armature.pose.bone_groups:
+                armature.pose.bone_groups.remove(group)
         else:
-          for collection in armature.data.collections:
-          armature.data.collections.remove(collection)
+            for collection in armature.data.collections:
+                armature.data.collections.remove(collection)
 
         # Bone constraints should be deleted
         # if context.scene.remove_constraints:
@@ -517,7 +517,7 @@ class FixArmature(bpy.types.Operator):
                     steps += 1
                 else:
                     steps -= 1
-                if version_3_6_or_older():
+            if version_3_6_or_older():
                 bone.layers[0] = True
 
         # Start loading bar
