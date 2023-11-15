@@ -240,7 +240,7 @@ There are a lot of perks like having your name inside the plugin!
    - Applies the selected shape key as the new Basis and creates a reverted shape key from the selected one.
    </details>
 
- - <details><summary>vatars 3.0 Eye Tracking Panel</summary>
+ - <details><summary>Avatars 3.0 Eye Tracking Panel</summary>
 
    ## Avatars 3.0 Eye Tracking Panel
    ![](https://i.imgur.com/x5Hkmfi.png)
