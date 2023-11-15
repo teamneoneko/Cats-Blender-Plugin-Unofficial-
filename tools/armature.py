@@ -498,7 +498,7 @@ class FixArmature(bpy.types.Operator):
         if version_3_6_or_older():
           for group in armature.pose.bone_groups:
           armature.pose.bone_groups.remove(group)
-        els:
+        else:
           for collection in armature.data.collections:
           armature.data.collections.remove(collection)
 
