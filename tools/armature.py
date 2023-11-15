@@ -517,6 +517,8 @@ class FixArmature(bpy.types.Operator):
                     steps += 1
                 else:
                     steps -= 1
+                if version_3_6_or_older():
+                bone.layers[0] = True
 
         # Start loading bar
         current_step = 0
