@@ -1,8 +1,9 @@
-# Cats Blender Plugin (0.30.1 DEV).
+# Cats Blender Plugin (0.40.0 DEV).
 
 
 #### This is the Development version which can be unstable, please use the main branch for the most up to date stable version.
 #### This version of Cats supports Blender 4.0, however due to some issues with 4.0 and the current compatibility of cats and MMD tools I highly recommend you use 3.6 for now.
+#### This version of Cats no longer support Blender 2.8,2.9 and 3.0, please use blender 3.1 and above.
 
 
 The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat.
