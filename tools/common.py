@@ -40,6 +40,9 @@ def version_2_79_or_older():
 
 def version_2_93_or_older():
     return bpy.app.version < (2, 90)
+    
+def version_3_6_or_older():
+    return bpy.app.version < (3, 7)
 
 
 def get_objects():

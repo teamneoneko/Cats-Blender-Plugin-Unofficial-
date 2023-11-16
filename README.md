@@ -1,18 +1,11 @@
-# Cats Blender Plugin (0.30.0).
+# Cats Blender Plugin (0.30.1 DEV).
 
-If you want a cats version that supports Blender 4.0 check out the dev branch version [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/dev) This version won't be released on the main branch unto i have tested it more and fixed some small issues.
 
-#### ATTENTION FROM VERSION 0.30.0 THIS VERSION OF CATS WILL NO LONGER SUPPORT BLENDER 2.79.
+#### This is the Development version which can be unstable, please use the main branch for the most up to date stable version.
+#### This version of Cats supports Blender 4.0, however due to some issues with 4.0 and the current compatibility of cats and MMD tools I highly recommend you use 3.6 for now.
 
-This Plugin was originally by absolute-quantum [click here](https://github.com/michaeldegroot/cats-blender-plugin/) to view the original github for the project.
 
-I decided to maintain this plugin myself because the original one was abandoned by it's author a long time ago and this does not seem like it's going to change anytime soon. However the community was maintaining it but updates are slow. Though i will most likely not be introducing any new features I am going to try and keep the plugin updated to the best of my abilty. 
-
-Though i have bumped the blender version to 3.6.* I do recomend to use 3.5 due to 3.6 being a bit crashy (Though seems to be more stable then it was a few months ago).
-
-# What is Cat's?
-
-A tool designed to shorten steps needed to import and optimize models into VRChat.
+The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat.
 Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
 
 With Cats it takes only a few minutes to upload your model into VRChat.
@@ -21,35 +14,16 @@ All the hours long processes of fixing your models are compressed into a few fun
 So if you enjoy how this plugin saves you countless hours of work consider supporting us through Patreon.
 There are a lot of perks like having your name inside the plugin!
 
-#### Download here: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/main.zip)
-
 ## Features (Click to Expand)
  - <details><summary>Creating lip syncing</summary>
 
    ## Visemes (Lip Sync)
-   ![](https://i.imgur.com/muM2PTS.png)
+   ![](https://i.imgur.com/SWjhe9y.png)
 
    **Mouth visemes are used to show more realistic mouth movement in-game when talking over the microphone.**
    The script generates 15 shape keys from the 3 shape keys you specified. It uses the mouth visemes A, OH and CH to generate this output.
    </details>
- - <details><summary>Creating eye tracking (Irrelevant/Depreciated)</summary>
 
-   ## Eye Tracking
-   ![](https://i.imgur.com/yw8INDO.png)
-   ![](https://i.imgur.com/VHw73zM.png)
-
-   **Eye tracking is used to artificially track someone when they come close to you.**
-   It's a good idea to check the eye movement in the testing tab after this operation to check the validity of the automatic eye tracking creation.
-
-   ##### Disable Eye Blinking
-   - Disables eye blinking. Useful if you only want eye movement.
-
-   ##### Disable Eye Movement
-   - Disables eye movement. Useful if you only want blinking. **IMPORTANT:** Do your decimation first if you check this!
-
-   ##### Eye Movement Speed
-   - Configure eye movement speed
-   </details>
  - <details><summary>Automatic decimation (while keeping shapekeys)</summary>
 
    ## Decimation
@@ -75,7 +49,7 @@ There are a lot of perks like having your name inside the plugin!
 
    ## Bone parenting
 
-   ![](https://i.imgur.com/mgadT4R.png)
+   ![](https://i.imgur.com/lH8lNVa.png)
 
    **Useful for Dynamic Bones where it is ideal to have one root bone full of child bones.**
    This works by checking all bones and trying to figure out if they can be grouped together, which will appear in a list for you to choose from. After satisfied with the selection of this group you can then press 'Parent bones' and the child bones will be parented to a new bone named RootBone_xyz
@@ -93,7 +67,7 @@ There are a lot of perks like having your name inside the plugin!
 
    ## Texture atlas
 
-   ![](https://i.imgur.com/XcoF0Ek.png)
+   ![](https://i.imgur.com/Mav3P9e.png)
 
    **Texture atlas is the process of combining multiple textures into one to drastically reduce draw calls and therefore make your model much more performant**
 
@@ -116,8 +90,8 @@ There are a lot of perks like having your name inside the plugin!
 
    ## Custom Model Creation
 
-   ![](https://i.imgur.com/szIWglS.png)
-   ![](https://i.imgur.com/04O63q1.png)
+   ![](https://i.imgur.com/WZJybq1.png)
+   ![](https://i.imgur.com/Ow8vvt1.png)
 
    **This makes creating custom avatars a breeze!**
 
@@ -164,7 +138,7 @@ There are a lot of perks like having your name inside the plugin!
 
    ## Model Options
 
-   ![](https://i.imgur.com/ZPj2VUJ.png)
+   ![](https://i.imgur.com/y6e3oYS.png)
 
    ##### Translation
    - Translate certain entities from any japanese to english.
@@ -202,7 +176,7 @@ There are a lot of perks like having your name inside the plugin!
 
    ## Bone merging
 
-   ![](https://i.imgur.com/FXwOvho.png)
+   ![](https://i.imgur.com/PL8THn8.png)
 
    **Lets you reduce overall bone count in a group set of bones.**
    This works by checking all bones and trying to figure out if they can be grouped together, which will appear in a list for you to choose from. After satisfied with the selection of this group you can then set a percentage value how much bones you would like to merge together in itself and press 'Merge bones'
@@ -218,7 +192,7 @@ There are a lot of perks like having your name inside the plugin!
 
    ## Settings and Updates
 
-   ![SettingsSection](https://user-images.githubusercontent.com/29756848/155445202-2703d112-3076-4b4d-b129-c888a36b5b9d.png)
+   ![SettingsSection](https://i.imgur.com/mcRBg7W.png)
 
    **This plugin has an auto updater.**
    It checks for a new version automatically once every day.
@@ -228,7 +202,7 @@ There are a lot of perks like having your name inside the plugin!
  - <details><summary>Import a variety of models, test your model movements, and fix common model sources like SFM/Source and MMD</summary>
 
    ## Model
-   ![](https://i.imgur.com/dYYAfb4.png)
+   ![](https://i.imgur.com/rfDIy6e.png)
 
    ##### Import/Export Model
    - Imports a model of the selected type with the optimal settings
@@ -262,84 +236,139 @@ There are a lot of perks like having your name inside the plugin!
 
    ## Shape Key
 
-   ![](https://i.imgur.com/LgFK4KO.png)
+   ![](https://i.imgur.com/zEnr1KA.png)
 
    **Apply Shape Key as Basis**
    - Applies the selected shape key as the new Basis and creates a reverted shape key from the selected one.
    </details>
 
-#### Avatars 3.0 Eye Tracking Panel
-Rotate eye bones so they point straight up and have zero roll, simplifying the eye-tracking setup in Unity for VRChat.
-This feature was a pull request by Mysteryem on the original Cats project so i ported it over.
-Original request https://github.com/absolute-quantum/cats-blender-plugin/pull/599
+ - <details><summary>Avatars 3.0 Eye Tracking Panel</summary>
+
+   ## Avatars 3.0 Eye Tracking Panel
+   ![](https://i.imgur.com/x5Hkmfi.png)
+
+   **Rotate eye bones so they point straight up and have zero roll, simplifying the eye-tracking setup in Unity for VRChat.**
+   This feature was a pull request by Mysteryem on the original Cats project so i ported it over.
+   Original request https://github.com/absolute-quantum/cats-blender-plugin/pull/599
+   </details>
 
 ## Requirements
- - Blender **2.80** or above (run as administrator is recommended)
-   - mmd_tools is **not required**! Cats comes pre-installed with it!
-     - If you have custom Python installed which Blender might use, you need to have Numpy installed
+
+- Blender 2.80 or above (run as administrator is recommended)
+  - Blender 3.6 is Recommended as this is the latest LTS.
+  - Though I have updated CATS to Blender 4.0, I do not currently recommend using 4.0 as there might be issues due to the amount of changes in 4.0.
+- If you have custom Python installed which Blender might use, you need to have Numpy installed
 
 ## Installation
- - Download the plugin: **[Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/dev.zip)**
+
+- Download the plugin: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/refs/heads/dev.zip)
    - **Important: Do NOT extract the downloaded zip! You will need the zip file during installation!**
  - Install the addon in blender like so:
-   - *This shows Blender 2.79. In Blender 2.80+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there.*
+   - In Blender 2.80+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there. Though this plugin may still work on Blender 2.79, it is no longer supported.
 
-![](https://i.imgur.com/eZV1zrs.gif)
+![](https://i.imgur.com/LsEDL6q.gif)
 
- - Check your 3d view and there should be a new menu item called **CATS** ....w00t
-   - Since Blender 2.80 the CATS tab is on the right in the menu that opens when pressing 'N'
+If installed correctly you should see cat's in your 3D View on your side bar (This appears when pressing the N Key on your keyboard). See image below.
 
-![](https://i.imgur.com/pJfVsho.png)
+![](https://i.imgur.com/WPoLbwK.png)
 
- - If you need help figuring out how to use the tool (very outdated):
+## Help
 
-[![VRChat - Cat's Blender Plugin Overview](https://img.youtube.com/vi/0gu0kEj2xwA/0.jpg)](https://www.youtube.com/watch?v=0gu0kEj2xwA)
+If you need help with Cat's you can check the wiki [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki).
+You can also see the the following video tutorials as well (Please note these videos may become outdated over time).
 
-Skip the step where he installs "mmd_tools" in the video below, it's not needed anymore! (also very outdated)
+[![VRCHAT Avatar Setup - Blender CATS Plugin](https://i.ytimg.com/vi/2fJMaxbBewg/0.jpg)](https://www.youtube.com/watch?v=2fJMaxbBewg)
 
-[![VRChat - Importing an MMD to VRChat Megatutorial!](https://img.youtube.com/vi/7P0ljQ6hU0A/0.jpg)](https://www.youtube.com/watch?v=7P0ljQ6hU0A)
+[![Full Blender Tutorial on how to create VRChat models](https://i.ytimg.com/vi/2NdPHW4_SOg/0.jpg)](https://www.youtube.com/watch?v=2NdPHW4_SOg)
 
-## Code contributors:
- - Hotox
- - Shotariya
- - Neitri
- - Kiraver
- - Jordo
- - Ruubick
- - 989onan
+## Acknowledgements
 
----
-## Changelogs
+Maintained by Yusarina.
 
-#### 0.30.0
+### Code contributors:
+- Hotox
+- Shotariya
+- Neitri
+- Kiraver
+- Jordo
+- Ruubick
+- 989onan
+
+Cats Blender Plugin was original developed by absolute quantum then maintained by the community, [click here](https://github.com/absolute-quantum/cats-blender-plugin) to see the original project.
+
+### Cat's Uses the Following Plugins to Enhance it's features:
+
+ - [MMD Tools](https://github.com/UuuNyaa/blender_mmd_tools)
+ - [Immersive Scaler](https://github.com/triazo/immersive_scaler)
+ - [Material Combiner](https://github.com/Grim-es/material-combiner-addon)
+
+## Feedback
+
+Please open an issue if you need to leave feedback.
+
+## Change Log
+
+<details><summary>0.30.1</summary>
+
+   ## 0.30.1
+   #### IMPORTANT! This will be the last version that supports Blender 2.8, 2.9 or 3.0. Next versions will only support 3.1 and above, this is due to MMD tools not working as well on older versions.
+
+- Added Support for Blender 4.0.
+- Updated Readme with newer text and pictures.
+- Fixed Text in the dev build installtion confirmation not displaying.
+- Fixed the quick decimation button lable and description not displaying.
+- Fixed the "bpy.ops.mmd_tools.set_shadeless_glsl_shading" error.
+</details>
+<details><summary>0.30.0</summary>
+
+   ## 0.30.0
+   ###IMPORTANT: This will be the last version that supports Blender 2.79.
+
 - Cats no longer supports blender versions older then 2.8, this means I dropped support for 2.79.
 - Change to some internal classes which seem to conflict with Tuxedo, hopefully this fixes issues if you have both plugins.
 - Bug fixes.
+</details>
+<details><summary>0.20.1</summary>
 
-#### 0.20.1
+   ## 0.20.1
+
 - Updated MMD Tools to latest version.
 - Change patchlog link to correct github.
 - Updated Wiki link.
 - Removed all VRC SDK 2.0 stuff, SDK2 is now completely obsolete and should not be used anyway.
-  
-#### 0.20.0
+</details>
+<details><summary>0.20.0</summary>
+
+   ## 0.20.0
 
 - Removed Patreon and removed supporters tab fully. I done this because the original project is dead.
 - Change the discord link to go to the github wiki, i going to put up some basic things on there at somepoint.
 - Added in credits that i maintaining this version.
 - Added 3.0 Eye Tracking by Mysteryem
 - Fix for Unselect all being called too many times.
+</details>
+<details><summary>0.19.3</summary>
 
-#### 0.19.3 
+   ## 0.19.3
+
 - Fix for update loop.
+</details>
+<details><summary>0.19.2</summary>
 
-#### 0.19.2
+   ## 0.19.2
+
 - Updated for Blender 3.6
+</details>
+<details><summary>0.19.1</summary>
 
-#### 0.19.1
+   ## 0.19.1
+
 - Fixed Google Translate error (you aren't banned by Google)
+</details>
+<details><summary>0.19.0</summary>
 
-#### 0.19.0
+   ## 0.19.0
+
 - **Fully compatible with Blender 2.93**
 - **Translations:**
   - **Added Korean translation!**
@@ -376,15 +405,8 @@ Skip the step where he installs "mmd_tools" in the video below, it's not needed 
   - '_bake' shapekeys: any shapekey with '_bake' at the end will be applied and completely removed, allowing the static shapekeys option to work better.
     If you're an avatar creator distributing bases, this is recommended for character customization keys!
   - Misc: Updated defaults to be in line with updated Quest limits.
-
+</details>
 
 Read the full changelog for the original Cat's here. [here](https://github.com/michaeldegroot/cats-blender-plugin/releases).
+
 Read the full changelog for this version Cat's here. [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases).
-
-## Roadmap
- - Adding Tuxedo Support.
- - Bug Fixes.
-
-## Feedback
-Please open an issue if you need to leave feedback.
-

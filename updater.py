@@ -256,7 +256,7 @@ class ConfirmUpdatePanel(bpy.types.Operator):
             row.label(text=t('ConfirmUpdatePanel.warn.dev4'))
             row = col.row(align=True)
             row.scale_y = 0.75
-            row.label(text='ConfirmUpdatePanel.warn.dev5')
+            row.label(text=t('ConfirmUpdatePanel.warn.dev5'))
 
         else:
             row.operator(ShowPatchnotesPanel.bl_idname, text=t('ConfirmUpdatePanel.ShowPatchnotesPanel.label'))
