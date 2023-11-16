@@ -35,14 +35,14 @@ Please restart Blender and enable CATS again!
 잘못된 설치된 Cats Plugin 발견됐고 수정되었습니다!
 Blender를 다시 시작하고 Cats Plugin를 다시 활성화하세요!
 "
-Main.error.unsupportedVersion,"
+Main.error.29unsupportedVersion,"
 
-Blender versions older than 2.79 are not supported by Cats.
-Please use Blender 2.79 or later.
+Blender versions older than 2.9 are not supported by Cats.
+Please use Blender 2.9 or later.
 ",,"
 
-2.79 이전의 블렌더 버전은 Cats에서 지원하지 않습니다.
-Blender 2.79 버전 이상을 사용하세요.
+2.9 이전의 블렌더 버전은 Cats에서 지원하지 않습니다.
+Blender 2.9 버전 이상을 사용하세요.
 "
 Main.error.beta2.80,"
 
@@ -63,12 +63,15 @@ Blender를 다시 시작하고 Cats Plugin를 다시 활성화하세요!
 ToolPanel.label,Cats Blender Plugin,Cats ブレンダープラグイン,
 ToolPanel.category,CATS,,
 ArmaturePanel.label,Model,モデル,모델
+ArmaturePanel.warn.40Blender1,You are using Blender 4.0 though cats does
+ArmaturePanel.warn.40Blender2,support 4.0 there could be some issues.
+ArmaturePanel.warn.40Blender3,Please downgrade to 3.5/3.6 if you have any.
 ArmaturePanel.warn.newBlender1,Potentially unsupported Blender version detected!
 ArmaturePanel.warn.newBlender2,Some features might not work!
 ArmaturePanel.warn.newBlender3,CATS currently supports up to Blender 4.0.
 ArmaturePanel.warn.oldBlender1,Old Blender version detected!,古いブレンダーバージョンが検出されました!,이전 블렌더 버전이 발견되었습니다!
 ArmaturePanel.warn.oldBlender2,Some features might not work!,一部の機能は動作しない可能性があります!,일부 기능이 작동하지 않을 수 있습니다!
-ArmaturePanel.warn.oldBlender3,Please update to Blender 2.79!,ブレンダー2.79以上にアップデートしてください!,블렌더 2.79 버전으로 업데이트하세요!
+ArmaturePanel.warn.oldBlender3,Please update to Blender 3.1!,ブレンダー3.1以上にアップデートしてください!,블렌더 3.1 버전으로 업데이트하세요!
 ArmaturePanel.warn.noDict1,Dictionary not found!,辞書が見つかりません!,사전파일(Dictionary)을 찾을 수 없습니다!
 ArmaturePanel.warn.noDict2,"Translations will work, but are not optimized.",翻訳は機能しますが、最適化されません。,번역은 되지만 최적화되지는 않습니다.
 ArmaturePanel.warn.noDict3,Reinstall Cats to fix this.,これを修正するためにCatsを再インストールします。,이 문제를 해결하려면 Cats를 다시 설치하세요.
