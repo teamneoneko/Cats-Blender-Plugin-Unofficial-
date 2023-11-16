@@ -1253,7 +1253,7 @@ class FixArmature(bpy.types.Operator):
         # Fix shading (check for runtime error because of ci tests)
         if not source_engine:
             try:
-                bpy.ops.mmd_tools.set_shadeless_glsl_shading()
+                bpy.ops.mmd_tools_local.set_shadeless_glsl_shading()
                 if not version_2_79_or_older():
                     set_material_shading()
             except RuntimeError:
