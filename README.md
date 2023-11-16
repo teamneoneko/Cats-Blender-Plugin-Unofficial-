@@ -306,9 +306,21 @@ Please open an issue if you need to leave feedback.
 
 ## Change Log
 
+<details><summary>0.30.1</summary>
+
+   ## 0.30.1
+   #### IMPORTANT! This will be the last version that supports Blender 2.8, 2.9 or 3.0. Next versions will only support 3.1 and above, this is due to MMD tools not working as well on older versions.
+
+- Added Support for Blender 4.0.
+- Updated Readme with newer text and pictures.
+- Fixed Text in the dev build installtion confirmation not displaying.
+- Fixed the quick decimation button lable and description not displaying.
+- Fixed the "bpy.ops.mmd_tools.set_shadeless_glsl_shading" error.
+</details>
 <details><summary>0.30.0</summary>
 
    ## 0.30.0
+   ###IMPORTANT: This will be the last version that supports Blender 2.79.
 
 - Cats no longer supports blender versions older then 2.8, this means I dropped support for 2.79.
 - Change to some internal classes which seem to conflict with Tuxedo, hopefully this fixes issues if you have both plugins.
