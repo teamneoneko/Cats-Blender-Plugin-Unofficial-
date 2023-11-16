@@ -256,9 +256,10 @@ There are a lot of perks like having your name inside the plugin!
 
 ## Requirements
 
-- Blender 2.80 or above (run as administrator is recommended)
+- Blender 2.9 or above (run as administrator is recommended)
   - Blender 3.6 is Recommended as this is the latest LTS.
   - Though I have updated CATS to Blender 4.0, I do not currently recommend using 4.0 as there might be issues due to the amount of changes in 4.0.
+  - Anything older then 2.9 is not supported and no longer works.
 - If you have custom Python installed which Blender might use, you need to have Numpy installed
 
 ## Installation
