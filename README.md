@@ -1,9 +1,6 @@
-# Cats Blender Plugin (0.30.1 DEV).
+# Cats Blender Plugin (0.30.1).
 
-
-#### This is the Development version which can be unstable, please use the main branch for the most up to date stable version.
 #### This version of Cats supports Blender 4.0, however due to some issues with 4.0 and the current compatibility of cats and MMD tools I highly recommend you use 3.6 for now.
-
 
 The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat.
 Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
@@ -261,7 +258,7 @@ There are a lot of perks like having your name inside the plugin!
 
 ## Installation
 
-- Download the plugin: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/refs/heads/dev.zip)
+- Download the plugin: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/refs/heads/main.zip)
    - **Important: Do NOT extract the downloaded zip! You will need the zip file during installation!**
  - Install the addon in blender like so:
    - In Blender 2.80+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there. Though this plugin may still work on Blender 2.79, it is no longer supported.
