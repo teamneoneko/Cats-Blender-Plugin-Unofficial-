@@ -309,7 +309,7 @@ Please open an issue if you need to leave feedback.
 <details><summary>0.30.1</summary>
 
    ## 0.30.1
-   ###IMPORTANT: This will be the last version that supports Blender 2.8, 2.9 or 3.0. Next versions will only support 3.1 and above, this is due to MMD tools not working as well on older versions.
+   ### IMPORTANT: This will be the last version that supports Blender 2.8, 2.9 or 3.0. Next versions will only support 3.1 and above, this is due to MMD tools not working as well on older versions.
 
 - Added Support for Blender 4.0.
 - Updated Readme with newer text and pictures.
