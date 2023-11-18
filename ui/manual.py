@@ -117,10 +117,10 @@ class ManualPanel(ToolPanel, bpy.types.Panel):
             row.scale_y = button_height
             row.operator(Armature_manual.RemoveDoubles.bl_idname, icon='X')
 
-            if not Common.version_2_79_or_older():
-                col.separator()
-                add_button_with_small_button(col, Armature_manual.CreateDigitigradeLegs.bl_idname, 'OUTLINER_DATA_ARMATURE',
-                                                  Armature_manual.DigitigradeTutorialButton.bl_idname, 'QUESTION', scale=button_height)
+
+            col.separator()
+            add_button_with_small_button(col, Armature_manual.CreateDigitigradeLegs.bl_idname, 'OUTLINER_DATA_ARMATURE',
+                                                Armature_manual.DigitigradeTutorialButton.bl_idname, 'QUESTION', scale=button_height)
 
             col.separator()
             row = layout_split(col, factor=0.6, align=True)

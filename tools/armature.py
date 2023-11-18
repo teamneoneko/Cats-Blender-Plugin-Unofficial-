@@ -8,7 +8,6 @@ from mathutils import Matrix
 from . import common as Common
 from . import translate as Translate
 from . import armature_bones as Bones
-from .common import version_2_79_or_older
 from .common import version_3_6_or_older
 from .register import register_wrap
 from .translations import t
@@ -210,20 +209,6 @@ class FixArmature(bpy.types.Operator):
         if view_area:
             view_area.clip_start = 0.01
             view_area.clip_end = 300
-
-        if version_2_79_or_older():
-            # Set better bone view
-            armature.data.draw_type = 'OCTAHEDRAL'
-            armature.draw_type = 'WIRE'
-            armature.show_x_ray = True
-            armature.data.show_bone_custom_shapes = False
-            armature.layers[0] = True
-
-            # Disable backface culling
-            area = next(area for area in bpy.context.screen.areas if area.type == 'VIEW_3D')
-            space = next(space for space in area.spaces if space.type == 'VIEW_3D')
-            space.show_backface_culling = True  # set the viewport shading
-        else:
             armature.data.display_type = 'OCTAHEDRAL'
             if hasattr(armature, 'draw_type'):
                 armature.draw_type = 'WIRE'
@@ -317,44 +302,24 @@ class FixArmature(bpy.types.Operator):
             for mesh in Common.get_meshes_objects(mode=2):
                 if mesh.name.endswith(('.baked', '.baked0')):
                     mesh.parent = armature
+        collections_armature_is_in = armature.users_collection
+        if collections_armature_is_in:
+            armature_collection = collections_armature_is_in[0]
+            for col in collections_armature_is_in[1::]:
+                col.objects.unlink(armature)
+        else:
+            armature_collection = context.scene.collection
+            armature_collection.objects.link(armature)
 
-        # Set the armature into only one collection and set all of its meshes into only that same collection.
-        # This ensures that meshes visually appear under the armature in the outliner and only appear once.
-        # 2.79 and older don't have collections, so this is only relevant for 2.80 and newer.
-        if not Common.version_2_79_or_older():
-            # Set the armature to only be linked inside of one collection
-            #
-            # Get the collections the armature is in
-            collections_armature_is_in = armature.users_collection
-            # The armature being in at least one collection is the expected case.
-            # Unlink the armature from all its collections except the first.
-            if collections_armature_is_in:
-                # The first collection is the one we'll make sure the armature and all its meshes are linked in
-                armature_collection = collections_armature_is_in[0]
-                # Unlink the armature from all the other collections
-                for col in collections_armature_is_in[1::]:
-                    # Unlink the armature from the collection
-                    col.objects.unlink(armature)
-            # The armature should always be in a collection if it's in the current view layer, but if it's not for some
-            # reason, link it to the scene collection.
-            else:
-                # Get the scene collection
-                armature_collection = context.scene.collection
-                # Link the armature to the scene collection
-                armature_collection.objects.link(armature)
-
-            # Link all the meshes to the same collection as the armature and unlink them from all other collections
-            for mesh in Common.get_meshes_objects():
-                mesh_already_in_armature_collection = False
-                # Unlink the mesh from all collections that aren't armature_collection
-                for col in mesh.users_collection:
-                    if col == armature_collection:
-                        mesh_already_in_armature_collection = True
-                    else:
-                        col.objects.unlink(mesh)
-                # Link the mesh to armature_collection if it's not already linked to armature_collection
-                if not mesh_already_in_armature_collection:
-                    armature_collection.objects.link(mesh)
+        for mesh in Common.get_meshes_objects():
+            mesh_already_in_armature_collection = False
+            for col in mesh.users_collection:
+                if col == armature_collection:
+                    mesh_already_in_armature_collection = True
+                else:
+                    col.objects.unlink(mesh)
+            if not mesh_already_in_armature_collection:
+                armature_collection.objects.link(mesh)
 
         # Check if weird FBX model
         print('CHECK TRANSFORMS:', armature.scale[0], armature.scale[1], armature.scale[2])
@@ -418,26 +383,16 @@ class FixArmature(bpy.types.Operator):
             Common.clean_material_names(mesh)
 
             # If all materials are transparent, make them visible. Also set transparency always to Z-Transparency
-            if version_2_79_or_older():
-                all_transparent = True
-                for mat_slot in mesh.material_slots:
-                    mat_slot.material.transparency_method = 'Z_TRANSPARENCY'
-                    if mat_slot.material.alpha > 0:
-                        all_transparent = False
-                if all_transparent:
-                    for mat_slot in mesh.material_slots:
-                        mat_slot.material.alpha = 1
-            else:
-                if context.scene.fix_materials:
-                    # Make materials exportable in Blender 2.80 and remove glossy mmd shader look
-                    # Common.remove_toon_shader(mesh)
-                    if mmd_tools_installed:
-                        Common.fix_mmd_shader(mesh)
+            if context.scene.fix_materials:
+                # Make materials exportable in Blender 2.80 and remove glossy mmd shader look
+                # Common.remove_toon_shader(mesh)
+                if mmd_tools_installed:
+                    Common.fix_mmd_shader(mesh)
                     Common.fix_vrm_shader(mesh)
                     Common.add_principled_shader(mesh)
-                    for mat_slot in mesh.material_slots:  # Fix transparency per polygon and general garbage look in blender. Asthetic purposes to fix user complaints.
-                        mat_slot.material.shadow_method = "HASHED"
-                        mat_slot.material.blend_method = "HASHED"
+                for mat_slot in mesh.material_slots:  # Fix transparency per polygon and general garbage look in blender. Asthetic purposes to fix user complaints.
+                    mat_slot.material.shadow_method = "HASHED"
+                    mat_slot.material.blend_method = "HASHED"
 
 			# Remove empty shape keys and then save the shape key order
             Common.clean_shapekeys(mesh)
@@ -1254,8 +1209,7 @@ class FixArmature(bpy.types.Operator):
         if not source_engine:
             try:
                 bpy.ops.mmd_tools_local.set_shadeless_glsl_shading()
-                if not version_2_79_or_older():
-                    set_material_shading()
+                set_material_shading()
             except RuntimeError:
                 pass
 

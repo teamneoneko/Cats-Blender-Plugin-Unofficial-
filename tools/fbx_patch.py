@@ -2,34 +2,13 @@
 
 # This is directly taken from the export_fbx_bin.py to change it via monkey patching
 import bpy
+import threading
 from . import common as Common
 from io_scene_fbx import fbx_utils
 
-if Common.version_2_79_or_older():
-    import bpy
-    import array
-    from threading import Thread
-    from mathutils import Vector
-    from collections import OrderedDict
-    from io_scene_fbx import data_types, export_fbx_bin
-
-    from io_scene_fbx.export_fbx_bin import (
-        check_skip_material, fbx_mat_properties_from_texture, fbx_template_def_globalsettings, fbx_template_def_null,
-        fbx_template_def_bone, fbx_generate_leaf_bones, fbx_template_def_light, fbx_template_def_camera, fbx_animations,
-        fbx_template_def_geometry, fbx_template_def_model, fbx_template_def_pose, fbx_template_def_deformer,
-        fbx_template_def_material, fbx_template_def_texture_file, fbx_template_def_animstack, fbx_template_def_animlayer,
-        fbx_template_def_video, fbx_template_def_animcurvenode, fbx_template_def_animcurve, fbx_skeleton_from_armature
-    )
-    from io_scene_fbx.fbx_utils import (
-        PerfMon, ObjectWrapper, get_blenderID_key, BLENDER_OBJECT_TYPES_MESHLIKE, get_blender_mesh_shape_key,
-        BLENDER_OTHER_OBJECT_TYPES, get_blender_empty_key, vcos_transformed_gen, get_blender_mesh_shape_channel_key,
-        FBXExportData, get_fbx_uuid_from_key, similar_values_iter
-    )
-
 def start_patch_fbx_exporter_timer():
-    if Common.version_2_79_or_older():
-        thread = Thread(target=time_patch_fbx_exporter, args=[])
-        thread.start()
+    thread = threading.Thread(target=time_patch_fbx_exporter, args=[])
+    thread.start()
 
 def time_patch_fbx_exporter():
     import time
@@ -43,8 +22,6 @@ def time_patch_fbx_exporter():
     patch_fbx_exporter()
 
 def patch_fbx_exporter():
-    if Common.version_2_79_or_older():
-        export_fbx_bin.fbx_data_from_scene = fbx_data_from_scene_v279
     fbx_utils.get_bid_name = get_bid_name
 
 # Blender-specific key generators - monkeypatched to force name if present
