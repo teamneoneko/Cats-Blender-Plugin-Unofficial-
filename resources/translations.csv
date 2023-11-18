@@ -63,9 +63,9 @@ Blender를 다시 시작하고 Cats Plugin를 다시 활성화하세요!
 ToolPanel.label,Cats Blender Plugin,Cats ブレンダープラグイン,
 ToolPanel.category,CATS,,
 ArmaturePanel.label,Model,モデル,모델
-ArmaturePanel.warn.40Blender1,You are using Blender 4.0 though cats does
-ArmaturePanel.warn.40Blender2,support 4.0 there could be some issues.
-ArmaturePanel.warn.40Blender3,Please downgrade to 3.5/3.6 if you have any.
+ArmaturePanel.warn.40Blender1,You are using Blender 4.0 though cats does allow
+ArmaturePanel.warn.40Blender2,Blender 4.0 there could be some issues.
+ArmaturePanel.warn.40Blender3,Please downgrade to 3.5/3.6 if you have any issues.
 ArmaturePanel.warn.newBlender1,Potentially unsupported Blender version detected!
 ArmaturePanel.warn.newBlender2,Some features might not work!
 ArmaturePanel.warn.newBlender3,CATS currently supports up to Blender 4.0.
