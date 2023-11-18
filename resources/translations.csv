@@ -37,21 +37,12 @@ Blender를 다시 시작하고 Cats Plugin를 다시 활성화하세요!
 "
 Main.error.29unsupportedVersion,"
 
-Blender versions older than 2.9 are not supported by Cats.
-Please use Blender 2.9 or later.
+Blender versions older than 3.1 are not supported by Cats.
+Please use Blender 3.1 or later.
 ",,"
 
-2.9 이전의 블렌더 버전은 Cats에서 지원하지 않습니다.
-Blender 2.9 버전 이상을 사용하세요.
-"
-Main.error.beta2.80,"
-
-You are still on the beta version of Blender 2.80!
-Please update to the release version of Blender 2.80.
-",,"
-
-아직 Blender 2.80 베타 버전을 사용 중입니다!
-Blender를 2.80 정식 버전으로 업데이트하세요.
+3.1 이전의 블렌더 버전은 Cats에서 지원하지 않습니다.
+Blender 3.1 버전 이상을 사용하세요.
 "
 Main.error.restartAndEnable_alt,"
 
@@ -71,7 +62,7 @@ ArmaturePanel.warn.newBlender2,Some features might not work!
 ArmaturePanel.warn.newBlender3,CATS currently supports up to Blender 4.0.
 ArmaturePanel.warn.oldBlender1,Old Blender version detected!,古いブレンダーバージョンが検出されました!,이전 블렌더 버전이 발견되었습니다!
 ArmaturePanel.warn.oldBlender2,Some features might not work!,一部の機能は動作しない可能性があります!,일부 기능이 작동하지 않을 수 있습니다!
-ArmaturePanel.warn.oldBlender3,Please update to Blender 3.1!,ブレンダー3.1以上にアップデートしてください!,블렌더 3.1 버전으로 업데이트하세요!
+ArmaturePanel.warn.oldBlender3,Please update to Blender 3.3!,ブレンダー3.1以上にアップデートしてください!,블렌더 3.1 버전으로 업데이트하세요!
 ArmaturePanel.warn.noDict1,Dictionary not found!,辞書が見つかりません!,사전파일(Dictionary)을 찾을 수 없습니다!
 ArmaturePanel.warn.noDict2,"Translations will work, but are not optimized.",翻訳は機能しますが、最適化されません。,번역은 되지만 최적화되지는 않습니다.
 ArmaturePanel.warn.noDict3,Reinstall Cats to fix this.,これを修正するためにCatsを再インストールします。,이 문제를 해결하려면 Cats를 다시 설치하세요.
@@ -550,26 +541,6 @@ TestLowerlid.desc,This lets you see how lowerlids will look in-game.,,게임 중
 ResetBlinkTest.label,Reset Shapes,図形をリセットする,쉐이프 초기화
 ResetBlinkTest.desc,This resets the blink testing.,,눈깜빡임 테스트를 초기화한다.
 ImportAnyModel.label,Import Any Model,任意のモデルをインポート,아무 모델 불러오기
-ImportAnyModel.desc2.79,"Import a model of any supported type.
-
-Supported types:
-- MMD: .pmx/.pmd
-- XNALara: .xps/.mesh/.ascii
-- Source: .smd/.qc
-- VRM: .vrm
-- FBX .fbx
-- DAE: .dae
-- ZIP: .zip",,
-ImportAnyModel.desc2.8,"Import a model of any supported type.
-
-Supported types:
-- MMD: .pmx/.pmd
-- XNALara: .xps/.mesh/.ascii
-- Source: .smd/.qc/.vta/.dmx
-- VRM: .vrm
-- FBX: .fbx
-- DAE: .dae
-- ZIP: .zip",,
 ImportAnyModel.importantInfo.label,IMPORTANT INFO (hover here),重要な情報(ここにホバー),
 ImportAnyModel.importantInfo.desc,"If you want to modify the import settings, use the button next to the Import button.
 
@@ -611,7 +582,6 @@ SourceToolsButton.label,Download Source Tools,ソースツールをダウンロ�
 SourceToolsButton.URL,https://github.com/Artfunkel/BlenderSourceTools,,
 SourceToolsButton.success,Source Tools link opened,,
 VrmToolsButton.label,Download VRM Importer,VRMインポーターをダウンロード,VRM Importer 다운로드
-VrmToolsButton.URL_2.79,https://github.com/iCyP/VRM_IMPORTER_for_Blender2_79,,
 VrmToolsButton.URL_2.8,https://github.com/saturday06/VRM_IMPORTER_for_Blender2_8,,
 VrmToolsButton.success,VRM Importer link opened,,
 ExportModel.label,Export Model,モデルのエクスポート,모델 내보내기
