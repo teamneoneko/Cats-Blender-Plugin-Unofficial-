@@ -373,7 +373,10 @@ class PoseToRest(bpy.types.Operator):
         # active object e.g., the user has multiple armatures opened in pose mode, but a different armature is currently
         # active. We can use an operator override to tell the operator to treat armature_obj as if it's the active
         # object even if it's not, skipping the need to actually set armature_obj as the active object.
-        bpy.ops.pose.armature_apply({'active_object': armature_obj})
+        if bpy.app.version < (3, 7, 0):
+            bpy.ops.pose.armature_apply({'active_object': armature_obj})
+        if bpy.app.version > (3, 7, 0):
+            bpy.ops.pose.armature_apply(selected=False)
 
         # Stop pose mode after operation
         bpy.ops.cats_manual.stop_pose_mode()
