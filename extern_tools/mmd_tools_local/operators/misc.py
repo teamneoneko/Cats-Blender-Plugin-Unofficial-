@@ -260,54 +260,21 @@ class ChangeMMDIKLoopFactor(Operator):
         min=1,
         soft_max=10,
         max=100,
-        options={'SKIP_SAVE'},
-        )
+    )
 
     @classmethod
     def poll(cls, context):
-        obj = context.active_object
-        return obj and obj.type == 'ARMATURE'
+        return mmd_model.FnModel.find_root(context.active_object) is not None
 
     def invoke(self, context, event):
-        arm = context.active_object
-        self.mmd_ik_loop_factor = max(arm.get('mmd_ik_loop_factor', 1), 1)
+        root_object = mmd_model.FnModel.find_root(context.active_object)
+        self.mmd_ik_loop_factor = root_object.mmd_root.ik_loop_factor
         vm = context.window_manager
         return vm.invoke_props_dialog(self)
 
     def execute(self, context):
-        arm = context.active_object
-
-        old_factor = max(arm.get('mmd_ik_loop_factor', 1), 1)
-        new_factor = arm['mmd_ik_loop_factor'] = self.mmd_ik_loop_factor
-
-        # Reference: https://developer.blender.org/rB8b9a3b94fc148d
-        if hasattr(arm, 'id_properties_ui'):
-            ui_data = arm.id_properties_ui('mmd_ik_loop_factor')
-            ui_data.update(
-                min=1,
-                soft_min=1,
-                soft_max=10,
-                max=100,
-                description='Scaling factor of MMD IK loop',
-                )
-        else:
-            from rna_prop_ui import rna_idprop_ui_prop_get
-            prop = rna_idprop_ui_prop_get(arm, 'mmd_ik_loop_factor', create=True)
-            prop['min'] = 1
-            prop['soft_min'] = 1
-            prop['soft_max'] = 10
-            prop['max'] = 100
-            prop['description'] = 'Scaling factor of MMD IK loop'
-
-        if new_factor == old_factor:
-            return { 'FINISHED' }
-        for b in arm.pose.bones:
-            for c in b.constraints:
-                if c.type != 'IK':
-                    continue
-                iterations = int(c.iterations * new_factor / old_factor)
-                self.report({ 'INFO' }, 'Update %s of %s: %d -> %d'%(c.name, b.name, c.iterations, iterations))
-                c.iterations = iterations
+        root_object = mmd_model.FnModel.find_root(context.active_object)
+        mmd_model.FnModel.change_mmd_ik_loop_factor(root_object, self.mmd_ik_loop_factor)
         return { 'FINISHED' }
 
 class RecalculateBoneRoll(Operator):
