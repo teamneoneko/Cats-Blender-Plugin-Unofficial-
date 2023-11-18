@@ -2,7 +2,7 @@
 
 
 #### This is the Development version which can be unstable, please use the main branch for the most up to date stable version.
-#### This version of Cats supports Blender 4.0, however due to some issues with 4.0 and the current compatibility of cats and MMD tools I highly recommend you use 3.6 for now.
+#### This version of Cats does allow Blender 4.0, however due to some issues with 4.0 and the current compatibility of cats and MMD tools I highly recommend you use 3.6 for now. Please do not report any issues relating to 4.0, If you hit any issues please downgrade to Blender 3.6 for the time being. This is because MMD Tools currently does not support Blender 4.0 and unto it does we can not fully support 4.0.
 #### This version of Cats no longer support Blender 2.8, 2.9 and 3.0, please use blender 3.1 and above.
 #### Note: Cats WILL NOT work in blender versions older then 2.9 due to MMD dropping support completely.
 
@@ -258,8 +258,9 @@ There are a lot of perks like having your name inside the plugin!
 
 - Blender 2.9 or above (run as administrator is recommended)
   - Blender 3.6 is Recommended as this is the latest LTS.
-  - Though I have updated CATS to Blender 4.0, I do not currently recommend using 4.0 as there might be issues due to the amount of changes in 4.0.
+  - Though I have updated CATS to Blender 4.0, I do not currently recommend using 4.0 as there multiple issues with MDD Tools and Blender 4.0 which cats uses.
   - Anything older then 2.9 is not supported and no longer works.
+  - In the future I won't be allowing anything older then Blender 3.3.
 - If you have custom Python installed which Blender might use, you need to have Numpy installed
 
 ## Installation
