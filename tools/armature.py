@@ -379,7 +379,7 @@ class FixArmature(bpy.types.Operator):
                 Common.sort_shape_keys(mesh.name, shapekey_order)
 
 
-            # Clean material names. Combining mats would do this too
+             # Clean material names. Combining mats would do this too
             Common.clean_material_names(mesh)
 
             # If all materials are transparent, make them visible. Also set transparency always to Z-Transparency
@@ -388,8 +388,8 @@ class FixArmature(bpy.types.Operator):
                 # Common.remove_toon_shader(mesh)
                 if mmd_tools_installed:
                     Common.fix_mmd_shader(mesh)
-                    Common.fix_vrm_shader(mesh)
-                    Common.add_principled_shader(mesh)
+                Common.fix_vrm_shader(mesh)
+                Common.add_principled_shader(mesh)
                 for mat_slot in mesh.material_slots:  # Fix transparency per polygon and general garbage look in blender. Asthetic purposes to fix user complaints.
                     mat_slot.material.shadow_method = "HASHED"
                     mat_slot.material.blend_method = "HASHED"

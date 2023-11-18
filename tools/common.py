@@ -174,6 +174,7 @@ def unselect_all():
 def set_active(obj, skip_sel=False):
     if not skip_sel:
         select(obj)
+        bpy.context.view_layer.objects.active = obj
 
 
 def get_active():
@@ -1926,22 +1927,28 @@ def add_principled_shader(mesh):
                     if bpy.data.is_saved:
                         node_image.image.save()
 
-
             # Create Principled BSDF node
             node_principled = nodes.new(type='ShaderNodeBsdfPrincipled')
             node_principled.label = 'Cats Export Shader'
             node_principled.location = principled_shader_pos
-            node_principled.inputs['Specular'].default_value = 0
+            if  not bpy.app.version < (3, 7, 0):
+                node_principled.inputs['Specular IOR Level'].default_value = 0
+            if bpy.app.version < (3, 7, 0):
+                node_principled.inputs['Specular'].default_value = 0
             node_principled.inputs['Roughness'].default_value = 0
-            node_principled.inputs['Sheen Tint'].default_value = 0
-            node_principled.inputs['Clearcoat Roughness'].default_value = 0
+            if  not bpy.app.version < (3, 7, 0):
+                node_principled.inputs['Sheen Tint'].default_value = (0, 0, 0, 1)
+            if bpy.app.version < (3, 7, 0):
+                node_principled.inputs['Sheen Tint'].default_value = 0
+            if  not bpy.app.version < (3, 7, 0):
+                    node_principled.inputs['Coat Roughness'].default_value = 0
+            if bpy.app.version < (3, 7, 0):
+                    node_principled.inputs['Clearcoat Roughness'].default_value = 0
             node_principled.inputs['IOR'].default_value = 0
-
             # Create Output node for correct image exports
             node_output = nodes.new(type='ShaderNodeOutputMaterial')
             node_output.label = 'Cats Export'
             node_output.location = output_shader_pos
-
             # Link nodes together
             mat_slot.material.node_tree.links.new(node_image.outputs['Color'], node_principled.inputs['Base Color'])
             mat_slot.material.node_tree.links.new(node_image.outputs['Alpha'], node_principled.inputs['Alpha'])
@@ -2096,7 +2103,8 @@ def toggle_mmd_tabs(shutdown_plugin=False):
         mmd_view_prop.MMDViewPanel,
         mmd_view_prop.MMDSDEFPanel,
     ]
-    mmd_cls = mmd_cls + mmd_cls_shading  # Corrected indentation
+    
+    mmd_cls = mmd_cls + mmd_cls_shading
 
     # If the plugin is shutting down, load the mmd_tools tabs before that, to avoid issues when unregistering mmd_tools
     if bpy.context.scene.show_mmd_tabs or shutdown_plugin:
