@@ -152,46 +152,6 @@ class CombineMaterialsButton(bpy.types.Operator):
                 Common.set_active(ob)
                 bpy.ops.object.material_slot_remove_unused()
 
-                #Why do all below when you can just do what is above? - @989onan
-
-
-#                mats = ob.material_slots.keys()
-
-#                usedMatIndex = []
-#                faceMats = []
-#                me = ob.data
-#                for f in me.polygons:
-#                    faceindex = f.material_index
-#                    if faceindex >= len(mats):
-#                        continue
-
-#                    currentfacemat = mats[faceindex]
-#                    faceMats.append(currentfacemat)
-
-#                    found = False
-#                    for m in usedMatIndex:
-#                        if m == faceindex:
-#                            found = True
-
-#                    if found == False:
-#                        usedMatIndex.append(faceindex)
-
-#                ml = []
-#                mnames = []
-#                for u in usedMatIndex:
-#                    ml.append(mats[u])
-#                    mnames.append(mats[u])
-
-#                self.assignmatslots(ob, ml)
-
-#                i = 0
-#                for f in me.polygons:
-#                    if i >= len(faceMats):
-#                        continue
-#                    matindex = mnames.index(faceMats[i])
-#                    f.material_index = matindex
-#                    i += 1
-
     # Iterates over each material slot and hashes combined image filepaths and material settings
     # Then uses this hash as the dict keys and material data as values
     def generate_combined_tex(self):
