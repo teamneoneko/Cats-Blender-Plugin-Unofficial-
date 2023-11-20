@@ -4,9 +4,9 @@ name: Run CATS-Blender-Plugin tests
 
 on:
   push:
-    branches: [ "master", "development", "forked_development" ]
+    branches: [ "main", "dev", "forked_dev" ]
   pull_request:
-    branches: [ "master", "development", "forked_development" ]
+    branches: [ "main", "dev", "forked_dev" ]
   schedule:
     - cron: "0 4 * * 1"
 
