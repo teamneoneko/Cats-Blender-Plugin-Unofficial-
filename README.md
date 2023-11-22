@@ -1,7 +1,5 @@
 # Cats Blender Plugin (0.40.0).
 
-
-#### This is the Development version which can be unstable, please use the main branch for the most up to date stable version.
 #### This version of Cats does allow Blender 4.0, however due to some issues with 4.0 and the current compatibility of cats and MMD tools I highly recommend you use 3.6 for now. Please do not report any issues relating to 4.0, If you hit any issues please downgrade to Blender 3.6 for the time being. This is because MMD Tools currently does not support Blender 4.0 and unto it does we can not fully support 4.0.
 #### This version of Cats will no longer support Blender 2.8 to 3.3, However some features may not work on blender 3.5 and below. Please use 3.6 or 4.0.
 #### This version of Cats will now give warnings on Blender version older than 3.6, any issues reported on Blender versions older then 3.6 will be closed. 
