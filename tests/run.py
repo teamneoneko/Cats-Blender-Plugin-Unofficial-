@@ -38,15 +38,15 @@ download_data = [
         directory='armatures',
         file_prefix='armature.',
         files={
-            'ryuko': 'https://www.dropbox.com/s/74fj6msbyn3c7rn/armature.ryuko.blend?dl=1',
-            'bonetranslationerror': 'https://www.dropbox.com/s/ckoseplcfdozpeu/armature.translationerror.blend?dl=1',
+            'ryuko': 'https://drive.google.com/uc?export=download&id=1ukHSWCdqFrQgYfrI_7OKzqQlfx1DSuS_',
+            'bonetranslationerror': 'https://drive.google.com/uc?export=download&id=1f-ZUenzSObXM5mijR2-rpWPwdyPc-o4X',
         }
     ),
     DownloadData(
         directory='shapekeys',
         file_prefix='shapekey.',
         files={
-            'shape_key_to_basis': 'https://www.dropbox.com/s/d0efnrkauq596ng/ApplyShapeToBasisTest.blend?dl=1',
+            'shape_key_to_basis': 'https://drive.google.com/uc?export=download&id=1CTdBH5XJ3p86afIEimr_UzcA2f90t--v',
         }
     ),
 ]
