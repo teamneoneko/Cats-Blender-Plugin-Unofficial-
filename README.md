@@ -275,7 +275,7 @@ There are a lot of perks like having your name inside the plugin!
 
 ## Requirements
 
-- Blender 3.3 or above (run as administrator is recommended)
+- Blender 3.3 or above (run as administrator is recommended) (Please note some features may not work in version below 3.6).
   - Blender 3.6 is Recommended as this is the latest LTS.
   - Though I have updated CATS to Blender 4.0, I do not currently recommend using 4.0 as there multiple issues with MDD Tools and Blender 4.0 which cats uses.
   - Anything older then 3.3 is not supported and no longer works.
@@ -287,7 +287,7 @@ There are a lot of perks like having your name inside the plugin!
 - Download the plugin: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/refs/heads/dev.zip)
    - **Important: Do NOT extract the downloaded zip! You will need the zip file during installation!**
  - Install the addon in blender like so:
-   - In Blender 3.3+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there. Though this plugin may still work on Blender blender versions older than 3.1, there are no longer supported.
+   - In Blender 3.3+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there. Though this plugin may still work on Blender blender versions older than 3.6, there are no longer supported.
 
 ![](https://i.imgur.com/LsEDL6q.gif)
 
