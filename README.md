@@ -287,7 +287,7 @@ There are a lot of perks like having your name inside the plugin!
 - Download the plugin: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/refs/heads/dev.zip)
    - **Important: Do NOT extract the downloaded zip! You will need the zip file during installation!**
  - Install the addon in blender like so:
-   - In Blender 3.1+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there. Though this plugin may still work on Blender blender versions older than 3.1, there are no longer supported.
+   - In Blender 3.3+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there. Though this plugin may still work on Blender blender versions older than 3.1, there are no longer supported.
 
 ![](https://i.imgur.com/LsEDL6q.gif)
 
