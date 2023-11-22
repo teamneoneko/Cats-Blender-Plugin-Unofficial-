@@ -105,6 +105,13 @@ class ImportPmx(Operator, ImportHelper):
         description='Fix IK links to be blender suitable',
         default=False,
         )
+    ik_loop_factor: bpy.props.IntProperty(
+        name='IK Loop Factor',
+        description='Scaling factor of MMD IK loop',
+        min=1,
+        soft_max=10, max=100,
+        default=5,
+        )
     apply_bone_fixed_axis: bpy.props.BoolProperty(
         name='Apply Bone Fixed Axis',
         description="Apply bone's fixed axis to be blender suitable",
@@ -144,7 +151,7 @@ class ImportPmx(Operator, ImportHelper):
         name='Log level',
         description='Select log level',
         items=LOG_LEVEL_ITEMS,
-        default='DEBUG',
+        default='INFO',
         )
     save_log: bpy.props.BoolProperty(
         name='Create a log file',
@@ -184,6 +191,7 @@ class ImportPmx(Operator, ImportHelper):
                 clean_model=self.clean_model,
                 remove_doubles=self.remove_doubles,
                 fix_IK_links=self.fix_IK_links,
+                ik_loop_factor=self.ik_loop_factor,
                 apply_bone_fixed_axis=self.apply_bone_fixed_axis,
                 rename_LR_bones=self.rename_bones,
                 use_underscore=self.use_underscore,
@@ -269,6 +277,10 @@ class ImportVmd(Operator, ImportHelper):
         description='Import the motion as NLA strips',
         default=False,
         )
+    files: bpy.props.CollectionProperty(
+        type=OperatorFileListElement,
+        )
+    directory: bpy.props.StringProperty(subtype='DIR_PATH')
 
     @classmethod
     def poll(cls, context):
@@ -310,20 +322,21 @@ class ImportVmd(Operator, ImportHelper):
                 translator=DictionaryEnum.get_translator(self.dictionary),
                 ).init
 
-        start_time = time.time()
-        importer = vmd_importer.VMDImporter(
-            filepath=self.filepath,
-            scale=self.scale,
-            bone_mapper=bone_mapper,
-            use_pose_mode=self.use_pose_mode,
-            frame_margin=self.margin,
-            use_mirror=self.use_mirror,
-            use_NLA=self.use_NLA,
-            )
+        for file in self.files:
+            start_time = time.time()
+            importer = vmd_importer.VMDImporter(
+                filepath=os.path.join(self.directory, file.name),
+                scale=self.scale,
+                bone_mapper=bone_mapper,
+                use_pose_mode=self.use_pose_mode,
+                frame_margin=self.margin,
+                use_mirror=self.use_mirror,
+                use_NLA=self.use_NLA,
+                )
 
-        for i in selected_objects:
-            importer.assign(i)
-        logging.info(' Finished importing motion in %f seconds.', time.time() - start_time)
+            for i in selected_objects:
+                importer.assign(i)
+            logging.info(' Finished importing motion in %f seconds.', time.time() - start_time)
 
         if self.update_scene_settings:
             auto_scene_setup.setupFrameRanges()

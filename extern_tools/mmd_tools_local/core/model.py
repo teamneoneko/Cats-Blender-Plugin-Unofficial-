@@ -202,10 +202,46 @@ class FnModel:
             'selected_editable_objects': [parent_armature_object],
         }, location=True, rotation=True, scale=True)
 
+        def _change_bone_id(bone: bpy.types.PoseBone, new_bone_id: int, bone_morphs, pose_bones):
+            """This function will also update the references of bone morphs and rotate+/move+."""
+            bone_id = bone.mmd_bone.bone_id
+            
+            # Change Bone ID
+            bone.mmd_bone.bone_id = new_bone_id
+            
+            # Update Relative Bone Morph # Update the reference of bone morph # 更新骨骼表情
+            for bone_morph in bone_morphs:
+                for data in bone_morph.data:
+                    if data.bone_id != bone_id:
+                        continue
+                    data.bone_id = new_bone_id
+            
+            # Update Relative Additional Transform # Update the reference of rotate+/move+ # 更新付与親
+            for pose_bone in pose_bones:
+                if pose_bone.is_mmd_shadow_bone:
+                    continue
+                mmd_bone = pose_bone.mmd_bone
+                if mmd_bone.additional_transform_bone_id != bone_id:
+                    continue
+                mmd_bone.additional_transform_bone_id = new_bone_id
+        
+        # Change the Bone ID if necessary to make sure that each ID is still unique after joining models.
+        max_bone_id = max((b.mmd_bone.bone_id for b in parent_armature_object.pose.bones if not b.is_mmd_shadow_bone), default=-1)
+        
         child_root_object: bpy.types.Object
         for child_root_object in child_root_objects:
             child_model = Model(child_root_object)
             child_armature_object = child_model.armature()
+            child_pose_bones = child_armature_object.pose.bones
+            child_bone_morphs = child_root_object.mmd_root.bone_morphs
+
+            for pose_bone in child_pose_bones:
+                if pose_bone.is_mmd_shadow_bone:
+                    continue
+                if pose_bone.mmd_bone.bone_id != -1:
+                    max_bone_id += 1
+                    _change_bone_id(pose_bone, max_bone_id, child_bone_morphs, child_pose_bones)
+
             child_armature_matrix = child_armature_object.matrix_parent_inverse.copy()
 
             bpy.ops.object.transform_apply({

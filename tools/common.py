@@ -11,6 +11,7 @@ from mathutils import Vector
 from datetime import datetime
 from html.parser import HTMLParser
 from html.entities import name2codepoint
+from typing import Optional, Set, Dict, Any
 
 from . import common as Common
 from . import supporter as Supporter
@@ -34,10 +35,6 @@ from mmd_tools_local.panels import view_prop as mmd_view_prop
 #  - Checkbox for eye blinking/moving
 #  - Translate progress bar
 
-
-def version_2_79_or_older():
-    return bpy.app.version < (2, 80)
-
 def version_2_93_or_older():
     return bpy.app.version < (2, 90)
     
@@ -46,7 +43,7 @@ def version_3_6_or_older():
 
 
 def get_objects():
-    return bpy.context.scene.objects if version_2_79_or_older() else bpy.context.view_layer.objects
+    return bpy.context.view_layer.objects
 
 
 class SavedData:
@@ -150,8 +147,6 @@ def unhide_all():
     for obj in get_objects():
         hide(obj, False)
         set_unselectable(obj, False)
-
-    if not version_2_79_or_older():
         unhide_all_unnecessary()
 
 
@@ -180,43 +175,30 @@ def unselect_all():
 def set_active(obj, skip_sel=False):
     if not skip_sel:
         select(obj)
-    if version_2_79_or_older():
-        bpy.context.scene.objects.active = obj
-    else:
         bpy.context.view_layer.objects.active = obj
 
 
 def get_active():
-    if version_2_79_or_older():
-        return bpy.context.scene.objects.active
     return bpy.context.view_layer.objects.active
 
 
 def select(obj, sel=True):
     if sel:
         hide(obj, False)
-    if version_2_79_or_older():
-        obj.select = sel
-    else:
         obj.select_set(sel)
 
 
 def is_selected(obj):
-    if version_2_79_or_older():
-        return obj.select
     return obj.select_get()
 
 
 def hide(obj, val=True):
     if hasattr(obj, 'hide'):
         obj.hide = val
-    if not version_2_79_or_older():
         obj.hide_set(val)
 
 
 def is_hidden(obj):
-    if version_2_79_or_older():
-        return obj.hide
     return obj.hide_get()
 
 
@@ -242,14 +224,12 @@ def set_default_stage_old():
 
 def set_default_stage():
     """
-
-    Selects the armature, unhides everything and sets the modes of every object to object mode
-
+    Selects the armature, unhides everything, and sets the modes of every object to object mode
     :return: the armature
     """
 
     # Remove rigidbody collections, as they cause issues if they are not in the view_layer
-    if not version_2_79_or_older() and bpy.context.scene.remove_rigidbodies_joints:
+    if bpy.context.scene.remove_rigidbodies_joints:
         print('Collections:')
         for collection in bpy.data.collections:
             print(' ' + collection.name, collection.name.lower())
@@ -274,9 +254,6 @@ def set_default_stage():
     armature = get_armature()
     if armature:
         set_active(armature)
-        if version_2_79_or_older():
-            armature.layers[0] = True
-
     return armature
 
 
@@ -787,17 +764,6 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
             elif mod.type == 'MIRROR':
                 if not has_shapekeys(mesh):
                     apply_modifier(mod)
-
-        # Standardize UV maps name
-        if version_2_79_or_older():
-            if mesh.data.uv_textures:
-                mesh.data.uv_textures[0].name = 'UVMap'
-            for mat_slot in mesh.material_slots:
-                if mat_slot and mat_slot.material:
-                    for tex_slot in mat_slot.material.texture_slots:
-                        if tex_slot and tex_slot.texture and tex_slot.texture_coords == 'UV':
-                            tex_slot.uv_layer = 'UVMap'
-        else:
             if mesh.data.uv_layers:
                 mesh.data.uv_layers[0].name = 'UVMap'
 
@@ -1740,8 +1706,6 @@ def has_shapekeys(mesh):
 
 
 def matmul(a, b):
-    if version_2_79_or_older():
-        return a * b
     return a @ b
 
 
@@ -1964,22 +1928,28 @@ def add_principled_shader(mesh):
                     if bpy.data.is_saved:
                         node_image.image.save()
 
-
             # Create Principled BSDF node
             node_principled = nodes.new(type='ShaderNodeBsdfPrincipled')
             node_principled.label = 'Cats Export Shader'
             node_principled.location = principled_shader_pos
-            node_principled.inputs['Specular'].default_value = 0
+            if  not bpy.app.version < (3, 7, 0):
+                node_principled.inputs['Specular IOR Level'].default_value = 0
+            if bpy.app.version < (3, 7, 0):
+                node_principled.inputs['Specular'].default_value = 0
             node_principled.inputs['Roughness'].default_value = 0
-            node_principled.inputs['Sheen Tint'].default_value = 0
-            node_principled.inputs['Clearcoat Roughness'].default_value = 0
+            if  not bpy.app.version < (3, 7, 0):
+                node_principled.inputs['Sheen Tint'].default_value = (0, 0, 0, 1)
+            if bpy.app.version < (3, 7, 0):
+                node_principled.inputs['Sheen Tint'].default_value = 0
+            if  not bpy.app.version < (3, 7, 0):
+                    node_principled.inputs['Coat Roughness'].default_value = 0
+            if bpy.app.version < (3, 7, 0):
+                    node_principled.inputs['Clearcoat Roughness'].default_value = 0
             node_principled.inputs['IOR'].default_value = 0
-
             # Create Output node for correct image exports
             node_output = nodes.new(type='ShaderNodeOutputMaterial')
             node_output.label = 'Cats Export'
             node_output.location = output_shader_pos
-
             # Link nodes together
             mat_slot.material.node_tree.links.new(node_image.outputs['Color'], node_principled.inputs['Base Color'])
             mat_slot.material.node_tree.links.new(node_image.outputs['Alpha'], node_principled.inputs['Alpha'])
@@ -2134,9 +2104,8 @@ def toggle_mmd_tabs(shutdown_plugin=False):
         mmd_view_prop.MMDViewPanel,
         mmd_view_prop.MMDSDEFPanel,
     ]
-
-    if not version_2_79_or_older():
-        mmd_cls = mmd_cls + mmd_cls_shading
+    
+    mmd_cls = mmd_cls + mmd_cls_shading
 
     # If the plugin is shutting down, load the mmd_tools tabs before that, to avoid issues when unregistering mmd_tools
     if bpy.context.scene.show_mmd_tabs or shutdown_plugin:
@@ -2154,7 +2123,6 @@ def toggle_mmd_tabs(shutdown_plugin=False):
 
     if not shutdown_plugin:
         Settings.update_settings(None, None)
-
 
 
 """
@@ -2385,7 +2353,6 @@ def _fix_out_of_bounds_enum_choices(property_holder, scene, choices, property_na
             # outside of UI drawing. This causes the temporary duplicates to be visible in the UI. Though, selecting
             # any of the temporary duplicates poses no problem as it causes the property to be updated outside of UI
             # drawing, thus fixing the out-of-bounds index and causing the temporary duplicates to disappear.
-            if not version_2_79_or_older():
                 # No modification is allowed when called as part of drawing UI, so we must schedule a task instead
                 # First check if a fix has not already been scheduled, otherwise around 4 or 5 tasks could get scheduled
                 # before the first one fixes the invalid choice
@@ -2473,6 +2440,41 @@ def wrap_dynamic_enum_items(items_func, property_name, sort=True, in_place=True)
         return _fix_out_of_bounds_enum_choices(self, context.scene, items, property_name, property_path)
 
     return wrapped_items_func
+    
+    
+if bpy.app.version >= (3, 2):
+    # Passing in context_override as a positional-only argument is deprecated as of Blender 3.2, replaced with
+    # Context.temp_override
+    def op_override(operator, context_override: dict[str, Any], context: Optional[bpy.types.Context] = None,
+                    execution_context: Optional[str] = None,
+                    undo: Optional[bool] = None, **operator_args) -> set[str]:
+        """Call an operator with a context override"""
+        args = []
+        if execution_context is not None:
+            args.append(execution_context)
+        if undo is not None:
+            args.append(undo)
+
+        if context is None:
+            context = bpy.context
+        with context.temp_override(**context_override):
+            return operator(*args, **operator_args)
+else:
+    def op_override(operator, context_override: Dict[str, Any], context: Optional[bpy.types.Context] = None,
+                    execution_context: Optional[str] = None,
+                    undo: Optional[bool] = None, **operator_args) -> Set[str]:
+        """Call an operator with a context override"""
+        if context is not None:
+            context_base = context.copy()
+            context_base.update(context_override)
+            context_override = context_base
+        args = [context_override]
+        if execution_context is not None:
+            args.append(execution_context)
+        if undo is not None:
+            args.append(undo)
+
+        return operator(*args, **operator_args)
 
 
 """ === THIS CODE COULD BE USEFUL === """

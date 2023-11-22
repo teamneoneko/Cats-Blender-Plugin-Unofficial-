@@ -7,12 +7,12 @@ bl_info = {
     'location': 'View 3D > Tool Shelf > CATS',
     'description': 'A tool designed to shorten steps needed to import and optimize models into VRChat',
     'version': (0, 30, 1),  # Has to be (x, x, x) not [x, x, x]!! Only change this version and the dev branch var right before publishing the new update!
-    'blender': (2, 80, 0),
+    'blender': (3, 3, 0),
     'wiki_url': 'https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki',
     'tracker_url': 'https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/issues',
     'warning': '',
 }
-dev_branch = False
+dev_branch = True
 
 import os
 import sys
@@ -178,18 +178,11 @@ def remove_corrupted_files():
 
 
 def check_unsupported_blender_versions():
-    # Don't allow Blender versions older than 2.8
-    if bpy.app.version < (2, 8):
+    # Don't allow Blender versions older than 3.1
+    if bpy.app.version < (3, 1):
         unregister()
         sys.tracebacklimit = 0
-        raise ImportError(t('Main.error.unsupportedVersion'))
-
-    # Versions 2.80.0 to 2.80.74 are beta versions, stable is 2.80.75
-    if (2, 80, 0) <= bpy.app.version < (2, 80, 75):
-        unregister()
-        sys.tracebacklimit = 0
-        raise ImportError(t('Main.error.beta2.80'))
-
+        raise ImportError(t('Main.error.29unsupportedVersion'))
 
 def set_cats_version_string():
     version = bl_info.get('version')

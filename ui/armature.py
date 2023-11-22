@@ -29,7 +29,7 @@ class ArmaturePanel(ToolPanel, bpy.types.Panel):
 
         col = box.column(align=True)
 
-        if bpy.app.version < (2, 79, 0):
+        if bpy.app.version < (3, 6, 0):
             col.separator()
             row = col.row(align=True)
             row.scale_y = 0.75
@@ -54,6 +54,20 @@ class ArmaturePanel(ToolPanel, bpy.types.Panel):
             row = col.row(align=True)
             row.scale_y = 0.75
             row.label(text=t('ArmaturePanel.warn.newBlender3'), icon='BLANK1')
+            col.separator()
+            col.separator()
+            
+        if (4, 0, 0) <= bpy.app.version < (4, 0, 98):
+            col.separator()
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.label(text=t('ArmaturePanel.warn.40Blender1'), icon='ERROR')
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.label(text=t('ArmaturePanel.warn.40Blender2'), icon='BLANK1')
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.label(text=t('ArmaturePanel.warn.40Blender3'), icon='BLANK1')
             col.separator()
             col.separator()
 
@@ -241,9 +255,8 @@ class ModelSettings(bpy.types.Operator):
         row.prop(context.scene, 'join_meshes')
         row = col.row(align=True)
         row.prop(context.scene, 'connect_bones')
-        if not Common.version_2_79_or_older():
-            row = col.row(align=True)
-            row.prop(context.scene, 'fix_materials')
+        row = col.row(align=True)
+        row.prop(context.scene, 'fix_materials')
         row = col.row(align=True)
         row.prop(context.scene, 'combine_mats')
         row = col.row(align=True)

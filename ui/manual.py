@@ -116,11 +116,23 @@ class ManualPanel(ToolPanel, bpy.types.Panel):
             row = col.row(align=True)
             row.scale_y = button_height
             row.operator(Armature_manual.RemoveDoubles.bl_idname, icon='X')
+            row = col.row(align=True)
+            row.scale_y = button_height
+            row.operator(Armature_manual.RepairShapekeys.bl_idname, icon='MESH_DATA')
+            row = col.row(align=True)
+            row.scale_y = button_height
+            row.operator(Armature_manual.OptimizeStaticShapekeys.bl_idname, icon='MESH_DATA')
 
-            if not Common.version_2_79_or_older():
-                col.separator()
-                add_button_with_small_button(col, Armature_manual.CreateDigitigradeLegs.bl_idname, 'OUTLINER_DATA_ARMATURE',
-                                                  Armature_manual.DigitigradeTutorialButton.bl_idname, 'QUESTION', scale=button_height)
+
+            col.separator()
+            add_button_with_small_button(col, Armature_manual.CreateDigitigradeLegs.bl_idname, 'OUTLINER_DATA_ARMATURE',
+                                                Armature_manual.DigitigradeTutorialButton.bl_idname, 'QUESTION', scale=button_height)
+            col.separator()
+            add_button_with_small_button(col, Armature_manual.GenerateTwistBones.bl_idname, 'OUTLINER_DATA_ARMATURE',
+                                            Armature_manual.TwistTutorialButton.bl_idname, 'QUESTION', scale=button_height)
+            row = col.row(align=True)
+            row.scale_y = button_height
+            row.prop(context.scene, 'generate_twistbones_upper')
 
             col.separator()
             row = layout_split(col, factor=0.6, align=True)

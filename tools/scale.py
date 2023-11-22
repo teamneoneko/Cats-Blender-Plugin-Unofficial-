@@ -29,10 +29,7 @@ class EnableIMScale(bpy.types.Operator):
             if mod.bl_info['name'] == "Immersive Scaler":
                 if mod.bl_info['version'] < (0, 2, 7) and addon_utils.check(mod.__name__)[0]:
                     try:
-                        if Common.version_2_79_or_older():
-                            bpy.ops.wm.addon_disable(module=mod.__name__)
-                        else:
-                            bpy.ops.preferences.addon_disable(module=mod.__name__)
+                        bpy.ops.preferences.addon_disable(module=mod.__name__)
                     except:
                         pass
                     continue
@@ -43,10 +40,7 @@ class EnableIMScale(bpy.types.Operator):
                 if mod.bl_info['version'] < (0, 2, 7):
                     continue
                 if not addon_utils.check(mod.__name__)[0]:
-                    if Common.version_2_79_or_older():
-                        bpy.ops.wm.addon_enable(module=mod.__name__)
-                    else:
-                        bpy.ops.preferences.addon_enable(module=mod.__name__)
+                    bpy.ops.preferences.addon_enable(module=mod.__name__)
                     break
         self.report({'INFO'}, t('EnableIMScale.success'))
         return {'FINISHED'}

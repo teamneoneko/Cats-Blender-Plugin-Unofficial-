@@ -2,12 +2,13 @@
 
 import bpy
 import operator
+import math
 import webbrowser
 import numpy as np
+from mathutils.geometry import intersect_point_line
 
 from . import common as Common
 from . import eyetracking as Eyetracking
-from .common import version_2_79_or_older
 from .register import register_wrap
 from .translations import t
 
@@ -98,6 +99,17 @@ class DigitigradeTutorialButton(bpy.types.Operator):
     def execute(self, context):
         webbrowser.open("https://www.furaffinity.net/view/44035707/")
         return {'FINISHED'}
+        
+@register_wrap
+class TwistTutorialButton(bpy.types.Operator):
+    bl_idname = 'cats_manual.twist_tutorial'
+    bl_label = t('cats_twist.tutorial_button.label')
+    bl_description = "This will open a basic tutorial on how to setup and use these constraints. You can skip to the Unity section."
+    bl_options = {'INTERNAL'}
+
+    def execute(self, context):
+        webbrowser.open("https://www.youtube.com/watch?v=eOwd5KNypfA")
+        return {'FINISHED'}
 
 @register_wrap
 class StartPoseMode(bpy.types.Operator):
@@ -142,13 +154,7 @@ def start_pose_mode(reset_pose=True):
     if bpy.context.active_object and bpy.context.active_object.mode == 'EDIT' and bpy.context.active_object.type == 'ARMATURE' and len(
             bpy.context.selected_editable_bones) > 0:
         current = bpy.context.selected_editable_bones[0].name
-
-    if version_2_79_or_older():
-        bpy.context.space_data.use_pivot_point_align = False
-        bpy.context.space_data.show_manipulator = True
-    else:
         pass
-        # TODO
 
     armature = Common.set_default_stage()
     Common.switch('POSE')
@@ -176,10 +182,6 @@ def start_pose_mode(reset_pose=True):
         for index, pb in enumerate(armature.data.bones):
             if index != 0:
                 pb.select = False
-
-    if version_2_79_or_older():
-        bpy.context.space_data.transform_manipulators = {'ROTATE'}
-    else:
         bpy.ops.wm.tool_set_by_id(name="builtin.rotate")
 
     saved_data.load(hide_only=True)
@@ -249,10 +251,6 @@ def stop_pose_mode(reset_pose=True):
         if Common.has_shapekeys(mesh):
             for shape_key in mesh.data.shape_keys.key_blocks:
                 shape_key.value = 0
-
-    if version_2_79_or_older():
-        bpy.context.space_data.transform_manipulators = {'TRANSLATE'}
-    else:
         bpy.ops.wm.tool_set_by_id(name="builtin.select_box")
 
     Eyetracking.eye_left = None
@@ -388,7 +386,7 @@ class PoseToRest(bpy.types.Operator):
         # active object e.g., the user has multiple armatures opened in pose mode, but a different armature is currently
         # active. We can use an operator override to tell the operator to treat armature_obj as if it's the active
         # object even if it's not, skipping the need to actually set armature_obj as the active object.
-        bpy.ops.pose.armature_apply({'active_object': armature_obj})
+        Common.op_override(bpy.ops.pose.armature_apply, {'active_object': armature_obj})
 
         # Stop pose mode after operation
         bpy.ops.cats_manual.stop_pose_mode()
@@ -411,14 +409,14 @@ class PoseToRest(bpy.types.Operator):
         # first and potentially having unexpected results.
         if bpy.app.version >= (2, 90, 0):
             # modifier_move_to_index was added in Blender 2.90
-            bpy.ops.object.modifier_move_to_index(context_override, modifier=mod_name, index=0)
+            Common.op_override(bpy.ops.object.modifier_move_to_index, context_override, modifier=mod_name, index=0)
         else:
             # The newly created modifier will be at the bottom of the list
             armature_mod_index = len(mesh_obj.modifiers) - 1
             # Move the modifier up until it's at the top of the list
             for _ in range(armature_mod_index):
-                bpy.ops.object.modifier_move_up(context_override, modifier=mod_name)
-        bpy.ops.object.modifier_apply(context_override, modifier=mod_name)
+                Common.op_override(bpy.ops.object.modifier_move_up, context_override, modifier=mod_name)
+        Common.op_override(bpy.ops.object.modifier_apply, context_override, modifier=mod_name)
 
     @staticmethod
     def apply_armature_to_mesh_with_shape_keys(armature_obj, mesh_obj, scene):
@@ -459,36 +457,24 @@ class PoseToRest(bpy.types.Operator):
         co_length = len(me.vertices) * 3
         # We can re-use the same array over and over
         eval_verts_cos_array = np.empty(co_length, dtype=np.single)
+        # depsgraph lets us evaluate objects and get their state after the effect of modifiers and shape keys
+        depsgraph = None
+        evaluated_mesh_obj = None
 
-        if Common.version_2_79_or_older():
-            def get_eval_cos_array():
-                # Create a new mesh with modifiers and shape keys applied
-                evaluated_mesh = mesh_obj.to_mesh(scene, True, 'PREVIEW')
-
-                # Get the cos of the vertices from the evaluated mesh
-                evaluated_mesh.vertices.foreach_get('co', eval_verts_cos_array)
-                # Delete the newly created mesh
-                bpy.data.meshes.remove(evaluated_mesh)
-                return eval_verts_cos_array
-        else:
-            # depsgraph lets us evaluate objects and get their state after the effect of modifiers and shape keys
-            depsgraph = None
-            evaluated_mesh_obj = None
-
-            def get_eval_cos_array():
-                nonlocal depsgraph
-                nonlocal evaluated_mesh_obj
-                # Get the depsgraph and evaluate the mesh if we haven't done so already
-                if depsgraph is None or evaluated_mesh_obj is None:
-                    depsgraph = bpy.context.evaluated_depsgraph_get()
-                    evaluated_mesh_obj = mesh_obj.evaluated_get(depsgraph)
-                else:
-                    # If we already have the depsgraph and evaluated mesh, in order for the change to the active shape
-                    # key to take effect, the depsgraph has to be updated
-                    depsgraph.update()
-                # Get the cos of the vertices from the evaluated mesh
-                evaluated_mesh_obj.data.vertices.foreach_get('co', eval_verts_cos_array)
-                return eval_verts_cos_array
+        def get_eval_cos_array():
+            nonlocal depsgraph
+            nonlocal evaluated_mesh_obj
+            # Get the depsgraph and evaluate the mesh if we haven't done so already
+            if depsgraph is None or evaluated_mesh_obj is None:
+                depsgraph = bpy.context.evaluated_depsgraph_get()
+                evaluated_mesh_obj = mesh_obj.evaluated_get(depsgraph)
+            else:
+                # If we already have the depsgraph and evaluated mesh, in order for the change to the active shape
+                # key to take effect, the depsgraph has to be updated
+                depsgraph.update()
+            # Get the cos of the vertices from the evaluated mesh
+            evaluated_mesh_obj.data.vertices.foreach_get('co', eval_verts_cos_array)
+            return eval_verts_cos_array
 
         for i, shape_key in enumerate(key_blocks):
             # As shape key pinning is enabled, when we change the active shape key, it will change the state of the mesh
@@ -518,7 +504,6 @@ class PoseToRest(bpy.types.Operator):
             shape_key.mute = mute
         mesh_obj.active_shape_key_index = old_active_shape_key_index
         mesh_obj.show_only_shape_key = old_show_only_shape_key
-
 
 @register_wrap
 class JoinMeshes(bpy.types.Operator):
@@ -997,6 +982,93 @@ class RemoveConstraints(bpy.types.Operator):
         return {'FINISHED'}
 
 @register_wrap
+class GenerateTwistBones(bpy.types.Operator):
+    bl_idname = 'cats_manual.generate_twist_bones'
+    bl_label = "Generate Twist Bones"
+    bl_description = "Attempt to generate twistbones for the selected bones"
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
+
+    @classmethod
+    def poll(cls, context):
+        if not Common.get_armature():
+            return False
+        return context.selected_editable_bones
+
+    def execute(self, context):
+        saved_data = Common.SavedData()
+        
+        # Check if the property exists in the scene, and create it if it doesn't
+        if not hasattr(context.scene, 'generate_twistbones_upper'):
+            bpy.types.Scene.generate_twistbones_upper = bpy.props.BoolProperty(
+                name="Generate Twist Bones Upper",
+                description="Generate Twist Bones Upper",
+                default=True
+            )
+
+        context.object.data.use_mirror_x = False
+        context.object.use_mesh_mirror_x = False
+        context.object.pose.use_mirror_x = False
+        generate_upper = context.scene.generate_twistbones_upper
+        armature = context.object
+        # For each bone...
+        bone_pairs = []
+        twist_locations = dict()
+        editable_bone_names = [bone.name for bone in context.selected_editable_bones]
+        for bone_name in editable_bone_names:
+            # Add '<bone>_Twist' and move the head halfway to the tail
+            bone = armature.data.edit_bones[bone_name]
+            if not generate_upper:
+                twist_bone = armature.data.edit_bones.new('~' + bone.name + "_Twist")
+                twist_bone.tail = bone.tail
+                twist_bone.head[:] = [(bone.head[i] + bone.tail[i]) / 2 for i in range(3)]
+                twist_locations[twist_bone.name] = (twist_bone.head[:], twist_bone.tail[:])
+            else:
+                twist_bone = armature.data.edit_bones.new('~' + bone.name + "_UpperTwist")
+                twist_bone.tail[:] = [(bone.head[i] + bone.tail[i]) / 2 for i in range(3)]
+                twist_bone.head = bone.head
+                twist_locations[twist_bone.name] = (twist_bone.tail[:], twist_bone.head[:])
+            twist_bone.parent = bone
+
+            bone_pairs.append((bone.name, twist_bone.name))
+
+        Common.switch('OBJECT')
+        for bone_name, twist_bone_name in bone_pairs:
+            twist_bone_head_tail = twist_locations[twist_bone_name]
+            print(twist_bone_head_tail[0])
+            print(twist_bone_head_tail[1])
+            for mesh in Common.get_meshes_objects(armature_name=armature.name):
+                if not bone_name in mesh.vertex_groups:
+                    continue
+
+                Common.set_active(mesh)
+                context.object.data.use_mirror_vertex_groups = False
+                context.object.data.use_mirror_x = False
+                context.object.use_mesh_mirror_x = False
+
+                mesh.vertex_groups.new(name=twist_bone_name)
+
+                # twist bone weights are a linear(?) gradient from head to tail, 0-1 * orig weight
+                group_idx = mesh.vertex_groups[bone_name].index
+                for vertex in mesh.data.vertices:
+                    if any(group.group == group_idx for group in vertex.groups):
+                        # calculate
+
+                        _, dist = intersect_point_line(vertex.co, twist_bone_head_tail[0], twist_bone_head_tail[1])
+                        clamped_dist = max(0.0, min(1.0, dist))
+                        # orig bone weights are their original weight minus the twist weight
+                        twist_weight = mesh.vertex_groups[bone_name].weight(vertex.index) * clamped_dist
+                        untwist_weight = mesh.vertex_groups[bone_name].weight(vertex.index) * (1.0 - clamped_dist)
+                        mesh.vertex_groups[twist_bone_name].add([vertex.index], twist_weight, "REPLACE")
+                        mesh.vertex_groups[bone_name].add([vertex.index], untwist_weight, "REPLACE")
+
+        Common.set_default_stage()
+
+        saved_data.load()
+        self.report({'INFO'}, t('RemoveConstraints.success'))
+        return {'FINISHED'}
+
+
+@register_wrap
 class RecalculateNormals(bpy.types.Operator):
     bl_idname = 'cats_manual.recalculate_normals'
     bl_label = t('RecalculateNormals.label')
@@ -1119,6 +1191,166 @@ class RemoveDoubles(bpy.types.Operator):
         saved_data.load()
 
         self.report({'INFO'}, t('RemoveDoubles.success', number=str(removed_tris)))
+        return {'FINISHED'}
+
+
+@register_wrap
+class OptimizeStaticShapekeys(bpy.types.Operator):
+    bl_idname = 'cats_manual.optimize_static_shapekeys'
+    bl_label = 'Optimize Static Shapekeys'
+    bl_description = "Move all shapekey-affected geometry into its own mesh, significantly decreasing GPU cost"
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.active_object
+        if obj and obj.type == 'MESH':
+            return True
+
+        meshes = Common.get_meshes_objects(check=False)
+        return meshes
+
+    def execute(self, context):
+        saved_data = Common.SavedData()
+
+        objs = [context.active_object]
+        if not objs[0] or (objs[0] and (objs[0].type != 'MESH' or objs[0].data.shape_keys is None)):
+            Common.unselect_all()
+            meshes = Common.get_meshes_objects()
+            if len(meshes) == 0:
+                saved_data.load()
+                return {'FINISHED'}
+            objs = meshes
+
+        if len([obj for obj in objs if obj.type == 'MESH']) > 1:
+            self.report({'ERROR'}, "Meshes must first be combined for this to be beneficial.")
+
+        for mesh in objs:
+            if mesh.type == 'MESH' and mesh.data.shape_keys is not None:
+                context.view_layer.objects.active = mesh
+
+                # Ensure auto-smooth is enabled, set custom normals from faces
+                if not mesh.data.use_auto_smooth:
+                    mesh.data.use_auto_smooth = True
+                    mesh.data.auto_smooth_angle = 3.1416
+                # TODO: if autosmooth is already enabled, set sharp from edges?
+
+                if not mesh.data.has_custom_normals:
+                    bpy.ops.object.mode_set(mode = 'EDIT')
+                    bpy.ops.mesh.select_mode(type="VERT")
+                    bpy.ops.mesh.select_all(action = 'SELECT')
+                    # TODO: un-smooth objects aren't handled correctly. A workaround is to run 'split
+                    # normals' on all un-smooth objects before baking
+                    bpy.ops.mesh.set_normals_from_faces(keep_sharp=True)
+
+                # Separate non-animating
+                bpy.ops.object.mode_set(mode = 'EDIT')
+                bpy.ops.mesh.select_mode(type="VERT")
+                bpy.ops.mesh.select_all(action = 'DESELECT')
+                bpy.ops.object.mode_set(mode = 'OBJECT')
+                for key_block in mesh.data.shape_keys.key_blocks[1:]:
+                    basis = mesh.data.shape_keys.key_blocks[0]
+
+                    for idx, vert in enumerate(key_block.data):
+                        if (math.sqrt(math.pow(basis.data[idx].co[0] - vert.co[0], 2.0) +
+                        math.pow(basis.data[idx].co[1] - vert.co[1], 2.0) +
+                        math.pow(basis.data[idx].co[2] - vert.co[2], 2.0)) > 0.0001):
+                            mesh.data.vertices[idx].select = True
+
+                if not all(v.select for v in mesh.data.vertices):
+                    if any(v.select for v in mesh.data.vertices):
+                        # Some affected, separate
+                        bpy.ops.object.mode_set(mode = 'EDIT')
+                        bpy.ops.mesh.select_more()
+                        bpy.ops.mesh.split() # required or custom normals aren't preserved
+                        bpy.ops.mesh.separate(type='SELECTED')
+                        bpy.ops.object.mode_set(mode = 'OBJECT')
+                    bpy.context.object.active_shape_key_index = 0
+                    mesh.name = "Static"
+                    mesh['catsForcedExportName'] = "Static"
+                    # remove all shape keys for 'Static'
+                    bpy.ops.object.shape_key_remove(all=True)
+
+        Common.set_default_stage()
+
+        saved_data.load()
+        self.report({'INFO'}, "Separation complete.")
+        return {'FINISHED'}
+        
+
+@register_wrap
+class RepairShapekeys(bpy.types.Operator):
+    bl_idname = 'cats_manual.repair_shapekeys'
+    bl_label = 'Repair Broken Shapekeys'
+    bl_description = "Attempt to repair messed up shapekeys caused by some Blender operations"
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.active_object
+        if obj and obj.type == 'MESH':
+            return True
+
+        meshes = Common.get_meshes_objects(check=False)
+        return meshes
+
+    def execute(self, context):
+        saved_data = Common.SavedData()
+
+        objs = [context.active_object]
+        if not objs[0] or (objs[0] and (objs[0].type != 'MESH' or objs[0].data.shape_keys is None)):
+            Common.unselect_all()
+            meshes = Common.get_meshes_objects()
+            if len(meshes) == 0:
+                saved_data.load()
+                return {'FINISHED'}
+            objs = meshes
+
+        for obj in objs:
+            if obj.data.shape_keys is None:
+                continue
+            Common.unselect_all()
+            Common.set_active(obj)
+            Common.switch('EDIT')
+            Common.switch('EDIT')
+            points = []
+            # For each vertex index...
+            for vert_idx in range(0, len(obj.data.shape_keys.key_blocks[0].data)):
+                # find the most common version of the point in all the non-basis keys
+                verts = dict()
+                for shape_idx in range(1, len(obj.data.shape_keys.key_blocks)):
+                    vert_coord = obj.data.shape_keys.key_blocks[shape_idx].data[vert_idx]
+                    if not vert_coord in verts:
+                        verts[vert_coord] = 0
+                    verts[vert_coord] += 1
+                found_coord = max(verts.items(), key=operator.itemgetter(1))[0]
+                print(found_coord)
+                points.append(found_coord)
+            # create a new shapekey
+            Common.switch('OBJECT')
+            bpy.ops.object.shape_key_add(from_mix=False)
+            obj.active_shape_key.name = "CATS Antibasis"
+
+            # set it to the most-common points
+            for vert_idx in range(0, len(obj.data.shape_keys.key_blocks[0].data)):
+                obj.active_shape_key.data[vert_idx].co[0] = points[vert_idx].co[0]
+                obj.active_shape_key.data[vert_idx].co[1] = points[vert_idx].co[1]
+                obj.active_shape_key.data[vert_idx].co[2] = points[vert_idx].co[2]
+            # un-apply it to all other shapekeys
+            for idx in range(1, len(obj.data.shape_keys.key_blocks) - 1):
+                obj.active_shape_key_index = idx
+                Common.switch('EDIT')
+                bpy.ops.mesh.select_all(action="SELECT")
+                bpy.ops.mesh.blend_from_shape(shape="CATS Antibasis", blend=-1.0, add=True)
+                Common.switch('OBJECT')
+            obj.shape_key_remove(key=obj.data.shape_keys.key_blocks["CATS Antibasis"])
+            obj.active_shape_key_index = 0
+
+
+        Common.set_default_stage()
+
+        saved_data.load()
+        self.report({'INFO'}, "Repair complete.")
         return {'FINISHED'}
 
 
