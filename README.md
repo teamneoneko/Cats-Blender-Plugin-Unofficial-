@@ -3,8 +3,8 @@
 
 #### This is the Development version which can be unstable, please use the main branch for the most up to date stable version.
 #### This version of Cats does allow Blender 4.0, however due to some issues with 4.0 and the current compatibility of cats and MMD tools I highly recommend you use 3.6 for now. Please do not report any issues relating to 4.0, If you hit any issues please downgrade to Blender 3.6 for the time being. This is because MMD Tools currently does not support Blender 4.0 and unto it does we can not fully support 4.0.
-#### This version of Cats will no longer support Blender 2.8, 2.9 and 3.0, please use blender 3.1 and above.
-#### This version of Cats will now give warnings on Blender version older than 3.3, any issues reported on Blender versions older then 3.3 will be closed. 
+#### This version of Cats will no longer support Blender 2.8 to 3.3, However some features may not work on blender 3.5 and below. Please use 3.6 or 4.0.
+#### This version of Cats will now give warnings on Blender version older than 3.6, any issues reported on Blender versions older then 3.6 will be closed. 
 
 The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat.
 Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
@@ -242,7 +242,27 @@ There are a lot of perks like having your name inside the plugin!
    **Apply Shape Key as Basis**
    - Applies the selected shape key as the new Basis and creates a reverted shape key from the selected one.
    </details>
+   <details><summary>Repair and Optimise Shapekeys</summary>
 
+   ## Repair Shape Keys Optimise Shapekeys
+
+   ![](https://i.imgur.com/xKaCY3u.png)
+
+   **Repair Shape Keys**
+   - Attempts to repair shape keys which can get broken by some blender operations.
+   
+   **Optimise Shape Keys**
+   - Moves all shapeekey affected geometry into it's own mesh, decreasing gpu cost, you need to combine all meshes for this to be effective.
+   </details>
+   <details><summary>Generate Twist Bones</summary>
+
+   ## Generate Twist Bones
+
+   ![](https://i.imgur.com/G7oZiMO.png)
+
+   **Generate Twist Bones**
+   - Attempts to generate an twist bone for a selected bone.
+   </details>
  - <details><summary>Avatars 3.0 Eye Tracking Panel</summary>
 
    ## Avatars 3.0 Eye Tracking Panel
@@ -255,11 +275,11 @@ There are a lot of perks like having your name inside the plugin!
 
 ## Requirements
 
-- Blender 3.1 or above (run as administrator is recommended)
+- Blender 3.3 or above (run as administrator is recommended)
   - Blender 3.6 is Recommended as this is the latest LTS.
   - Though I have updated CATS to Blender 4.0, I do not currently recommend using 4.0 as there multiple issues with MDD Tools and Blender 4.0 which cats uses.
-  - Anything older then 3.1 is not supported and no longer works.
-  - In the future I won't be allowing anything older then Blender 3.3.
+  - Anything older then 3.3 is not supported and no longer works.
+  - In the future I won't be allowing anything older then Blender 3.6.
 - If you have custom Python installed which Blender might use, you need to have Numpy installed
 
 ## Installation

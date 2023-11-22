@@ -37,12 +37,12 @@ Blender를 다시 시작하고 Cats Plugin를 다시 활성화하세요!
 "
 Main.error.29unsupportedVersion,"
 
-Blender versions older than 3.1 are not supported by Cats.
-Please use Blender 3.1 or later.
+Blender versions older than 3.3 are not supported by Cats.
+Please use Blender 3.3 or later.
 ",,"
 
-3.1 이전의 블렌더 버전은 Cats에서 지원하지 않습니다.
-Blender 3.1 버전 이상을 사용하세요.
+3.3 이전의 블렌더 버전은 Cats에서 지원하지 않습니다.
+Blender 3.3 버전 이상을 사용하세요.
 "
 Main.error.restartAndEnable_alt,"
 
@@ -56,13 +56,13 @@ ToolPanel.category,CATS,,
 ArmaturePanel.label,Model,モデル,모델
 ArmaturePanel.warn.40Blender1,You are using Blender 4.0 though cats does allow
 ArmaturePanel.warn.40Blender2,Blender 4.0 there could be some issues.
-ArmaturePanel.warn.40Blender3,Please downgrade to 3.5/3.6 if you have any issues.
+ArmaturePanel.warn.40Blender3,Please downgrade to 3.6 if you have any issues.
 ArmaturePanel.warn.newBlender1,Potentially unsupported Blender version detected!
 ArmaturePanel.warn.newBlender2,Some features might not work!
 ArmaturePanel.warn.newBlender3,CATS currently supports up to Blender 4.0.
 ArmaturePanel.warn.oldBlender1,Old Blender version detected!,古いブレンダーバージョンが検出されました!,이전 블렌더 버전이 발견되었습니다!
 ArmaturePanel.warn.oldBlender2,Some features might not work!,一部の機能は動作しない可能性があります!,일부 기능이 작동하지 않을 수 있습니다!
-ArmaturePanel.warn.oldBlender3,Please update to Blender 3.3!,ブレンダー3.1以上にアップデートしてください!,블렌더 3.1 버전으로 업데이트하세요!
+ArmaturePanel.warn.oldBlender3,Please update to Blender 3.6!,ブレンダー3.1以上にアップデートしてください!,블렌더 3.1 버전으로 업데이트하세요!
 ArmaturePanel.warn.noDict1,Dictionary not found!,辞書が見つかりません!,사전파일(Dictionary)을 찾을 수 없습니다!
 ArmaturePanel.warn.noDict2,"Translations will work, but are not optimized.",翻訳は機能しますが、最適化されません。,번역은 되지만 최적화되지는 않습니다.
 ArmaturePanel.warn.noDict3,Reinstall Cats to fix this.,これを修正するためにCatsを再インストールします。,이 문제를 해결하려면 Cats를 다시 설치하세요.
@@ -71,6 +71,7 @@ ModelSettings.label,Fix Model Settings,モデル設定の修正,모델 고치기
 ModelSettings.warn.fbtFix1,The Full Body Tracking Fix,フル ボディトラッキングの修正,풀바디 트래킹 수정
 ModelSettings.warn.fbtFix2,is no longer needed for VRChat.,もはやVrChatのために必要とされていません。,VRChat에 더 이상 필요하지 않음.
 ModelSettings.warn.fbtFix3,It's still available in Model Options.,モデル オプションで引き続き使用できます。.,이것은 모델옵션에서 여전히 이용가능.
+cats_twist.tutorial_button.label,Twist Bones Tutotial,,
 ManualPanel.label,Model Options,モデル オプション,모델 옵션
 ManualPanel.separateBy,Separate by:,別に:,메쉬 분리:
 ManualPanel.SeparateByMaterials.label,Materials,材料,매테리얼별로

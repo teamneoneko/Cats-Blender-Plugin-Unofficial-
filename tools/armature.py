@@ -450,7 +450,9 @@ class FixArmature(bpy.types.Operator):
             bpy.ops.mesh.reveal()
 
         # Remove Bone Groups
-        if version_3_6_or_older():
+        # Replaced in 4.0 with Bone Collections (Armature.collections), which also subsumed Armature.layers. Bone colors
+        # are now defined per-bone, Bone.color.palette and PoseBone.color.palette
+        if Common.version_3_6_or_older():
             for group in armature.pose.bone_groups:
                 armature.pose.bone_groups.remove(group)
         else:
@@ -466,14 +468,37 @@ class FixArmature(bpy.types.Operator):
 
         # Count steps for loading bar again and reset the layers
         steps += len(armature.data.edit_bones)
+        if Common.version_3_6_or_older:
+            def set_bone_visible(edit_bone):
+                edit_bone.layers[0] = True
+        else:
+            # Armature/Bone layers were replaced with Bone Collections in Blender 4.0.
+            bone_collections = armature.data.collections
+            if not bone_collections:
+                # All bones are visible when there are no bone collections, so nothing to do.
+                def set_bone_visible(_edit_bone):
+                    pass
+            else:
+                # The default collection on new Armatures is called "Bones" and usually has all bones assigned to it.
+                default_collection_name = "Bones"
+                bone_collection = bone_collections.get(default_collection_name)
+                if bone_collection is None:
+                    # The default "Bones" collection does not exist, create it.
+                    bone_collection = bone_collections.new(default_collection_name)
+                # Ensure the collection is visible.
+                bone_collection.is_visible = True
+
+                def set_bone_visible(edit_bone):
+                    bone_collection.assign(edit_bone)
         for bone in armature.data.edit_bones:
             if bone.name in Bones.bone_list or bone.name.startswith(tuple(Bones.bone_list_with)):
                 if bone.parent is not None:
                     steps += 1
                 else:
                     steps -= 1
-            if version_3_6_or_older():
-                bone.layers[0] = True
+        if version_3_6_or_older():
+            bone.layers[0] = True
+            
 
         # Start loading bar
         current_step = 0
