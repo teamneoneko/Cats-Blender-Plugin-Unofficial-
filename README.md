@@ -1,4 +1,4 @@
-# Cats Blender Plugin (0.40.0 DEV).
+# Cats Blender Plugin (0.40.0).
 
 
 #### This is the Development version which can be unstable, please use the main branch for the most up to date stable version.
@@ -284,7 +284,7 @@ There are a lot of perks like having your name inside the plugin!
 
 ## Installation
 
-- Download the plugin: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/refs/heads/dev.zip)
+- Download the plugin: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/refs/heads/main.zip)
    - **Important: Do NOT extract the downloaded zip! You will need the zip file during installation!**
  - Install the addon in blender like so:
    - In Blender 3.3+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there. Though this plugin may still work on Blender blender versions older than 3.6, there are no longer supported.
@@ -330,7 +330,21 @@ Cats Blender Plugin was original developed by absolute quantum then maintained b
 Please open an issue if you need to leave feedback.
 
 ## Change Log
+<details><summary>0.40.0</summary>
+  ## 0.40.0
+  #### IMPORTANT WE DO NOT SUPPORT ANY BLENDER VERSION BELOW 3.6 IF YOU HAVE ANY ISSUES PLEASE UPGRADE TO BLENDER 3.6.
 
+- Added Twist Bone Generation.
+- Added Repair Shapekeys Generation.
+- Added Optimised Shapekeys.
+- CAT's is no longer supported on versions below 3.6.
+- 4.0 Fixes by Mysteryem absolute-quantum/cats-blender-plugin#648
+- Cleanup of old code.
+- Removed Tuxedo, I decided no to integrate this into cats.
+- Removed of any references to blender 2.79. Cats have not supported this version for a while and I see no point having this in the code anymore.
+- Preparing for a new option to remove material from the material combiner list.
+- Small bug fixes.
+</details>
 <details><summary>0.30.1</summary>
 
    ## 0.30.1
