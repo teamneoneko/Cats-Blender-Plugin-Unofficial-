@@ -13,6 +13,10 @@ All the hours long processes of fixing your models are compressed into a few fun
 So if you enjoy how this plugin saves you countless hours of work consider supporting us through Patreon.
 There are a lot of perks like having your name inside the plugin!
 
+- See my gumroad: https://yusarina.gumroad.com
+- See my github: https://github.com/Yusarina
+- See all my social media sites here: https://yusarina.xyz
+
 ## Features (Click to Expand)
  - <details><summary>Creating lip syncing</summary>
 
