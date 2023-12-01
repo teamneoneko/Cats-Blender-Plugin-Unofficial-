@@ -371,7 +371,7 @@ class __PmxExporter:
 
                 pmx_bone.location = __to_pmx_location(p_bone.head)
                 pmx_bone.parent = bone.parent
-                pmx_bone.visible = not bone.hide and any((all(x) for x in zip(bone.layers, arm.data.layers)))
+                pmx_bone.visible = not bone.hide and any(c.is_visible for c in bone.collections)
                 pmx_bone.isControllable = mmd_bone.is_controllable
                 pmx_bone.isMovable = not all(p_bone.lock_location)
                 pmx_bone.isRotatable = not all(p_bone.lock_rotation)

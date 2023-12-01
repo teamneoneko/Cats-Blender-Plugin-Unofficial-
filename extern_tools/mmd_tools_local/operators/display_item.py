@@ -8,6 +8,7 @@ from collections import OrderedDict
 from mmd_tools_local import utils
 from mmd_tools_local.utils import ItemOp, ItemMoveOp
 import mmd_tools_local.core.model as mmd_model
+from mmd_tools_local.core.bone import FnBone
 
 
 class AddDisplayItemFrame(Operator):
@@ -329,44 +330,4 @@ class DisplayItemQuickSetup(Operator):
 
     @staticmethod
     def apply_bone_groups(mmd_root, armature):
-        arm_bone_groups = armature.pose.bone_groups
-        if not hasattr(arm_bone_groups, 'remove'): #bpy.app.version < (2, 72, 0):
-            from mmd_tools_local import bpyutils
-            bpyutils.select_object(armature)
-            bpy.ops.object.mode_set(mode='POSE')
-            class arm_bone_groups:
-                values = armature.pose.bone_groups.values
-                get = armature.pose.bone_groups.get
-                @staticmethod
-                def new(name):
-                    bpy.ops.pose.group_add()
-                    group = armature.pose.bone_groups.active
-                    group.name = name
-                    return group
-                @staticmethod
-                def remove(group):
-                    armature.pose.bone_groups.active = group
-                    bpy.ops.pose.group_remove()
-
-        pose_bones = armature.pose.bones
-        used_groups = set()
-        unassigned_bones = {b.name for b in pose_bones}
-        for frame in mmd_root.display_item_frames:
-            for item in frame.data:
-                if item.type == 'BONE' and item.name in unassigned_bones:
-                    unassigned_bones.remove(item.name)
-                    group_name = frame.name
-                    used_groups.add(group_name)
-                    group = arm_bone_groups.get(group_name)
-                    if group is None:
-                        group = arm_bone_groups.new(name=group_name)
-                    pose_bones[item.name].bone_group = group
-
-        for name in unassigned_bones:
-            pose_bones[name].bone_group = None
-
-        # remove unused bone groups
-        for group in arm_bone_groups.values():
-            if group.name not in used_groups:
-                arm_bone_groups.remove(group)
-
+        FnBone.sync_bone_collections_from_armature(armature)

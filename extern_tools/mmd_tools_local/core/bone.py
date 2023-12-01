@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from typing import Optional
 import bpy
-from bpy.types import PoseBone
 
 from math import pi
 import math
 from mathutils import Vector, Quaternion, Matrix
+from mmd_tools_local.core.model import FnModel
 from mmd_tools_local import bpyutils
 from mmd_tools_local.bpyutils import TransformConstraintOp
 
@@ -23,6 +24,14 @@ def remove_edit_bones(edit_bones, bone_names):
         if b:
             edit_bones.remove(b)
 
+BONE_COLLECTION_CUSTOM_PROPERTY_NAME = 'mmd_tools_local'
+BONE_COLLECTION_CUSTOM_PROPERTY_VALUE_SPECIAL = 'special collection'
+BONE_COLLECTION_CUSTOM_PROPERTY_VALUE_NORMAL = 'normal collection'
+BONE_COLLECTION_NAME_SHADOW = 'mmd_shadow'
+BONE_COLLECTION_NAME_DUMMY = 'mmd_dummy'
+
+SPECIAL_BONE_COLLECTION_NAMES = [BONE_COLLECTION_NAME_SHADOW, BONE_COLLECTION_NAME_DUMMY]
+
 
 class FnBone(object):
     AUTO_LOCAL_AXIS_ARMS = ('左肩', '左腕', '左ひじ', '左手首', '右腕', '右肩', '右ひじ', '右手首')
@@ -30,7 +39,7 @@ class FnBone(object):
     AUTO_LOCAL_AXIS_SEMI_STANDARD_ARMS = ('左腕捩', '左手捩', '左肩P', '左ダミー', '右腕捩', '右手捩', '右肩P', '右ダミー')
 
     def __init__(self, pose_bone=None):
-        if pose_bone is not None and not isinstance(pose_bone, PoseBone):
+        if pose_bone is not None and not isinstance(pose_bone, bpy.types.PoseBone):
             raise ValueError
         self.__bone = pose_bone
 
@@ -88,6 +97,104 @@ class FnBone(object):
                 # unlock transform locks if fixed axis was applied
                 b.lock_ik_x, b.lock_ik_y, b.lock_ik_z = b.lock_rotation = (False, False, False)
                 b.lock_location = b.lock_scale = (False, False, False)
+
+    @classmethod
+    def __setup_special_bone_collections(cls, armature_object: bpy.types.Object):
+        armature: bpy.types.Armature = armature_object.data
+        bone_collections = armature.collections
+        for bone_collection_name in SPECIAL_BONE_COLLECTION_NAMES:
+            if bone_collection_name in bone_collections:
+                continue
+            bone_collection = bone_collections.new(bone_collection_name)
+            cls.set_bone_collection_to_special(bone_collection, is_visible=False)
+
+    @staticmethod
+    def is_mmd_tools_local_bone_collection(bone_collection) -> bool:
+        return BONE_COLLECTION_CUSTOM_PROPERTY_NAME in bone_collection
+
+    @staticmethod
+    def is_special_bone_collection(bone_collection) -> bool:
+        return BONE_COLLECTION_CUSTOM_PROPERTY_VALUE_SPECIAL == bone_collection.get(BONE_COLLECTION_CUSTOM_PROPERTY_NAME)
+
+    @staticmethod
+    def set_bone_collection_to_special(bone_collection, is_visible: Optional[bool] = None):
+        bone_collection[BONE_COLLECTION_CUSTOM_PROPERTY_NAME] = BONE_COLLECTION_CUSTOM_PROPERTY_VALUE_SPECIAL
+        if is_visible is None:
+            return
+        bone_collection.is_visible = is_visible
+
+    @staticmethod
+    def is_normal_bone_collection(bone_collection) -> bool:
+        return BONE_COLLECTION_CUSTOM_PROPERTY_VALUE_NORMAL == bone_collection.get(BONE_COLLECTION_CUSTOM_PROPERTY_NAME)
+
+    @staticmethod
+    def set_bone_collection_to_normal(bone_collection):
+        bone_collection[BONE_COLLECTION_CUSTOM_PROPERTY_NAME] = BONE_COLLECTION_CUSTOM_PROPERTY_VALUE_NORMAL
+
+
+    @staticmethod
+    def __set_edit_bone_to_special(edit_bone: bpy.types.EditBone, bone_collection_name: str) -> bpy.types.EditBone:
+        edit_bone.id_data.collections[bone_collection_name].assign(edit_bone)
+        edit_bone.use_deform = False
+        return edit_bone
+
+    @staticmethod
+    def set_edit_bone_to_dummy(edit_bone: bpy.types.EditBone) -> bpy.types.EditBone:
+        return FnBone.__set_edit_bone_to_special(edit_bone, BONE_COLLECTION_NAME_DUMMY)
+
+    @staticmethod
+    def set_edit_bone_to_shadow(edit_bone: bpy.types.EditBone) -> bpy.types.EditBone:
+        return FnBone.__set_edit_bone_to_special(edit_bone, BONE_COLLECTION_NAME_SHADOW)
+
+    @classmethod
+    def clear_bone_collection(cls, edit_bone: bpy.types.EditBone) -> bpy.types.EditBone:
+        for bone_collection in edit_bone.collections:
+            if not cls.is_mmd_tools_local_bone_collection(bone_collection):
+                continue
+            bone_collection.unassign(edit_bone)
+        return edit_bone
+
+    @classmethod
+    def sync_bone_collections_from_armature(cls, armature_object: bpy.types.Object):
+        armature: bpy.types.Armature = armature_object.data
+        bone_collections = armature.collections
+
+        root_object: bpy.types.Object = FnModel.find_root(armature_object)
+        mmd_root = root_object.mmd_root
+
+        bones = armature_object.data.bones
+        used_groups = set()
+        unassigned_bone_names = {b.name for b in bones}
+
+        for frame in mmd_root.display_item_frames:
+            for item in frame.data:
+                if item.type == 'BONE' and item.name in unassigned_bone_names:
+                    unassigned_bone_names.remove(item.name)
+                    group_name = frame.name
+                    used_groups.add(group_name)
+                    bone_collection = bone_collections.get(group_name)
+                    if bone_collection is None:
+                        bone_collection = bone_collections.new(name=group_name)
+                        cls.set_bone_collection_to_normal(bone_collection)
+                    bone_collection.assign(bones[item.name])
+
+        for name in unassigned_bone_names:
+            for bc in bones[name].collections:
+                if not cls.is_mmd_tools_local_bone_collection(bc):
+                    continue
+                if not cls.is_normal_bone_collection(bc):
+                    continue
+                bc.unassign(bones[name])
+
+        # remove unused bone groups
+        for bone_collection in bone_collections.values():
+            if bone_collection.name in used_groups:
+                continue
+            if not cls.is_mmd_tools_local_bone_collection(bone_collection):
+                continue
+            if not cls.is_normal_bone_collection(bone_collection):
+                continue
+            bone_collections.remove(bone_collection)
 
     @classmethod
     def apply_bone_fixed_axis(cls, armature):
@@ -271,6 +378,8 @@ class FnBone(object):
             return mmd_bone.is_additional_transform_dirty
         dirty_bones = [b for b in armature.pose.bones if __is_dirty_bone(b)]
 
+        cls.__setup_special_bone_collections(armature)
+
         # setup constraints
         shadow_bone_pool = []
         for p_bone in dirty_bones:
@@ -384,22 +493,14 @@ class _AT_ShadowBoneCreate:
             return
 
         dummy_bone_name = self.__dummy_bone_name
-        dummy = edit_bones.get(dummy_bone_name, None)
-        if dummy is None:
-            dummy = edit_bones.new(name=dummy_bone_name)
-            dummy.layers = [x == 9 for x in range(len(dummy.layers))]
-            dummy.use_deform = False
+        dummy = edit_bones.get(dummy_bone_name, None) or FnBone.set_edit_bone_to_dummy(edit_bones.new(name=dummy_bone_name))
         dummy.parent = target_bone
         dummy.head = target_bone.head
         dummy.tail = dummy.head + bone.tail - bone.head
         dummy.roll = bone.roll
 
         shadow_bone_name = self.__shadow_bone_name
-        shadow = edit_bones.get(shadow_bone_name, None)
-        if shadow is None:
-            shadow = edit_bones.new(name=shadow_bone_name)
-            shadow.layers = [x == 8 for x in range(len(shadow.layers))]
-            shadow.use_deform = False
+        shadow = edit_bones.get(shadow_bone_name, None) or FnBone.set_edit_bone_to_shadow(edit_bones.new(name=shadow_bone_name))
         shadow.parent = target_bone.parent
         shadow.head = dummy.head
         shadow.tail = dummy.tail

@@ -4,7 +4,7 @@ import bpy
 import mmd_tools_local.core.model as mmd_model
 from bpy.types import Operator
 from mmd_tools_local.bpyutils import SceneOp, activate_layer_collection
-from mmd_tools_local.core.bone import FnBone
+from mmd_tools_local.core.bone import FnBone, MigrationFnBone
 
 
 class MorphSliderSetup(Operator):
@@ -94,7 +94,7 @@ class CleanAdditionalTransformConstraints(Operator):
         obj = context.active_object
         root = mmd_model.Model.findRoot(obj)
         rig = mmd_model.Model(root)
-        rig.cleanAdditionalTransformConstraints()
+        FnBone.clean_additional_transformation(rig.armature())
         SceneOp(context).active_object = obj
         return {'FINISHED'}
 
@@ -108,7 +108,9 @@ class ApplyAdditionalTransformConstraints(Operator):
         obj = context.active_object
         root = mmd_model.Model.findRoot(obj)
         rig = mmd_model.Model(root)
-        rig.applyAdditionalTransformConstraints()
+        MigrationFnBone.fix_mmd_ik_limit_override(rig.armature())
+        FnBone.apply_additional_transformation(rig.armature())
+
         SceneOp(context).active_object = obj
         return {'FINISHED'}
 
@@ -418,7 +420,8 @@ class AssembleAll(Operator):
         with activate_layer_collection(root_object):
             rig = mmd_model.Model(root_object)
 
-            rig.applyAdditionalTransformConstraints()
+            MigrationFnBone.fix_mmd_ik_limit_override(rig.armature())
+            FnBone.apply_additional_transformation(rig.armature())
             rig.build()
             rig.morph_slider.bind()
 
@@ -445,7 +448,7 @@ class DisassembleAll(Operator):
             bpy.ops.mmd_tools_local.sdef_unbind({'selected_objects': [active_object]})
             rig.morph_slider.unbind()
             rig.clean()
-            rig.cleanAdditionalTransformConstraints()
+            FnBone.clean_additional_transformation(rig.armature())
 
             SceneOp(context).active_object = active_object
 

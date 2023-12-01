@@ -192,7 +192,7 @@ class MMDToolsModelSetupPanel(bpy.types.Panel):
 
         groups = {}
         for ik, (b, cnt, err) in ik_map.items():
-            if any(all(x) for x in zip(ik.bone.layers, armature_object.data.layers)):
+            if any(c.is_visible for c in ik.bone.collections):
                 px, py, pz = -ik.bone.head_local/base
                 bx, by, bz = -b.head_local/base*0.15
                 groups.setdefault(

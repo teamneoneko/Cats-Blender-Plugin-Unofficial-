@@ -505,7 +505,7 @@ class _FnMaterialCycles(_FnMaterialBI):
                 if hasattr(texture, 'color_space'):
                     texture.color_space = 'NONE' if is_sph_add else 'COLOR'
                 elif hasattr(texture.image, 'colorspace_settings'):
-                    texture.image.colorspace_settings.name = 'Linear' if is_sph_add else 'sRGB'
+                    texture.image.colorspace_settings.name = 'Linear Rec.709' if is_sph_add else 'sRGB'
 
                 mat = self.material
                 nodes, links = mat.node_tree.nodes, mat.node_tree.links
@@ -725,10 +725,9 @@ class _FnMaterialCycles(_FnMaterialBI):
         self.__update_shader_nodes()
         shader = mat.node_tree.nodes.get('mmd_shader', None)
         if shader and name in shader.inputs:
-            if hasattr(shader, 'node_tree'):
-                input_socket = shader.node_tree.inputs[name]
-                if hasattr(input_socket, 'min_value'):
-                    val = min(max(val, input_socket.min_value), input_socket.max_value)
+            interface_socket = shader.node_tree.interface.items_tree[name]
+            if hasattr(interface_socket, 'min_value'):
+                val = min(max(val, interface_socket.min_value), interface_socket.max_value)
             shader.inputs[name].default_value = val
 
     def __update_shader_nodes(self):

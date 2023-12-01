@@ -46,6 +46,14 @@ class _NodeTreeUtils:
         return node
 
 
+SOCKET_TYPE_MAPPING = {
+    'NodeSocketFloatFactor': 'NodeSocketFloat'
+}
+
+SOCKET_SUBTYPE_MAPPING = {
+    'NodeSocketFloatFactor': 'FACTOR'
+}
+
 class _NodeGroupUtils(_NodeTreeUtils):
 
     def __init__(self, shader):
@@ -75,26 +83,28 @@ class _NodeGroupUtils(_NodeTreeUtils):
                     s.hide = not s.is_linked
 
     def new_input_socket(self, io_name, socket, default_val=None, min_max=None, socket_type=None):
-        self.__new_io(self.shader.inputs, self.node_input.outputs, io_name, socket, default_val, min_max, socket_type)
+        self.__new_io('INPUT', self.node_input.outputs, io_name, socket, default_val, min_max, socket_type)
 
     def new_output_socket(self, io_name, socket, default_val=None, min_max=None, socket_type=None):
-        self.__new_io(self.shader.outputs, self.node_output.inputs, io_name, socket, default_val, min_max, socket_type)
+        self.__new_io('OUTPUT', self.node_output.inputs, io_name, socket, default_val, min_max, socket_type)
 
-    def __new_io(self, shader_io, io_sockets, io_name, socket, default_val=None, min_max=None, socket_type=None):
+    def __new_io(self, in_out, io_sockets, io_name, socket, default_val=None, min_max=None, socket_type=None):
         if io_name not in io_sockets:
             idname = socket_type or socket.bl_idname
-            shader_io.new(type=idname, name=io_name)
+            interface_socket = self.shader.interface.new_socket(name=io_name, in_out=in_out, socket_type=SOCKET_TYPE_MAPPING.get(idname, idname))
+            if idname in SOCKET_SUBTYPE_MAPPING:
+                interface_socket.subtype = SOCKET_SUBTYPE_MAPPING.get(idname, '')
             if not min_max:
                 if idname.endswith('Factor') or io_name.endswith('Alpha'):
-                    shader_io[io_name].min_value, shader_io[io_name].max_value = 0, 1
+                    interface_socket.min_value, interface_socket.max_value = 0, 1
                 elif idname.endswith('Float') or idname.endswith('Vector'):
-                    shader_io[io_name].min_value, shader_io[io_name].max_value = -10, 10
+                    interface_socket.min_value, interface_socket.max_value = -10, 10
         if socket is not None:
             self.links.new(io_sockets[io_name], socket)
         if default_val is not None:
-            shader_io[io_name].default_value = default_val
+            interface_socket.default_value = default_val
         if min_max is not None:
-            shader_io[io_name].min_value, shader_io[io_name].max_value = min_max
+            interface_socket.min_value, interface_socket.max_value = min_max
 
 
 class _MaterialMorph:

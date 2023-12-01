@@ -120,12 +120,9 @@ class MMDBoneHandler(MMDDataHandlerABC):
     @classmethod
     def collect_data(cls, mmd_translation: 'MMDTranslation'):
         armature_object: bpy.types.Object = FnModel.find_armature(mmd_translation.id_data)
-        armature: bpy.types.Armature = armature_object.data
-        visible_layer_indices = {i for i, visible in enumerate(armature.layers) if visible}
         pose_bone: bpy.types.PoseBone
         for index, pose_bone in enumerate(armature_object.pose.bones):
-            layers = pose_bone.bone.layers
-            if not any(layers[i] for i in visible_layer_indices):
+            if not any(c.is_visible for c in pose_bone.bone.collections):
                 continue
 
             mmd_translation_element: 'MMDTranslationElement' = mmd_translation.translation_elements.add()
