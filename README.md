@@ -10,9 +10,6 @@ Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/P
 With Cats it takes only a few minutes to upload your model into VRChat.
 All the hours long processes of fixing your models are compressed into a few functions!
 
-So if you enjoy how this plugin saves you countless hours of work consider supporting us through Patreon.
-There are a lot of perks like having your name inside the plugin!
-
 - See my gumroad: https://yusarina.gumroad.com
 - See my github: https://github.com/Yusarina
 - See all my social media sites here: https://yusarina.xyz
