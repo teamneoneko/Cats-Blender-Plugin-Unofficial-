@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
+# Copyright 2015 MMD Tools authors
+# This file is part of MMD Tools.
 
 import bpy
+
 import mmd_tools_local.core.model as mmd_model
 
 
 class _PanelBase(object):
-    bl_space_type = 'PROPERTIES'
-    bl_region_type = 'WINDOW'
-    bl_context = 'object'
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context = "object"
 
 
 class MMDModelObjectPanel(_PanelBase, bpy.types.Panel):
-    bl_idname = 'OBJECT_PT_mmd_tools_local_root_object'
-    bl_label = 'MMD Model Information'
+    bl_idname = "OBJECT_PT_mmd_tools_local_root_object"
+    bl_label = "MMD Model Information"
 
     @classmethod
     def poll(cls, context):
@@ -25,11 +28,11 @@ class MMDModelObjectPanel(_PanelBase, bpy.types.Panel):
         root = mmd_model.FnModel.find_root(obj)
 
         c = layout.column()
-        c.prop(root.mmd_root, 'name')
-        c.prop(root.mmd_root, 'name_e')
+        c.prop(root.mmd_root, "name")
+        c.prop(root.mmd_root, "name_e")
         c = layout.column()
-        c.prop_search(root.mmd_root, 'comment_text', search_data=bpy.data, search_property='texts')
-        c.prop_search(root.mmd_root, 'comment_e_text', search_data=bpy.data, search_property='texts')
+        c.prop_search(root.mmd_root, "comment_text", search_data=bpy.data, search_property="texts")
+        c.prop_search(root.mmd_root, "comment_e_text", search_data=bpy.data, search_property="texts")
         c = layout.column()
-        c.operator('mmd_tools_local.change_mmd_ik_loop_factor', text='Change MMD IK Loop Factor')
-        c.operator('mmd_tools_local.recalculate_bone_roll', text='Recalculate bone roll')
+        c.operator("mmd_tools_local.change_mmd_ik_loop_factor", text="Change MMD IK Loop Factor")
+        c.operator("mmd_tools_local.recalculate_bone_roll", text="Recalculate bone roll")

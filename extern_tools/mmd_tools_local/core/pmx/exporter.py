@@ -1,27 +1,29 @@
 # -*- coding: utf-8 -*-
-import os
+# Copyright 2014 MMD Tools authors
+# This file is part of MMD Tools.
+
 import copy
 import logging
 import math
+import os
 import shutil
 import time
-
-import mathutils
-import bpy
-import bmesh
-
 from collections import OrderedDict
+
+import bmesh
+import bpy
+import mathutils
+
+from mmd_tools_local import bpyutils
+from mmd_tools_local.bpyutils import matmul
 from mmd_tools_local.core import pmx
-from mmd_tools_local.core.bone import FnBone
 from mmd_tools_local.core.material import FnMaterial
 from mmd_tools_local.core.morph import FnMorph
-from mmd_tools_local.core.translations import FnTranslations
 from mmd_tools_local.core.sdef import FnSDEF
+from mmd_tools_local.core.translations import FnTranslations
 from mmd_tools_local.core.vmd.importer import BoneConverter, BoneConverterPoseMode
-from mmd_tools_local import bpyutils
-from mmd_tools_local.utils import saferelpath
-from mmd_tools_local.bpyutils import matmul
 from mmd_tools_local.operators.misc import MoveObject
+from mmd_tools_local.utils import saferelpath
 
 
 class _Vertex:
