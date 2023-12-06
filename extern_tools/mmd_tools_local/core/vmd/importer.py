@@ -11,7 +11,6 @@ import bpy
 from mathutils import Quaternion, Vector
 
 from mmd_tools_local import utils
-from mmd_tools_local.bpyutils import matmul
 from mmd_tools_local.core import vmd
 from mmd_tools_local.core.camera import MMDCamera
 from mmd_tools_local.core.lamp import MMDLamp
@@ -87,12 +86,12 @@ class BoneConverter:
         self.convert_interpolation = _InterpolationHelper(self.__mat).convert
 
     def convert_location(self, location):
-        return matmul(self.__mat, Vector(location)) * self.__scale
+        return (self.__mat @ Vector(location)) * self.__scale
 
     def convert_rotation(self, rotation_xyzw):
         rot = Quaternion()
         rot.x, rot.y, rot.z, rot.w = rotation_xyzw
-        return Quaternion(matmul(self.__mat, rot.axis) * -1, rot.angle).normalized()
+        return Quaternion((self.__mat @ rot.axis) * -1, rot.angle).normalized()
 
 
 class BoneConverterPoseMode:
@@ -102,7 +101,7 @@ class BoneConverterPoseMode:
         self.__mat = mat.transposed()
         self.__scale = scale
         self.__mat_rot = pose_bone.matrix_basis.to_3x3()
-        self.__mat_loc = matmul(self.__mat_rot, self.__mat)
+        self.__mat_loc = self.__mat_rot @ self.__mat
         self.__offset = pose_bone.location.copy()
         self.convert_location = self._convert_location
         self.convert_rotation = self._convert_rotation
@@ -115,40 +114,33 @@ class BoneConverterPoseMode:
         self.convert_interpolation = _InterpolationHelper(self.__mat_loc).convert
 
     def _convert_location(self, location):
-        return self.__offset + matmul(self.__mat_loc, Vector(location)) * self.__scale
+        return self.__offset + (self.__mat_loc @ Vector(location)) * self.__scale
 
     def _convert_rotation(self, rotation_xyzw):
         rot = Quaternion()
         rot.x, rot.y, rot.z, rot.w = rotation_xyzw
-        rot = Quaternion(matmul(self.__mat, rot.axis) * -1, rot.angle)
-        return matmul(self.__mat_rot, rot.to_matrix()).to_quaternion()
+        rot = Quaternion((self.__mat @ rot.axis) * -1, rot.angle)
+        return (self.__mat_rot @ rot.to_matrix()).to_quaternion()
 
     def _convert_location_inverted(self, location):
-        return matmul(self.__mat_loc, Vector(location) - self.__offset) * self.__scale
+        return (self.__mat_loc @ (Vector(location) - self.__offset)) * self.__scale
 
     def _convert_rotation_inverted(self, rotation_xyzw):
         rot = Quaternion()
         rot.x, rot.y, rot.z, rot.w = rotation_xyzw
-        rot = matmul(self.__mat_rot, rot.to_matrix()).to_quaternion()
-        return Quaternion(matmul(self.__mat, rot.axis) * -1, rot.angle).normalized()
+        rot = (self.__mat_rot @ rot.to_matrix()).to_quaternion()
+        return Quaternion((self.__mat @ rot.axis) * -1, rot.angle).normalized()
 
 
 class _FnBezier:
-    __BLENDER_2_91_OR_NEWER = not (bpy.app.version < (2, 91, 0))
-
     @classmethod
     def from_fcurve(cls, kp0, kp1):
         p0, p1, p2, p3 = kp0.co, kp0.handle_right, kp1.handle_left, kp1.co
-        if cls.__BLENDER_2_91_OR_NEWER:  # the F-Curve can become near-vertical
-            if p1.x > p3.x:
-                t = (p3.x - p0.x) / (p1.x - p0.x)
-                p1 = (1 - t) * p0 + p1 * t
-            if p0.x > p2.x:
-                t = (p3.x - p0.x) / (p3.x - p2.x)
-                p2 = (1 - t) * p3 + p2 * t
-        elif p1.x > p2.x:  # legacy F-Curve correction
-            t = (p3.x - p0.x) / (p1.x - p0.x + p3.x - p2.x)
+        if p1.x > p3.x:
+            t = (p3.x - p0.x) / (p1.x - p0.x)
             p1 = (1 - t) * p0 + p1 * t
+        if p0.x > p2.x:
+            t = (p3.x - p0.x) / (p3.x - p2.x)
             p2 = (1 - t) * p3 + p2 * t
         return cls(p0, p1, p2, p3)
 

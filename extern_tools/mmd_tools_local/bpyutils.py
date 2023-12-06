@@ -6,23 +6,13 @@ from typing import Optional, Union
 
 import bpy
 
-# TODO: remove
-matmul = (lambda a, b: a * b) if bpy.app.version < (2, 80, 0) else (lambda a, b: a.__matmul__(b))
-
 
 class Props:  # For API changes of only name changed properties
-    if bpy.app.version < (2, 80, 0):
-        show_in_front = "show_x_ray"
-        display_type = "draw_type"
-        display_size = "draw_size"
-        empty_display_type = "empty_draw_type"
-        empty_display_size = "empty_draw_size"
-    else:
-        show_in_front = "show_in_front"
-        display_type = "display_type"
-        display_size = "display_size"
-        empty_display_type = "empty_display_type"
-        empty_display_size = "empty_display_size"
+    show_in_front = "show_in_front"
+    display_type = "display_type"
+    display_size = "display_size"
+    empty_display_type = "empty_display_type"
+    empty_display_size = "empty_display_size"
 
 
 class __EditMode:
@@ -264,21 +254,12 @@ def makeSphere(segment=8, ring_count=5, radius=1.0, target_object=None):
 
     mesh = target_object.data
     bm = bmesh.new()
-    if bpy.app.version >= (3, 0, 0):
-        bmesh.ops.create_uvsphere(
-            bm,
-            u_segments=segment,
-            v_segments=ring_count,
-            radius=radius,
-        )
-    else:
-        # SUPPORT_UNTIL: 3.3 LTS
-        bmesh.ops.create_uvsphere(
-            bm,
-            u_segments=segment,
-            v_segments=ring_count,
-            diameter=radius,
-        )
+    bmesh.ops.create_uvsphere(
+        bm,
+        u_segments=segment,
+        v_segments=ring_count,
+        radius=radius,
+    )
     for f in bm.faces:
         f.smooth = True
     bm.to_mesh(mesh)
@@ -380,40 +361,20 @@ class ObjectOp:
             if d.data_path.startswith(key.path_from_id()):
                 key.id_data.driver_remove(d.data_path, -1)
 
-    if bpy.app.version < (2, 75, 0):
-
-        def shape_key_remove(self, key):
-            obj = self.__obj
-            assert key.id_data == obj.data.shape_keys
-            key_blocks = key.id_data.key_blocks
-            relative_key_map = {k.name: getattr(k.relative_key, "name", "") for k in key_blocks}
-            last_index, obj.active_shape_key_index = obj.active_shape_key_index, key_blocks.find(key.name)
-            if last_index >= obj.active_shape_key_index:
-                last_index = max(0, last_index - 1)
-            bpy.context.scene.objects.active, last = obj, bpy.context.scene.objects.active
-            self.__clean_drivers(key)
-            bpy.ops.object.shape_key_remove()
-            bpy.context.scene.objects.active = last
-            for k in key_blocks:
-                k.relative_key = key_blocks.get(relative_key_map[k.name], key_blocks[0])
-            obj.active_shape_key_index = min(last_index, len(key_blocks) - 1)
-
-    else:
-
-        def shape_key_remove(self, key):
-            obj = self.__obj
-            assert key.id_data == obj.data.shape_keys
-            key_blocks = key.id_data.key_blocks
-            last_index = obj.active_shape_key_index
-            if last_index >= key_blocks.find(key.name):
-                last_index = max(0, last_index - 1)
-            self.__clean_drivers(key)
-            obj.shape_key_remove(key)
-            obj.active_shape_key_index = min(last_index, len(key_blocks) - 1)
+    def shape_key_remove(self, key):
+        obj = self.__obj
+        assert key.id_data == obj.data.shape_keys
+        key_blocks = key.id_data.key_blocks
+        last_index = obj.active_shape_key_index
+        if last_index >= key_blocks.find(key.name):
+            last_index = max(0, last_index - 1)
+        self.__clean_drivers(key)
+        obj.shape_key_remove(key)
+        obj.active_shape_key_index = min(last_index, len(key_blocks) - 1)
 
 
 class TransformConstraintOp:
-    __MIN_MAX_MAP = {} if bpy.app.version < (2, 71, 0) else {"ROTATION": "_rot", "SCALE": "_scale"}
+    __MIN_MAX_MAP = {"ROTATION": "_rot", "SCALE": "_scale"}
 
     @staticmethod
     def create(constraints, name, map_type):
@@ -463,102 +424,59 @@ class TransformConstraintOp:
             setattr(c, attr, value * influence)
 
 
-if bpy.app.version < (2, 80, 0):
+class SceneOp:
+    def __init__(self, context=None):
+        self.__context = context or bpy.context
+        self.__scene = self.__context.scene
+        self.__collection = self.__context.collection
+        self.__view_layer = self.__context.view_layer
 
-    class SceneOp:
-        def __init__(self, context=None):
-            self.__context = context or bpy.context
-            self.__scene = self.__context.scene
+    def __ensure_selectable(self, obj):
+        obj.hide_viewport = obj.hide_select = False
+        obj.hide_set(False)
+        if obj not in self.__context.selectable_objects:
 
-        def __ensure_selectable(self, obj):
-            obj.hide = obj.hide_select = False
-            if obj not in self.__context.selectable_objects:
-                selected_objects = self.__context.selected_objects
-                self.__scene.layers[next(i for i, enabled in enumerate(obj.layers) if enabled)] = True
-                if len(self.__context.selected_objects) != len(selected_objects):
-                    for i in self.__context.selected_objects:
-                        if i not in selected_objects:
-                            i.select = False
+            def __unhide(lc):
+                lc.hide_viewport = lc.collection.hide_viewport = lc.collection.hide_select = False
+                return True
 
-        def select_object(self, obj):
-            self.__ensure_selectable(obj)
-            obj.select = True
-
-        def link_object(self, obj):
-            self.__scene.objects.link(obj)
-
-        @property
-        def active_object(self):
-            return self.__scene.objects.active
-
-        @active_object.setter
-        def active_object(self, obj):
-            self.select_object(obj)
-            self.__scene.objects.active = obj
-
-        @property
-        def id_scene(self):
-            return self.__scene
-
-        @property
-        def id_objects(self):
-            return self.__scene.objects
-
-else:
-
-    class SceneOp:
-        def __init__(self, context=None):
-            self.__context = context or bpy.context
-            self.__scene = self.__context.scene
-            self.__collection = self.__context.collection
-            self.__view_layer = self.__context.view_layer
-
-        def __ensure_selectable(self, obj):
-            obj.hide_viewport = obj.hide_select = False
-            obj.hide_set(False)
-            if obj not in self.__context.selectable_objects:
-
-                def __unhide(lc):
-                    lc.hide_viewport = lc.collection.hide_viewport = lc.collection.hide_select = False
+            def __layer_check(layer_collection):
+                for lc in layer_collection.children:
+                    if __layer_check(lc):
+                        return __unhide(lc)
+                if obj in layer_collection.collection.objects.values():
+                    if layer_collection.exclude:
+                        layer_collection.exclude = False
                     return True
+                return False
 
-                def __layer_check(layer_collection):
-                    for lc in layer_collection.children:
-                        if __layer_check(lc):
-                            return __unhide(lc)
-                    if obj in layer_collection.collection.objects.values():
-                        if layer_collection.exclude:
-                            layer_collection.exclude = False
-                        return True
-                    return False
+            selected_objects = self.__context.selected_objects
+            __layer_check(self.__view_layer.layer_collection)
+            if len(self.__context.selected_objects) != len(selected_objects):
+                for i in self.__context.selected_objects:
+                    if i not in selected_objects:
+                        i.select_set(False)
 
-                selected_objects = self.__context.selected_objects
-                __layer_check(self.__view_layer.layer_collection)
-                if len(self.__context.selected_objects) != len(selected_objects):
-                    for i in self.__context.selected_objects:
-                        if i not in selected_objects:
-                            i.select_set(False)
+    def select_object(self, obj):
+        self.__ensure_selectable(obj)
+        obj.select_set(True)
 
-        def select_object(self, obj):
-            self.__ensure_selectable(obj)
-            obj.select_set(True)
+    def link_object(self, obj):
+        self.__collection.objects.link(obj)
 
-        def link_object(self, obj):
-            self.__collection.objects.link(obj)
+    @property
+    def active_object(self):
+        return self.__view_layer.objects.active
 
-        @property
-        def active_object(self):
-            return self.__view_layer.objects.active
+    @active_object.setter
+    def active_object(self, obj):
+        self.select_object(obj)
+        self.__view_layer.objects.active = obj
 
-        @active_object.setter
-        def active_object(self, obj):
-            self.select_object(obj)
-            self.__view_layer.objects.active = obj
+    @property
+    def id_scene(self):
+        return self.__scene
 
-        @property
-        def id_scene(self):
-            return self.__scene
-
-        @property
-        def id_objects(self):
-            return self.__scene.objects
+    @property
+    def id_objects(self):
+        return self.__scene.objects

@@ -337,12 +337,6 @@ class EdgePreviewSetup(Operator):
             node_shader.width = 200
             node_shader.node_tree = self.__get_edge_preview_shader()
 
-            if bpy.app.version < (2, 80, 0):
-                node_out = nodes.new("ShaderNodeOutput")
-                node_out.location = (XPOS * 2, YPOS * 2)
-                links.new(node_shader.outputs["Color"], node_out.inputs["Color"])
-                links.new(node_shader.outputs["Alpha"], node_out.inputs["Alpha"])
-
             node_out = nodes.new("ShaderNodeOutputMaterial")
             node_out.location = (XPOS * 2, YPOS * 0)
             links.new(node_shader.outputs["Shader"], node_out.inputs["Surface"])
@@ -367,16 +361,6 @@ class EdgePreviewSetup(Operator):
 
         ng.new_input_socket("Color", node_color.inputs["Color1"])
 
-        if bpy.app.version < (2, 80, 0):
-            node_geo = ng.new_node("ShaderNodeGeometry", (-2, -2.5))
-            node_cull = ng.new_math_node("MULTIPLY", (-1, -2.5))
-
-            ng.links.new(node_geo.outputs["Front/Back"], node_cull.inputs[1])
-
-            ng.new_input_socket("Alpha", node_cull.inputs[0])
-            ng.new_output_socket("Color", node_color.outputs["Color"])
-            ng.new_output_socket("Alpha", node_cull.outputs["Value"])
-
         ############################################################################
         node_ray = ng.new_node("ShaderNodeLightPath", (-3, 1.5))
         node_geo = ng.new_node("ShaderNodeNewGeometry", (-3, 0))
@@ -385,8 +369,7 @@ class EdgePreviewSetup(Operator):
         node_gt = ng.new_math_node("GREATER_THAN", (-1, 1))
         node_alpha = ng.new_math_node("MULTIPLY", (0, 1))
         node_trans = ng.new_node("ShaderNodeBsdfTransparent", (0, 0))
-        EDGE_NODE_NAME = "ShaderNodeEmission" if bpy.app.version < (2, 80, 0) else "ShaderNodeBackground"
-        node_rgb = ng.new_node(EDGE_NODE_NAME, (0, -0.5))  # BsdfDiffuse/Background/Emission
+        node_rgb = ng.new_node("ShaderNodeBackground", (0, -0.5))
         node_mix = ng.new_node("ShaderNodeMixShader", (1, 0.5))
 
         links = ng.links

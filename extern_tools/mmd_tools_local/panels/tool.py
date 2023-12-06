@@ -10,31 +10,9 @@ from mmd_tools_local import bpyutils, operators
 from mmd_tools_local.bpyutils import SceneOp
 from mmd_tools_local.utils import ItemOp
 
-TRIA_UP_BAR = "TRIA_UP_BAR"
-TRIA_DOWN_BAR = "TRIA_DOWN_BAR"
-if bpy.app.version < (2, 73, 0):
-    TRIA_UP_BAR = "TRIA_UP"
-    TRIA_DOWN_BAR = "TRIA_DOWN"
-
-ICON_ADD, ICON_REMOVE = "ADD", "REMOVE"
-if bpy.app.version < (2, 80, 0):
-    ICON_ADD, ICON_REMOVE = "ZOOMIN", "ZOOMOUT"
-
-
-if bpy.app.version < (2, 80, 0):
-
-    def _layout_split(layout, factor, align):
-        return layout.split(percentage=factor, align=align)
-
-else:
-
-    def _layout_split(layout, factor, align):
-        return layout.split(factor=factor, align=align)
-
-
 class _PanelBase(object):
     bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS" if bpy.app.version < (2, 80, 0) else "UI"
+    bl_region_type = "UI"
     bl_category = "MMD"
 
     @classmethod
@@ -101,7 +79,7 @@ class MMD_ROOT_UL_display_item_frames(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         frame = item
         if self.layout_type in {"DEFAULT"}:
-            row = _layout_split(layout, factor=0.5, align=True)
+            row = layout.split(factor=0.5, align=True)
             if frame.is_special:
                 row.label(text=frame.name, translate=False)
                 row = row.row(align=True)
@@ -167,11 +145,11 @@ class MMD_ROOT_UL_display_items(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {"DEFAULT"}:
             if item.type == "BONE":
-                row = _layout_split(layout, factor=0.5, align=True)
+                row = layout.split(factor=0.5, align=True)
                 row.prop(item, "name", text="", emboss=False, icon="BONE_DATA")
                 self.draw_bone_special(row, mmd_model.Model(item.id_data).armature(), item.name, self.mmd_name)
             else:
-                row = _layout_split(layout, factor=0.6, align=True)
+                row = layout.split(factor=0.6, align=True)
                 row.prop(item, "name", text="", emboss=False, icon="SHAPEKEY_DATA")
                 row = row.row(align=True)
                 row.prop(item, "morph_type", text="", emboss=False)
@@ -212,8 +190,8 @@ class MMDDisplayItemFrameMenu(Menu):
         layout = self.layout
         layout.operator_enum("mmd_tools_local.display_item_quick_setup", "type")
         layout.separator()
-        layout.operator("mmd_tools_local.display_item_frame_move", icon=TRIA_UP_BAR, text="Move To Top").type = "TOP"
-        layout.operator("mmd_tools_local.display_item_frame_move", icon=TRIA_DOWN_BAR, text="Move To Bottom").type = "BOTTOM"
+        layout.operator("mmd_tools_local.display_item_frame_move", icon="TRIA_UP_BAR", text="Move To Top").type = "TOP"
+        layout.operator("mmd_tools_local.display_item_frame_move", icon="TRIA_DOWN_BAR", text="Move To Bottom").type = "BOTTOM"
 
 
 class MMDDisplayItemMenu(Menu):
@@ -224,8 +202,8 @@ class MMDDisplayItemMenu(Menu):
         layout = self.layout
         layout.operator("mmd_tools_local.display_item_remove", text="Delete All", icon="X").all = True
         layout.separator()
-        layout.operator("mmd_tools_local.display_item_move", icon=TRIA_UP_BAR, text="Move To Top").type = "TOP"
-        layout.operator("mmd_tools_local.display_item_move", icon=TRIA_DOWN_BAR, text="Move To Bottom").type = "BOTTOM"
+        layout.operator("mmd_tools_local.display_item_move", icon="TRIA_UP_BAR", text="Move To Top").type = "TOP"
+        layout.operator("mmd_tools_local.display_item_move", icon="TRIA_DOWN_BAR", text="Move To Bottom").type = "BOTTOM"
 
 
 class MMDDisplayItemsPanel(_PanelBase, Panel):
@@ -253,8 +231,8 @@ class MMDDisplayItemsPanel(_PanelBase, Panel):
         )
         tb = row.column()
         tb1 = tb.column(align=True)
-        tb1.operator("mmd_tools_local.display_item_frame_add", text="", icon=ICON_ADD)
-        tb1.operator("mmd_tools_local.display_item_frame_remove", text="", icon=ICON_REMOVE)
+        tb1.operator("mmd_tools_local.display_item_frame_add", text="", icon="ADD")
+        tb1.operator("mmd_tools_local.display_item_frame_remove", text="", icon="REMOVE")
         tb1.menu("OBJECT_MT_mmd_tools_local_display_item_frame_menu", text="", icon="DOWNARROW_HLT")
         tb.separator()
         tb1 = tb.column(align=True)
@@ -277,8 +255,8 @@ class MMDDisplayItemsPanel(_PanelBase, Panel):
         )
         tb = row.column()
         tb1 = tb.column(align=True)
-        tb1.operator("mmd_tools_local.display_item_add", text="", icon=ICON_ADD)
-        tb1.operator("mmd_tools_local.display_item_remove", text="", icon=ICON_REMOVE)
+        tb1.operator("mmd_tools_local.display_item_add", text="", icon="ADD")
+        tb1.operator("mmd_tools_local.display_item_remove", text="", icon="REMOVE")
         tb1.menu("OBJECT_MT_mmd_tools_local_display_item_menu", text="", icon="DOWNARROW_HLT")
         tb.separator()
         tb1 = tb.column(align=True)
@@ -299,9 +277,9 @@ class mmd_tools_local_UL_Morphs(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         mmd_root = data
         if self.layout_type in {"DEFAULT"}:
-            row = _layout_split(layout, factor=0.4, align=True)
+            row = layout.split(factor=0.4, align=True)
             row.prop(item, "name", text="", emboss=False, icon="SHAPEKEY_DATA")
-            row = _layout_split(row, factor=0.6, align=True)
+            row = row.split(factor=0.6, align=True)
             row.prop(item, "name_e", text="", emboss=True)
             row = row.row(align=True)
             row.prop(item, "category", text="", emboss=False)
@@ -361,7 +339,7 @@ class mmd_tools_local_UL_BoneMorphOffsets(UIList):
 class mmd_tools_local_UL_GroupMorphOffsets(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {"DEFAULT"}:
-            row = _layout_split(layout, factor=0.5, align=True)
+            row = layout.split(factor=0.5, align=True)
             row.prop(item, "name", text="", emboss=False, icon="SHAPEKEY_DATA")
             row = row.row(align=True)
             row.prop(item, "morph_type", text="", emboss=False)
@@ -391,8 +369,8 @@ class MMDMorphMenu(Menu):
         layout.operator("mmd_tools_local.morph_overwrite_from_active_pose_library", icon="PRESET_NEW")
         layout.operator("mmd_tools_local.clean_duplicated_material_morphs", icon="TRASH")
         layout.separator()
-        layout.operator("mmd_tools_local.morph_move", icon=TRIA_UP_BAR, text="Move To Top").type = "TOP"
-        layout.operator("mmd_tools_local.morph_move", icon=TRIA_DOWN_BAR, text="Move To Bottom").type = "BOTTOM"
+        layout.operator("mmd_tools_local.morph_move", icon="TRIA_UP_BAR", text="Move To Top").type = "TOP"
+        layout.operator("mmd_tools_local.morph_move", icon="TRIA_DOWN_BAR", text="Move To Bottom").type = "BOTTOM"
 
 
 class MMDMorphToolsPanel(_PanelBase, Panel):
@@ -419,8 +397,8 @@ class MMDMorphToolsPanel(_PanelBase, Panel):
         row.template_list("mmd_tools_local_UL_Morphs", "", mmd_root, morph_type, mmd_root, "active_morph")
         tb = row.column()
         tb1 = tb.column(align=True)
-        tb1.operator("mmd_tools_local.morph_add", text="", icon=ICON_ADD)
-        tb1.operator("mmd_tools_local.morph_remove", text="", icon=ICON_REMOVE)
+        tb1.operator("mmd_tools_local.morph_add", text="", icon="ADD")
+        tb1.operator("mmd_tools_local.morph_remove", text="", icon="REMOVE")
         tb1.menu("OBJECT_MT_mmd_tools_local_morph_menu", text="", icon="DOWNARROW_HLT")
         tb.separator()
         tb1 = tb.column(align=True)
@@ -459,8 +437,8 @@ class MMDMorphToolsPanel(_PanelBase, Panel):
         )
         tb = row.column()
         tb1 = tb.column(align=True)
-        tb1.operator("mmd_tools_local.morph_offset_add", text="", icon=ICON_ADD)
-        tb1.operator("mmd_tools_local.morph_offset_remove", text="", icon=ICON_REMOVE)
+        tb1.operator("mmd_tools_local.morph_offset_add", text="", icon="ADD")
+        tb1.operator("mmd_tools_local.morph_offset_remove", text="", icon="REMOVE")
         tb.operator("mmd_tools_local.morph_offset_remove", text="", icon="X").all = True
         return ItemOp.get_by_index(morph.data, morph.active_data)
 
@@ -612,7 +590,7 @@ class MMDMorphToolsPanel(_PanelBase, Panel):
             return
 
         c = col.column(align=True)
-        row = _layout_split(c, factor=0.67, align=True)
+        row = c.split(factor=0.67, align=True)
         row.prop_search(item, "name", morph.id_data.mmd_root, item.morph_type, icon="SHAPEKEY_DATA", text="")
         row.prop(item, "morph_type", text="")
 
@@ -635,7 +613,7 @@ class UL_ObjectsMixIn(object):
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {"DEFAULT", "COMPACT"}:
-            row = _layout_split(layout, factor=0.5, align=True)
+            row = layout.split(factor=0.5, align=True)
             item_prop = getattr(item, self.prop_name)
             row.prop(item_prop, "name_j", text="", emboss=False, icon=self.icon)
             row = row.row(align=True)
@@ -711,8 +689,8 @@ class MMDRigidbodyMenu(Menu):
         layout.enabled = context.active_object.mmd_type == "RIGID_BODY"
         layout.menu("OBJECT_MT_mmd_tools_local_rigidbody_select_menu", text="Select Similar")
         layout.separator()
-        layout.operator("mmd_tools_local.object_move", icon=TRIA_UP_BAR, text="Move To Top").type = "TOP"
-        layout.operator("mmd_tools_local.object_move", icon=TRIA_DOWN_BAR, text="Move To Bottom").type = "BOTTOM"
+        layout.operator("mmd_tools_local.object_move", icon="TRIA_UP_BAR", text="Move To Top").type = "TOP"
+        layout.operator("mmd_tools_local.object_move", icon="TRIA_DOWN_BAR", text="Move To Bottom").type = "BOTTOM"
 
 
 class MMDRigidbodySelectorPanel(_PanelBase, Panel):
@@ -740,8 +718,8 @@ class MMDRigidbodySelectorPanel(_PanelBase, Panel):
         )
         tb = row.column()
         tb1 = tb.column(align=True)
-        tb1.operator("mmd_tools_local.rigid_body_add", text="", icon=ICON_ADD)
-        tb1.operator("mmd_tools_local.rigid_body_remove", text="", icon=ICON_REMOVE)
+        tb1.operator("mmd_tools_local.rigid_body_add", text="", icon="ADD")
+        tb1.operator("mmd_tools_local.rigid_body_remove", text="", icon="REMOVE")
         tb1.menu("OBJECT_MT_mmd_tools_local_rigidbody_menu", text="", icon="DOWNARROW_HLT")
         tb.separator()
         tb1 = tb.column(align=True)
@@ -772,8 +750,8 @@ class MMDJointMenu(Menu):
     def draw(self, context):
         layout = self.layout
         layout.enabled = context.active_object.mmd_type == "JOINT"
-        layout.operator("mmd_tools_local.object_move", icon=TRIA_UP_BAR, text="Move To Top").type = "TOP"
-        layout.operator("mmd_tools_local.object_move", icon=TRIA_DOWN_BAR, text="Move To Bottom").type = "BOTTOM"
+        layout.operator("mmd_tools_local.object_move", icon="TRIA_UP_BAR", text="Move To Top").type = "TOP"
+        layout.operator("mmd_tools_local.object_move", icon="TRIA_DOWN_BAR", text="Move To Bottom").type = "BOTTOM"
 
 
 class MMDJointSelectorPanel(_PanelBase, Panel):
@@ -802,8 +780,8 @@ class MMDJointSelectorPanel(_PanelBase, Panel):
         )
         tb = row.column()
         tb1 = tb.column(align=True)
-        tb1.operator("mmd_tools_local.joint_add", text="", icon=ICON_ADD)
-        tb1.operator("mmd_tools_local.joint_remove", text="", icon=ICON_REMOVE)
+        tb1.operator("mmd_tools_local.joint_add", text="", icon="ADD")
+        tb1.operator("mmd_tools_local.joint_remove", text="", icon="REMOVE")
         tb1.menu("OBJECT_MT_mmd_tools_local_joint_menu", text="", icon="DOWNARROW_HLT")
         tb.separator()
         tb1 = tb.column(align=True)

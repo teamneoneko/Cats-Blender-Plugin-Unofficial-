@@ -46,7 +46,7 @@ class _FnMaterialBI:
     @classmethod
     def clean_materials(cls, obj, can_remove):
         materials = obj.data.materials
-        materials_pop = (lambda index: materials.pop(index=index, update_data=True)) if bpy.app.version < (2, 81, 0) else materials.pop
+        materials_pop = materials.pop
         for i in sorted((x for x, m in enumerate(materials) if can_remove(m)), reverse=True):
             m = materials_pop(index=i)
             if m.users < 1:
@@ -811,12 +811,8 @@ class _FnMaterialCycles(_FnMaterialBI):
 
         node_vector = ng.new_node("ShaderNodeMapping", (2, -1))
         node_vector.vector_type = "POINT"
-        if bpy.app.version < (2, 81, 0):
-            node_vector.translation = (0.5, 0.5, 0.0)
-            node_vector.scale = (0.5, 0.5, 1.0)
-        else:
-            node_vector.inputs["Location"].default_value = (0.5, 0.5, 0.0)
-            node_vector.inputs["Scale"].default_value = (0.5, 0.5, 1.0)
+        node_vector.inputs["Location"].default_value = (0.5, 0.5, 0.0)
+        node_vector.inputs["Scale"].default_value = (0.5, 0.5, 1.0)
 
         links = ng.links
         links.new(tex_coord.outputs["Normal"], vec_trans.inputs["Vector"])
@@ -922,9 +918,6 @@ class _FnMaterialCycles(_FnMaterialBI):
 
 
 FnMaterial = _FnMaterialCycles
-if bpy.app.version < (2, 80, 0):
-    FnMaterial = _FnMaterialBI
-
 
 class MigrationFnMaterial:
     @staticmethod

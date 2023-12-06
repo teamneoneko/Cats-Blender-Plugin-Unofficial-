@@ -2,14 +2,9 @@
 # Copyright 2015 MMD Tools authors
 # This file is part of MMD Tools.
 
-import bpy
 from bpy.types import Panel
 
 from mmd_tools_local.core.material import FnMaterial
-
-ICON_FILE_FOLDER = "FILE_FOLDER"
-if bpy.app.version < (2, 80, 0):
-    ICON_FILE_FOLDER = "FILESEL"
 
 
 class MMDMaterialPanel(Panel):
@@ -104,7 +99,7 @@ class MMDTexturePanel(Panel):
                 r.operator("mmd_tools_local.material_remove_texture", text="Remove", icon="PANEL_CLOSE")
                 r.label(icon="ERROR")
         else:
-            r.operator("mmd_tools_local.material_open_texture", text="Add", icon=ICON_FILE_FOLDER)
+            r.operator("mmd_tools_local.material_open_texture", text="Add", icon="FILE_FOLDER")
 
         col = layout.column()
         col.label(text="Sphere Texture:")
@@ -118,7 +113,7 @@ class MMDTexturePanel(Panel):
                 r.operator("mmd_tools_local.material_remove_sphere_texture", text="Remove", icon="PANEL_CLOSE")
                 r.label(icon="ERROR")
         else:
-            r.operator("mmd_tools_local.material_open_sphere_texture", text="Add", icon=ICON_FILE_FOLDER)
+            r.operator("mmd_tools_local.material_open_sphere_texture", text="Add", icon="FILE_FOLDER")
         col.row(align=True).prop(mmd_material, "sphere_texture_type", expand=True)
 
         col = layout.column()

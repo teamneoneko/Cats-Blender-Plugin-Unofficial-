@@ -7,11 +7,7 @@ from bpy.types import Panel, UIList
 
 from mmd_tools_local.bpyutils import SceneOp
 from mmd_tools_local.core.model import FnModel, Model
-from mmd_tools_local.panels.tool import TRIA_DOWN_BAR, TRIA_UP_BAR, _layout_split, _PanelBase
-
-ICON_APPEND_MOVE, ICON_APPEND_ROT, ICON_APPEND_MOVE_ROT = "IPO_LINEAR", "IPO_EXPO", "IPO_QUAD"
-if bpy.app.version < (2, 71, 0):
-    ICON_APPEND_MOVE, ICON_APPEND_ROT, ICON_APPEND_MOVE_ROT = "NDOF_TRANS", "NDOF_TURN", "FORCE_MAGNETIC"
+from mmd_tools_local.panels.tool import _PanelBase
 
 
 class mmd_tools_local_UL_Materials(UIList):
@@ -111,10 +107,10 @@ class MMDMeshSorter(_PanelBase, Panel):
         tb = row.column()
         tb1 = tb.column(align=True)
         tb1.enabled = active_obj.type == "MESH" and active_obj.mmd_type == "NONE"
-        tb1.operator("mmd_tools_local.object_move", text="", icon=TRIA_UP_BAR).type = "TOP"
+        tb1.operator("mmd_tools_local.object_move", text="", icon="TRIA_UP_BAR").type = "TOP"
         tb1.operator("mmd_tools_local.object_move", text="", icon="TRIA_UP").type = "UP"
         tb1.operator("mmd_tools_local.object_move", text="", icon="TRIA_DOWN").type = "DOWN"
-        tb1.operator("mmd_tools_local.object_move", text="", icon=TRIA_DOWN_BAR).type = "BOTTOM"
+        tb1.operator("mmd_tools_local.object_move", text="", icon="TRIA_DOWN_BAR").type = "BOTTOM"
 
 
 class _DummyVertexGroup:
@@ -216,14 +212,14 @@ class mmd_tools_local_UL_ModelBones(UIList):
             r.alignment = "RIGHT"
             r.label(text=str(index))
         else:
-            row = _layout_split(layout, factor=0.45, align=False)
+            row = layout.split(factor=0.45, align=False)
             r0 = row.row()
             r0.label(text=bone_name, translate=False, icon="POSE_HLT" if bone_name in cls._IK_BONES else "BONE_DATA")
             r = r0.row()
             r.alignment = "RIGHT"
             r.label(text=str(index))
 
-            row_sub = _layout_split(row, factor=0.67, align=False)
+            row_sub = row.split(factor=0.67, align=False)
 
             mmd_bone = bone.mmd_bone
             count = len(pose_bones)
@@ -249,7 +245,7 @@ class mmd_tools_local_UL_ModelBones(UIList):
                     if append_bone:
                         r.label(text=str(idx), icon="ERROR")
                 else:
-                    r.label(text=str(idx), icon=ICON_APPEND_MOVE_ROT if mmd_bone.has_additional_location else ICON_APPEND_ROT)
+                    r.label(text=str(idx), icon="IPO_QUAD" if mmd_bone.has_additional_location else "IPO_EXPO")
             elif mmd_bone.has_additional_location:
                 append_bone = mmd_bone.additional_transform_bone
                 idx = vertex_groups.get(append_bone, _DummyVertexGroup).index
@@ -257,7 +253,7 @@ class mmd_tools_local_UL_ModelBones(UIList):
                     if append_bone:
                         r.label(text=str(idx), icon="ERROR")
                 else:
-                    r.label(text=str(idx), icon=ICON_APPEND_MOVE)
+                    r.label(text=str(idx), icon="IPO_LINEAR")
 
             for idx, b in sorted(((vertex_groups.get(b, _DummyVertexGroup).index, b) for b in cls._IK_MAP.get(hash(bone), ())), key=lambda i: i[0] or 0):
                 ik_bone = pose_bones[b]

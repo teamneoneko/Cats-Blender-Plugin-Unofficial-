@@ -440,8 +440,6 @@ class ViewBoneMorph(Operator):
     bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
     def execute(self, context):
-        from mmd_tools_local.bpyutils import matmul
-
         obj = context.active_object
         root = mmd_model.Model.findRoot(obj)
         mmd_root = root.mmd_root
@@ -453,7 +451,7 @@ class ViewBoneMorph(Operator):
             p_bone = armature.pose.bones.get(morph_data.bone, None)
             if p_bone:
                 p_bone.bone.select = True
-                mtx = matmul(p_bone.matrix_basis.to_3x3(), Quaternion(*morph_data.rotation.to_axis_angle()).to_matrix()).to_4x4()
+                mtx = (p_bone.matrix_basis.to_3x3() @ Quaternion(*morph_data.rotation.to_axis_angle()).to_matrix()).to_4x4()
                 mtx.translation = p_bone.location + morph_data.location
                 p_bone.matrix_basis = mtx
         return {"FINISHED"}

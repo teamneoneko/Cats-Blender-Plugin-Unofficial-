@@ -332,14 +332,6 @@ class FnBone:
         return False
 
     @staticmethod
-    def patch_rna_idprop(pose_bones):
-        if bpy.app.version < (2, 81, 0):  # workaround for Rigify conflicts (fixed in Blender 2.81)
-            from rna_prop_ui import rna_idprop_ui_get
-
-            for b in pose_bones:
-                rna_idprop_ui_get(b, create=True)
-
-    @staticmethod
     def clean_additional_transformation(armature):
         # clean constraints
         for p_bone in armature.pose.bones:
@@ -364,7 +356,6 @@ class FnBone:
         if len(shadow_bone_names) > 0:
             with bpyutils.edit_object(armature) as data:
                 remove_edit_bones(data.edit_bones, shadow_bone_names)
-        FnBone.patch_rna_idprop(armature.pose.bones)
 
     @staticmethod
     def apply_additional_transformation(armature_object: bpy.types.Object):
@@ -398,7 +389,6 @@ class FnBone:
         # finish
         for p_bone in dirty_bones:
             p_bone.mmd_bone.is_additional_transform_dirty = False
-        FnBone.patch_rna_idprop(armature_object.pose.bones)
 
     @staticmethod
     def __setup_constraints(p_bone):

@@ -115,8 +115,7 @@ def __patch(properties):  # temporary patching, should be removed in the future
     )
 
 
-if bpy.app.version >= (2, 80, 0):
-    __patch(__properties)
+__patch(__properties)
 
 
 def register():

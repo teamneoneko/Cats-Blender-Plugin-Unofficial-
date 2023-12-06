@@ -7,8 +7,6 @@ import re
 from bpy.types import Operator
 from mathutils import Matrix
 
-from mmd_tools_local.bpyutils import matmul
-
 
 class _SetShadingBase:
     bl_options = {"REGISTER", "UNDO"}
@@ -125,7 +123,7 @@ class FlipPose(Operator):
 
     @staticmethod
     def __matrix_compose(loc, rot, scale):
-        return matmul(matmul(Matrix.Translation(loc), rot.to_matrix().to_4x4()), Matrix([(scale[0], 0, 0, 0), (0, scale[1], 0, 0), (0, 0, scale[2], 0), (0, 0, 0, 1)]))
+        return (Matrix.Translation(loc) @ rot.to_matrix().to_4x4()) @ Matrix([(scale[0], 0, 0, 0), (0, scale[1], 0, 0), (0, 0, scale[2], 0), (0, 0, 0, 1)])
 
     @classmethod
     def __flip_pose(cls, matrix_basis, bone_src, bone_dest):
@@ -134,9 +132,9 @@ class FlipPose(Operator):
         m = bone_dest.bone.matrix_local.to_3x3().transposed()
         mi = bone_src.bone.matrix_local.to_3x3().transposed().inverted() if bone_src != bone_dest else m.inverted()
         loc, rot, scale = matrix_basis.decompose()
-        loc = cls.__cmul(matmul(mi, loc), (-1, 1, 1))
-        rot = cls.__cmul(Quaternion(matmul(mi, rot.axis), rot.angle).normalized(), (1, 1, -1, -1))
-        bone_dest.matrix_basis = cls.__matrix_compose(matmul(m, loc), Quaternion(matmul(m, rot.axis), rot.angle).normalized(), scale)
+        loc = cls.__cmul(mi @ loc, (-1, 1, 1))
+        rot = cls.__cmul(Quaternion(mi @ rot.axis, rot.angle).normalized(), (1, 1, -1, -1))
+        bone_dest.matrix_basis = cls.__matrix_compose(m @ loc, Quaternion(m @ rot.axis, rot.angle).normalized(), scale)
 
     @classmethod
     def poll(cls, context):
