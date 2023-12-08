@@ -128,7 +128,7 @@ class CombineMaterialsButton(bpy.types.Operator):
             return False
         return len(Common.get_meshes_objects(check=False)) > 0
 
-    def assignmatslots(self, ob, matlist):
+    def assign_material_slots(self, ob, matlist):
         scn = bpy.context.scene
         ob_active = Common.get_active()
         Common.set_active(ob)
@@ -144,7 +144,7 @@ class CombineMaterialsButton(bpy.types.Operator):
 
         Common.set_active(ob_active)
 
-    def cleanmatslots(self):
+    def clean_material_slots(self):
         objs = bpy.context.selected_editable_objects
 
         for ob in objs:
@@ -210,8 +210,23 @@ class CombineMaterialsButton(bpy.types.Operator):
                     self.combined_tex[hash_this] = []
                 self.combined_tex[hash_this].append({'mat': mat_slot.name, 'index': index})
 
+    def get_image_textures(self, material_name):
+        textures = []
+        for node in bpy.data.materials[material_name].node_tree.nodes:
+            if node.type == 'TEX_IMAGE':
+                textures.append(node)
+        return textures
+
+    def copy_textures(self, image_textures, target_material):
+        for texture in image_textures:
+            new_texture_node = target_material.node_tree.nodes.new(type='ShaderNodeTexImage')
+            new_texture_node.image = texture.image
+
+    def combine_materials(self, file):
+        target_material = bpy.data.materials.new(name="CombinedMaterial")
+        return target_material
+
     def execute(self, context):
-        print('COMBINE MATERIALS!')
         saved_data = Common.SavedData()
 
         Common.set_default_stage()
@@ -224,42 +239,18 @@ class CombineMaterialsButton(bpy.types.Operator):
             Common.unselect_all()
             Common.set_active(mesh)
 
-            def combine_materials(file):
+            for file in self.combined_tex:
                 combined_textures = self.combined_tex[file]
+                target_material = self.combine_materials(file)
 
                 if len(combined_textures) <= 1:
-                    return
+                    continue
 
-                target_mat = bpy.data.materials.new(name="CombinedMaterial")
+                image_textures = self.get_image_textures(combined_textures[0]['mat'])
+                self.copy_textures(image_textures, target_material)
 
-                for mat in combined_textures:
-                    imgs = self.get_image_textures(mat['mat'])
-                    self.copy_textures(imgs, target_mat)
-
-                target_mat.use_nodes = True
-                target_mat.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = [1, 1, 1, 1]
-
-                return target_mat
-
-            def get_image_textures(mat):
-                textures = []
-                # Code to loop through nodes and get image textures
-                return textures
-
-            def copy_textures(imgs, target_mat):
-                # Code to copy image textures to target material
-
-                for file in self.combined_tex:
-
-                    combined_textures = self.combined_tex[file]
-                    target_mat = combine_materials(file)
-
-                    if len(combined_textures) <= 1:
-                        continue
-                    i += len(combined_textures)
-
-                if target_mat.name not in mesh.data.materials:
-                    mesh.data.materials.append(target_mat)
+                if target_material.name not in mesh.data.materials:
+                    mesh.data.materials.append(target_material)
 
                 Common.switch('EDIT')
                 bpy.ops.mesh.select_all(action='DESELECT')
@@ -276,7 +267,7 @@ class CombineMaterialsButton(bpy.types.Operator):
                 Common.unselect_all()
                 Common.set_active(mesh)
                 Common.switch('OBJECT')
-                self.cleanmatslots()
+                self.clean_material_slots()
                 Common.clean_material_names(mesh)
 
         Common.update_material_list()
