@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+# Copyright 2014 MMD Tools authors
+# This file is part of MMD Tools.
 
 import bpy
+
 from mmd_tools_local import utils
 from mmd_tools_local.core import material
 from mmd_tools_local.core.material import FnMaterial
@@ -64,11 +67,11 @@ def _updateEdgeWeight(prop, context):
 
 
 def _getNameJ(prop):
-    return prop.get('name_j', '')
+    return prop.get("name_j", "")
 
 
 def _setNameJ(prop, value):
-    old_value = prop.get('name_j')
+    old_value = prop.get("name_j")
     prop_value = value
     if prop_value and prop_value != old_value:
         root = Model.findRoot(bpy.context.active_object)
@@ -78,7 +81,8 @@ def _setNameJ(prop, value):
         else:
             prop_value = utils.uniqueName(value, [mat.mmd_material.name_j for mat in bpy.data.materials])
 
-    prop['name_j'] = prop_value
+    prop["name_j"] = prop_value
+
 
 # ===========================================
 # Property classes
@@ -86,33 +90,33 @@ def _setNameJ(prop, value):
 
 
 class MMDMaterial(bpy.types.PropertyGroup):
-    """ マテリアル
-    """
+    """マテリアル"""
+
     name_j: bpy.props.StringProperty(
-        name='Name',
-        description='Japanese Name',
-        default='',
+        name="Name",
+        description="Japanese Name",
+        default="",
         set=_setNameJ,
         get=_getNameJ,
     )
 
     name_e: bpy.props.StringProperty(
-        name='Name(Eng)',
-        description='English Name',
-        default='',
+        name="Name(Eng)",
+        description="English Name",
+        default="",
     )
 
     material_id: bpy.props.IntProperty(
-        name='Material ID',
-        description='Unique ID for the reference of material morph',
+        name="Material ID",
+        description="Unique ID for the reference of material morph",
         default=-1,
         min=-1,
     )
 
     ambient_color: bpy.props.FloatVectorProperty(
-        name='Ambient Color',
-        description='Ambient color',
-        subtype='COLOR',
+        name="Ambient Color",
+        description="Ambient color",
+        subtype="COLOR",
         size=3,
         min=0,
         max=1,
@@ -123,9 +127,9 @@ class MMDMaterial(bpy.types.PropertyGroup):
     )
 
     diffuse_color: bpy.props.FloatVectorProperty(
-        name='Diffuse Color',
-        description='Diffuse color',
-        subtype='COLOR',
+        name="Diffuse Color",
+        description="Diffuse color",
+        subtype="COLOR",
         size=3,
         min=0,
         max=1,
@@ -136,8 +140,8 @@ class MMDMaterial(bpy.types.PropertyGroup):
     )
 
     alpha: bpy.props.FloatProperty(
-        name='Alpha',
-        description='Alpha transparency',
+        name="Alpha",
+        description="Alpha transparency",
         min=0,
         max=1,
         precision=3,
@@ -147,9 +151,9 @@ class MMDMaterial(bpy.types.PropertyGroup):
     )
 
     specular_color: bpy.props.FloatVectorProperty(
-        name='Specular Color',
-        description='Specular color',
-        subtype='COLOR',
+        name="Specular Color",
+        description="Specular color",
+        subtype="COLOR",
         size=3,
         min=0,
         max=1,
@@ -160,8 +164,8 @@ class MMDMaterial(bpy.types.PropertyGroup):
     )
 
     shininess: bpy.props.FloatProperty(
-        name='Reflect',
-        description='Sharpness of reflected highlights',
+        name="Reflect",
+        description="Sharpness of reflected highlights",
         min=0,
         soft_max=512,
         step=100.0,
@@ -170,44 +174,44 @@ class MMDMaterial(bpy.types.PropertyGroup):
     )
 
     is_double_sided: bpy.props.BoolProperty(
-        name='Double Sided',
-        description='Both sides of mesh should be rendered',
+        name="Double Sided",
+        description="Both sides of mesh should be rendered",
         default=False,
         update=_updateIsDoubleSided,
     )
 
     enabled_drop_shadow: bpy.props.BoolProperty(
-        name='Ground Shadow',
-        description='Display ground shadow',
+        name="Ground Shadow",
+        description="Display ground shadow",
         default=True,
         update=_updateDropShadow,
     )
 
     enabled_self_shadow_map: bpy.props.BoolProperty(
-        name='Self Shadow Map',
-        description='Object can become shadowed by other objects',
+        name="Self Shadow Map",
+        description="Object can become shadowed by other objects",
         default=True,
         update=_updateSelfShadowMap,
     )
 
     enabled_self_shadow: bpy.props.BoolProperty(
-        name='Self Shadow',
-        description='Object can cast shadows',
+        name="Self Shadow",
+        description="Object can cast shadows",
         default=True,
         update=_updateSelfShadow,
     )
 
     enabled_toon_edge: bpy.props.BoolProperty(
-        name='Toon Edge',
-        description='Use toon edge',
+        name="Toon Edge",
+        description="Use toon edge",
         default=False,
         update=_updateEnabledToonEdge,
     )
 
     edge_color: bpy.props.FloatVectorProperty(
-        name='Edge Color',
-        description='Toon edge color',
-        subtype='COLOR',
+        name="Edge Color",
+        description="Toon edge color",
+        subtype="COLOR",
         size=4,
         min=0,
         max=1,
@@ -218,8 +222,8 @@ class MMDMaterial(bpy.types.PropertyGroup):
     )
 
     edge_weight: bpy.props.FloatProperty(
-        name='Edge Weight',
-        description='Toon edge size',
+        name="Edge Weight",
+        description="Toon edge size",
         min=0,
         max=100,
         soft_max=2,
@@ -229,35 +233,35 @@ class MMDMaterial(bpy.types.PropertyGroup):
     )
 
     sphere_texture_type: bpy.props.EnumProperty(
-        name='Sphere Map Type',
-        description='Choose sphere texture blend type',
+        name="Sphere Map Type",
+        description="Choose sphere texture blend type",
         items=[
-            (str(material.SPHERE_MODE_OFF),    'Off',        '', 1),
-            (str(material.SPHERE_MODE_MULT),   'Multiply',   '', 2),
-            (str(material.SPHERE_MODE_ADD),    'Add',        '', 3),
-            (str(material.SPHERE_MODE_SUBTEX), 'SubTexture', '', 4),
+            (str(material.SPHERE_MODE_OFF), "Off", "", 1),
+            (str(material.SPHERE_MODE_MULT), "Multiply", "", 2),
+            (str(material.SPHERE_MODE_ADD), "Add", "", 3),
+            (str(material.SPHERE_MODE_SUBTEX), "SubTexture", "", 4),
         ],
         update=_updateSphereMapType,
     )
 
     is_shared_toon_texture: bpy.props.BoolProperty(
-        name='Use Shared Toon Texture',
-        description='Use shared toon texture or custom toon texture',
+        name="Use Shared Toon Texture",
+        description="Use shared toon texture or custom toon texture",
         default=False,
         update=_updateToonTexture,
     )
 
     toon_texture: bpy.props.StringProperty(
-        name='Toon Texture',
-        subtype='FILE_PATH',
-        description='The file path of custom toon texture',
-        default='',
+        name="Toon Texture",
+        subtype="FILE_PATH",
+        description="The file path of custom toon texture",
+        default="",
         update=_updateToonTexture,
     )
 
     shared_toon_texture: bpy.props.IntProperty(
-        name='Shared Toon Texture',
-        description='Shared toon texture id (toon01.bmp ~ toon10.bmp)',
+        name="Shared Toon Texture",
+        description="Shared toon texture id (toon01.bmp ~ toon10.bmp)",
         default=0,
         min=0,
         max=9,
@@ -265,8 +269,8 @@ class MMDMaterial(bpy.types.PropertyGroup):
     )
 
     comment: bpy.props.StringProperty(
-        name='Comment',
-        description='Comment',
+        name="Comment",
+        description="Comment",
     )
 
     def is_id_unique(self):
