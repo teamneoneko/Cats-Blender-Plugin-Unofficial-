@@ -78,8 +78,6 @@ class DynamicPatronButton(bpy.types.Operator):
             webbrowser.open(self.website)
         return {'FINISHED'}
 
-idname = idname.replace('ä', 'ae').replace("ö", 'oe').replace('ü', 'ue').replace('ß', 'ss')
-
 def register_dynamic_buttons():
     if not supporter_data:
         return
