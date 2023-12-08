@@ -5,9 +5,9 @@
 # Module for custom exceptions
 
 
-class MaterialNotFoundError(Exception):
-    pass
+class MaterialNotFoundError(KeyError):
+    """Exception raised when a material is not found in the scene"""
 
-
-class DivisionError(Exception):
-    pass
+    def __init__(self, *args: object) -> None:
+        """Constructor for MaterialNotFoundError"""
+        super().__init__(*args)

@@ -6,7 +6,7 @@ import bpy
 
 from mmd_tools_local import bpyutils
 from mmd_tools_local.core import rigid_body
-from mmd_tools_local.core.model import FnModel, getRigidBodySize
+from mmd_tools_local.core.model import FnModel
 
 
 def _updateCollisionGroup(prop, context):
@@ -74,7 +74,7 @@ def _set_bone(prop, value):
 def _get_size(prop):
     if prop.id_data.mmd_type != "RIGID_BODY":
         return (0, 0, 0)
-    return getRigidBodySize(prop.id_data)
+    return FnModel.get_rigid_body_size(prop.id_data)
 
 
 def _set_size(prop, value):
@@ -122,7 +122,7 @@ def _set_size(prop, value):
                 z0 = -z if z0 < 0 else z
                 v.co = [x0, y0, z0]
         elif shape == "CAPSULE":
-            r0, h0, xx = getRigidBodySize(prop.id_data)
+            r0, h0, xx = FnModel.get_rigid_body_size(prop.id_data)
             h0 *= 0.5
             radius = max(value[0], 1e-3)
             height = max(value[1], 1e-3) * 0.5

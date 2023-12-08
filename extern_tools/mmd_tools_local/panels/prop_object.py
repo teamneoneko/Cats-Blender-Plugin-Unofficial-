@@ -4,28 +4,25 @@
 
 import bpy
 
-import mmd_tools_local.core.model as mmd_model
+from mmd_tools_local.core.model import FnModel
 
 
-class _PanelBase(object):
+class MMDModelObjectPanel(bpy.types.Panel):
     bl_space_type = "PROPERTIES"
     bl_region_type = "WINDOW"
     bl_context = "object"
-
-
-class MMDModelObjectPanel(_PanelBase, bpy.types.Panel):
     bl_idname = "OBJECT_PT_mmd_tools_local_root_object"
     bl_label = "MMD Model Information"
 
     @classmethod
     def poll(cls, context):
-        return mmd_model.FnModel.find_root(context.active_object)
+        return FnModel.find_root(context.active_object)
 
     def draw(self, context):
         layout = self.layout
         obj = context.active_object
 
-        root = mmd_model.FnModel.find_root(obj)
+        root = FnModel.find_root(obj)
 
         c = layout.column()
         c.prop(root.mmd_root, "name")

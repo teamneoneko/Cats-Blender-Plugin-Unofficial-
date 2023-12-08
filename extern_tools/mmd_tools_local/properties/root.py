@@ -176,7 +176,7 @@ def _getVisibilityOfMMDRigArmature(prop):
 
 def _setActiveRigidbodyObject(prop, v):
     obj = SceneOp(bpy.context).id_objects[v]
-    if mmd_model.isRigidBodyObject(obj):
+    if mmd_model.FnModel.is_rigid_body_object(obj):
         utils.selectAObject(obj)
     prop["active_rigidbody_object_index"] = v
 
@@ -184,14 +184,14 @@ def _setActiveRigidbodyObject(prop, v):
 def _getActiveRigidbodyObject(prop):
     scene = SceneOp(bpy.context)
     active_obj = scene.active_object
-    if mmd_model.isRigidBodyObject(active_obj):
+    if mmd_model.FnModel.is_rigid_body_object(active_obj):
         prop["active_rigidbody_object_index"] = scene.id_objects.find(active_obj.name)
     return prop.get("active_rigidbody_object_index", 0)
 
 
 def _setActiveJointObject(prop, v):
     obj = SceneOp(bpy.context).id_objects[v]
-    if mmd_model.isJointObject(obj):
+    if mmd_model.FnModel.is_joint_object(obj):
         utils.selectAObject(obj)
     prop["active_joint_object_index"] = v
 
@@ -199,7 +199,7 @@ def _setActiveJointObject(prop, v):
 def _getActiveJointObject(prop):
     scene = SceneOp(bpy.context)
     active_obj = scene.active_object
-    if mmd_model.isJointObject(active_obj):
+    if mmd_model.FnModel.is_joint_object(active_obj):
         prop["active_joint_object_index"] = scene.id_objects.find(active_obj.name)
     return prop.get("active_joint_object_index", 0)
 

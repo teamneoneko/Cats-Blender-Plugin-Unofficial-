@@ -472,26 +472,6 @@ class MigrationFnModel:
             root_object["mmd_tools_local_version"] = "2.8.0"
 
 
-# SUPPORT_UNTIL: 4.3 LTS
-def isRigidBodyObject(obj):
-    return FnModel.is_rigid_body_object(obj)
-
-
-# SUPPORT_UNTIL: 4.3 LTS
-def isJointObject(obj):
-    return FnModel.is_joint_object(obj)
-
-
-# SUPPORT_UNTIL: 4.3 LTS
-def isTemporaryObject(obj):
-    return FnModel.is_temporary_object(obj)
-
-
-# SUPPORT_UNTIL: 4.3 LTS
-def getRigidBodySize(obj):
-    return FnModel.get_rigid_body_size(obj)
-
-
 class Model:
     def __init__(self, root_obj):
         if root_obj.mmd_type != "ROOT":

@@ -10,7 +10,8 @@ from mmd_tools_local import bpyutils, operators
 from mmd_tools_local.bpyutils import SceneOp
 from mmd_tools_local.utils import ItemOp
 
-class _PanelBase(object):
+
+class _PanelBase:
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "MMD"
@@ -595,7 +596,7 @@ class MMDMorphToolsPanel(_PanelBase, Panel):
         row.prop(item, "morph_type", text="")
 
 
-class UL_ObjectsMixIn(object):
+class UL_ObjectsMixIn:
     model_filter: bpy.props.EnumProperty(
         name="Model Filter",
         description="Show items of active model or all models",

@@ -363,7 +363,7 @@ class ConvertToMMDModel(Operator):
 
         FnMaterial.set_nodes_are_readonly(not self.convert_material_nodes)
         try:
-            for m in {x for mesh in meshes for x in mesh.data.materials if x}:
+            for m in (x for mesh in meshes for x in mesh.data.materials if x):
                 FnMaterial.convert_to_mmd_material(m, context)
                 mmd_material = m.mmd_material
                 if self.ambient_color_source == "MIRROR" and hasattr(m, "mirror_color"):

@@ -94,7 +94,7 @@ class ConvertMaterials(Operator):
         return {"FINISHED"}
 
 
-class _OpenTextureBase(object):
+class _OpenTextureBase:
     """Create a texture for mmd model material."""
 
     bl_options = {"REGISTER", "UNDO", "INTERNAL"}

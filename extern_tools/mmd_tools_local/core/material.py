@@ -4,7 +4,7 @@
 
 import logging
 import os
-from typing import Optional
+from typing import Optional, Tuple
 
 import bpy
 
@@ -18,23 +18,30 @@ SPHERE_MODE_ADD = 2
 SPHERE_MODE_SUBTEX = 3
 
 
-# SUPPORT_UNTIL: 3.3LTS
-class _FnMaterialBI:
-    __BASE_TEX_SLOT = 0
-    __TOON_TEX_SLOT = 1
-    __SPHERE_TEX_SLOT = 2
-    __SPHERE_ALPHA_SLOT = 5
+class _DummyTexture:
+    def __init__(self, image):
+        self.type = "IMAGE"
+        self.image = image
+        self.use_mipmap = True
 
+
+class _DummyTextureSlot:
+    def __init__(self, image):
+        self.diffuse_color_factor = 1
+        self.uv_layer = ""
+        self.texture = _DummyTexture(image)
+
+
+class FnMaterial:
     __NODES_ARE_READONLY = False
 
     def __init__(self, material=None):
         self.__material = material
-        self._nodes_are_readonly = _FnMaterialBI.__NODES_ARE_READONLY
+        self._nodes_are_readonly = FnMaterial.__NODES_ARE_READONLY
 
-    # SUPPORT_UNTIL: 3.3LTS
-    @classmethod
-    def set_nodes_are_readonly(cls, nodes_are_readonly):
-        _FnMaterialBI.__NODES_ARE_READONLY = nodes_are_readonly
+    @staticmethod
+    def set_nodes_are_readonly(nodes_are_readonly):
+        FnMaterial.__NODES_ARE_READONLY = nodes_are_readonly
 
     @classmethod
     def from_material_id(cls, material_id):
@@ -43,8 +50,8 @@ class _FnMaterialBI:
                 return cls(material)
         return None
 
-    @classmethod
-    def clean_materials(cls, obj, can_remove):
+    @staticmethod
+    def clean_materials(obj, can_remove):
         materials = obj.data.materials
         materials_pop = materials.pop
         for i in sorted((x for x, m in enumerate(materials) if can_remove(m)), reverse=True):
@@ -52,40 +59,53 @@ class _FnMaterialBI:
             if m.users < 1:
                 bpy.data.materials.remove(m)
 
-    @classmethod
-    def swap_materials(cls, meshObj, mat1_ref, mat2_ref, reverse=False, swap_slots=False):
+    @staticmethod
+    def swap_materials(mesh_object: bpy.types.Object, mat1_ref: str | int, mat2_ref: str | int, reverse=False, swap_slots=False) -> Tuple[bpy.types.Material, bpy.types.Material]:
         """
         This method will assign the polygons of mat1 to mat2.
         If reverse is True it will also swap the polygons assigned to mat2 to mat1.
         The reference to materials can be indexes or names
         Finally it will also swap the material slots if the option is given.
+
+        Args:
+            mesh_object (bpy.types.Object): The mesh object
+            mat1_ref (str | int): The reference to the first material
+            mat2_ref (str | int): The reference to the second material
+            reverse (bool, optional): If true it will also swap the polygons assigned to mat2 to mat1. Defaults to False.
+            swap_slots (bool, optional): If true it will also swap the material slots. Defaults to False.
+
+        Retruns:
+            Tuple[bpy.types.Material, bpy.types.Material]: The swapped materials
+
+        Raises:
+            MaterialNotFoundError: If one of the materials is not found
         """
+        mesh: bpy.types.Mesh = mesh_object.data
         try:
             # Try to find the materials
-            mat1 = meshObj.data.materials[mat1_ref]
-            mat2 = meshObj.data.materials[mat2_ref]
+            mat1 = mesh.materials[mat1_ref]
+            mat2 = mesh.materials[mat2_ref]
             if None in (mat1, mat2):
                 raise MaterialNotFoundError()
-        except (KeyError, IndexError):
+        except (KeyError, IndexError) as exc:
             # Wrap exceptions within our custom ones
-            raise MaterialNotFoundError()
-        mat1_idx = meshObj.data.materials.find(mat1.name)
-        mat2_idx = meshObj.data.materials.find(mat2.name)
-        if 1:  # with select_object(meshObj):
-            # Swap polygons
-            for poly in meshObj.data.polygons:
-                if poly.material_index == mat1_idx:
-                    poly.material_index = mat2_idx
-                elif reverse and poly.material_index == mat2_idx:
-                    poly.material_index = mat1_idx
-            # Swap slots if specified
-            if swap_slots:
-                meshObj.material_slots[mat1_idx].material = mat2
-                meshObj.material_slots[mat2_idx].material = mat1
+            raise MaterialNotFoundError() from exc
+        mat1_idx = mesh.materials.find(mat1.name)
+        mat2_idx = mesh.materials.find(mat2.name)
+        # Swap polygons
+        for poly in mesh.polygons:
+            if poly.material_index == mat1_idx:
+                poly.material_index = mat2_idx
+            elif reverse and poly.material_index == mat2_idx:
+                poly.material_index = mat1_idx
+        # Swap slots if specified
+        if swap_slots:
+            mesh_object.material_slots[mat1_idx].material = mat2
+            mesh_object.material_slots[mat2_idx].material = mat1
         return mat1, mat2
 
-    @classmethod
-    def fixMaterialOrder(cls, meshObj, material_names):
+    @staticmethod
+    def fixMaterialOrder(meshObj, material_names):
         """
         This method will fix the material order. Which is lost after joining meshes.
         """
@@ -94,7 +114,7 @@ class _FnMaterialBI:
             other_mat = meshObj.data.materials[new_idx]
             if other_mat.name == mat:
                 continue  # This is already in place
-            cls.swap_materials(meshObj, mat, new_idx, reverse=True, swap_slots=True)
+            FnMaterial.swap_materials(meshObj, mat, new_idx, reverse=True, swap_slots=True)
 
     @property
     def material_id(self):
@@ -112,9 +132,11 @@ class _FnMaterialBI:
 
     def __same_image_file(self, image, filepath):
         if image and image.source == "FILE":
+            # pylint: disable=assignment-from-no-return
             img_filepath = bpy.path.abspath(image.filepath)  # image.filepath_from_user()
             if img_filepath == filepath:
                 return True
+            # pylint: disable=bare-except
             try:
                 return os.path.samefile(img_filepath, filepath)
             except:
@@ -124,6 +146,7 @@ class _FnMaterialBI:
     def _load_image(self, filepath):
         img = next((i for i in bpy.data.images if self.__same_image_file(i, filepath)), None)
         if img is None:
+            # pylint: disable=bare-except
             try:
                 img = bpy.data.images.load(filepath)
             except:
@@ -138,165 +161,6 @@ class _FnMaterialBI:
                 img.alpha_mode = "NONE"
         return img
 
-    def __load_texture(self, filepath):
-        tex = next((t for t in bpy.data.textures if t.type == "IMAGE" and self.__same_image_file(t.image, filepath)), None)
-        if tex is None:
-            tex = bpy.data.textures.new(name=bpy.path.display_name_from_filepath(filepath), type="IMAGE")
-            tex.image = self._load_image(filepath)
-            tex.use_alpha = tex.image.use_alpha
-        return tex
-
-    def __has_alpha_channel(self, texture):
-        return texture.type == "IMAGE" and getattr(texture.image, "use_alpha", False)
-
-    def get_texture(self):
-        return self.__get_texture(self.__BASE_TEX_SLOT)
-
-    def __get_texture(self, index):
-        texture_slot = self.__material.texture_slots[index]
-        return texture_slot.texture if texture_slot else None
-
-    def __use_texture(self, index, use_tex):
-        texture_slot = self.__material.texture_slots[index]
-        if texture_slot:
-            texture_slot.use = use_tex
-
-    def create_texture(self, filepath):
-        """create a texture slot for textures of MMD models.
-
-        Args:
-            material: the material object to add a texture_slot
-            filepath: the file path to texture.
-
-        Returns:
-            bpy.types.MaterialTextureSlot object
-        """
-        texture_slot = self.__material.texture_slots.create(self.__BASE_TEX_SLOT)
-        texture_slot.texture_coords = "UV"
-        texture_slot.blend_type = "MULTIPLY"
-        texture_slot.texture = self.__load_texture(filepath)
-        texture_slot.use_map_alpha = self.__has_alpha_channel(texture_slot.texture)
-        return texture_slot
-
-    def remove_texture(self):
-        if self._nodes_are_readonly:
-            return
-        self.__remove_texture(self.__BASE_TEX_SLOT)
-
-    def __remove_texture(self, index):
-        texture_slot = self.__material.texture_slots[index]
-        if texture_slot:
-            tex = texture_slot.texture
-            self.__material.texture_slots.clear(index)
-            # logging.debug('clear texture: %s  users: %d', tex.name, tex.users)
-            if tex and tex.users < 1 and tex.type == "IMAGE":
-                # logging.debug(' - remove texture: %s', tex.name)
-                img = tex.image
-                tex.image = None
-                bpy.data.textures.remove(tex)
-                if img and img.users < 1:
-                    # logging.debug('    - remove image: %s', img.name)
-                    bpy.data.images.remove(img)
-
-    def get_sphere_texture(self):
-        return self.__get_texture(self.__SPHERE_TEX_SLOT)
-
-    def use_sphere_texture(self, use_sphere, obj=None):
-        if self._nodes_are_readonly:
-            return
-        if use_sphere:
-            self.update_sphere_texture_type(obj)
-        else:
-            self.__use_texture(self.__SPHERE_TEX_SLOT, use_sphere)
-            self.__use_texture(self.__SPHERE_ALPHA_SLOT, use_sphere)
-
-    def create_sphere_texture(self, filepath, obj=None):
-        """create a texture slot for environment mapping textures of MMD models.
-
-        Args:
-            material: the material object to add a texture_slot
-            filepath: the file path to environment mapping texture.
-
-        Returns:
-            bpy.types.MaterialTextureSlot object
-        """
-        texture_slot = self.__material.texture_slots.create(self.__SPHERE_TEX_SLOT)
-        texture_slot.texture_coords = "NORMAL"
-        texture_slot.texture = self.__load_texture(filepath)
-        self.update_sphere_texture_type(obj)
-        return texture_slot
-
-    def update_sphere_texture_type(self, obj=None):
-        if self._nodes_are_readonly:
-            return
-
-        texture_slot = self.__material.texture_slots[self.__SPHERE_TEX_SLOT]
-        if not texture_slot:
-            self.__remove_texture(self.__SPHERE_ALPHA_SLOT)
-            return
-
-        sphere_texture_type = int(self.__material.mmd_material.sphere_texture_type)
-        if sphere_texture_type not in (1, 2, 3):
-            texture_slot.use = False
-        else:
-            texture_slot.use = True
-            texture_slot.blend_type = ("MULTIPLY", "ADD", "MULTIPLY")[sphere_texture_type - 1]
-            if sphere_texture_type == 3:
-                texture_slot.texture_coords = "UV"
-                if obj and obj.type == "MESH" and self.__material in tuple(obj.data.materials):
-                    uv_layers = (l for l in obj.data.uv_layers if not l.name.startswith("_"))
-                    next(uv_layers, None)  # skip base UV
-                    texture_slot.uv_layer = getattr(next(uv_layers, None), "name", "")
-            else:
-                texture_slot.texture_coords = "NORMAL"
-
-        if not texture_slot.use or not self.__has_alpha_channel(texture_slot.texture):
-            self.__remove_texture(self.__SPHERE_ALPHA_SLOT)
-            return
-
-        alpha_slot = self.__material.texture_slots[self.__SPHERE_ALPHA_SLOT]
-        if not alpha_slot:
-            alpha_slot = self.__material.texture_slots.create(self.__SPHERE_ALPHA_SLOT)
-            alpha_slot.use_map_color_diffuse = False
-            alpha_slot.use_map_alpha = True
-            alpha_slot.blend_type = "MULTIPLY"
-            alpha_slot.texture = texture_slot.texture
-            alpha_slot.alpha_factor = texture_slot.diffuse_color_factor
-        alpha_slot.use = texture_slot.use
-        alpha_slot.texture_coords = texture_slot.texture_coords
-        alpha_slot.uv_layer = texture_slot.uv_layer
-
-    def remove_sphere_texture(self):
-        if self._nodes_are_readonly:
-            return
-        self.__remove_texture(self.__SPHERE_TEX_SLOT)
-        self.__remove_texture(self.__SPHERE_ALPHA_SLOT)
-
-    def get_toon_texture(self):
-        return self.__get_texture(self.__TOON_TEX_SLOT)
-
-    def use_toon_texture(self, use_toon):
-        if self._nodes_are_readonly:
-            return
-        self.__use_texture(self.__TOON_TEX_SLOT, use_toon)
-
-    def create_toon_texture(self, filepath):
-        """create a texture slot for toon textures of MMD models.
-
-        Args:
-            material: the material object to add a texture_slot
-            filepath: the file path to toon texture.
-
-        Returns:
-            bpy.types.MaterialTextureSlot object
-        """
-        texture_slot = self.__material.texture_slots.create(self.__TOON_TEX_SLOT)
-        texture_slot.texture_coords = "NORMAL"
-        texture_slot.blend_type = "MULTIPLY"
-        texture_slot.texture = self.__load_texture(filepath)
-        texture_slot.use_map_alpha = self.__has_alpha_channel(texture_slot.texture)
-        return texture_slot
-
     def update_toon_texture(self):
         if self._nodes_are_readonly:
             return
@@ -310,87 +174,13 @@ class _FnMaterialBI:
         else:
             self.remove_toon_texture()
 
-    def remove_toon_texture(self):
-        if self._nodes_are_readonly:
-            return
-        self.__remove_texture(self.__TOON_TEX_SLOT)
-
     def _mixDiffuseAndAmbient(self, mmd_mat):
         r, g, b = mmd_mat.diffuse_color
         ar, ag, ab = mmd_mat.ambient_color
         return [min(1.0, 0.5 * r + ar), min(1.0, 0.5 * g + ag), min(1.0, 0.5 * b + ab)]
 
-    def update_ambient_color(self):
-        if self._nodes_are_readonly:
-            return
-        self.update_diffuse_color()
-
-    def update_diffuse_color(self):
-        if self._nodes_are_readonly:
-            return
-        mat = self.__material
-        mmd_mat = mat.mmd_material
-        mat.diffuse_color[:3] = self._mixDiffuseAndAmbient(mmd_mat)
-        mat.diffuse_intensity = 0.8
-
-    def update_alpha(self):
-        if self._nodes_are_readonly:
-            return
-        mat = self.__material
-        mmd_mat = mat.mmd_material
-        mat.alpha = mmd_mat.alpha
-        mat.specular_alpha = mmd_mat.alpha
-        mat.use_transparency = True
-        mat.transparency_method = "Z_TRANSPARENCY"
-        mat.game_settings.alpha_blend = "ALPHA"
-        self.update_self_shadow_map()
-
-    def update_specular_color(self):
-        if self._nodes_are_readonly:
-            return
-        mat = self.__material
-        mmd_mat = mat.mmd_material
-        mat.specular_color = mmd_mat.specular_color
-        mat.specular_shader = "PHONG"
-        mat.specular_intensity = 0.8
-
-    def update_shininess(self):
-        if self._nodes_are_readonly:
-            return
-        mat = self.__material
-        mmd_mat = mat.mmd_material
-        shininess = mmd_mat.shininess
-        mat.specular_hardness = shininess
-
-    def update_is_double_sided(self):
-        if self._nodes_are_readonly:
-            return
-        mat = self.__material
-        mmd_mat = mat.mmd_material
-        mat.game_settings.use_backface_culling = not mmd_mat.is_double_sided
-
     def update_drop_shadow(self):
         pass
-
-    def update_self_shadow_map(self):
-        if self._nodes_are_readonly:
-            return
-        mat = self.__material
-        mmd_mat = mat.mmd_material
-        cast_shadows = mmd_mat.enabled_self_shadow_map if mat.alpha > 1e-3 else False
-        mat.use_cast_buffer_shadows = cast_shadows  # only buffer shadows
-        if hasattr(mat, "use_cast_shadows"):
-            # "use_cast_shadows" is not supported in older Blender (< 2.71),
-            # so we still use "use_cast_buffer_shadows".
-            mat.use_cast_shadows = cast_shadows
-
-    def update_self_shadow(self):
-        if self._nodes_are_readonly:
-            return
-        mat = self.__material
-        mmd_mat = mat.mmd_material
-        mat.use_shadows = mmd_mat.enabled_self_shadow
-        mat.use_transparent_shadows = mmd_mat.enabled_self_shadow
 
     def update_enabled_toon_edge(self):
         if self._nodes_are_readonly:
@@ -422,42 +212,6 @@ class _FnMaterialBI:
     def update_edge_weight(self):
         pass
 
-    @staticmethod
-    def convert_to_mmd_material(material, context=bpy.context):
-        m, mmd_material = material, material.mmd_material
-
-        map_diffuse = next((s.blend_type for s in m.texture_slots if s and s.use_map_color_diffuse), None)
-        use_diffuse = map_diffuse in {None, "MULTIPLY"}
-        diffuse = m.diffuse_color * min(1.0, m.diffuse_intensity / 0.8) if use_diffuse else (1.0, 1.0, 1.0)
-        mmd_material.diffuse_color = diffuse
-
-        cast_shadows = getattr(m, "cast_shadows", m.use_cast_buffer_shadows)
-        map_alpha = next((s.blend_type for s in m.texture_slots if s and s.use_map_alpha), None)
-        if m.use_transparency and map_alpha in {None, "MULTIPLY"}:
-            mmd_material.alpha = m.alpha
-
-        mmd_material.specular_color = m.specular_color * min(1.0, m.specular_intensity / 0.8)
-        mmd_material.shininess = m.specular_hardness
-        mmd_material.is_double_sided = m.game_settings.use_backface_culling
-        mmd_material.enabled_self_shadow_map = cast_shadows and m.alpha > 1e-3
-        mmd_material.enabled_self_shadow = m.use_shadows
-
-
-class _DummyTexture:
-    def __init__(self, image):
-        self.type = "IMAGE"
-        self.image = image
-        self.use_mipmap = True
-
-
-class _DummyTextureSlot:
-    def __init__(self, image):
-        self.diffuse_color_factor = 1
-        self.uv_layer = ""
-        self.texture = _DummyTexture(image)
-
-
-class _FnMaterialCycles(_FnMaterialBI):
     def get_texture(self):
         return self.__get_texture_node("mmd_base_tex", use_dummy=True)
 
@@ -563,6 +317,7 @@ class _FnMaterialCycles(_FnMaterialBI):
             self.__update_shader_nodes()
             nodes = self.material.node_tree.nodes
             texture = nodes.new("ShaderNodeTexImage")
+            # pylint: disable=assignment-from-no-return
             texture.label = bpy.path.display_name(node_name)
             texture.name = node_name
             texture.location = nodes["mmd_shader"].location + Vector((pos[0] * 210, pos[1] * 220))
@@ -661,10 +416,10 @@ class _FnMaterialCycles(_FnMaterialBI):
             def search_tex_image_node(node: bpy.types.ShaderNode):
                 if node.type == "TEX_IMAGE":
                     return node
-                for input in node.inputs:
-                    if not input.is_linked:
+                for node_input in node.inputs:
+                    if not node_input.is_linked:
                         continue
-                    child = search_tex_image_node(input.links[0].from_node)
+                    child = search_tex_image_node(node_input.links[0].from_node)
                     if child is not None:
                         return child
                 return None
@@ -793,7 +548,7 @@ class _FnMaterialCycles(_FnMaterialBI):
         ng = _NodeGroupUtils(shader)
 
         ############################################################################
-        node_output = ng.new_node("NodeGroupOutput", (6, 0))
+        _node_output = ng.new_node("NodeGroupOutput", (6, 0))
 
         tex_coord = ng.new_node("ShaderNodeTexCoord", (0, 0))
 
@@ -835,7 +590,7 @@ class _FnMaterialCycles(_FnMaterialBI):
 
         ############################################################################
         node_input = ng.new_node("NodeGroupInput", (-5, -1))
-        node_output = ng.new_node("NodeGroupOutput", (11, 1))
+        _node_output = ng.new_node("NodeGroupOutput", (11, 1))
 
         node_diffuse = ng.new_mix_node("ADD", (-3, 4), fac=0.6)
         node_diffuse.use_clamp = True
@@ -916,8 +671,6 @@ class _FnMaterialCycles(_FnMaterialBI):
 
         return shader
 
-
-FnMaterial = _FnMaterialCycles
 
 class MigrationFnMaterial:
     @staticmethod

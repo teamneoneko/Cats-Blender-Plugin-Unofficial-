@@ -11,7 +11,7 @@ from mmd_tools_local import bpyutils
 from mmd_tools_local.bpyutils import ObjectOp, SceneOp, TransformConstraintOp
 
 
-class FnMorph(object):
+class FnMorph:
     def __init__(self, morph, model):
         self.__morph = morph
         self.__rig = model

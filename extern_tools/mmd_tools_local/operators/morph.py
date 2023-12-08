@@ -8,7 +8,7 @@ from mathutils import Quaternion, Vector
 
 import mmd_tools_local.core.model as mmd_model
 from mmd_tools_local import bpyutils, utils
-from mmd_tools_local.core.exceptions import DivisionError, MaterialNotFoundError
+from mmd_tools_local.core.exceptions import MaterialNotFoundError
 from mmd_tools_local.core.material import FnMaterial
 from mmd_tools_local.core.morph import FnMorph
 from mmd_tools_local.utils import ItemMoveOp, ItemOp
@@ -24,7 +24,7 @@ def divide_vector_components(vec1, vec2):
             if v1 == 0:
                 v2 = 1  # If we have a 0/0 case we change the divisor to 1
             else:
-                raise DivisionError("Invalid Input: a non-zero value can't be divided by zero")
+                raise ZeroDivisionError("Invalid Input: a non-zero value can't be divided by zero")
         result.append(v1 / v2)
     return result
 
@@ -44,7 +44,7 @@ def special_division(n1, n2):
         if n1 == 0:
             n2 = 1
         else:
-            raise DivisionError("Invalid Input: a non-zero value can't be divided by zero")
+            raise ZeroDivisionError("Invalid Input: a non-zero value can't be divided by zero")
     return n1 / n2
 
 
@@ -319,7 +319,7 @@ class ApplyMaterialOffset(Operator):
                 mat_data.edge_color = edge_offset
                 mat_data.edge_weight = special_division(work_mmd_mat.edge_weight, base_mmd_mat.edge_weight)
 
-            except DivisionError:
+            except ZeroDivisionError:
                 mat_data.offset_type = "ADD"  # If there is any 0 division we automatically switch it to type ADD
             except ValueError:
                 self.report({"ERROR"}, "An unexpected error happened")
