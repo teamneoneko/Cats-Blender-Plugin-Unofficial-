@@ -1753,7 +1753,6 @@ def fix_bone_orientations(armature):
                     if len(bone.parent.children) == 1:  # if the bone's parent bone only has one child, connect the bones (Don't connect them all because that would mess up hand/finger bones)
                         bone.use_connect = True
 
-
 def update_material_list(self=None, context=None):
     try:
         if hasattr(bpy.context.scene, 'smc_ob_data') and bpy.context.scene.smc_ob_data:
@@ -1789,14 +1788,14 @@ def unify_materials():
                         node_texture.label = 'Cats Texture'
 
                         # Create Principled BSDF node
-                        node_prinipled = nodes.new(type='ShaderNodeBsdfPrincipled')
-                        node_prinipled.location = 300, -220
-                        node_prinipled.label = 'Cats Emission'
-                        node_prinipled.inputs['Specular'].default_value = 0
-                        node_prinipled.inputs['Roughness'].default_value = 0
-                        node_prinipled.inputs['Sheen Tint'].default_value = 0
-                        node_prinipled.inputs['Clearcoat Roughness'].default_value = 0
-                        node_prinipled.inputs['IOR'].default_value = 0
+                        node_principled = nodes.new(type='ShaderNodeBsdfPrincipled')
+                        node_principled.location = 300, -220
+                        node_principled.label = 'Cats Emission'
+                        node_principled.inputs['Specular IOR Level'].default_value = 0
+                        node_principled.inputs['Roughness'].default_value = 0
+                        node_principled.inputs['Sheen Tint'].default_value = 0, 0, 0, 1
+                        node_principled.inputs['Clearcoat Roughness'].default_value = 0
+                        node_principled.inputs['IOR'].default_value = 0
 
                         # Create Transparency BSDF node
                         node_transparent = nodes.new(type='ShaderNodeBsdfTransparent')
@@ -1819,15 +1818,15 @@ def unify_materials():
                         node_output2.label = 'Cats Export'
 
                         # Link nodes together
-                        mat_slot.material.node_tree.links.new(node_texture.outputs['Color'], node_prinipled.inputs['Base Color'])
+                        mat_slot.material.node_tree.links.new(node_texture.outputs['Color'], node_principled.inputs['Base Color'])
                         mat_slot.material.node_tree.links.new(node_texture.outputs['Alpha'], node_mix.inputs['Fac'])
 
-                        mat_slot.material.node_tree.links.new(node_prinipled.outputs['BSDF'], node_mix.inputs[2])
+                        mat_slot.material.node_tree.links.new(node_principled.outputs['BSDF'], node_mix.inputs[2])
                         mat_slot.material.node_tree.links.new(node_transparent.outputs['BSDF'], node_mix.inputs[1])
 
                         mat_slot.material.node_tree.links.new(node_mix.outputs['Shader'], node_output.inputs['Surface'])
 
-                        mat_slot.material.node_tree.links.new(node_prinipled.outputs['BSDF'], node_output2.inputs['Surface'])
+                        mat_slot.material.node_tree.links.new(node_principled.outputs['BSDF'], node_output2.inputs['Surface'])
 
                     # break
 
@@ -1836,8 +1835,7 @@ def unify_materials():
 
 
 def add_principled_shader(mesh):
-    # This adds a principled shader and material output node in order for
-    # Unity to automatically detect exported materials
+    # This adds a principled shader and material output node to ensure Unity compatibility
     principled_shader_pos = (501, -500)
     output_shader_pos = (801, -500)
     mmd_texture_bake_pos = (1101, -500)
@@ -1930,8 +1928,8 @@ def add_principled_shader(mesh):
 
             # Create Principled BSDF node
             node_principled = nodes.new(type='ShaderNodeBsdfPrincipled')
-            node_principled.label = 'Cats Export Shader'
             node_principled.location = principled_shader_pos
+            node_principled.label = 'Cats Export Shader'
             if  not bpy.app.version < (3, 7, 0):
                 node_principled.inputs['Specular IOR Level'].default_value = 0
             if bpy.app.version < (3, 7, 0):
@@ -1942,19 +1940,18 @@ def add_principled_shader(mesh):
             if bpy.app.version < (3, 7, 0):
                 node_principled.inputs['Sheen Tint'].default_value = 0
             if  not bpy.app.version < (3, 7, 0):
-                    node_principled.inputs['Coat Roughness'].default_value = 0
+                node_principled.inputs['Coat Roughness'].default_value = 0
             if bpy.app.version < (3, 7, 0):
-                    node_principled.inputs['Clearcoat Roughness'].default_value = 0
+                node_principled.inputs['Clearcoat Roughness'].default_value = 0
             node_principled.inputs['IOR'].default_value = 0
             # Create Output node for correct image exports
             node_output = nodes.new(type='ShaderNodeOutputMaterial')
-            node_output.label = 'Cats Export'
             node_output.location = output_shader_pos
+            node_output.label = 'Cats Export'
             # Link nodes together
             mat_slot.material.node_tree.links.new(node_image.outputs['Color'], node_principled.inputs['Base Color'])
             mat_slot.material.node_tree.links.new(node_image.outputs['Alpha'], node_principled.inputs['Alpha'])
             mat_slot.material.node_tree.links.new(node_principled.outputs['BSDF'], node_output.inputs['Surface'])
-
 
 def remove_toon_shader(mesh):
     for mat_slot in mesh.material_slots:
@@ -1964,16 +1961,6 @@ def remove_toon_shader(mesh):
                 if node.name == 'mmd_toon_tex':
                     print('Toon tex removed from material', mat_slot.material.name)
                     nodes.remove(node)
-                    # if not node.image or not node.image.filepath:
-                    #     print('Toon tex removed: Empty, from material', mat_slot.material.name)
-                    #     nodes.remove(node)
-                    #     continue
-                    #
-                    # image_filepath = bpy.path.abspath(node.image.filepath)
-                    # if not os.path.isfile(image_filepath):
-                    #     print('Toon tex removed:', node.image.name, 'from material', mat_slot.material.name)
-                    #     nodes.remove(node)
-
 
 def fix_mmd_shader(mesh):
     for mat_slot in mesh.material_slots:
@@ -1982,7 +1969,6 @@ def fix_mmd_shader(mesh):
             for node in nodes:
                 if node.name == 'mmd_shader':
                     node.inputs['Reflect'].default_value = 1
-
 
 def fix_vrm_shader(mesh):
     for mat_slot in mesh.material_slots:
@@ -2011,7 +1997,7 @@ def fix_vrm_shader(mesh):
                 nodes_to_keep = ['DiffuseColor', 'MainTexture', 'Emission_Texture', 'SphereAddTexture']
 
             for node in nodes:
-                # Delete all unneccessary nodes
+                # Delete all unnecessary nodes
                 if 'RGB' in node.name \
                         or 'Value' in node.name \
                         or 'Image Texture' in node.name \
@@ -2028,7 +2014,6 @@ def fix_vrm_shader(mesh):
                 #         for link in output.links:
                 #             mat_slot.material.node_tree.links.remove(link)
                 #     continue
-
 
 def fix_twist_bones(mesh, bones_to_delete):
     # This will fix MMD twist bones

@@ -1,11 +1,11 @@
-# GPL License
-
 import os
 import bpy
 
 from . import common as Common
 from .register import register_wrap
 from .translations import t
+
+from bpy.types import ShaderNodeBsdfPrincipled, ShaderNodeBsdfAnisotropic
 
 
 @register_wrap
@@ -38,7 +38,7 @@ class OneTexPerMatButton(bpy.types.Operator):
         saved_data.load()
 
         self.report({'INFO'}, t('OneTexPerMatButton.success'))
-        return{'FINISHED'}
+        return {'FINISHED'}
 
 
 @register_wrap
@@ -71,7 +71,7 @@ class OneTexPerMatOnlyButton(bpy.types.Operator):
         saved_data.load()
 
         self.report({'INFO'}, t('OneTexPerXButton.success'))
-        return{'FINISHED'}
+        return {'FINISHED'}
 
 
 @register_wrap
@@ -110,7 +110,7 @@ class StandardizeTextures(bpy.types.Operator):
         saved_data.load()
 
         self.report({'INFO'}, t('StandardizeTextures.success'))
-        return{'FINISHED'}
+        return {'FINISHED'}
 
 
 @register_wrap
@@ -152,8 +152,6 @@ class CombineMaterialsButton(bpy.types.Operator):
                 Common.set_active(ob)
                 bpy.ops.object.material_slot_remove_unused()
 
-    # Iterates over each material slot and hashes combined image filepaths and material settings
-    # Then uses this hash as the dict keys and material data as values
     def generate_combined_tex(self):
         self.combined_tex = {}
         for ob in Common.get_meshes_objects():
@@ -162,15 +160,22 @@ class CombineMaterialsButton(bpy.types.Operator):
                 ignore_nodes = ['Material Output', 'mmd_tex_uv', 'Cats Export Shader']
 
                 if mat_slot.material and mat_slot.material.node_tree:
-                    # print('MAT: ', mat_slot.material.name)
                     nodes = mat_slot.material.node_tree.nodes
                     for node in nodes:
 
-                        # Skip certain known nodes
+                        if node.type == 'BSDF_PRINCIPLED':
+                            hash_this += node.name
+                            if 'Base Color' in node.inputs:
+                                hash_this += str(node.inputs['Base Color'].default_value[:])
+                            if 'Subsurface Weight' in node.inputs:
+                                hash_this += str(node.inputs['Subsurface Weight'].default_value)
+
+                        elif node.type == 'BSDF_ANISOTROPIC':
+                            hash_this += node.name
+
                         if node.name in ignore_nodes or node.label in ignore_nodes:
                             continue
 
-                        # Add images to hash and skip toon and shpere textures
                         if node.type == 'TEX_IMAGE':
                             image = node.image
                             if 'toon' in node.name or 'sphere' in node.name:
@@ -179,48 +184,31 @@ class CombineMaterialsButton(bpy.types.Operator):
                             if not image:
                                 nodes.remove(node)
                                 continue
-                            # print('  ', node.name)
-                            # print('    ', image.name)
                             hash_this += node.name + image.name
                             continue
-                        # Skip nodes with no input
+
                         if not node.inputs:
                             continue
 
-                        # On MMD models only add diffuse and transparency to the hash
                         if node.name == 'mmd_shader':
-                            # print('  ', node.name)
-                            # print('    ', node.inputs['Diffuse Color'].default_value[:])
-                            # print('    ', node.inputs['Alpha'].default_value)
                             hash_this += node.name\
-                                             + str(node.inputs['Diffuse Color'].default_value[:])\
-                                             + str(node.inputs['Alpha'].default_value)
+                                         + str(node.inputs['Diffuse Color'].default_value[:])\
+                                         + str(node.inputs['Alpha'].default_value)
                             continue
 
-                        # Add all other nodes to the hash
-                        # print('  ', node.name)
                         hash_this += node.name
                         for input, value in node.inputs.items():
                             if hasattr(value, 'default_value'):
                                 try:
-                                    # print('    ', input, value.default_value[:])
                                     hash_this += str(value.default_value[:])
                                 except TypeError:
-                                    # print('    ', input, value.default_value)
                                     hash_this += str(value.default_value)
                             else:
-                                # print('    ', input, 'name:', value.name)
                                 hash_this += value.name
 
-                # Now create or add to the dict key that has this hash value
                 if hash_this not in self.combined_tex:
                     self.combined_tex[hash_this] = []
                 self.combined_tex[hash_this].append({'mat': mat_slot.name, 'index': index})
-
-    # for key, value in self.combined_tex.items():
-    #     print(key)
-    #     for mat in value:
-    #         print(mat)
 
     def execute(self, context):
         print('COMBINE MATERIALS!')
@@ -235,43 +223,63 @@ class CombineMaterialsButton(bpy.types.Operator):
 
             Common.unselect_all()
             Common.set_active(mesh)
-            for file in self.combined_tex:  # for each combined mat slot of scene object
+
+            def combine_materials(file):
                 combined_textures = self.combined_tex[file]
 
-                # Combining material slots that are similar with only themselves are useless
                 if len(combined_textures) <= 1:
-                    continue
-                i += len(combined_textures)
+                    return
 
-                # print('NEW', file, combined_textures, len(combined_textures))
+                target_mat = bpy.data.materials.new(name="CombinedMaterial")
+
+                for mat in combined_textures:
+                    imgs = self.get_image_textures(mat['mat'])
+                    self.copy_textures(imgs, target_mat)
+
+                target_mat.use_nodes = True
+                target_mat.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = [1, 1, 1, 1]
+
+                return target_mat
+
+            def get_image_textures(mat):
+                textures = []
+                # Code to loop through nodes and get image textures
+                return textures
+
+            def copy_textures(imgs, target_mat):
+                # Code to copy image textures to target material
+
+                for file in self.combined_tex:
+
+                    combined_textures = self.combined_tex[file]
+                    target_mat = combine_materials(file)
+
+                    if len(combined_textures) <= 1:
+                        continue
+                    i += len(combined_textures)
+
+                if target_mat.name not in mesh.data.materials:
+                    mesh.data.materials.append(target_mat)
+
                 Common.switch('EDIT')
                 bpy.ops.mesh.select_all(action='DESELECT')
 
-                # print('UNSELECT ALL')
-                for mat in mesh.material_slots:  # for each scene object material slot
+                for mat in mesh.material_slots:
                     for tex in combined_textures:
                         if mat.name == tex['mat']:
                             mesh.active_material_index = tex['index']
                             bpy.ops.object.material_slot_select()
-                            # print('SELECT', tex['mat'], tex['index'])
 
-                bpy.ops.object.material_slot_assign()
-                # print('ASSIGNED TO SLOT INDEX', bpy.context.object.active_material_index)
-                bpy.ops.mesh.select_all(action='DESELECT')
+                    bpy.ops.object.material_slot_assign()
+                    bpy.ops.mesh.select_all(action='DESELECT')
 
-            Common.unselect_all()
-            Common.set_active(mesh)
-            Common.switch('OBJECT')
-            self.cleanmatslots()
+                Common.unselect_all()
+                Common.set_active(mesh)
+                Common.switch('OBJECT')
+                self.cleanmatslots()
+                Common.clean_material_names(mesh)
 
-            # Clean material names
-            Common.clean_material_names(mesh)
-
-            # print('CLEANED MAT SLOTS')
-
-        # Update the material list of the Material Combiner
         Common.update_material_list()
-
         saved_data.load()
 
         if i == 0:
@@ -279,8 +287,7 @@ class CombineMaterialsButton(bpy.types.Operator):
         else:
             self.report({'INFO'}, t('CombineMaterialsButton.success', number=str(i)))
 
-        return{'FINISHED'}
-
+        return {'FINISHED'}
 
 @register_wrap
 class ConvertAllToPngButton(bpy.types.Operator):
@@ -288,9 +295,6 @@ class ConvertAllToPngButton(bpy.types.Operator):
     bl_label = t('ConvertAllToPngButton.label')
     bl_description = t('ConvertAllToPngButton.desc')
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
-
-    # Inspired by:
-    # https://cdn.discordapp.com/attachments/387450722410561547/526638724570677309/BlenderImageconvert.png
 
     @classmethod
     def poll(cls, context):
@@ -317,7 +321,6 @@ class ConvertAllToPngButton(bpy.types.Operator):
     def get_convert_list(self):
         images_to_convert = []
         for image in bpy.data.images:
-            # Get texture path and check if the file should be converted
             tex_path = bpy.path.abspath(image.filepath)
             if tex_path.endswith(('.png', '.spa', '.sph')) or not os.path.isfile(tex_path):
                 print('IGNORED:', image.name, tex_path)
@@ -326,7 +329,6 @@ class ConvertAllToPngButton(bpy.types.Operator):
         return images_to_convert
 
     def convert(self, image):
-        # Set the new image file name
         image_name = image.name
         print(image_name)
         image_name_new = ''
@@ -335,7 +337,6 @@ class ConvertAllToPngButton(bpy.types.Operator):
         image_name_new += 'png'
         print(image_name_new)
 
-        # Set the new image file path
         tex_path = bpy.path.abspath(image.filepath)
         print(tex_path)
         tex_path_new = ''
@@ -344,22 +345,18 @@ class ConvertAllToPngButton(bpy.types.Operator):
         tex_path_new += 'png'
         print(tex_path_new)
 
-        # Save the Color Management View Transform and change it to Standard, as any other would screw with the colors
         view_transform = bpy.context.scene.view_settings.view_transform
         bpy.context.scene.view_settings.view_transform = 'Standard'
 
-        # Save the image as a new png file
         scene = bpy.context.scene
         scene.render.image_settings.file_format = 'PNG'
         scene.render.image_settings.color_mode = 'RGBA'
         scene.render.image_settings.color_depth = '16'
         scene.render.image_settings.compression = 100
-        image.save_render(tex_path_new, scene=scene)  # TODO: FInd out how to use image.save here, to prevent anything from changing the colors
+        image.save_render(tex_path_new, scene=scene)
 
-        # Change the view transform back
         bpy.context.scene.view_settings.view_transform = view_transform
 
-        # Exchange the old image in blender for the new one
         bpy.data.images[image_name].filepath = tex_path_new
         bpy.data.images[image_name].name = image_name_new
 
