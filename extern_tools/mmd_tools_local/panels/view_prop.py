@@ -4,9 +4,9 @@
 
 # SUPPORT_UNTIL: 3.3 LTS
 
-from mmd_tools_local_local import bpyutils
-from mmd_tools_local_local.core.model import FnModel, Model
-from mmd_tools_local_local.core.sdef import FnSDEF
+from mmd_tools_local import bpyutils
+from mmd_tools_local.core.model import FnModel, Model
+from mmd_tools_local.core.sdef import FnSDEF
 
 
 class _PanelBase(object):
@@ -19,7 +19,7 @@ class _PanelBase(object):
 
 
 class MMDModelObjectDisplayPanel(_PanelBase):
-    bl_idname = "OBJECT_PT_mmd_tools_local_local_root_object_display"
+    bl_idname = "OBJECT_PT_mmd_tools_local_root_object_display"
     bl_label = "MMD Display"
 
     @classmethod
@@ -76,7 +76,7 @@ class MMDModelObjectDisplayPanel(_PanelBase):
 
 
 class MMDViewPanel(_PanelBase):
-    bl_idname = "OBJECT_PT_mmd_tools_local_local_view"
+    bl_idname = "OBJECT_PT_mmd_tools_local_view"
     bl_label = "MMD Shading"
 
     def draw(self, context):
@@ -84,20 +84,20 @@ class MMDViewPanel(_PanelBase):
 
         c = layout.column(align=True)
         r = c.row(align=True)
-        r.operator("mmd_tools_local_local.set_glsl_shading", text="GLSL")
-        r.operator("mmd_tools_local_local.set_shadeless_glsl_shading", text="Shadeless")
+        r.operator("mmd_tools_local.set_glsl_shading", text="GLSL")
+        r.operator("mmd_tools_local.set_shadeless_glsl_shading", text="Shadeless")
         r = c.row(align=True)
-        r.operator("mmd_tools_local_local.reset_shading", text="Reset")
+        r.operator("mmd_tools_local.reset_shading", text="Reset")
 
 
 class MMDSDEFPanel(_PanelBase):
-    bl_idname = "OBJECT_PT_mmd_tools_local_local_sdef"
+    bl_idname = "OBJECT_PT_mmd_tools_local_sdef"
     bl_label = "MMD SDEF Driver"
 
     def draw(self, context):
         c = self.layout.column(align=True)
-        c.operator("mmd_tools_local_local.sdef_bind", text="Bind")
-        c.operator("mmd_tools_local_local.sdef_unbind", text="Unbind")
+        c.operator("mmd_tools_local.sdef_bind", text="Bind")
+        c.operator("mmd_tools_local.sdef_unbind", text="Unbind")
         row = c.row()
         row.label(text="Cache Info: %d data" % (len(FnSDEF.g_verts)), icon="INFO")
-        row.operator("mmd_tools_local_local.sdef_cache_reset", text="", icon="X")
+        row.operator("mmd_tools_local.sdef_cache_reset", text="", icon="X")
