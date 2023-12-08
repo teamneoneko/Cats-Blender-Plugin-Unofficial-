@@ -1,8 +1,7 @@
-# Cats Blender Plugin (0.50.0).
+# Cats Blender Plugin (0.50.0 DEV VERSION).
 
-
-#### This is the Development version for Blender 4.0 which can be unstable, please use the main branch for the most up to date stable version. This branch will be merge into the main dev branch once stable.
-#### This version of cats will be mainly trying to get everything working on blender 4.0, HOWEVER we will be droping support for blender version below 3.6 completely.
+#### THIS IS THE DEVELOPMENT VERSION OF Unofficial CATS THERE MAYBE ISSUES AND CRASHES.
+#### THIS VERSION IS FOR VERSION BLENDER 3.6 AND 4.0 OLDER VERSIONS ARE NOT SUPPORTED.
 #### Any issues reported on versions older then Blender 3.6 will not be fixed. ensure you are using either 3.6 or 4.0.
 
 The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat.
@@ -278,7 +277,6 @@ All the hours long processes of fixing your models are compressed into a few fun
 - Blender 3.6 or above (run as administrator is recommended).
   - Blender 3.6 is Recommended as this is the latest LTS.
   - Anything older then 3.6 is not supported and no longer works.
-  - Though this branch is aimed for version 4.0 of blender it is still possible it is unstable and could crash.
 - If you have custom Python installed which Blender might use, you need to have Numpy installed
 
 ## Installation
@@ -334,8 +332,8 @@ Please open an issue if you need to leave feedback.
   #### IMPORTANT CAT'S WILL NO LONGER WORK IN VERSION BELOW 3.6, PLEASE USE CATS 0.40.0 FOR BLENDER VERSIONS BELOW 3.6.
 
 - Reformatted the UI so things are eaiser to find.
-- Updated MMD Tools so blender 4.0 works better with ut.
-- Small bug fixes.
+- Updated MMD Tools so blender 4.0 works better with it.
+- Fixed, fix materials from removing materials nodes, still need a little work though.
 - No longer allow blender versions below 3.6.
 </details>
 <details><summary>0.40.0</summary>
