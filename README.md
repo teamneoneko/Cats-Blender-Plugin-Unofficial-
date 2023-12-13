@@ -1,6 +1,6 @@
 # Cats Blender Plugin.
 
-#### THIS VERSION IS FOR VERSION BLENDER 3.6 AND 4.0 OLDER VERSIONS ARE NOT SUPPORTED.
+#### THIS VERSION OF CAT'S IS FOR BLENDER 3.6 AND ABOVE!.
 #### Any issues reported on versions older then Blender 3.6 will not be fixed. ensure you are using either 3.6 or 4.0.
 
 The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat.
