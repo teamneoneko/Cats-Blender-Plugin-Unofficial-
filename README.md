@@ -14,6 +14,9 @@ All the hours long processes of fixing your models are compressed into a few fun
 - See my github: https://github.com/Yusarina
 - See all my social media sites here: https://yusarina.xyz
 
+## Blender version support policies.
+Please [Click Here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Blender-Version-Support-Policies) to view which versions of blender we support.
+
 ## Features (Click to Expand)
  - <details><summary>Creating lip syncing</summary>
 
