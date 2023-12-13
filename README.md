@@ -1,6 +1,5 @@
-# Cats Blender Plugin (0.50.0 DEV VERSION).
+# Cats Blender Plugin.
 
-#### THIS IS THE DEVELOPMENT VERSION OF Unofficial CATS THERE MAYBE ISSUES AND CRASHES.
 #### THIS VERSION IS FOR VERSION BLENDER 3.6 AND 4.0 OLDER VERSIONS ARE NOT SUPPORTED.
 #### Any issues reported on versions older then Blender 3.6 will not be fixed. ensure you are using either 3.6 or 4.0.
 
@@ -331,13 +330,14 @@ Please open an issue if you need to leave feedback.
 
 ## Change Log
 <details><summary>0.50.0</summary>
-  ## 0.50.0 (These changes have not been done yet)
+  ## 0.50.0
   #### IMPORTANT CAT'S WILL NO LONGER WORK IN VERSION BELOW 3.6, PLEASE USE CATS 0.40.0 FOR BLENDER VERSIONS BELOW 3.6.
 
-- Reformatted the UI so things are eaiser to find.
 - Updated MMD Tools so blender 4.0 works better with it.
 - Fixed, fix materials from removing materials nodes, still need a little work though.
 - No longer allow blender versions below 3.6.
+- renamed node_priniped to node_prinipled.
+- bug fixes.
 </details>
 <details><summary>0.40.0</summary>
   ## 0.40.0
