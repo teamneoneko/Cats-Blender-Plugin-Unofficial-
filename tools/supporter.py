@@ -78,7 +78,6 @@ class DynamicPatronButton(bpy.types.Operator):
             webbrowser.open(self.website)
         return {'FINISHED'}
 
-
 def register_dynamic_buttons():
     if not supporter_data:
         return

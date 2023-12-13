@@ -37,12 +37,12 @@ Blender를 다시 시작하고 Cats Plugin를 다시 활성화하세요!
 "
 Main.error.29unsupportedVersion,"
 
-Blender versions older than 3.3 are not supported by Cats.
-Please use Blender 3.3 or later.
+Blender versions older than 3.6 are not supported by Cats.
+Please use Blender 3.6 or later.
 ",,"
 
-3.3 이전의 블렌더 버전은 Cats에서 지원하지 않습니다.
-Blender 3.3 버전 이상을 사용하세요.
+3.6 이전의 블렌더 버전은 Cats에서 지원하지 않습니다.
+Blender 3.6 버전 이상을 사용하세요.
 "
 Main.error.restartAndEnable_alt,"
 
@@ -54,9 +54,6 @@ Blender를 다시 시작하고 Cats Plugin를 다시 활성화하세요!
 ToolPanel.label,Cats Blender Plugin,Cats ブレンダープラグイン,
 ToolPanel.category,CATS,,
 ArmaturePanel.label,Model,モデル,모델
-ArmaturePanel.warn.40Blender1,You are using Blender 4.0 though cats does allow
-ArmaturePanel.warn.40Blender2,Blender 4.0 there could be some issues.
-ArmaturePanel.warn.40Blender3,Please downgrade to 3.6 if you have any issues.
 ArmaturePanel.warn.newBlender1,Potentially unsupported Blender version detected!
 ArmaturePanel.warn.newBlender2,Some features might not work!
 ArmaturePanel.warn.newBlender3,CATS currently supports up to Blender 4.0.

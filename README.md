@@ -1,8 +1,8 @@
-# Cats Blender Plugin (0.40.0).
+# Cats Blender Plugin (0.50.0 DEV VERSION).
 
-#### This version of Cats does allow Blender 4.0, however due to some issues with 4.0 and the current compatibility of cats and MMD tools I highly recommend you use 3.6 for now. Please do not report any issues relating to 4.0, If you hit any issues please downgrade to Blender 3.6 for the time being. This is because MMD Tools currently does not support Blender 4.0 and unto it does we can not fully support 4.0.
-#### This version of Cats will no longer support Blender 2.8 to 3.3, However some features may not work on blender 3.5 and below. Please use 3.6 or 4.0.
-#### This version of Cats will now give warnings on Blender version older than 3.6, any issues reported on Blender versions older then 3.6 will be closed. 
+#### THIS IS THE DEVELOPMENT VERSION OF Unofficial CATS THERE MAYBE ISSUES AND CRASHES.
+#### THIS VERSION IS FOR VERSION BLENDER 3.6 AND 4.0 OLDER VERSIONS ARE NOT SUPPORTED.
+#### Any issues reported on versions older then Blender 3.6 will not be fixed. ensure you are using either 3.6 or 4.0.
 
 The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat.
 Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
@@ -277,19 +277,17 @@ Please [Click Here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/
 
 ## Requirements
 
-- Blender 3.3 or above (run as administrator is recommended) (Please note some features may not work in version below 3.6).
+- Blender 3.6 or above (run as administrator is recommended).
   - Blender 3.6 is Recommended as this is the latest LTS.
-  - Though I have updated CATS to Blender 4.0, I do not currently recommend using 4.0 as there multiple issues with MDD Tools and Blender 4.0 which cats uses.
-  - Anything older then 3.3 is not supported and no longer works.
-  - In the future I won't be allowing anything older then Blender 3.6.
+  - Anything older then 3.6 is not supported and no longer works.
 - If you have custom Python installed which Blender might use, you need to have Numpy installed
 
 ## Installation
 
-- Download the plugin: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/refs/heads/main.zip)
+- Download the plugin: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/refs/heads/dev.zip)
    - **Important: Do NOT extract the downloaded zip! You will need the zip file during installation!**
  - Install the addon in blender like so:
-   - In Blender 3.3+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there. Though this plugin may still work on Blender blender versions older than 3.6, there are no longer supported.
+   - In Blender 3.6+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there.
 
 ![](https://i.imgur.com/LsEDL6q.gif)
 
@@ -332,6 +330,15 @@ Cats Blender Plugin was original developed by absolute quantum then maintained b
 Please open an issue if you need to leave feedback.
 
 ## Change Log
+<details><summary>0.50.0</summary>
+  ## 0.50.0 (These changes have not been done yet)
+  #### IMPORTANT CAT'S WILL NO LONGER WORK IN VERSION BELOW 3.6, PLEASE USE CATS 0.40.0 FOR BLENDER VERSIONS BELOW 3.6.
+
+- Reformatted the UI so things are eaiser to find.
+- Updated MMD Tools so blender 4.0 works better with it.
+- Fixed, fix materials from removing materials nodes, still need a little work though.
+- No longer allow blender versions below 3.6.
+</details>
 <details><summary>0.40.0</summary>
   ## 0.40.0
   #### IMPORTANT WE DO NOT SUPPORT ANY BLENDER VERSION BELOW 3.6 IF YOU HAVE ANY ISSUES PLEASE UPGRADE TO BLENDER 3.6.
@@ -377,74 +384,6 @@ Please open an issue if you need to leave feedback.
 - Removed all VRC SDK 2.0 stuff, SDK2 is now completely obsolete and should not be used anyway.
 </details>
 <details><summary>0.20.0</summary>
-
-   ## 0.20.0
-
-- Removed Patreon and removed supporters tab fully. I done this because the original project is dead.
-- Change the discord link to go to the github wiki, i going to put up some basic things on there at somepoint.
-- Added in credits that i maintaining this version.
-- Added 3.0 Eye Tracking by Mysteryem
-- Fix for Unselect all being called too many times.
-</details>
-<details><summary>0.19.3</summary>
-
-   ## 0.19.3
-
-- Fix for update loop.
-</details>
-<details><summary>0.19.2</summary>
-
-   ## 0.19.2
-
-- Updated for Blender 3.6
-</details>
-<details><summary>0.19.1</summary>
-
-   ## 0.19.1
-
-- Fixed Google Translate error (you aren't banned by Google)
-</details>
-<details><summary>0.19.0</summary>
-
-   ## 0.19.0
-
-- **Fully compatible with Blender 2.93**
-- **Translations:**
-  - **Added Korean translation!**
-    - Cats is now translated into Korean by a large portion
-    - To use it, simply change your Blender language to Korean and then restart Blender or select it in the Cats Settings
-    - Thanks to **Siromori** for contributing the translation! <3
-  - Added Cats Ui Language setting
-    - This lets you choose in which language Cats should be displayed
-    - Setting it to "auto" will choose the current Blender language
-  - Added button to download the latest Cats Translations
-    - This feature is for translators to test their translations in the plugin
-    - If you want to help to translate Cats into any language, please let me (Hotox) know in our Discord
-- **Model Options:**
-  - Added "Connect Bones" button
-  - Added options to keep merged bones and to merge the bones of visible meshes only
-- **Custom Model Creation:**
-  - Reworked "Attach Mesh" feature, it is much more reliable now
-- **General:**
-  - Fixed translation errors
-  - Updated mmd_tools
-- **Bake: (by feilen)**
-  - Emission influence baking: fake realtime lighting based on your emissive channel, quest-compatible!
-  - 'Manual' reprojection mode for Bake: creating new UV maps called 'Target' will allow you to re-bake to a specific layout.
-  - 'Optimize static shapekeys' option
-    - Splits your mesh into two skinned meshes, one with all shapekey-influenced geometry,
-      one with the rest (and fixes the normals in place). Significantly improves GPU performance, especially when a lot of shapekeys are in effect.
-      Needs the lighting anchor point in Unity to be set to the armature Hips on both, or you'll get lighting artifacts.
-  - Introduce 'BakeFixer.cs', which is a run-time unity script that hopefully should do the lighting work for you.
-  - 'Ignore hidden objects' option
-    - When baking, this will ignore any objects you currently have hidden, making it easier to create different versions of your avatar.
-  - Apply Current Shapekey Mix option
-    - Sets your basis to whatever current mix of shapekeys you have. Always-on shapekeys are terrible for performance,
-      so if you have some that are only intended to customize the character without updates, this will help with that.
-  - '_bake' shapekeys: any shapekey with '_bake' at the end will be applied and completely removed, allowing the static shapekeys option to work better.
-    If you're an avatar creator distributing bases, this is recommended for character customization keys!
-  - Misc: Updated defaults to be in line with updated Quest limits.
-</details>
 
 Read the full changelog for the original Cat's here. [here](https://github.com/michaeldegroot/cats-blender-plugin/releases).
 
