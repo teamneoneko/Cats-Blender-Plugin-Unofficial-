@@ -1,6 +1,6 @@
 # Cats Blender Plugin.
 
-#### THIS VERSION OF CAT'S IS FOR BLENDER 3.6 AND ABOVE!.
+#### THIS VERSION OF CAT'S IS FOR BLENDER 4.0 [CLICK HERE](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases) for the belnder 4.0 version.
 #### Any issues reported on versions older then Blender 3.6 will not be fixed. ensure you are using either 3.6 or 4.0.
 
 The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat.
@@ -283,7 +283,7 @@ Please [Click Here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/
 
 ## Installation
 
-- Download the plugin: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/refs/heads/dev.zip)
+- Download the plugin: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/refs/heads/blender-4.0.zip)
    - **Important: Do NOT extract the downloaded zip! You will need the zip file during installation!**
  - Install the addon in blender like so:
    - In Blender 3.6+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there.
