@@ -44,6 +44,15 @@ Please use Blender 3.6 or later.
 3.6 이전의 블렌더 버전은 Cats에서 지원하지 않습니다.
 Blender 3.6 버전 이상을 사용하세요.
 "
+Main.error.40unsupportedVersion,"
+
+Blender 4.0 is not supported by this version of cats.
+Please use Blender 3.6, you can download a 4.0 version on my github.
+",,"
+
+이 버전의 고양이에서는 블렌더 4.0이 지원되지 않습니다..
+Blender 3.6을 사용하세요. 내 github에서 4.0 버전을 다운로드할 수 있습니다.
+"
 Main.error.restartAndEnable_alt,"
 
 Please restart Blender and enable CATS again!
