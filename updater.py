@@ -423,7 +423,7 @@ def get_github_releases(repo):
 
     try:
         ssl._create_default_https_context = ssl._create_unverified_context
-        with urllib.request.urlopen('https://api.github.com/repos/' + repo + '/Cats-Blender-Plugin-Unofficial-/releases') as url:
+        with urllib.request.urlopen('https://api.github.com/repos/' + repo + '/Cats-Blender-Plugin-Unofficial-/tree/blender-4.0') as url:
             data = json.loads(url.read().decode())
     except urllib.error.URLError:
         print('URL ERROR')
@@ -529,7 +529,7 @@ def update_now(version=None, latest=False, dev=False):
         return
     if dev:
         print('UPDATE TO DEVELOPMENT')
-        update_link = 'https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/dev.zip'
+        update_link = 'https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/blender-4.0.zip'
     elif latest or not version:
         print('UPDATE TO ' + latest_version_str)
         update_link = version_list.get(latest_version_str)[0]

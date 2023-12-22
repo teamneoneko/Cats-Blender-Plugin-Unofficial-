@@ -31,7 +31,7 @@ settings_default = OrderedDict()
 settings_default['show_mmd_tabs'] = [True, False]
 settings_default['embed_textures'] = [False, False]
 settings_default['ui_lang'] = ["auto", False]
-# settings_default['use_custom_mmd_tools'] = [False, True]
+# settings_default['use_custom_mmd_tools_local'] = [False, True]
 
 lock_settings = False
 
@@ -257,8 +257,8 @@ def update_settings_core(self, context):
 
     return settings_changed_tmp
 
-def get_use_custom_mmd_tools():
-    return settings_data.get('use_custom_mmd_tools')
+def get_use_custom_mmd_tools_local():
+    return settings_data.get('use_custom_mmd_tools_local')
 
 
 def get_embed_textures():

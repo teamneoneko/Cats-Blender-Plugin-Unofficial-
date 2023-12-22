@@ -2049,7 +2049,7 @@ def toggle_mmd_tabs(shutdown_plugin=False):
     
     mmd_cls = mmd_cls + mmd_cls_shading
 
-    # If the plugin is shutting down, load the mmd_tools tabs before that, to avoid issues when unregistering mmd_tools
+    # If the plugin is shutting down, load the mmd_tools_local tabs before that, to avoid issues when unregistering mmd_tools_local
     if bpy.context.scene.show_mmd_tabs or shutdown_plugin:
         for cls in mmd_cls:
             try:

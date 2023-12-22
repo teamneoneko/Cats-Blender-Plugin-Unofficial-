@@ -37,12 +37,12 @@ Blender를 다시 시작하고 Cats Plugin를 다시 활성화하세요!
 "
 Main.error.29unsupportedVersion,"
 
-Blender versions older than 3.6 are not supported by Cats.
-Please use Blender 3.6 or later.
+Blender versions older than 4.0 are not supported by Cats 4.0.
+Please use Blender 4.0 or later or use the 3.6 version on github.
 ",,"
 
-3.6 이전의 블렌더 버전은 Cats에서 지원하지 않습니다.
-Blender 3.6 버전 이상을 사용하세요.
+4.0 이전의 블렌더 버전은 Cats에서 지원하지 않습니다.
+Blender 4.0 버전 이상을 사용하세요.
 "
 Main.error.restartAndEnable_alt,"
 
