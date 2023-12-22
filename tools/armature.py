@@ -12,9 +12,9 @@ from .common import version_3_6_or_older
 from .register import register_wrap
 from .translations import t
 
-# Only load mmd_tools if it's not on linux and 2.90 or higher since it causes Blender to crash
+# Only load mmd_tools_local if it's not on linux and 2.90 or higher since it causes Blender to crash
 from mmd_tools_local.operators import morph as Morph
-mmd_tools_installed = True
+mmd_tools_local_installed = True
 
 
 @register_wrap
@@ -123,7 +123,7 @@ class FixArmature(bpy.types.Operator):
         print('DOUBLES END')
 
         # Check if model is mmd model
-        if mmd_tools_installed:
+        if mmd_tools_local_installed:
             mmd_root = None
             try:
                 mmd_root = armature.parent.mmd_root
@@ -386,7 +386,7 @@ class FixArmature(bpy.types.Operator):
             if context.scene.fix_materials:
                 # Make materials exportable in Blender 2.80 and remove glossy mmd shader look
                 # Common.remove_toon_shader(mesh)
-                if mmd_tools_installed:
+                if mmd_tools_local_installed:
                     Common.fix_mmd_shader(mesh)
                 Common.fix_vrm_shader(mesh)
                 Common.add_principled_shader(mesh)

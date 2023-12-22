@@ -21,10 +21,10 @@ from . import fbx_patch as Fbx_patch
 from .register import register_wrap
 from .translations import t
 
-mmd_tools_installed = False
+mmd_tools_local_installed = False
 try:
     import mmd_tools_local
-    mmd_tools_installed = True
+    mmd_tools_local_installed = True
 except:
     pass
 
@@ -115,16 +115,16 @@ class ImportAnyModel(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         # MMD
         if file_ending == 'pmx' or file_ending == 'pmd':
             try:
-                bpy.ops.mmd_tools.import_model('EXEC_DEFAULT',
+                bpy.ops.mmd_tools_local.import_model('EXEC_DEFAULT',
                                                files=[{'name': file_name}],
                                                directory=directory,
                                                scale=0.08,
                                                types={'MESH', 'ARMATURE', 'MORPHS'},
                                                log_level='WARNING')
             except AttributeError:
-                bpy.ops.mmd_tools.import_model('INVOKE_DEFAULT')
+                bpy.ops.mmd_tools_local.import_model('INVOKE_DEFAULT')
             except (TypeError, ValueError):
-                bpy.ops.mmd_tools.import_model('INVOKE_DEFAULT')
+                bpy.ops.mmd_tools_local.import_model('INVOKE_DEFAULT')
 
         # XNALara
         elif file_ending == 'xps' or file_ending == 'mesh' or file_ending == 'ascii':
@@ -396,19 +396,19 @@ class ImportMMD(bpy.types.Operator):
         if hasattr(context.scene, 'layers'):
             context.scene.layers[0] = True
 
-        if not mmd_tools_installed:
+        if not mmd_tools_local_installed:
             bpy.ops.cats_importer.enable_mmd('INVOKE_DEFAULT')
             return {'FINISHED'}
 
         try:
-            bpy.ops.mmd_tools.import_model('INVOKE_DEFAULT',
+            bpy.ops.mmd_tools_local.import_model('INVOKE_DEFAULT',
                                            scale=0.08,
                                            types={'MESH', 'ARMATURE', 'MORPHS'},
                                            log_level='WARNING')
         except AttributeError:
             bpy.ops.cats_importer.enable_mmd('INVOKE_DEFAULT')
         except (TypeError, ValueError):
-            bpy.ops.mmd_tools.import_model('INVOKE_DEFAULT')
+            bpy.ops.mmd_tools_local.import_model('INVOKE_DEFAULT')
 
         return {'FINISHED'}
 
@@ -441,7 +441,7 @@ class ImportMMDAnimation(bpy.types.Operator,bpy_extras.io_utils.ImportHelper):
         if hasattr(context.scene, 'layers'):
             context.scene.layers[0] = True
 
-        if not mmd_tools_installed:
+        if not mmd_tools_local_installed:
             bpy.ops.cats_importer.enable_mmd('INVOKE_DEFAULT')
             return {'FINISHED'}
 
@@ -494,7 +494,7 @@ class ImportMMDAnimation(bpy.types.Operator,bpy_extras.io_utils.ImportHelper):
                 if bone.name in bonedict:
                     bone.name = bonedict[bone.name]
 
-            bpy.ops.mmd_tools.import_vmd(filepath=self.filepath,bone_mapper='RENAMED_BONES',use_underscore=True, dictionary='INTERNAL')
+            bpy.ops.mmd_tools_local.import_vmd(filepath=self.filepath,bone_mapper='RENAMED_BONES',use_underscore=True, dictionary='INTERNAL')
 
             #create animation for original if there isn't one.
             if armature.animation_data == None :
