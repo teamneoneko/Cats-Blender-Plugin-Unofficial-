@@ -1,7 +1,7 @@
 # Cats Blender Plugin.
 
-#### THIS VERSION OF CAT'S IS FOR BLENDER 3.6 AND ABOVE!.
-#### Any issues reported on versions older then Blender 3.6 will not be fixed. ensure you are using either 3.6 or 4.0.
+If you are using blender 3.6 please use the latest release [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases).
+If you are using blender 4.0 please download this version [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-4.0), please note blender 4.0 version can be unstabel and there will be bugs due to mmd tools not being fully updated for 4.0 yet. 
 
 The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat.
 Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
@@ -283,7 +283,7 @@ Please [Click Here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/
 
 ## Installation
 
-- Download the plugin: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/archive/refs/heads/dev.zip)
+- Download the plugin: [Cats Blender Plugin](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases)
    - **Important: Do NOT extract the downloaded zip! You will need the zip file during installation!**
  - Install the addon in blender like so:
    - In Blender 3.6+ go to Edit > Preferences > Add-ons. Also you don't need to save the user settings there.
@@ -327,64 +327,3 @@ Cats Blender Plugin was original developed by absolute quantum then maintained b
 ## Feedback
 
 Please open an issue if you need to leave feedback.
-
-## Change Log
-<details><summary>0.50.0</summary>
-  ## 0.50.0
-  #### IMPORTANT CAT'S WILL NO LONGER WORK IN VERSION BELOW 3.6, PLEASE USE CATS 0.40.0 FOR BLENDER VERSIONS BELOW 3.6.
-
-- Updated MMD Tools so blender 4.0 works better with it.
-- Fixed, fix materials from removing materials nodes, still need a little work though.
-- No longer allow blender versions below 3.6.
-- renamed node_priniped to node_prinipled.
-- bug fixes.
-</details>
-<details><summary>0.40.0</summary>
-  ## 0.40.0
-  #### IMPORTANT WE DO NOT SUPPORT ANY BLENDER VERSION BELOW 3.6 IF YOU HAVE ANY ISSUES PLEASE UPGRADE TO BLENDER 3.6.
-
-- Added Twist Bone Generation.
-- Added Repair Shapekeys Generation.
-- Added Optimised Shapekeys.
-- CAT's is no longer supported on versions below 3.6.
-- 4.0 Fixes by Mysteryem absolute-quantum/cats-blender-plugin#648
-- Cleanup of old code.
-- Removed Tuxedo, I decided no to integrate this into cats.
-- Removed of any references to blender 2.79. Cats have not supported this version for a while and I see no point having this in the code anymore.
-- Preparing for a new option to remove material from the material combiner list.
-- Small bug fixes.
-</details>
-<details><summary>0.30.1</summary>
-
-   ## 0.30.1
-   #### IMPORTANT! This will be the last version that supports Blender 2.8, 2.9 or 3.0. Next versions will only support 3.1 and above, this is due to MMD tools not working as well on older versions.
-
-- Added Support for Blender 4.0.
-- Updated Readme with newer text and pictures.
-- Fixed Text in the dev build installtion confirmation not displaying.
-- Fixed the quick decimation button lable and description not displaying.
-- Fixed the "bpy.ops.mmd_tools.set_shadeless_glsl_shading" error.
-</details>
-<details><summary>0.30.0</summary>
-
-   ## 0.30.0
-   ###IMPORTANT: This will be the last version that supports Blender 2.79.
-
-- Cats no longer supports blender versions older then 2.8, this means I dropped support for 2.79.
-- Change to some internal classes which seem to conflict with Tuxedo, hopefully this fixes issues if you have both plugins.
-- Bug fixes.
-</details>
-<details><summary>0.20.1</summary>
-
-   ## 0.20.1
-
-- Updated MMD Tools to latest version.
-- Change patchlog link to correct github.
-- Updated Wiki link.
-- Removed all VRC SDK 2.0 stuff, SDK2 is now completely obsolete and should not be used anyway.
-</details>
-<details><summary>0.20.0</summary>
-
-Read the full changelog for the original Cat's here. [here](https://github.com/michaeldegroot/cats-blender-plugin/releases).
-
-Read the full changelog for this version Cat's here. [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases).
