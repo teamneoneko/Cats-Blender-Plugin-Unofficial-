@@ -1,6 +1,6 @@
 # Cats Blender Plugin.
 
-**From 22/12/2023 there are seperate versions for blender 3.6 and 4.0, see below for the links. This version of cats WILL NOT support version below blender 3.6**
+**From 22/12/2023 there are seperate versions for blender 3.6 and 4.0, see below for the links. This version of cats WILL NOT support version below blender 3.6, as this change was made last minute into the holidays i will not have time to update the wiki or the docs, i will do this after the holidays (Most likely new years now)**
 
 If you are using blender 3.6 please use the latest release [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases).
 
