@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013 MMD Tools authors
-# This file is part of MMD Tools.
 
 import bpy
-
 
 def setupFrameRanges():
     s, e = 1, 1
@@ -17,12 +14,10 @@ def setupFrameRanges():
         bpy.context.scene.rigidbody_world.point_cache.frame_start = int(s)
         bpy.context.scene.rigidbody_world.point_cache.frame_end = int(e)
 
-
 def setupLighting():
     bpy.context.scene.world.light_settings.use_ambient_occlusion = True
     bpy.context.scene.world.light_settings.use_environment_light = True
     bpy.context.scene.world.light_settings.use_indirect_light = True
-
 
 def setupFps():
     bpy.context.scene.render.fps = 30

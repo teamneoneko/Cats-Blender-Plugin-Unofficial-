@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
-# Copyright 2014 MMD Tools authors
-# This file is part of MMD Tools.
 
 import bpy
-
 from mmd_tools_local import bpyutils
 from mmd_tools_local.core import rigid_body
-from mmd_tools_local.core.model import FnModel
+from mmd_tools_local.core.model import FnModel, getRigidBodySize
 
 
 def _updateCollisionGroup(prop, context):
@@ -22,7 +19,7 @@ def _updateType(prop, context):
     obj = prop.id_data
     rb = obj.rigid_body
     if rb:
-        rb.kinematic = int(prop.type) == rigid_body.MODE_STATIC
+        rb.kinematic = (int(prop.type) == rigid_body.MODE_STATIC)
 
 
 def _updateShape(prop, context):
@@ -39,22 +36,22 @@ def _updateShape(prop, context):
 
 def _get_bone(prop):
     obj = prop.id_data
-    relation = obj.constraints.get("mmd_tools_local_rigid_parent", None)
+    relation = obj.constraints.get('mmd_tools_local_rigid_parent', None)
     if relation:
         arm = relation.target
         bone_name = relation.subtarget
         if arm is not None and bone_name in arm.data.bones:
             return bone_name
-    return prop.get("bone", "")
+    return prop.get('bone', '')
 
 
 def _set_bone(prop, value):
     bone_name = value
     obj = prop.id_data
-    relation = obj.constraints.get("mmd_tools_local_rigid_parent", None)
+    relation = obj.constraints.get('mmd_tools_local_rigid_parent', None)
     if relation is None:
-        relation = obj.constraints.new("CHILD_OF")
-        relation.name = "mmd_tools_local_rigid_parent"
+        relation = obj.constraints.new('CHILD_OF')
+        relation.name = 'mmd_tools_local_rigid_parent'
         relation.mute = True
 
     arm = relation.target
@@ -66,37 +63,37 @@ def _set_bone(prop, value):
     if arm is not None and bone_name in arm.data.bones:
         relation.subtarget = bone_name
     else:
-        relation.subtarget = bone_name = ""
+        relation.subtarget = bone_name = ''
 
-    prop["bone"] = bone_name
+    prop['bone'] = bone_name
 
 
 def _get_size(prop):
-    if prop.id_data.mmd_type != "RIGID_BODY":
+    if prop.id_data.mmd_type != 'RIGID_BODY':
         return (0, 0, 0)
-    return FnModel.get_rigid_body_size(prop.id_data)
+    return getRigidBodySize(prop.id_data)
 
 
 def _set_size(prop, value):
     obj = prop.id_data
-    assert obj.mode == "OBJECT"  # not support other mode yet
+    assert(obj.mode == 'OBJECT')  # not support other mode yet
     shape = prop.shape
 
     mesh = obj.data
     rb = obj.rigid_body
 
     if len(mesh.vertices) == 0 or rb is None or rb.collision_shape != shape:
-        if shape == "SPHERE":
+        if shape == 'SPHERE':
             bpyutils.makeSphere(
                 radius=value[0],
                 target_object=obj,
             )
-        elif shape == "BOX":
+        elif shape == 'BOX':
             bpyutils.makeBox(
                 size=value,
                 target_object=obj,
             )
-        elif shape == "CAPSULE":
+        elif shape == 'CAPSULE':
             bpyutils.makeCapsule(
                 radius=value[0],
                 height=value[1],
@@ -106,12 +103,12 @@ def _set_size(prop, value):
         if rb:
             rb.collision_shape = shape
     else:
-        if shape == "SPHERE":
+        if shape == 'SPHERE':
             radius = max(value[0], 1e-3)
             for v in mesh.vertices:
                 vec = v.co.normalized()
                 v.co = vec * radius
-        elif shape == "BOX":
+        elif shape == 'BOX':
             x = max(value[0], 1e-3)
             y = max(value[1], 1e-3)
             z = max(value[2], 1e-3)
@@ -121,50 +118,50 @@ def _set_size(prop, value):
                 y0 = -y if y0 < 0 else y
                 z0 = -z if z0 < 0 else z
                 v.co = [x0, y0, z0]
-        elif shape == "CAPSULE":
-            r0, h0, xx = FnModel.get_rigid_body_size(prop.id_data)
+        elif shape == 'CAPSULE':
+            r0, h0, xx = getRigidBodySize(prop.id_data)
             h0 *= 0.5
             radius = max(value[0], 1e-3)
-            height = max(value[1], 1e-3) * 0.5
-            scale = radius / max(r0, 1e-3)
+            height = max(value[1], 1e-3)*0.5
+            scale = radius/max(r0, 1e-3)
             for v in mesh.vertices:
                 x0, y0, z0 = v.co
                 x0 *= scale
                 y0 *= scale
                 if z0 < 0:
-                    z0 = (z0 + h0) * scale - height
+                    z0 = (z0 + h0)*scale - height
                 else:
-                    z0 = (z0 - h0) * scale + height
+                    z0 = (z0 - h0)*scale + height
                 v.co = [x0, y0, z0]
         mesh.update()
 
 
 def _get_rigid_name(prop):
-    return prop.get("name", "")
+    return prop.get('name', '')
 
 
 def _set_rigid_name(prop, value):
-    prop["name"] = value
+    prop['name'] = value
 
 
 class MMDRigidBody(bpy.types.PropertyGroup):
     name_j: bpy.props.StringProperty(
-        name="Name",
-        description="Japanese Name",
-        default="",
+        name='Name',
+        description='Japanese Name',
+        default='',
         get=_get_rigid_name,
         set=_set_rigid_name,
     )
 
     name_e: bpy.props.StringProperty(
-        name="Name(Eng)",
-        description="English Name",
-        default="",
+        name='Name(Eng)',
+        description='English Name',
+        default='',
     )
 
     collision_group_number: bpy.props.IntProperty(
-        name="Collision Group",
-        description="The collision group of the object",
+        name='Collision Group',
+        description='The collision group of the object',
         min=0,
         max=15,
         default=1,
@@ -172,46 +169,49 @@ class MMDRigidBody(bpy.types.PropertyGroup):
     )
 
     collision_group_mask: bpy.props.BoolVectorProperty(
-        name="Collision Group Mask",
-        description="The groups the object can not collide with",
+        name='Collision Group Mask',
+        description='The groups the object can not collide with',
         size=16,
-        subtype="LAYER",
+        subtype='LAYER',
     )
 
     type: bpy.props.EnumProperty(
-        name="Rigid Type",
-        description="Select rigid type",
+        name='Rigid Type',
+        description='Select rigid type',
         items=[
-            (str(rigid_body.MODE_STATIC), "Bone", "Rigid body's orientation completely determined by attached bone", 1),
-            (str(rigid_body.MODE_DYNAMIC), "Physics", "Attached bone's orientation completely determined by rigid body", 2),
-            (str(rigid_body.MODE_DYNAMIC_BONE), "Physics + Bone", "Bone determined by combination of parent and attached rigid body", 3),
+            (str(rigid_body.MODE_STATIC), 'Bone',
+                "Rigid body's orientation completely determined by attached bone", 1),
+            (str(rigid_body.MODE_DYNAMIC), 'Physics',
+                "Attached bone's orientation completely determined by rigid body", 2),
+            (str(rigid_body.MODE_DYNAMIC_BONE), 'Physics + Bone',
+                "Bone determined by combination of parent and attached rigid body", 3),
         ],
         update=_updateType,
     )
 
     shape: bpy.props.EnumProperty(
-        name="Shape",
-        description="Select the collision shape",
+        name='Shape',
+        description='Select the collision shape',
         items=[
-            ("SPHERE", "Sphere", "", 1),
-            ("BOX", "Box", "", 2),
-            ("CAPSULE", "Capsule", "", 3),
+            ('SPHERE', 'Sphere', '', 1),
+            ('BOX', 'Box', '', 2),
+            ('CAPSULE', 'Capsule', '', 3),
         ],
         update=_updateShape,
     )
 
     bone: bpy.props.StringProperty(
-        name="Bone",
-        description="Target bone",
-        default="",
+        name='Bone',
+        description='Target bone',
+        default='',
         get=_get_bone,
         set=_set_bone,
     )
 
     size: bpy.props.FloatVectorProperty(
-        name="Size",
-        description="Size of the object",
-        subtype="XYZ",
+        name='Size',
+        description='Size of the object',
+        subtype='XYZ',
         size=3,
         min=0,
         step=0.1,
@@ -232,7 +232,7 @@ def _updateSpringLinear(prop, context):
 def _updateSpringAngular(prop, context):
     obj = prop.id_data
     rbc = obj.rigid_body_constraint
-    if rbc and hasattr(rbc, "use_spring_ang_x"):
+    if rbc and hasattr(rbc, 'use_spring_ang_x'):
         rbc.spring_stiffness_ang_x = prop.spring_angular[0]
         rbc.spring_stiffness_ang_y = prop.spring_angular[1]
         rbc.spring_stiffness_ang_z = prop.spring_angular[2]
@@ -240,21 +240,21 @@ def _updateSpringAngular(prop, context):
 
 class MMDJoint(bpy.types.PropertyGroup):
     name_j: bpy.props.StringProperty(
-        name="Name",
-        description="Japanese Name",
-        default="",
+        name='Name',
+        description='Japanese Name',
+        default='',
     )
 
     name_e: bpy.props.StringProperty(
-        name="Name(Eng)",
-        description="English Name",
-        default="",
+        name='Name(Eng)',
+        description='English Name',
+        default='',
     )
 
     spring_linear: bpy.props.FloatVectorProperty(
-        name="Spring(Linear)",
-        description="Spring constant of movement",
-        subtype="XYZ",
+        name='Spring(Linear)',
+        description='Spring constant of movement',
+        subtype='XYZ',
         size=3,
         min=0,
         step=0.1,
@@ -262,9 +262,9 @@ class MMDJoint(bpy.types.PropertyGroup):
     )
 
     spring_angular: bpy.props.FloatVectorProperty(
-        name="Spring(Angular)",
-        description="Spring constant of rotation",
-        subtype="XYZ",
+        name='Spring(Angular)',
+        description='Spring constant of rotation',
+        subtype='XYZ',
         size=3,
         min=0,
         step=0.1,

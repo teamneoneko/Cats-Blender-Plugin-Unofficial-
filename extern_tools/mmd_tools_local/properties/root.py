@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
-# Copyright 2014 MMD Tools authors
-# This file is part of MMD Tools.
-
 """ MMDモデルパラメータ用Prop
 """
 import bpy
-
 import mmd_tools_local.core.model as mmd_model
 from mmd_tools_local import utils
 from mmd_tools_local.bpyutils import SceneOp, activate_layer_collection
 from mmd_tools_local.core.material import FnMaterial
 from mmd_tools_local.core.sdef import FnSDEF
-from mmd_tools_local.properties.morph import BoneMorph, GroupMorph, MaterialMorph, UVMorph, VertexMorph
+from mmd_tools_local.properties.morph import (BoneMorph, GroupMorph, MaterialMorph,
+                                        UVMorph, VertexMorph)
 from mmd_tools_local.properties.translations import MMDTranslation
 
 
@@ -26,9 +23,9 @@ def __driver_variables(id_data, path, index=-1):
 def __add_single_prop(variables, id_obj, data_path, prefix):
     var = variables.new()
     var.name = prefix + str(len(variables))
-    var.type = "SINGLE_PROP"
+    var.type = 'SINGLE_PROP'
     target = var.targets[0]
-    target.id_type = "OBJECT"
+    target.id_type = 'OBJECT'
     target.id = id_obj
     target.data_path = data_path
     return var
@@ -37,35 +34,34 @@ def __add_single_prop(variables, id_obj, data_path, prefix):
 def _toggleUsePropertyDriver(self, context):
     root = self.id_data
     rig = mmd_model.Model(root)
-    bones = getattr((rig.armature() or root).pose, "bones", ())
-    ik_map = {bones[c.subtarget]: (b, c) for b in bones for c in b.constraints if c.type == "IK" and c.is_valid and c.subtarget in bones}
-    prop_hide_viewport = "hide_viewport" if hasattr(root, "hide_viewport") else "hide"
+    bones = getattr((rig.armature() or root).pose, 'bones', ())
+    ik_map = {bones[c.subtarget]: (b, c) for b in bones for c in b.constraints if c.type == 'IK' and c.is_valid and c.subtarget in bones}
+    prop_hide_viewport = 'hide_viewport' if hasattr(root, 'hide_viewport') else 'hide'
     if self.use_property_driver:
         for ik, (b, c) in ik_map.items():
-            driver, variables = __driver_variables(c, "influence")
-            driver.expression = "%s" % __add_single_prop(variables, ik.id_data, ik.path_from_id("mmd_ik_toggle"), "use_ik").name
+            driver, variables = __driver_variables(c, 'influence')
+            driver.expression = '%s' % __add_single_prop(variables, ik.id_data, ik.path_from_id('mmd_ik_toggle'), 'use_ik').name
             b = b if c.use_tail else b.parent
-            for b in ([b] + b.parent_recursive)[: c.chain_count]:
-                c = next((c for c in b.constraints if c.type == "LIMIT_ROTATION" and not c.mute), None)
+            for b in ([b]+b.parent_recursive)[:c.chain_count]:
+                c = next((c for c in b.constraints if c.type == 'LIMIT_ROTATION' and not c.mute), None)
                 if c:
-                    driver, variables = __driver_variables(c, "influence")
-                    driver.expression = "%s" % __add_single_prop(variables, ik.id_data, ik.path_from_id("mmd_ik_toggle"), "use_ik").name
+                    driver, variables = __driver_variables(c, 'influence')
+                    driver.expression = '%s' % __add_single_prop(variables, ik.id_data, ik.path_from_id('mmd_ik_toggle'), 'use_ik').name
         for i in rig.meshes():
-            for prop_hide in (prop_hide_viewport, "hide_render"):
+            for prop_hide in (prop_hide_viewport, 'hide_render'):
                 driver, variables = __driver_variables(i, prop_hide)
-                driver.expression = "not %s" % __add_single_prop(variables, root, "mmd_root.show_meshes", "show").name
+                driver.expression = 'not %s' % __add_single_prop(variables, root, 'mmd_root.show_meshes', 'show').name
     else:
         for ik, (b, c) in ik_map.items():
-            c.driver_remove("influence")
+            c.driver_remove('influence')
             b = b if c.use_tail else b.parent
-            for b in ([b] + b.parent_recursive)[: c.chain_count]:
-                c = next((c for c in b.constraints if c.type == "LIMIT_ROTATION" and not c.mute), None)
+            for b in ([b]+b.parent_recursive)[:c.chain_count]:
+                c = next((c for c in b.constraints if c.type == 'LIMIT_ROTATION' and not c.mute), None)
                 if c:
-                    c.driver_remove("influence")
+                    c.driver_remove('influence')
         for i in rig.meshes():
-            for prop_hide in (prop_hide_viewport, "hide_render"):
+            for prop_hide in (prop_hide_viewport, 'hide_render'):
                 i.driver_remove(prop_hide)
-
 
 # ===========================================
 # Callback functions
@@ -107,12 +103,12 @@ def _toggleVisibilityOfMeshes(self, context):
 
 
 def _show_meshes_get(prop):
-    return prop.get("show_meshes", True)
+    return prop.get('show_meshes', True)
 
 
 def _show_meshes_set(prop, v):
-    if v != prop.get("show_meshes", None):
-        prop["show_meshes"] = v
+    if v != prop.get('show_meshes', None):
+        prop['show_meshes'] = v
         _toggleVisibilityOfMeshes(prop, bpy.context)
 
 
@@ -166,7 +162,7 @@ def _setVisibilityOfMMDRigArmature(prop, v):
 
 
 def _getVisibilityOfMMDRigArmature(prop):
-    if prop.id_data.mmd_type != "ROOT":
+    if prop.id_data.mmd_type != 'ROOT':
         return False
     arm = mmd_model.FnModel.find_armature(prop.id_data)
     r = arm and not arm.hide
@@ -176,60 +172,59 @@ def _getVisibilityOfMMDRigArmature(prop):
 
 def _setActiveRigidbodyObject(prop, v):
     obj = SceneOp(bpy.context).id_objects[v]
-    if mmd_model.FnModel.is_rigid_body_object(obj):
+    if mmd_model.isRigidBodyObject(obj):
         utils.selectAObject(obj)
-    prop["active_rigidbody_object_index"] = v
+    prop['active_rigidbody_object_index'] = v
 
 
 def _getActiveRigidbodyObject(prop):
     scene = SceneOp(bpy.context)
     active_obj = scene.active_object
-    if mmd_model.FnModel.is_rigid_body_object(active_obj):
-        prop["active_rigidbody_object_index"] = scene.id_objects.find(active_obj.name)
-    return prop.get("active_rigidbody_object_index", 0)
+    if mmd_model.isRigidBodyObject(active_obj):
+        prop['active_rigidbody_object_index'] = scene.id_objects.find(active_obj.name)
+    return prop.get('active_rigidbody_object_index', 0)
 
 
 def _setActiveJointObject(prop, v):
     obj = SceneOp(bpy.context).id_objects[v]
-    if mmd_model.FnModel.is_joint_object(obj):
+    if mmd_model.isJointObject(obj):
         utils.selectAObject(obj)
-    prop["active_joint_object_index"] = v
+    prop['active_joint_object_index'] = v
 
 
 def _getActiveJointObject(prop):
     scene = SceneOp(bpy.context)
     active_obj = scene.active_object
-    if mmd_model.FnModel.is_joint_object(active_obj):
-        prop["active_joint_object_index"] = scene.id_objects.find(active_obj.name)
-    return prop.get("active_joint_object_index", 0)
+    if mmd_model.isJointObject(active_obj):
+        prop['active_joint_object_index'] = scene.id_objects.find(active_obj.name)
+    return prop.get('active_joint_object_index', 0)
 
 
 def _setActiveMorph(prop, v):
-    if "active_morph_indices" not in prop:
-        prop["active_morph_indices"] = [0] * 5
-    prop["active_morph_indices"][prop.get("active_morph_type", 3)] = v
+    if 'active_morph_indices' not in prop:
+        prop['active_morph_indices'] = [0]*5
+    prop['active_morph_indices'][prop.get('active_morph_type', 3)] = v
 
 
 def _getActiveMorph(prop):
-    if "active_morph_indices" in prop:
-        return prop["active_morph_indices"][prop.get("active_morph_type", 3)]
+    if 'active_morph_indices' in prop:
+        return prop['active_morph_indices'][prop.get('active_morph_type', 3)]
     return 0
 
 
 def _setActiveMeshObject(prop, v):
     obj = SceneOp(bpy.context).id_objects[v]
-    if obj.type == "MESH" and obj.mmd_type == "NONE":
+    if obj.type == 'MESH' and obj.mmd_type == 'NONE':
         utils.selectAObject(obj)
-    prop["active_mesh_index"] = v
+    prop['active_mesh_index'] = v
 
 
 def _getActiveMeshObject(prop):
     scene = SceneOp(bpy.context)
     active_obj = scene.active_object
-    if active_obj and active_obj.type == "MESH" and active_obj.mmd_type == "NONE":
-        prop["active_mesh_index"] = scene.id_objects.find(active_obj.name)
-    return prop.get("active_mesh_index", -1)
-
+    if active_obj and active_obj.type == 'MESH' and active_obj.mmd_type == 'NONE':
+        prop['active_mesh_index'] = scene.id_objects.find(active_obj.name)
+    return prop.get('active_mesh_index', -1)
 
 # ===========================================
 # Property classes
@@ -237,98 +232,96 @@ def _getActiveMeshObject(prop):
 
 
 class MMDDisplayItem(bpy.types.PropertyGroup):
-    """PMX 表示項目(表示枠内の1項目)"""
-
+    """ PMX 表示項目(表示枠内の1項目)
+    """
     type: bpy.props.EnumProperty(
-        name="Type",
-        description="Select item type",
+        name='Type',
+        description='Select item type',
         items=[
-            ("BONE", "Bone", "", 1),
-            ("MORPH", "Morph", "", 2),
+            ('BONE', 'Bone', '', 1),
+            ('MORPH', 'Morph', '', 2),
         ],
     )
 
     morph_type: bpy.props.EnumProperty(
-        name="Morph Type",
-        description="Select morph type",
+        name='Morph Type',
+        description='Select morph type',
         items=[
-            ("material_morphs", "Material", "Material Morphs", 0),
-            ("uv_morphs", "UV", "UV Morphs", 1),
-            ("bone_morphs", "Bone", "Bone Morphs", 2),
-            ("vertex_morphs", "Vertex", "Vertex Morphs", 3),
-            ("group_morphs", "Group", "Group Morphs", 4),
+            ('material_morphs', 'Material', 'Material Morphs', 0),
+            ('uv_morphs', 'UV', 'UV Morphs', 1),
+            ('bone_morphs', 'Bone', 'Bone Morphs', 2),
+            ('vertex_morphs', 'Vertex', 'Vertex Morphs', 3),
+            ('group_morphs', 'Group', 'Group Morphs', 4),
         ],
-        default="vertex_morphs",
+        default='vertex_morphs',
     )
 
 
 class MMDDisplayItemFrame(bpy.types.PropertyGroup):
-    """PMX 表示枠
+    """ PMX 表示枠
 
-    PMXファイル内では表示枠がリストで格納されています。
+     PMXファイル内では表示枠がリストで格納されています。
     """
-
     name_e: bpy.props.StringProperty(
-        name="Name(Eng)",
-        description="English Name",
-        default="",
+        name='Name(Eng)',
+        description='English Name',
+        default='',
     )
 
     # 特殊枠フラグ
     # 特殊枠はファイル仕様上の固定枠(削除、リネーム不可)
     is_special: bpy.props.BoolProperty(
-        name="Special",
-        description="Is special",
+        name='Special',
+        description='Is special',
         default=False,
     )
 
     # 表示項目のリスト
     data: bpy.props.CollectionProperty(
-        name="Display Items",
+        name='Display Items',
         type=MMDDisplayItem,
     )
 
     # 現在アクティブな項目のインデックス
     active_item: bpy.props.IntProperty(
-        name="Active Display Item",
+        name='Active Display Item',
         min=0,
         default=0,
     )
 
 
 class MMDRoot(bpy.types.PropertyGroup):
-    """MMDモデルデータ
+    """ MMDモデルデータ
 
-    モデルルート用に作成されたEmtpyオブジェクトで使用します
+     モデルルート用に作成されたEmtpyオブジェクトで使用します
     """
-
     name: bpy.props.StringProperty(
-        name="Name",
-        description="The name of the MMD model",
-        default="",
+        name='Name',
+        description='The name of the MMD model',
+        default='',
     )
 
     name_e: bpy.props.StringProperty(
-        name="Name (English)",
-        description="The english name of the MMD model",
-        default="",
+        name='Name (English)',
+        description='The english name of the MMD model',
+        default='',
     )
 
     comment_text: bpy.props.StringProperty(
-        name="Comment",
-        description="The text datablock of the comment",
-        default="",
+        name='Comment',
+        description='The text datablock of the comment',
+        default='',
     )
 
     comment_e_text: bpy.props.StringProperty(
-        name="Comment (English)",
-        description="The text datablock of the english comment",
-        default="",
+        name='Comment (English)',
+        description='The text datablock of the english comment',
+        default='',
     )
 
     ik_loop_factor: bpy.props.IntProperty(
-        name="MMD IK Loop Factor",
-        description="Scaling factor of MMD IK loop",
+        name='MMD IK Loop Factor',
+        description='Scaling factor of MMD IK loop',
         min=1,
         soft_max=10,
         max=100,
@@ -337,8 +330,8 @@ class MMDRoot(bpy.types.PropertyGroup):
 
     # TODO: Replace to driver for NLA
     show_meshes: bpy.props.BoolProperty(
-        name="Show Meshes",
-        description="Show all meshes of the MMD model",
+        name='Show Meshes',
+        description='Show all meshes of the MMD model',
         # get=_show_meshes_get,
         # set=_show_meshes_set,
         update=_toggleVisibilityOfMeshes,
@@ -346,83 +339,83 @@ class MMDRoot(bpy.types.PropertyGroup):
     )
 
     show_rigid_bodies: bpy.props.BoolProperty(
-        name="Show Rigid Bodies",
-        description="Show all rigid bodies of the MMD model",
+        name='Show Rigid Bodies',
+        description='Show all rigid bodies of the MMD model',
         update=_toggleVisibilityOfRigidBodies,
     )
 
     show_joints: bpy.props.BoolProperty(
-        name="Show Joints",
-        description="Show all joints of the MMD model",
+        name='Show Joints',
+        description='Show all joints of the MMD model',
         update=_toggleVisibilityOfJoints,
     )
 
     show_temporary_objects: bpy.props.BoolProperty(
-        name="Show Temps",
-        description="Show all temporary objects of the MMD model",
+        name='Show Temps',
+        description='Show all temporary objects of the MMD model',
         update=_toggleVisibilityOfTemporaryObjects,
     )
 
     show_armature: bpy.props.BoolProperty(
-        name="Show Armature",
-        description="Show the armature object of the MMD model",
+        name='Show Armature',
+        description='Show the armature object of the MMD model',
         get=_getVisibilityOfMMDRigArmature,
         set=_setVisibilityOfMMDRigArmature,
     )
 
     show_names_of_rigid_bodies: bpy.props.BoolProperty(
-        name="Show Rigid Body Names",
-        description="Show rigid body names",
+        name='Show Rigid Body Names',
+        description='Show rigid body names',
         update=_toggleShowNamesOfRigidBodies,
     )
 
     show_names_of_joints: bpy.props.BoolProperty(
-        name="Show Joint Names",
-        description="Show joint names",
+        name='Show Joint Names',
+        description='Show joint names',
         update=_toggleShowNamesOfJoints,
     )
 
     use_toon_texture: bpy.props.BoolProperty(
-        name="Use Toon Texture",
-        description="Use toon texture",
+        name='Use Toon Texture',
+        description='Use toon texture',
         update=_toggleUseToonTexture,
         default=True,
     )
 
     use_sphere_texture: bpy.props.BoolProperty(
-        name="Use Sphere Texture",
-        description="Use sphere texture",
+        name='Use Sphere Texture',
+        description='Use sphere texture',
         update=_toggleUseSphereTexture,
         default=True,
     )
 
     use_sdef: bpy.props.BoolProperty(
-        name="Use SDEF",
-        description="Use SDEF",
+        name='Use SDEF',
+        description='Use SDEF',
         update=_toggleUseSDEF,
         default=True,
     )
 
     use_property_driver: bpy.props.BoolProperty(
-        name="Use Property Driver",
-        description="Setup drivers for MMD property animation (Visibility and IK toggles)",
+        name='Use Property Driver',
+        description='Setup drivers for MMD property animation (Visibility and IK toggles)',
         update=_toggleUsePropertyDriver,
         default=False,
     )
 
     is_built: bpy.props.BoolProperty(
-        name="Is Built",
+        name='Is Built',
     )
 
     active_rigidbody_index: bpy.props.IntProperty(
-        name="Active Rigidbody Index",
+        name='Active Rigidbody Index',
         min=0,
         get=_getActiveRigidbodyObject,
         set=_setActiveRigidbodyObject,
     )
 
     active_joint_index: bpy.props.IntProperty(
-        name="Active Joint Index",
+        name='Active Joint Index',
         min=0,
         get=_getActiveJointObject,
         set=_setActiveJointObject,
@@ -432,12 +425,12 @@ class MMDRoot(bpy.types.PropertyGroup):
     # Display Items
     # *************************
     display_item_frames: bpy.props.CollectionProperty(
-        name="Display Frames",
+        name='Display Frames',
         type=MMDDisplayItemFrame,
     )
 
     active_display_item_frame: bpy.props.IntProperty(
-        name="Active Display Item Frame",
+        name='Active Display Item Frame',
         min=0,
         default=0,
     )
@@ -446,47 +439,50 @@ class MMDRoot(bpy.types.PropertyGroup):
     # Morph
     # *************************
     material_morphs: bpy.props.CollectionProperty(
-        name="Material Morphs",
+        name='Material Morphs',
         type=MaterialMorph,
     )
     uv_morphs: bpy.props.CollectionProperty(
-        name="UV Morphs",
+        name='UV Morphs',
         type=UVMorph,
     )
     bone_morphs: bpy.props.CollectionProperty(
-        name="Bone Morphs",
+        name='Bone Morphs',
         type=BoneMorph,
     )
-    vertex_morphs: bpy.props.CollectionProperty(name="Vertex Morphs", type=VertexMorph)
+    vertex_morphs: bpy.props.CollectionProperty(
+        name='Vertex Morphs',
+        type=VertexMorph
+    )
     group_morphs: bpy.props.CollectionProperty(
-        name="Group Morphs",
+        name='Group Morphs',
         type=GroupMorph,
     )
     active_morph_type: bpy.props.EnumProperty(
-        name="Active Morph Type",
-        description="Select current morph type",
+        name='Active Morph Type',
+        description='Select current morph type',
         items=[
-            ("material_morphs", "Material", "Material Morphs", 0),
-            ("uv_morphs", "UV", "UV Morphs", 1),
-            ("bone_morphs", "Bone", "Bone Morphs", 2),
-            ("vertex_morphs", "Vertex", "Vertex Morphs", 3),
-            ("group_morphs", "Group", "Group Morphs", 4),
+            ('material_morphs', 'Material', 'Material Morphs', 0),
+            ('uv_morphs', 'UV', 'UV Morphs', 1),
+            ('bone_morphs', 'Bone', 'Bone Morphs', 2),
+            ('vertex_morphs', 'Vertex', 'Vertex Morphs', 3),
+            ('group_morphs', 'Group', 'Group Morphs', 4),
         ],
-        default="vertex_morphs",
+        default='vertex_morphs',
     )
     active_morph: bpy.props.IntProperty(
-        name="Active Morph",
+        name='Active Morph',
         min=0,
         set=_setActiveMorph,
         get=_getActiveMorph,
     )
     morph_panel_show_settings: bpy.props.BoolProperty(
-        name="Morph Panel Show Settings",
-        description="Show Morph Settings",
+        name='Morph Panel Show Settings',
+        description='Show Morph Settings',
         default=True,
     )
     active_mesh_index: bpy.props.IntProperty(
-        name="Active Mesh",
+        name='Active Mesh',
         min=0,
         set=_setActiveMeshObject,
         get=_getActiveMeshObject,
@@ -496,6 +492,6 @@ class MMDRoot(bpy.types.PropertyGroup):
     # Translation
     # *************************
     translation: bpy.props.PointerProperty(
-        name="Translation",
+        name='Translation',
         type=MMDTranslation,
     )
