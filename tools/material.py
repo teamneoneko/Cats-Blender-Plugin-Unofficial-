@@ -162,7 +162,6 @@ class CombineMaterialsButton(bpy.types.Operator):
                 if mat_slot.material and mat_slot.material.node_tree:
                     nodes = mat_slot.material.node_tree.nodes
                     for node in nodes:
-
                         if node.type == 'BSDF_PRINCIPLED':
                             hash_this += node.name
                             if 'Base Color' in node.inputs:
@@ -204,23 +203,24 @@ class CombineMaterialsButton(bpy.types.Operator):
                                 except TypeError:
                                     hash_this += str(value.default_value)
                             else:
-                                hash_this += value.name
-
+                                hash_this += value.name                               
                 if hash_this not in self.combined_tex:
                     self.combined_tex[hash_this] = []
                 self.combined_tex[hash_this].append({'mat': mat_slot.name, 'index': index})
 
     def get_image_textures(self, material_name):
         textures = []
-        for node in bpy.data.materials[material_name].node_tree.nodes:
-            if node.type == 'TEX_IMAGE':
-                textures.append(node)
+        if bpy.data.materials[material_name].node_tree is not None:
+            for node in bpy.data.materials[material_name].node_tree.nodes:
+                if node.type == 'TEX_IMAGE':
+                    textures.append(node)
         return textures
 
     def copy_textures(self, image_textures, target_material):
-        for texture in image_textures:
-            new_texture_node = target_material.node_tree.nodes.new(type='ShaderNodeTexImage')
-            new_texture_node.image = texture.image
+        if target_material.node_tree is not None:
+            for texture in image_textures:
+                new_texture_node = target_material.node_tree.nodes.new(type='ShaderNodeTexImage')
+                new_texture_node.image = texture.image
 
     def combine_materials(self, file):
         target_material = bpy.data.materials.new(name="CombinedMaterial")
@@ -269,6 +269,8 @@ class CombineMaterialsButton(bpy.types.Operator):
                 Common.switch('OBJECT')
                 self.clean_material_slots()
                 Common.clean_material_names(mesh)
+
+                i += 1
 
         Common.update_material_list()
         saved_data.load()
