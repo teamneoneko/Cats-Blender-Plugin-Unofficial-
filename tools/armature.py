@@ -305,7 +305,7 @@ class FixArmature(bpy.types.Operator):
         collections_armature_is_in = armature.users_collection
         if collections_armature_is_in:
             armature_collection = collections_armature_is_in[0]
-            for col in collections_armature_is_in[1::]:
+            for col in collections_armature_is_in[1:]:
                 col.objects.unlink(armature)
         else:
             armature_collection = context.scene.collection

@@ -20,7 +20,7 @@
 
 # This file is copied from
 #   https://github.com/nutti/Screencast-Keys/blob/a16f6c7dd697f6ec7bced5811db4a8144514d320/src/screencast_keys/utils/addon_updater.py
-# fmt: off
+
 
 import datetime
 import json
@@ -176,7 +176,6 @@ class AddonUpdaterConfig:
         # If you specify (-1, -1), ignore versions less than current add-on
         # version specified in bl_info.
         self.min_release_version = (-1, -1)
-        self.max_release_version = (+999, +999)
 
         # Target add-on path
         # {"branch/tag": "add-on path"}
@@ -269,7 +268,8 @@ class AddonUpdaterManager:
             releases = _get_all_releases_data(self.__config.owner,
                                               self.__config.repository)
             for r in releases:
-                if _compare_version(_parse_release_version(r["tag_name"]), self.__config.min_release_version) > 0 and _compare_version(_parse_release_version(r["tag_name"]), self.__config.max_release_version) < 0:
+                if _compare_version(_parse_release_version(r["tag_name"]),
+                                    self.__config.min_release_version) > 0:
                     info = UpdateCandidateInfo()
                     info.name = r["tag_name"]
                     info.url = r["assets"][0]["browser_download_url"]
@@ -377,27 +377,25 @@ class AddonUpdaterManager:
     def updated(self):
         return self.__updated
 
-# fmt: on
 
 
 class CheckAddonUpdate(bpy.types.Operator):
     bl_idname = "mmd_tools_local.check_addon_update"
     bl_label = "Check Update"
     bl_description = "Check Add-on Update"
-    bl_options = {"INTERNAL"}
+    bl_options = {'INTERNAL'}
 
     def execute(self, context):
         updater = AddonUpdaterManager.get_instance()
         updater.check_update_candidate()
 
-        return {"FINISHED"}
-
+        return {'FINISHED'}
 
 class UpdateAddon(bpy.types.Operator):
     bl_idname = "mmd_tools_local.update_addon"
     bl_label = "Update"
     bl_description = "Update Add-on"
-    bl_options = {"INTERNAL"}
+    bl_options = {'INTERNAL'}
 
     branch_name: bpy.props.StringProperty(
         name="Branch Name",
@@ -409,19 +407,17 @@ class UpdateAddon(bpy.types.Operator):
         updater = AddonUpdaterManager.get_instance()
         updater.update(self.branch_name)
 
-        return {"FINISHED"}
-
+        return {'FINISHED'}
 
 def register_updater(bl_info, init_py_file):
     config = AddonUpdaterConfig()
-    config.owner = "UuuNyaa"
-    config.repository = "blender_mmd_tools_local"
+    config.owner = 'UuuNyaa'
+    config.repository = 'blender_mmd_tools_local'
     config.current_addon_path = os.path.dirname(os.path.realpath(init_py_file))
-    config.branches = ["main"]
+    config.branches = ['main']
     config.addon_directory = os.path.dirname(config.current_addon_path)
     config.min_release_version = (1, 0, 0)
-    config.max_release_version = (4, 0, 0)
-    config.default_target_addon_path = "mmd_tools_local"
+    config.default_target_addon_path = 'mmd_tools_local'
     config.target_addon_path = {}
     updater = AddonUpdaterManager.get_instance()
     updater.init(bl_info, config)

@@ -5,8 +5,6 @@ from . import common as Common
 from .register import register_wrap
 from .translations import t
 
-from bpy.types import ShaderNodeBsdfPrincipled, ShaderNodeBsdfAnisotropic
-
 
 @register_wrap
 class OneTexPerMatButton(bpy.types.Operator):
@@ -40,7 +38,6 @@ class OneTexPerMatButton(bpy.types.Operator):
         self.report({'INFO'}, t('OneTexPerMatButton.success'))
         return {'FINISHED'}
 
-
 @register_wrap
 class OneTexPerMatOnlyButton(bpy.types.Operator):
     bl_idname = 'cats_material.one_tex_only'
@@ -73,7 +70,6 @@ class OneTexPerMatOnlyButton(bpy.types.Operator):
         self.report({'INFO'}, t('OneTexPerXButton.success'))
         return {'FINISHED'}
 
-
 @register_wrap
 class StandardizeTextures(bpy.types.Operator):
     bl_idname = 'cats_material.standardize_textures'
@@ -90,7 +86,7 @@ class StandardizeTextures(bpy.types.Operator):
     def execute(self, context):
         self.report({'ERROR'}, t('ToolsMaterial.error.notCompatible'))
         return {'CANCELLED'}
-
+        
         saved_data = Common.SavedData()
 
         Common.set_default_stage()
@@ -112,7 +108,6 @@ class StandardizeTextures(bpy.types.Operator):
         self.report({'INFO'}, t('StandardizeTextures.success'))
         return {'FINISHED'}
 
-
 @register_wrap
 class CombineMaterialsButton(bpy.types.Operator):
     bl_idname = 'cats_material.combine_mats'
@@ -128,7 +123,7 @@ class CombineMaterialsButton(bpy.types.Operator):
             return False
         return len(Common.get_meshes_objects(check=False)) > 0
 
-    def assign_material_slots(self, ob, matlist):
+    def assignmatslots(self, ob, matlist):
         scn = bpy.context.scene
         ob_active = Common.get_active()
         Common.set_active(ob)
@@ -144,7 +139,7 @@ class CombineMaterialsButton(bpy.types.Operator):
 
         Common.set_active(ob_active)
 
-    def clean_material_slots(self):
+    def cleanmatslots(self):
         objs = bpy.context.selected_editable_objects
 
         for ob in objs:
@@ -162,15 +157,6 @@ class CombineMaterialsButton(bpy.types.Operator):
                 if mat_slot.material and mat_slot.material.node_tree:
                     nodes = mat_slot.material.node_tree.nodes
                     for node in nodes:
-                        if node.type == 'BSDF_PRINCIPLED':
-                            hash_this += node.name
-                            if 'Base Color' in node.inputs:
-                                hash_this += str(node.inputs['Base Color'].default_value[:])
-                            if 'Subsurface Weight' in node.inputs:
-                                hash_this += str(node.inputs['Subsurface Weight'].default_value)
-
-                        elif node.type == 'BSDF_ANISOTROPIC':
-                            hash_this += node.name
 
                         if node.name in ignore_nodes or node.label in ignore_nodes:
                             continue
@@ -185,7 +171,6 @@ class CombineMaterialsButton(bpy.types.Operator):
                                 continue
                             hash_this += node.name + image.name
                             continue
-
                         if not node.inputs:
                             continue
 
@@ -203,30 +188,14 @@ class CombineMaterialsButton(bpy.types.Operator):
                                 except TypeError:
                                     hash_this += str(value.default_value)
                             else:
-                                hash_this += value.name                               
+                                hash_this += value.name
+
                 if hash_this not in self.combined_tex:
                     self.combined_tex[hash_this] = []
                 self.combined_tex[hash_this].append({'mat': mat_slot.name, 'index': index})
 
-    def get_image_textures(self, material_name):
-        textures = []
-        if bpy.data.materials[material_name].node_tree is not None:
-            for node in bpy.data.materials[material_name].node_tree.nodes:
-                if node.type == 'TEX_IMAGE':
-                    textures.append(node)
-        return textures
-
-    def copy_textures(self, image_textures, target_material):
-        if target_material.node_tree is not None:
-            for texture in image_textures:
-                new_texture_node = target_material.node_tree.nodes.new(type='ShaderNodeTexImage')
-                new_texture_node.image = texture.image
-
-    def combine_materials(self, file):
-        target_material = bpy.data.materials.new(name="CombinedMaterial")
-        return target_material
-
     def execute(self, context):
+        print('COMBINE MATERIALS!')
         saved_data = Common.SavedData()
 
         Common.set_default_stage()
@@ -238,41 +207,35 @@ class CombineMaterialsButton(bpy.types.Operator):
 
             Common.unselect_all()
             Common.set_active(mesh)
-
-            for file in self.combined_tex:
+            for file in self.combined_tex:  
                 combined_textures = self.combined_tex[file]
-                target_material = self.combine_materials(file)
 
                 if len(combined_textures) <= 1:
                     continue
-
-                image_textures = self.get_image_textures(combined_textures[0]['mat'])
-                self.copy_textures(image_textures, target_material)
-
-                if target_material.name not in mesh.data.materials:
-                    mesh.data.materials.append(target_material)
+                i += len(combined_textures)
 
                 Common.switch('EDIT')
                 bpy.ops.mesh.select_all(action='DESELECT')
 
-                for mat in mesh.material_slots:
+                for mat in mesh.material_slots:  
                     for tex in combined_textures:
                         if mat.name == tex['mat']:
                             mesh.active_material_index = tex['index']
                             bpy.ops.object.material_slot_select()
 
-                    bpy.ops.object.material_slot_assign()
-                    bpy.ops.mesh.select_all(action='DESELECT')
+                bpy.ops.object.material_slot_assign()
+                bpy.ops.mesh.select_all(action='DESELECT')
 
-                Common.unselect_all()
-                Common.set_active(mesh)
-                Common.switch('OBJECT')
-                self.clean_material_slots()
-                Common.clean_material_names(mesh)
+            Common.unselect_all()
+            Common.set_active(mesh)
+            Common.switch('OBJECT')
+            self.cleanmatslots()
 
-                i += 1
+            Common.clean_material_names(mesh)
+
 
         Common.update_material_list()
+
         saved_data.load()
 
         if i == 0:
@@ -346,7 +309,7 @@ class ConvertAllToPngButton(bpy.types.Operator):
         scene.render.image_settings.color_mode = 'RGBA'
         scene.render.image_settings.color_depth = '16'
         scene.render.image_settings.compression = 100
-        image.save_render(tex_path_new, scene=scene)
+        image.save_render(tex_path_new, scene=scene)  
 
         bpy.context.scene.view_settings.view_transform = view_transform
 

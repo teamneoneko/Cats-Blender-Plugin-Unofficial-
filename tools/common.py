@@ -35,6 +35,10 @@ from mmd_tools_local.panels import view_prop as mmd_view_prop
 #  - Checkbox for eye blinking/moving
 #  - Translate progress bar
 
+
+def version_2_79_or_older():
+    return bpy.app.version < (2, 80)
+
 def version_2_93_or_older():
     return bpy.app.version < (2, 90)
     
@@ -147,6 +151,8 @@ def unhide_all():
     for obj in get_objects():
         hide(obj, False)
         set_unselectable(obj, False)
+
+    if not version_2_79_or_older():
         unhide_all_unnecessary()
 
 
@@ -185,20 +191,28 @@ def get_active():
 def select(obj, sel=True):
     if sel:
         hide(obj, False)
+    if version_2_79_or_older():
+        obj.select = sel
+    else:
         obj.select_set(sel)
 
 
 def is_selected(obj):
+    if version_2_79_or_older():
+        return obj.select
     return obj.select_get()
 
 
 def hide(obj, val=True):
     if hasattr(obj, 'hide'):
         obj.hide = val
+    if not version_2_79_or_older():
         obj.hide_set(val)
 
 
 def is_hidden(obj):
+    if version_2_79_or_older():
+        return obj.hide
     return obj.hide_get()
 
 
@@ -224,12 +238,14 @@ def set_default_stage_old():
 
 def set_default_stage():
     """
-    Selects the armature, unhides everything, and sets the modes of every object to object mode
+
+    Selects the armature, unhides everything and sets the modes of every object to object mode
+
     :return: the armature
     """
 
     # Remove rigidbody collections, as they cause issues if they are not in the view_layer
-    if bpy.context.scene.remove_rigidbodies_joints:
+    if not version_2_79_or_older() and bpy.context.scene.remove_rigidbodies_joints:
         print('Collections:')
         for collection in bpy.data.collections:
             print(' ' + collection.name, collection.name.lower())
@@ -254,6 +270,9 @@ def set_default_stage():
     armature = get_armature()
     if armature:
         set_active(armature)
+        if version_2_79_or_older():
+            armature.layers[0] = True
+
     return armature
 
 
@@ -764,6 +783,17 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
             elif mod.type == 'MIRROR':
                 if not has_shapekeys(mesh):
                     apply_modifier(mod)
+
+        # Standardize UV maps name
+        if version_2_79_or_older():
+            if mesh.data.uv_textures:
+                mesh.data.uv_textures[0].name = 'UVMap'
+            for mat_slot in mesh.material_slots:
+                if mat_slot and mat_slot.material:
+                    for tex_slot in mat_slot.material.texture_slots:
+                        if tex_slot and tex_slot.texture and tex_slot.texture_coords == 'UV':
+                            tex_slot.uv_layer = 'UVMap'
+        else:
             if mesh.data.uv_layers:
                 mesh.data.uv_layers[0].name = 'UVMap'
 
@@ -1318,6 +1348,7 @@ def removeZeroVerts(obj, thres=0):
             obj.vertex_groups[g.group].remove([v.index])
 
 def delete_hierarchy(parent):
+    unselect_all()
     to_delete = []
 
     def get_child_names(obj):
@@ -1706,6 +1737,8 @@ def has_shapekeys(mesh):
 
 
 def matmul(a, b):
+    if version_2_79_or_older():
+        return a * b
     return a @ b
 
 
@@ -1753,6 +1786,7 @@ def fix_bone_orientations(armature):
                     if len(bone.parent.children) == 1:  # if the bone's parent bone only has one child, connect the bones (Don't connect them all because that would mess up hand/finger bones)
                         bone.use_connect = True
 
+
 def update_material_list(self=None, context=None):
     try:
         if hasattr(bpy.context.scene, 'smc_ob_data') and bpy.context.scene.smc_ob_data:
@@ -1788,14 +1822,14 @@ def unify_materials():
                         node_texture.label = 'Cats Texture'
 
                         # Create Principled BSDF node
-                        node_principled = nodes.new(type='ShaderNodeBsdfPrincipled')
-                        node_principled.location = 300, -220
-                        node_principled.label = 'Cats Emission'
-                        node_principled.inputs['Specular IOR Level'].default_value = 0
-                        node_principled.inputs['Roughness'].default_value = 0
-                        node_principled.inputs['Sheen Tint'].default_value = 0, 0, 0, 1
-                        node_principled.inputs['Clearcoat Roughness'].default_value = 0
-                        node_principled.inputs['IOR'].default_value = 0
+                        node_prinipled = nodes.new(type='ShaderNodeBsdfPrincipled')
+                        node_prinipled.location = 300, -220
+                        node_prinipled.label = 'Cats Emission'
+                        node_prinipled.inputs['Specular'].default_value = 0
+                        node_prinipled.inputs['Roughness'].default_value = 0
+                        node_prinipled.inputs['Sheen Tint'].default_value = 0
+                        node_prinipled.inputs['Clearcoat Roughness'].default_value = 0
+                        node_prinipled.inputs['IOR'].default_value = 0
 
                         # Create Transparency BSDF node
                         node_transparent = nodes.new(type='ShaderNodeBsdfTransparent')
@@ -1818,15 +1852,15 @@ def unify_materials():
                         node_output2.label = 'Cats Export'
 
                         # Link nodes together
-                        mat_slot.material.node_tree.links.new(node_texture.outputs['Color'], node_principled.inputs['Base Color'])
+                        mat_slot.material.node_tree.links.new(node_texture.outputs['Color'], node_prinipled.inputs['Base Color'])
                         mat_slot.material.node_tree.links.new(node_texture.outputs['Alpha'], node_mix.inputs['Fac'])
 
-                        mat_slot.material.node_tree.links.new(node_principled.outputs['BSDF'], node_mix.inputs[2])
+                        mat_slot.material.node_tree.links.new(node_prinipled.outputs['BSDF'], node_mix.inputs[2])
                         mat_slot.material.node_tree.links.new(node_transparent.outputs['BSDF'], node_mix.inputs[1])
 
                         mat_slot.material.node_tree.links.new(node_mix.outputs['Shader'], node_output.inputs['Surface'])
 
-                        mat_slot.material.node_tree.links.new(node_principled.outputs['BSDF'], node_output2.inputs['Surface'])
+                        mat_slot.material.node_tree.links.new(node_prinipled.outputs['BSDF'], node_output2.inputs['Surface'])
 
                     # break
 
@@ -1835,6 +1869,8 @@ def unify_materials():
 
 
 def add_principled_shader(mesh):
+    # This adds a principled shader and material output node in order for
+    # Unity to automatically detect exported materials
     principled_shader_pos = (501, -500)
     output_shader_pos = (801, -500)
     mmd_texture_bake_pos = (1101, -500)
@@ -1851,60 +1887,97 @@ def add_principled_shader(mesh):
 
             # Check if the new nodes should be added and to which image node they should be attached to
             for node in nodes:
+                # Cancel if the cats nodes are already found
                 if node.type == 'BSDF_PRINCIPLED' and node.label == principled_shader_label:
                     node_image = None
                     break
                 elif node.type == 'OUTPUT_MATERIAL' and node.label == output_shader_label:
                     node_image = None
                     break
-                elif node.type == 'OUTPUT_MATERIAL':
+                elif node.type == 'OUTPUT_MATERIAL': #So that blender doesn't get confused on which to output
                     nodes.remove(node)
                     continue
                 if node.name == "mmd_shader":
                     node_mmd_shader = node
                     needsmmdcolor = True
                     continue
+
+                # Skip if this node is not an image node
                 if node.type != 'TEX_IMAGE':
                     continue
                 node_image_count += 1
+
+                # If an mmd_texture is found, link it to the principled shader later
                 if node.name == 'mmd_base_tex' or node.label == 'MainTexture':
                     node_image = node
                     node_image_count = 0
                     break
+
+                # This is an image node, so link it to the principled shader later
                 node_image = node
+            #this material doesn't have a texture and doesn't have a MMD AO+Diffuse so skip
+            if (not node_image or node_image_count > 1) and not needsmmdcolor:
+                continue
+            elif needsmmdcolor and node_mmd_shader: #this needs to implement mmd color and has a shader node
+                #bake AO and Diffuse color into pixels for MMD texture. if texture exists, multiply over
+                #Thank this guy for pixel manipulation: https://blender.stackexchange.com/a/652
 
-            if not node_image or node_image_count > 1:
-                # Create a new texture node
-                node_image = nodes.new(type='ShaderNodeTexImage')
-                node_image.location = mmd_texture_bake_pos
-                node_image.label = "Mmd Base Tex"
-                node_image.name = "mmd_base_tex"
-                # Set some default properties or customize as needed
-                node_image.image = bpy.data.images.new("MMDCatsBaked", width=8, height=8, alpha=True)
-                # ... (you can set other properties or create a procedural texture)
 
+                basecolor = [x*0.6 for x in node_mmd_shader.inputs[1].default_value[:]] #multply color of diffuse by .6 which is MMD's addition factor
+                for rgba,num in enumerate(basecolor):
+                    basecolor[rgba] = max(0,min(1,basecolor[rgba]+node_mmd_shader.inputs[0].default_value[rgba])) #add AO to diffuse and clamp between 0-1 for each channel
+
+                if not node_image:
+                    node_image = mat_slot.material.node_tree.nodes.new(type="ShaderNodeTexImage")
+                    node_image.location = mmd_texture_bake_pos
+                    node_image.label = "Mmd Base Tex"
+                    node_image.name = "mmd_base_tex"
+                    node_image.image = bpy.data.images.new("MMDCatsBaked", width=8, height=8, alpha=True)
+
+                    #make pixels using AO color
+
+
+                    #assign to image so it's baked
+                    node_image.image.generated_color = basecolor
+                    node_image.image.filepath = bpy.path.abspath("//"+node_image.image.name+".png")
+                    node_image.image.file_format = 'PNG'
+                    if bpy.data.is_saved:
+                        node_image.image.save()
+                elif node_image:
+
+                    #multiply color on top of default color.
+                    pixels = np.array(node_image.image.pixels[:])
+
+                    multiply_image = np.tile(np.array(basecolor),int(len(pixels)/4))
+
+                    new_pixels = pixels*multiply_image
+
+                    #create new image as to not touch old one
+                    node_image.image = bpy.data.images.new(node_image.image.name+"MMDCatsBaked", width=node_image.image.size[0], height=node_image.image.size[1], alpha=True)
+                    node_image.image.filepath = bpy.path.abspath("//"+node_image.image.name+".png")
+                    node_image.image.file_format = 'PNG'
+
+                    node_image.image.pixels = new_pixels
+                    if bpy.data.is_saved:
+                        node_image.image.save()
+
+
+            # Create Principled BSDF node
             node_principled = nodes.new(type='ShaderNodeBsdfPrincipled')
             node_principled.label = 'Cats Export Shader'
             node_principled.location = principled_shader_pos
-            if not bpy.app.version < (3, 7, 0):
-                node_principled.inputs['Specular IOR Level'].default_value = 0
-            if bpy.app.version < (3, 7, 0):
-                node_principled.inputs['Specular'].default_value = 0
+            node_principled.inputs['Specular'].default_value = 0
             node_principled.inputs['Roughness'].default_value = 0
-            if not bpy.app.version < (3, 7, 0):
-                node_principled.inputs['Sheen Tint'].default_value = (0, 0, 0, 1)
-            if bpy.app.version < (3, 7, 0):
-                node_principled.inputs['Sheen Tint'].default_value = 0
-            if not bpy.app.version < (3, 7, 0):
-                node_principled.inputs['Coat Roughness'].default_value = 0
-            if bpy.app.version < (3, 7, 0):
-                node_principled.inputs['Clearcoat Roughness'].default_value = 0
+            node_principled.inputs['Sheen Tint'].default_value = 0
+            node_principled.inputs['Clearcoat Roughness'].default_value = 0
             node_principled.inputs['IOR'].default_value = 0
 
+            # Create Output node for correct image exports
             node_output = nodes.new(type='ShaderNodeOutputMaterial')
             node_output.label = 'Cats Export'
             node_output.location = output_shader_pos
 
+            # Link nodes together
             mat_slot.material.node_tree.links.new(node_image.outputs['Color'], node_principled.inputs['Base Color'])
             mat_slot.material.node_tree.links.new(node_image.outputs['Alpha'], node_principled.inputs['Alpha'])
             mat_slot.material.node_tree.links.new(node_principled.outputs['BSDF'], node_output.inputs['Surface'])
@@ -1918,6 +1991,16 @@ def remove_toon_shader(mesh):
                 if node.name == 'mmd_toon_tex':
                     print('Toon tex removed from material', mat_slot.material.name)
                     nodes.remove(node)
+                    # if not node.image or not node.image.filepath:
+                    #     print('Toon tex removed: Empty, from material', mat_slot.material.name)
+                    #     nodes.remove(node)
+                    #     continue
+                    #
+                    # image_filepath = bpy.path.abspath(node.image.filepath)
+                    # if not os.path.isfile(image_filepath):
+                    #     print('Toon tex removed:', node.image.name, 'from material', mat_slot.material.name)
+                    #     nodes.remove(node)
+
 
 def fix_mmd_shader(mesh):
     for mat_slot in mesh.material_slots:
@@ -1926,6 +2009,7 @@ def fix_mmd_shader(mesh):
             for node in nodes:
                 if node.name == 'mmd_shader':
                     node.inputs['Reflect'].default_value = 1
+
 
 def fix_vrm_shader(mesh):
     for mat_slot in mesh.material_slots:
@@ -1954,7 +2038,7 @@ def fix_vrm_shader(mesh):
                 nodes_to_keep = ['DiffuseColor', 'MainTexture', 'Emission_Texture', 'SphereAddTexture']
 
             for node in nodes:
-                # Delete all unnecessary nodes
+                # Delete all unneccessary nodes
                 if 'RGB' in node.name \
                         or 'Value' in node.name \
                         or 'Image Texture' in node.name \
@@ -1971,6 +2055,7 @@ def fix_vrm_shader(mesh):
                 #         for link in output.links:
                 #             mat_slot.material.node_tree.links.remove(link)
                 #     continue
+
 
 def fix_twist_bones(mesh, bones_to_delete):
     # This will fix MMD twist bones
@@ -2046,8 +2131,9 @@ def toggle_mmd_tabs(shutdown_plugin=False):
         mmd_view_prop.MMDViewPanel,
         mmd_view_prop.MMDSDEFPanel,
     ]
-    
-    mmd_cls = mmd_cls + mmd_cls_shading
+
+    if not version_2_79_or_older():
+        mmd_cls = mmd_cls + mmd_cls_shading
 
     # If the plugin is shutting down, load the mmd_tools tabs before that, to avoid issues when unregistering mmd_tools
     if bpy.context.scene.show_mmd_tabs or shutdown_plugin:
@@ -2065,6 +2151,7 @@ def toggle_mmd_tabs(shutdown_plugin=False):
 
     if not shutdown_plugin:
         Settings.update_settings(None, None)
+
 
 
 """
@@ -2295,6 +2382,7 @@ def _fix_out_of_bounds_enum_choices(property_holder, scene, choices, property_na
             # outside of UI drawing. This causes the temporary duplicates to be visible in the UI. Though, selecting
             # any of the temporary duplicates poses no problem as it causes the property to be updated outside of UI
             # drawing, thus fixing the out-of-bounds index and causing the temporary duplicates to disappear.
+            if not version_2_79_or_older():
                 # No modification is allowed when called as part of drawing UI, so we must schedule a task instead
                 # First check if a fix has not already been scheduled, otherwise around 4 or 5 tasks could get scheduled
                 # before the first one fixes the invalid choice
@@ -2383,7 +2471,6 @@ def wrap_dynamic_enum_items(items_func, property_name, sort=True, in_place=True)
 
     return wrapped_items_func
     
-    
 if bpy.app.version >= (3, 2):
     # Passing in context_override as a positional-only argument is deprecated as of Blender 3.2, replaced with
     # Context.temp_override
@@ -2417,7 +2504,6 @@ else:
             args.append(undo)
 
         return operator(*args, **operator_args)
-
 
 """ === THIS CODE COULD BE USEFUL === """
 
