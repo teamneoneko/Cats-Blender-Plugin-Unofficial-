@@ -1,5 +1,5 @@
 # Cats Blender Plugin.
-
+### THIS IS A DEVELOPMENT VERSION FOR BLENDER 4.0 HOWEVER WE ARE ALSO WAITING FOR MMD TOOLS TO BE UPDATED WHICH WILL NOT BE UNTO THE 4.2 LTS COMES OUT LATER THIS YEAR, I WILL TRY MY BEST TO KEEP THIS VERSION STABLE HOWEVER SOME ISSUES MAY NOT BE FIXED UNTO THE 4.2LTS COMES OUT.
 #### THIS VERSION OF CAT'S IS FOR BLENDER 4.0 [CLICK HERE](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases) for the belnder 3.6 version.
 #### Any issues reported on versions older then Blender 3.6 will not be fixed. ensure you are using either 3.6 or 4.0.
 
