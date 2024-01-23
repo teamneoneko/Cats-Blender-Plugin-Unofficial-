@@ -509,30 +509,3 @@ def register():
         description=t('Scene.debug_translations.desc'),
         default=False
     )
-
-    # Scene.disable_vrchat_features = BoolProperty(
-    #     name=t('Disable VRChat Only Features'),
-    #     description='This will disable features which are solely used for VRChat.'
-    #                 '\nThe following will be disabled:'
-    #                 '\n- Eye Tracking'
-    #                 '\n- Visemes',
-    #     default=False,
-    #     update=Settings.update_settings
-    # )
-
-    # Copy Protection - obsolete
-    # Scene.protection_mode = EnumProperty(
-    #     name=t("Randomization Level"),
-    #     description=t("Randomization Level"),
-    #     items=[
-    #         ("FULL", "Full", "This will randomize every vertex of your model and it will be completely unusable for thieves.\n"
-    #                          'However this method might cause problems with the Outline option from Cubed shader.\n'
-    #                          'If you have any issues ingame try again with option "Partial".'),
-    #         ("PARTIAL", "Partial", 'Use this if you experience issues ingame with the Full option!\n'
-    #                                '\n'
-    #                                "This will only randomize a number of vertices and therefore will have a few unprotected areas,\n"
-    #                                "but it's still unusable to thieves as a whole.\n"
-    #                                'This method however reduces the glitches that can occur ingame by a lot.')
-    #     ],
-    #     default='FULL'
-    # )

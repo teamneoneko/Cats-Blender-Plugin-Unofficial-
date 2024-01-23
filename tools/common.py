@@ -5,6 +5,7 @@ import bpy
 import time
 import bmesh
 import numpy as np
+import bpy.types
 
 from math import degrees
 from mathutils import Vector
@@ -1673,30 +1674,6 @@ def get_tricount(obj):
     return len(bmesh_mesh.faces)
 
 
-def get_bone_orientations(armature):
-    x_cord = 0
-    y_cord = 1
-    z_cord = 2
-    fbx = False
-    # armature = get_armature()
-    #
-    # for index, bone in enumerate(armature.pose.bones):
-    #     if 'Head' in bone.name:
-    #     #if index == 5:
-    #         bone_pos = bone.matrix
-    #         print(bone_pos)
-    #         world_pos = armature.matrix_world * bone.matrix
-    #         print(world_pos)
-    #         print(bone_pos[0][0], world_pos[0][0])
-    #         if round(abs(bone_pos[0][0]), 4) != round(abs(world_pos[0][0]), 4):
-    #             z_cord = 1
-    #             y_cord = 2
-    #             fbx = True
-    #             break
-
-    return x_cord, y_cord, z_cord, fbx
-
-
 def clean_material_names(mesh):
     for j, mat in enumerate(mesh.material_slots):
         if mat.name.endswith('.001'):
@@ -1757,18 +1734,13 @@ def ui_refresh():
             time.sleep(0.5)
 
 
-def fix_zero_length_bones(armature, x_cord, y_cord, z_cord):
-    pre_mode = armature.mode
-    set_active(armature)
-    switch('EDIT')
+def fix_zero_length_bones(armature: bpy.types.Object):
+    if armature.mode != 'EDIT':
+        return
 
     for bone in armature.data.edit_bones:
-        if round(bone.head[x_cord], 4) == round(bone.tail[x_cord], 4) \
-                and round(bone.head[y_cord], 4) == round(bone.tail[y_cord], 4) \
-                and round(bone.head[z_cord], 4) == round(bone.tail[z_cord], 4):
-            bone.tail[z_cord] += 0.1
-
-    switch(pre_mode)
+        if all(round(h, 4) == round(t, 4) for h, t in zip(bone.head, bone.tail)):
+            bone.tail.z += 0.1
 
 
 def fix_bone_orientations(armature):
@@ -2448,12 +2420,13 @@ def is_enum_non_empty(string):
     return _empty_enum_identifier != string
 
 
-def wrap_dynamic_enum_items(items_func, property_name, sort=True, in_place=True):
+def wrap_dynamic_enum_items(items_func, property_name, sort=True, in_place=True, is_holder=True):
     """Wrap an EnumProperty items function to automatically fix the property when it goes out of bounds of the items list.
     Automatically adds at least one choice if the items function returns an empty list.
     By default, sorts the items by the lowercase of the identifiers, this can be disabled by setting sort=False.
     Interns and caches all strings in the items to avoid a known Blender UI bug.
-    Only works for properties whose owner is a scene."""
+    Only works for properties whose owner is a scene.
+    By setting is_holder=false, the fix for out of bounds values will be disabled."""
     def wrapped_items_func(self, context):
         nonlocal in_place
         items = items_func(self, context)
@@ -2463,11 +2436,14 @@ def wrap_dynamic_enum_items(items_func, property_name, sort=True, in_place=True)
                 # Sorting has already created a new list in this case, so the rest can be done in place
                 in_place = True
         items = _ensure_enum_choices_not_empty(items, in_place=in_place)
-        property_path = self.path_from_id(property_name)
+        property_path = self.path_from_id(property_name) if is_holder else property_name
         # If ensuring the list wasn't empty wasn't done in place, then a new list has been created and the rest can
         # be done in place
         items = _ensure_python_references(items, property_path)
-        return _fix_out_of_bounds_enum_choices(self, context.scene, items, property_name, property_path)
+        if is_holder:
+            return _fix_out_of_bounds_enum_choices(self, context.scene, items, property_name, property_path)
+        else:
+            return items
 
     return wrapped_items_func
     

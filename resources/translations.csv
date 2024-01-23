@@ -156,6 +156,17 @@ Av3EyeTrackingRotateEyeBones.poll.noBones,No bones,骨がない,뼈가 없다
 Av3EyeTrackingRotateEyeBones.poll.notInCurrentEditMode,"{armature} is not in the current Edit mode, either exit the current Edit mode or open {armature} in Edit mode","{armature} は現在の編集モードではありません。現在の編集モードを終了するか、編集モードで {armature} を開いてください.","{armature}가 현재 편집 모드에 있지 않습니다. 현재 편집 모드를 종료하거나 편집 모드에서 {armature}를 엽니다."
 Av3EyeTrackingRotateEyeBones.info.noChanges,"Eye bones are already rotated for VRChat, no changes were made.","目のボーンは VRChat 用にすでに回転されており、変更は加えられません.","VRChat에서는 눈 뼈가 이미 회전되어 있어 변경 사항이 없습니다."
 Av3EyeTrackingRotateEyeBones.success,Eye bones rotated.,目の骨が回転しました.,눈뼈가 회전했습니다.
+FixLegacy.info1,Fix Model Button has been moved.,「モデルを修正」ボタンが移動されました,모델 수정 버튼이 이동되었습니다
+FixLegacy.info2,to legacy features submenu.,従来の機能のサブメニューへ。,레거시 기능 하위 메뉴로 이동합니다.
+LegacyStuff.label,Legacy Features,レガシーなもの,레거시 물건
+LegacyStuff.info1,End of Life features,この領域はサポート終了機能に関するものです,이 영역은 단종 기능을 위한 것입니다.
+LegacyStuff.info2,Might be removed in the future,これらの機能は将来のアップデートで削除される可能性があります,이러한 기능은 향후 업데이트에서 제거될 수 있습니다.
+FixLegacyStuff.info1,Fix model should only be,修正モデルは次のとおりです,수정 모델은 다음과 같아야 합니다
+FixLegacyStuff.info2,used for older MMD models.,古いMMDモデルに使用されます。,구형 MMD 모델에 사용됩니다.
+FixLegacyStuff.info3,You should not be using,使用すべきではありません,당신은 사용해서는 안됩니다
+FixLegacyStuff.info4,this for VRChat models at all!,これは VRChat モデルにとってはまったくのことです。,이것은 VRChat 모델을 위한 것입니다!
+FixLegacyStuff.info5,Use the customs options instead!,代わりにカスタム オプションを使用してください。,대신 세관 옵션을 사용하세요!
+ManualPanel.fbtFix1,Not needed for vrchat anymore!,vrchatにはもう必要ありません,vrchat에는 더 이상 필요하지 않습니다.
 OptimizePanel.label,Optimization,最適化,최적화
 OptimizePanel.atlasDesc,A greatly improved Atlas Generator.,アトラスジェネレータを大幅に改良。,텍스처들을 결합시켜주는 더욱 향상된 아틀라스 생성기입니다.
 OptimizePanel.atlasAuthor,Made by Shotariya,shotaryiaによって作られた,제작자: Shotariya
@@ -194,7 +205,11 @@ CreditsPanel.descContributors2,"Shotariya and Neitri","ShotariyaとNeitri","Shot
 CreditsPanel.desc5,Unoffical Maintainer - Yusarina,非公式メンテナ - Yusarina,비공식 유지관리자 - Yusarina
 CreditsPanel.desc6,Do you need help or found a bug?,助けが必要ですか、バグを見つけましたか?,도움이 필요하시거나 혹시 버그를 찾으셨나요?
 FixArmature.label,Fix Model,モデル修正,모델 고치기
-FixArmature.desc,"Automatically:
+FixArmature.desc,"WARNING: DO NOT USE THIS UNLESS YOU ARE
+IMPORTING A OLDER MMD MODEL, DO NOT YOU USE 
+THIS FOR VRCHAT MODELS!
+
+Automatically:
 - Reparents bones
 - Removes unnecessary bones, objects, groups & constraints
 - Translates and renames bones & objects
@@ -202,7 +217,23 @@ FixArmature.desc,"Automatically:
 - Corrects the hips
 - Joins meshes
 - Converts morphs into shapes
-- Corrects shading",,"자동으로 아래의 항목들이 고쳐집니다:
+- Corrects shading","「警告: そうでない場合はこれを使用しないでください
+古い MMD モデルをインポートしています。使用しないでください
+VRCHATモデルの場合はこちら！
+
+自動的に：
+- 親の骨
+- 不要なボーン、オブジェクト、グループ、コンストレイントを削除します
+- ボーンとオブジェクトの翻訳と名前変更
+- ウェイトペイントをマージします
+- ヒップを補正します
+- メッシュを結合します
+- モーフをシェイプに変換します
+- シェーディングを修正します」","警告: そうでない場合はこれを使用しないでください。
+古い MMD モデルをインポートしています。使用しないでください
+VRCHATモデルの場合はこちら！
+
+자동으로 아래의 항목들이 고쳐집니다:
 - 본들의 부모 재설정
 - 필요하지 않는 본들, 오브젝트들, 그룹들과 컨스트레인트들을 제거
 - 본들과 오브젝트들을 영어로 번역하고 이름들을 바꿈
@@ -371,7 +402,8 @@ FixVRMShapesButton.desc,Fixes the shapekeys of Koikatsu models,,
 FixVRMShapesButton.warn.notDetected,No shapekeys detected!,,
 FixVRMShapesButton.success,Fixed VRM shapekeys.,,
 FixFBTButton.label,Fix Full Body Tracking,全身追跡を修正,풀바디 트래킹 적용
-FixFBTButton.desc,"WARNING: This fix is no longer needed for VRChat, you should not use it!
+FixFBTButton.desc,"WARNING: This fix is no longer needed for vrchat, 
+you shouldn't use it unless you know what you are doing!
 
 Applies a general fix for Full Body Tracking.
 Ignore the ""Spine length zero"" warning in Unity",,
@@ -473,7 +505,10 @@ ForumButton.URL,https://vrcat.club/threads/cats-blender-plugin.6/,,
 ForumButton.success,Forum opened.,,
 HelpButton.label,Need Help?,ウィキを参照してください,우리 위키를 참조하세요
 HelpButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki,,
-HelpButton.success,Github opened.,,
+HelpButton.success,Github wiki opened.,,
+LegacyReadButton.label,Legacy features wiki,従来の機能の Wiki,레거시 기능 위키
+LegacyReadButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Legacy-Features,,
+LegacyReadButton.success,Github wiki opened.,,
 PatchnotesButton.label,Latest Patchnotes,最新のパッチノート,최신 패치노트
 PatchnotesButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases,,
 PatchnotesButton.success,Patchnotes opened.,,

@@ -16,8 +16,12 @@ class SearchMenuOperatorMouthA(bpy.types.Operator):
     bl_idname = "scene.search_menu_mouth_a"
     bl_label = ""
     bl_property = "my_enum"
-
-    my_enum: bpy.props.EnumProperty(name="shapekeys", description=t('Scene.mouth_a.desc'), items=Common.get_shapekeys_mouth_ah) #default, change after making operator in UI like shown below.7
+    #default, change after making operator in UI like shown below.7
+    my_enum: bpy.props.EnumProperty(
+        name="shapekeys",
+        description=t('Scene.mouth_a.desc'),
+        items=Common.wrap_dynamic_enum_items(Common.get_shapekeys_mouth_ah, bl_idname, sort=False, is_holder=False),
+    )
 
     def execute(self, context):
         context.scene.mouth_a = self.my_enum
@@ -35,8 +39,12 @@ class SearchMenuOperatorMouthO(bpy.types.Operator):
     bl_idname = "scene.search_menu_mouth_o"
     bl_label = ""
     bl_property = "my_enum"
-
-    my_enum: bpy.props.EnumProperty(name="shapekeys", description=t('Scene.mouth_o.desc'), items=Common.get_shapekeys_mouth_oh) #default, change after making operator in UI like shown below.7
+    #default, change after making operator in UI like shown below.7
+    my_enum: bpy.props.EnumProperty(
+        name="shapekeys",
+        description=t('Scene.mouth_o.desc'),
+        items=Common.wrap_dynamic_enum_items(Common.get_shapekeys_mouth_oh, bl_idname, sort=False, is_holder=False),
+    )
 
     def execute(self, context):
         context.scene.mouth_o = self.my_enum
@@ -54,8 +62,12 @@ class SearchMenuOperatorMouthCH(bpy.types.Operator):
     bl_idname = "scene.search_menu_mouth_ch"
     bl_label = ""
     bl_property = "my_enum"
-
-    my_enum: bpy.props.EnumProperty(name="shapekeys", description=t('Scene.mouth_ch.desc'), items=Common.get_shapekeys_mouth_ch) #default, change after making operator in UI like shown below.7
+    #default, change after making operator in UI like shown below.7
+    my_enum: bpy.props.EnumProperty(
+        name="shapekeys",
+        description=t('Scene.mouth_ch.desc'),
+        items=Common.wrap_dynamic_enum_items(Common.get_shapekeys_mouth_ch, bl_idname, sort=False, is_holder=False),
+    )
 
     def execute(self, context):
         context.scene.mouth_ch = self.my_enum

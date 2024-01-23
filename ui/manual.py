@@ -134,14 +134,6 @@ class ManualPanel(ToolPanel, bpy.types.Panel):
             row.scale_y = button_height
             row.prop(context.scene, 'generate_twistbones_upper')
 
-            col.separator()
-            row = layout_split(col, factor=0.6, align=True)
-            row.scale_y = button_height
-            row.label(text=t('ManualPanel.fbtFix'), icon='ARMATURE_DATA')
-            row2 = layout_split(row, factor=0.35, align=True)
-            row2.operator(Armature_manual.FixFBTButton.bl_idname, text=t('ManualPanel.FixFBTButton.label'))
-            row2.operator(Armature_manual.RemoveFBTButton.bl_idname, text=t('ManualPanel.RemoveFBTButton.label'))
-
             row = col.row(align=True)
             row.scale_y = button_height
             row.operator(Armature_manual.FixVRMShapesButton.bl_idname, icon='SHAPEKEY_DATA')
