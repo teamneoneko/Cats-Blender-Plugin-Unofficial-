@@ -65,7 +65,7 @@ class DecimationPanel(ToolPanel, bpy.types.Panel):
         col.separator()       
         row = col.row(align=True)
         row.scale_y = 1.5
-        row.operator(LegacyDecimationButton.bl_idname, icon_value=Supporter.preview_collections["custom_icons"]["help1"].icon_id)
+        row.operator(LegacyDecimationButton.bl_idname, icon_value=Supporter.preview_collections['custom_icons']['help1'].icon_id)
         col.separator()
         col.separator() 
         row = col.row(align=True)
@@ -173,6 +173,11 @@ class DecimationPanel(ToolPanel, bpy.types.Panel):
         row = col.row(align=True)
         row.scale_y = 1.2
         row.operator(Decimation.AutoDecimateButtonCats.bl_idname, icon='MOD_DECIM')
+        col.separator()       
+        row = col.row(align=True)
+        row.scale_y = 1.5
+        row.operator(DecimationHelpButton.bl_idname, icon_value=Supporter.preview_collections['custom_icons']['help1'].icon_id)
+        col.separator()
 
 @register_wrap
 class LegacyDecimationButton(bpy.types.Operator):
@@ -184,4 +189,16 @@ class LegacyDecimationButton(bpy.types.Operator):
         webbrowser.open(t('LegacyDecimationButton.URL'))
 
         self.report({'INFO'}, t('LegacyDecimationButton.success'))
+        return {'FINISHED'}
+        
+@register_wrap
+class DecimationHelpButton(bpy.types.Operator):
+    bl_idname = 'legacy_helpdecimation.help'
+    bl_label = t('DecimationHelpButton.label')
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
+
+    def execute(self, context):
+        webbrowser.open(t('DecimationHelpButton.URL'))
+
+        self.report({'INFO'}, t('DecimationHelpButton.success'))
         return {'FINISHED'}
