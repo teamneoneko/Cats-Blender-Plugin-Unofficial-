@@ -588,6 +588,11 @@ ImportAnyModel.importantInfo.desc,"If you want to modify the import settings, us
 
 ",,
 ImportAnyModel.error.emptyZip,The selected zip file contains no importable models.,,
+DecimationLegacy.info1,Decimation will be made a legacy,デシメーションは遺産となるだろう,학살은 유산이 될 것입니다
+DecimationLegacy.info2,Compoment Soon we recomend using,すぐに使用することをお勧めします,곧 우리는 다음을 사용하는 것이 좋습니다
+DecimationLegacy.info3,Tuxedo instead!,代わりにタキシード！,대신 턱시도!
+LegacyDecimationButton.label,Get Tuxedo!,タキシードをゲット！,턱시도 획득!
+LegacyDecimationButton.URL,https://github.com/feilen/tuxedo-blender-plugin/releases,,
 ImportAnyModel.error.unsupportedFBX,"The FBX file version is unsupported!
 Please use a tool such as the ""Autodesk FBX Converter"" to make it compatible.",,
 ZipPopup.label,Zip Model Selection:,圧縮モデルの選択:,Zip 모델 선택:

@@ -1,11 +1,13 @@
 # GPL License
 
 import bpy
+import webbrowser
 
 from .. import globs
 from .main import ToolPanel
 from .main import layout_split
 from ..tools import common as Common
+from ..tools import supporter as Supporter
 from ..tools import decimation as Decimation
 from ..tools import armature_manual as Armature_manual
 from ..tools.register import register_wrap
@@ -55,6 +57,17 @@ class DecimationPanel(ToolPanel, bpy.types.Panel):
         box = layout.box()
         col = box.column(align=True)
 
+        row = col.column(align=True)
+        row.scale_y = 0.75
+        row.label(text=t('DecimationLegacy.info1'), icon='INFO')
+        row.label(text=t('DecimationLegacy.info2'), icon='BLANK1')
+        row.label(text=t('DecimationLegacy.info3'), icon='BLANK1')
+        col.separator()       
+        row = col.row(align=True)
+        row.scale_y = 1.5
+        row.operator(LegacyDecimationButton.bl_idname, icon_value=Supporter.preview_collections["custom_icons"]["help1"].icon_id)
+        col.separator()
+        col.separator() 
         row = col.row(align=True)
         row.label(text=t('DecimationPanel.decimationMode'))
         row = col.row(align=True)
@@ -160,3 +173,15 @@ class DecimationPanel(ToolPanel, bpy.types.Panel):
         row = col.row(align=True)
         row.scale_y = 1.2
         row.operator(Decimation.AutoDecimateButtonCats.bl_idname, icon='MOD_DECIM')
+
+@register_wrap
+class LegacyDecimationButton(bpy.types.Operator):
+    bl_idname = 'legacy_decimation.help'
+    bl_label = t('LegacyDecimationButton.label')
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
+
+    def execute(self, context):
+        webbrowser.open(t('LegacyDecimationButton.URL'))
+
+        self.report({'INFO'}, t('LegacyDecimationButton.success'))
+        return {'FINISHED'}
