@@ -5,7 +5,19 @@ import bpy
 import time
 import bmesh
 import numpy as np
-import bpy.types
+
+from bpy.types import (
+    Key,
+    ShapeKey,
+    AnimData,
+    Context,
+    Object,
+    Mesh,
+    Node,
+    NodeLink,
+    ShaderNodeTexImage,
+    ShaderNodeGroup,
+)
 
 from math import degrees
 from mathutils import Vector
@@ -1840,119 +1852,227 @@ def unify_materials():
     return {'FINISHED'}
 
 
-def add_principled_shader(mesh):
-    # This adds a principled shader and material output node in order for
-    # Unity to automatically detect exported materials
+def bake_mmd_colors(node_base_tex: ShaderNodeTexImage, node_mmd_shader: ShaderNodeGroup):
+    """Bake the mmd ambient color and diffuse color into the base tex or return the combined color if there is no base
+    tex. This process follows the same steps that the mmd_shader group node follows."""
+    # Input names used by mmd_shader group node from the mmd_tools addon
+    ambient_color_input_name = "Ambient Color"
+    diffuse_color_input_name = "Diffuse Color"
+
+    ambient_color_input = node_mmd_shader.inputs.get(ambient_color_input_name)
+
+    if not ambient_color_input or ambient_color_input.type != 'RGBA':
+        print(f"Could not find color input '{ambient_color_input_name}' in {node_mmd_shader}."
+              f" Is it a correct mmd_shader group node?")
+        # The mmd_shader node does not appear to be correct, abort
+        return node_base_tex, None
+
+    diffuse_color_input = node_mmd_shader.inputs.get(diffuse_color_input_name)
+
+    if not diffuse_color_input or diffuse_color_input.type != 'RGBA':
+        print(f"Could not find color input '{diffuse_color_input_name}' in {node_mmd_shader}."
+              f" Is it a correct mmd_shader group node?")
+        # The mmd_shader node does not appear to be correct, abort
+        return node_base_tex, None
+
+    # We assume that the Ambient Color and Diffuse Color inputs have not been modified following the initial import of
+    # the mmd model into Blender, meaning that they are not linked to other nodes.
+    # Colors in shader nodes only use RGB, so ignore the alpha channels
+    ambient_color = np.array(ambient_color_input.default_value[:3])
+    diffuse_color = np.array(diffuse_color_input.default_value[:3])
+
+    # Add 0.6 times the Diffuse Color to the Ambient Color and clamp the result to the range [0,1]
+    # This is the first step done inside the mmd_shader group node
+    mmd_color = np.clip(ambient_color + diffuse_color * 0.6, 0, 1)
+
+    # TODO: Create a 4x4 image of the colour instead to avoid issues where Blender colours are linear, but Unity colours
+    #  could be linear or could be sRGB depending on the settings used and the shaders used.
+    # If there's no image, we'll use a color instead
+    if not node_base_tex or not node_base_tex.image:
+        # Add alpha of 1 to the color to make it into RGBA because colors in shader nodes are RGBA, despite only RGB
+        # being used.
+        principled_base_color = np.append(mmd_color, 1)
+        return None, principled_base_color
+    else:
+        # Multiply the base_tex by the combined diffuse and ambient color.
+        base_tex_image = node_base_tex.image
+
+        if not base_tex_image.pixels:
+            # Image is not loaded
+            return node_base_tex, None
+
+        # There are other non-linear colorspaces, but they are more complicated and there are no clear conversions
+        # because it looks like Blender uses OCIO for them. Typically, only linear colorspaces and sRGB are used, so we
+        # are ignoring the other colorspaces for now.
+        if base_tex_image.colorspace_settings.name == 'sRGB':
+            # In shader nodes, the linear base_color would be multiplied by the sRGB image pixels, but we can only read
+            # and write image pixels in scene linear colorspace.
+            #
+            # We have to convert base_color (linear) to appear in sRGB as it currently appears in linear. We can do this
+            # by converting it to linear as if it was already sRGB.
+            # The conversion from linear to sRGB is then cancelled out by being viewed in sRGB colorspace.
+            #
+            # Alternatively, you can look at it mathematically, since to convert linear pixels to how they would appear
+            # if viewed in sRGB colorspace, the conversion is pretty close to RGB**2.4:
+            # Given: sRGB(pixels) * color == sRGB(baked_pixels)
+            # We can treat it as:
+            #   pixels**2.4 * color == baked_pixels**2.4
+            # to get:
+            #   pixels * color**1/2.4 == baked_pixels
+            # giving us both the input and output image pixels in linear colorspace
+            # The following is color_scene_linear_to_srgb from node_color.h in the Blender source code, rewritten for
+            # Python and numpy
+            is_small_mask = mmd_color < 0.0031308
+            small_rgb = mmd_color[is_small_mask]
+            # 0 if less than 0, otherwise multiply by 12.92
+            mmd_color[is_small_mask] = np.where(small_rgb < 0.0, 0, small_rgb * 12.92)
+
+            # Invert is_small_mask in-place, new variable name for clarity
+            is_large_mask = np.invert(is_small_mask, out=is_small_mask)
+            large_rgb = mmd_color[is_large_mask]
+            mmd_color[is_large_mask] = (large_rgb ** (1.0 / 2.4)) * 1.055 - 0.055
+
+        # Read the image pixels into a numpy array
+        pixels = np.empty(np.prod(base_tex_image.size) * 4, dtype=np.single)
+        base_tex_image.pixels.foreach_get(pixels)
+
+        # View as grouped into individual pixels, so we can easily multiply all pixels by the same amount
+        pixels.shape = (-1, 4)
+
+        # Multiply the RGB of all the pixels in-place, automatically broadcasting the basecolor array.
+        # We are currently ignoring base tex fac, treating it as if it's always 1
+        pixels[:, :3] *= np.asarray(mmd_color)
+
+        # Create new image so as not to touch the old one.
+        baked_image = bpy.data.images.new(base_tex_image.name + "MMDCatsBaked",
+                                          width=base_tex_image.size[0],
+                                          height=base_tex_image.size[1],
+                                          alpha=True)
+        baked_image.filepath = bpy.path.abspath("//" + base_tex_image.name + ".png")
+        baked_image.file_format = 'PNG'
+        # Set the colorspace to match the original image
+        baked_image.colorspace_settings.name = base_tex_image.colorspace_settings.name
+        # Replace the existing image in the node with the new, baked image
+        node_base_tex.image = baked_image
+
+        # Write the image pixels to the image
+        baked_image.pixels.foreach_set(pixels)
+        # Save the image to file if possible
+        if bpy.data.is_saved:
+            node_base_tex.image.save()
+        return node_base_tex, None
+
+
+def add_principled_shader(mesh: Object, bake_mmd=True):
+    # Blender's FBX exporter only exports material properties when a Principled BSDF shader is used.
+    # This adds a Principled BSDF shader and material output node in order for Unity to automatically detect exported
+    # material properties.
+    # Note that Unity's support for material properties from Blender exported FBX files is limited without additional
+    # Unity scripts, for Blender exported FBX, Unity uses CreateFromStandardMaterial in:
+    # https://github.com/Unity-Technologies/UnityCsReference/blob/master/Modules/AssetPipelineEditor/AssetPostprocessors/FBXMaterialDescriptionPreprocessor.cs
+
+    # Positions to place Cats specific nodes, this typically puts the nodes down and to the right of existing nodes
     principled_shader_pos = (501, -500)
     output_shader_pos = (801, -500)
-    mmd_texture_bake_pos = (1101, -500)
-    principled_shader_label = 'Cats Export Shader'
-    output_shader_label = 'Cats Export'
+    # Labels used to identify Cats specific nodes
+    principled_shader_label = "Cats Export Shader"
+    output_shader_label = "Cats Export"
+    # Node names and labels used by Materials created when importing an MMD model
+    mmd_base_tex_name = "mmd_base_tex"
+    mmd_base_tex_label = "MainTexture"
+    mmd_shader_name = "mmd_shader"
+    # Node types. These are Blender defined constants
+    principled_bsdf_idname = "ShaderNodeBsdfPrincipled"
+    material_output_idname = "ShaderNodeOutputMaterial"
+    image_texture_idname = "ShaderNodeTexImage"
+    group_idname = "ShaderNodeGroup"
 
     for mat_slot in mesh.material_slots:
-        if mat_slot.material and mat_slot.material.node_tree:
-            nodes = mat_slot.material.node_tree.nodes
-            node_image = None
-            node_image_count = 0
-            node_mmd_shader = None
-            needsmmdcolor = False
+        mat = mat_slot.material
+        if mat and mat.node_tree:
+            node_tree = mat.node_tree
+            nodes = node_tree.nodes
+            node_base_tex = nodes.get(mmd_base_tex_name)
+            if node_base_tex and node_base_tex.bl_idname != image_texture_idname:
+                # If for some reason it's not an Image Texture node, we'll try and get the node by its label instead
+                node_base_tex = None
+            found_image_texture_nodes = []
+            cats_principled_bsdf = None
+            cats_material_output = None
 
-            # Check if the new nodes should be added and to which image node they should be attached to
+            # Check if the new nodes should be added and to which image node they should be linked to
+            # Remove any extra Material Output nodes that aren't the Cats one
+            # If there is more than one Material Output node or Principled BSDF node with the Cats label, remove
+            # all but the first found.
             for node in nodes:
-                # Cancel if the cats nodes are already found
-                if node.type == 'BSDF_PRINCIPLED' and node.label == principled_shader_label:
-                    node_image = None
-                    break
-                elif node.type == 'OUTPUT_MATERIAL' and node.label == output_shader_label:
-                    node_image = None
-                    break
-                elif node.type == 'OUTPUT_MATERIAL': #So that blender doesn't get confused on which to output
-                    nodes.remove(node)
-                    continue
-                if node.name == "mmd_shader":
-                    node_mmd_shader = node
-                    needsmmdcolor = True
-                    continue
+                if node.bl_idname == principled_bsdf_idname and node.label == principled_shader_label:
+                    if cats_principled_bsdf:
+                        # Remove any extra principled bsdf nodes with the label
+                        nodes.remove(node)
+                    else:
+                        cats_principled_bsdf = node
+                elif node.bl_idname == material_output_idname:
+                    if node.label == output_shader_label:
+                        if cats_material_output:
+                            # Remove any extra material output nodes with the label
+                            nodes.remove(node)
+                        else:
+                            cats_material_output = node
+                    else:
+                        # Remove any extra Material Output nodes so that blender doesn't get confused on which to use
+                        nodes.remove(node)
+                elif not node_base_tex and node.bl_idname == image_texture_idname:
+                    # If we couldn't find the mmd_base_tex node by name initially, we'll try to find it by its expected
+                    # label instead.
+                    # Otherwise, we'll only pick an image texture node if there's only one.
+                    if node.label == mmd_base_tex_label:
+                        node_base_tex = node
+                    else:
+                        found_image_texture_nodes.append(node)
 
-                # Skip if this node is not an image node
-                if node.type != 'TEX_IMAGE':
-                    continue
-                node_image_count += 1
+            # If the Cats nodes weren't found, they need to be added
+            if not cats_principled_bsdf or not cats_material_output:
+                node_mmd_shader = nodes.get(mmd_shader_name)
 
-                # If an mmd_texture is found, link it to the principled shader later
-                if node.name == 'mmd_base_tex' or node.label == 'MainTexture':
-                    node_image = node
-                    node_image_count = 0
-                    break
+                # If there's no mmd texture, but there was only one image texture node, we'll use that one image texture
+                # node.
+                if not node_base_tex:
+                    if len(found_image_texture_nodes) == 1:
+                        node_base_tex = found_image_texture_nodes[0]
 
-                # This is an image node, so link it to the principled shader later
-                node_image = node
-            #this material doesn't have a texture and doesn't have a MMD AO+Diffuse so skip
-            if (not node_image or node_image_count > 1) and not needsmmdcolor:
-                continue
-            elif needsmmdcolor and node_mmd_shader: #this needs to implement mmd color and has a shader node
-                #bake AO and Diffuse color into pixels for MMD texture. if texture exists, multiply over
-                #Thank this guy for pixel manipulation: https://blender.stackexchange.com/a/652
+                # If there is an mmd_shader group node, copy how it combines the Ambient Color, Diffuse Color and
+                # Base Tex, and bake the result into a single texture (or color if there is no Base Tex) that can be
+                # used as the Base Color in the Principled BSDF shader node.
+                if node_mmd_shader and node_mmd_shader.bl_idname == group_idname and bake_mmd:
+                    node_base_tex, principled_base_color = bake_mmd_colors(node_base_tex, node_mmd_shader)
+                else:
+                    principled_base_color = None
 
+                # Create Principled BSDF node if it doesn't exist
+                if not cats_principled_bsdf:
+                    cats_principled_bsdf = nodes.new(type="ShaderNodeBsdfPrincipled")
+                cats_principled_bsdf.label = principled_shader_label
+                cats_principled_bsdf.location = principled_shader_pos
+                cats_principled_bsdf.inputs["Specular"].default_value = 0
+                cats_principled_bsdf.inputs["Roughness"].default_value = 0
+                cats_principled_bsdf.inputs["Sheen Tint"].default_value = 0
+                cats_principled_bsdf.inputs["Clearcoat Roughness"].default_value = 0
+                cats_principled_bsdf.inputs["IOR"].default_value = 0
 
-                basecolor = [x*0.6 for x in node_mmd_shader.inputs[1].default_value[:]] #multply color of diffuse by .6 which is MMD's addition factor
-                for rgba,num in enumerate(basecolor):
-                    basecolor[rgba] = max(0,min(1,basecolor[rgba]+node_mmd_shader.inputs[0].default_value[rgba])) #add AO to diffuse and clamp between 0-1 for each channel
+                # Create Material Output node if it doesn't exist
+                if not cats_material_output:
+                    cats_material_output = nodes.new(type="ShaderNodeOutputMaterial")
+                cats_material_output.label = output_shader_label
+                cats_material_output.location = output_shader_pos
 
-                if not node_image:
-                    node_image = mat_slot.material.node_tree.nodes.new(type="ShaderNodeTexImage")
-                    node_image.location = mmd_texture_bake_pos
-                    node_image.label = "Mmd Base Tex"
-                    node_image.name = "mmd_base_tex"
-                    node_image.image = bpy.data.images.new("MMDCatsBaked", width=8, height=8, alpha=True)
-
-                    #make pixels using AO color
-
-
-                    #assign to image so it's baked
-                    node_image.image.generated_color = basecolor
-                    node_image.image.filepath = bpy.path.abspath("//"+node_image.image.name+".png")
-                    node_image.image.file_format = 'PNG'
-                    if bpy.data.is_saved:
-                        node_image.image.save()
-                elif node_image:
-
-                    #multiply color on top of default color.
-                    pixels = np.array(node_image.image.pixels[:])
-
-                    multiply_image = np.tile(np.array(basecolor),int(len(pixels)/4))
-
-                    new_pixels = pixels*multiply_image
-
-                    #create new image as to not touch old one
-                    node_image.image = bpy.data.images.new(node_image.image.name+"MMDCatsBaked", width=node_image.image.size[0], height=node_image.image.size[1], alpha=True)
-                    node_image.image.filepath = bpy.path.abspath("//"+node_image.image.name+".png")
-                    node_image.image.file_format = 'PNG'
-
-                    node_image.image.pixels = new_pixels
-                    if bpy.data.is_saved:
-                        node_image.image.save()
-
-
-            # Create Principled BSDF node
-            node_principled = nodes.new(type='ShaderNodeBsdfPrincipled')
-            node_principled.label = 'Cats Export Shader'
-            node_principled.location = principled_shader_pos
-            node_principled.inputs['Specular'].default_value = 0
-            node_principled.inputs['Roughness'].default_value = 0
-            node_principled.inputs['Sheen Tint'].default_value = 0
-            node_principled.inputs['Clearcoat Roughness'].default_value = 0
-            node_principled.inputs['IOR'].default_value = 0
-
-            # Create Output node for correct image exports
-            node_output = nodes.new(type='ShaderNodeOutputMaterial')
-            node_output.label = 'Cats Export'
-            node_output.location = output_shader_pos
-
-            # Link nodes together
-            mat_slot.material.node_tree.links.new(node_image.outputs['Color'], node_principled.inputs['Base Color'])
-            mat_slot.material.node_tree.links.new(node_image.outputs['Alpha'], node_principled.inputs['Alpha'])
-            mat_slot.material.node_tree.links.new(node_principled.outputs['BSDF'], node_output.inputs['Surface'])
+                # Link base tex image texture node's color output to the principled BSDF node's Base Color input or set
+                # the Base Color input's default_value if there is no node to link
+                if node_base_tex and node_base_tex.image:
+                    node_tree.links.new(node_base_tex.outputs["Color"], cats_principled_bsdf.inputs["Base Color"])
+                elif principled_base_color is not None:
+                    cats_principled_bsdf.inputs["Base Color"].default_value = principled_base_color
+                # Link principled BSDF node's output to the material output
+                node_tree.links.new(cats_principled_bsdf.outputs["BSDF"], cats_material_output.inputs["Surface"])
 
 
 def remove_toon_shader(mesh):

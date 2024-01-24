@@ -90,7 +90,7 @@ class LegacyStuff(ToolPanel, bpy.types.Panel):
         
 @register_wrap
 class LegacyReadButton(bpy.types.Operator):
-    bl_idname = 'cats_credits.help'
+    bl_idname = 'legacy_read.help'
     bl_label = t('LegacyReadButton.label')
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
