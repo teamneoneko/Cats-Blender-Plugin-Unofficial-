@@ -1,6 +1,7 @@
 # Cats Blender Plugin.
 
-If you are using blender 3.6 please use the latest release [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases). Blender 3.6 is the current recomended blender version to use!
+If you are using blender 3.6 please use the latest release [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases). Blender 3.6 is the current recomended blender version to use!  
+
 You can find the development version for Blender 3.6 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-36-dev).
 
 ### Warning for Blender 4.0 users:
@@ -9,6 +10,7 @@ Though we have updated cats to blender 4.0, please note there are still some iss
 Belnder 4.0 is also buggy and does have issues as well, we won't be recommending use of blender 4.x unto the first LTS comes out later this year.
 
 However if you must use blender 4.0 you can download it from this branch [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-40).
+
 You can find the development version for Blender 4.0 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-40-dev).
 
 The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat.
