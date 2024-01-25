@@ -187,10 +187,8 @@ def merge_armatures(base_armature_name, merge_armature_name, mesh_only, mesh_nam
     merge_armature = Common.get_objects()[merge_armature_name]
 
     # Fixes bones disappearing, prevents bones from having their tail and head at the exact same position
-    x_cord, y_cord, z_cord, fbx = Common.get_bone_orientations(base_armature)
-    Common.fix_zero_length_bones(base_armature, x_cord, y_cord, z_cord)
-    x_cord, y_cord, z_cord, fbx = Common.get_bone_orientations(merge_armature)
-    Common.fix_zero_length_bones(merge_armature, x_cord, y_cord, z_cord)
+    Common.fix_zero_length_bones(base_armature)
+    Common.fix_zero_length_bones(merge_armature)
 
     # Get all meshes and join if neccessary
     if bpy.context.scene.merge_armatures_join_meshes:

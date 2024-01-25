@@ -1645,7 +1645,6 @@ class FixFBTButton(bpy.types.Operator):
         armature = Common.set_default_stage()
         Common.switch('EDIT')
 
-        x_cord, y_cord, z_cord, fbx = Common.get_bone_orientations(armature)
 
         hips = armature.data.edit_bones.get('Hips')
         spine = armature.data.edit_bones.get('Spine')
@@ -1678,10 +1677,10 @@ class FixFBTButton(bpy.types.Operator):
         # Flip hips
         hips.head = spine.head
         hips.tail = spine.head
-        hips.tail[z_cord] = left_leg.head[z_cord]
+        hips.tail.z = left_leg.head.z
 
-        if hips.tail[z_cord] > hips.head[z_cord]:
-            hips.tail[z_cord] -= 0.1
+        if hips.tail.z > hips.head.z:
+            hips.tail.z -= 0.1
 
         # Create new leg bones and put them at the old location
         if not left_leg_new:
@@ -1705,23 +1704,23 @@ class FixFBTButton(bpy.types.Operator):
 
         # Set new location for old leg bones
         left_leg.tail = left_leg.head
-        left_leg.tail[z_cord] = left_leg.head[z_cord] + 0.1
+        left_leg.tail.z = left_leg.head.z + 0.1
 
         right_leg.tail = right_leg.head
-        right_leg.tail[z_cord] = right_leg.head[z_cord] + 0.1
+        right_leg.tail.z = right_leg.head.z + 0.1
 
         left_leg_new.parent = left_leg
         right_leg_new.parent = right_leg
 
         # Fixes bones disappearing, prevents bones from having their tail and head at the exact same position
         for bone in armature.data.edit_bones:
-            if round(bone.head[x_cord], 5) == round(bone.tail[x_cord], 5) \
-                    and round(bone.head[y_cord], 5) == round(bone.tail[y_cord], 5) \
-                    and round(bone.head[z_cord], 5) == round(bone.tail[z_cord], 5):
+            if round(bone.head.x, 5) == round(bone.tail.x, 5) \
+                    and round(bone.head.y, 5) == round(bone.tail.y, 5) \
+                    and round(bone.head.z, 5) == round(bone.tail.z, 5):
                 if bone.name == 'Hips':
-                    bone.tail[z_cord] -= 0.1
+                    bone.tail.z -= 0.1
                 else:
-                    bone.tail[z_cord] += 0.1
+                    bone.tail.z += 0.1
 
         Common.switch('OBJECT')
 
@@ -1748,7 +1747,6 @@ class RemoveFBTButton(bpy.types.Operator):
         armature = Common.set_default_stage()
         Common.switch('EDIT')
 
-        x_cord, y_cord, z_cord, fbx = Common.get_bone_orientations(armature)
 
         hips = armature.data.edit_bones.get('Hips')
         spine = armature.data.edit_bones.get('Spine')
@@ -1770,24 +1768,24 @@ class RemoveFBTButton(bpy.types.Operator):
 
         # Remove FBT Fix
         # Corrects hips
-        if hips.head[z_cord] > hips.tail[z_cord]:
+        if hips.head.z > hips.tail.z:
             # Put Hips in the center of the leg bones
-            hips.head[x_cord] = (right_leg.head[x_cord] + left_leg.head[x_cord]) / 2
+            hips.head.x = (right_leg.head.x + left_leg.head.x) / 2
 
             # Put Hips at 33% between spine and legs
-            hips.head[z_cord] = left_leg.head[z_cord] + (spine.head[z_cord] - left_leg.head[z_cord]) * 0.33
+            hips.head.z = left_leg.head.z + (spine.head.z - left_leg.head.z) * 0.33
 
             # If Hips are below or at the leg bones, put them above
-            if hips.head[z_cord] <= right_leg.head[z_cord]:
-                hips.head[z_cord] = right_leg.head[z_cord] + 0.1
+            if hips.head.z <= right_leg.head.z:
+                hips.head.z = right_leg.head.z + 0.1
 
             # Make Hips point straight up
-            hips.tail[x_cord] = hips.head[x_cord]
-            hips.tail[y_cord] = hips.head[y_cord]
-            hips.tail[z_cord] = spine.head[z_cord]
+            hips.tail.x = hips.head.x
+            hips.tail.y = hips.head.y
+            hips.tail.z = spine.head.z
 
-            if hips.tail[z_cord] < hips.head[z_cord]:
-                hips.tail[z_cord] = hips.tail[z_cord] + 0.1
+            if hips.tail.z < hips.head.z:
+                hips.tail.z = hips.tail.z + 0.1
 
         # Put the original legs at their old location
         left_leg.head = left_leg_new.head
@@ -1802,10 +1800,10 @@ class RemoveFBTButton(bpy.types.Operator):
 
         # Fixes bones disappearing, prevents bones from having their tail and head at the exact same position
         for bone in armature.data.edit_bones:
-            if round(bone.head[x_cord], 5) == round(bone.tail[x_cord], 5) \
-                    and round(bone.head[y_cord], 5) == round(bone.tail[y_cord], 5) \
-                    and round(bone.head[z_cord], 5) == round(bone.tail[z_cord], 5):
-                bone.tail[z_cord] += 0.1
+            if round(bone.head.x, 5) == round(bone.tail.x, 5) \
+                    and round(bone.head.y, 5) == round(bone.tail.y, 5) \
+                    and round(bone.head.z, 5) == round(bone.tail.z, 5):
+                bone.tail.z += 0.1
 
         Common.switch('OBJECT')
 

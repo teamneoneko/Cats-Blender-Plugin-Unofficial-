@@ -44,7 +44,5 @@ class CreditsPanel(ToolPanel, bpy.types.Panel):
         row = col.row(align=True)
         row.scale_y = 1.4
         row.operator(Credits.HelpButton.bl_idname, icon_value=Supporter.preview_collections["custom_icons"]["help1"].icon_id)
-        # row = col.row(align=True)
-        # row.operator(Credits.ForumButton.bl_idname, icon_value=Supporter.preview_collections["custom_icons"]["cats1"].icon_id)
         row = col.row(align=True)
         row.operator(Credits.PatchnotesButton.bl_idname, icon='WORDWRAP_ON')
