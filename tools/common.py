@@ -1809,7 +1809,7 @@ def unify_materials():
                         node_prinipled = nodes.new(type='ShaderNodeBsdfPrincipled')
                         node_prinipled.location = 300, -220
                         node_prinipled.label = 'Cats Emission'
-                        node_prinipled.inputs['Specular'].default_value = 0
+                        node_prinipled.inputs['Specular IOR Level'].default_value = 0
                         node_prinipled.inputs['Roughness'].default_value = 0
                         node_prinipled.inputs['Sheen Tint'].default_value = 0
                         node_prinipled.inputs['Clearcoat Roughness'].default_value = 0
@@ -2053,7 +2053,7 @@ def add_principled_shader(mesh: Object, bake_mmd=True):
                     cats_principled_bsdf = nodes.new(type="ShaderNodeBsdfPrincipled")
                 cats_principled_bsdf.label = principled_shader_label
                 cats_principled_bsdf.location = principled_shader_pos
-                cats_principled_bsdf.inputs["Specular"].default_value = 0
+                cats_principled_bsdf.inputs["Specular IOR Level"].default_value = 0
                 cats_principled_bsdf.inputs["Roughness"].default_value = 0
                 cats_principled_bsdf.inputs["Sheen Tint"].default_value = 0
                 cats_principled_bsdf.inputs["Clearcoat Roughness"].default_value = 0
