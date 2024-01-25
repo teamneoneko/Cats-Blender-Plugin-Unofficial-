@@ -5,9 +5,9 @@ If you are using blender 3.6 please use the latest release [here](https://github
 You can find the development version for Blender 3.6 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-36-dev).
 
 ### Warning for Blender 4.0 users:
-Though we have updated cats to blender 4.0, please note there are still some issues with MMD Tools which may break some plugin functionilty, this is not a cats issue so please redirect those issues to MMD Tools. Blender 4.0 is not our priority and will be behind the blender 3.6 version. We HIGHLY recommend using blender 3.6 for the time being unless you REALLY need the new features in 4.0, which if your just making VRChat models or doing MMD stuff you most likely don't.
+Though we have updated cats to blender 4.0, please note there are still some issues with MMD Tools which may break some plugin functionality, this is not a cats issue so please redirect those issues to MMD Tools. Blender 4.0 is not our priority and will be behind the blender 3.6 version. We HIGHLY recommend using blender 3.6 for the time being unless you REALLY need the new features in 4.0, which if your just making VRChat models or doing MMD stuff you most likely don't.
 
-Belnder 4.0 is also buggy and does have issues as well, we won't be recommending use of blender 4.x unto the first LTS comes out later this year.
+Blender 4.0 is also buggy and does have issues as well, we won't be recommending use of blender 4.x unto the first LTS comes out later this year.
 
 However if you must use blender 4.0 you can download it from this branch [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-40).
 
