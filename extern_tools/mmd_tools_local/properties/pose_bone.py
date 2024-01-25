@@ -2,46 +2,47 @@
 # Copyright 2014 MMD Tools authors
 # This file is part of MMD Tools.
 
+from typing import cast
 import bpy
 
 from mmd_tools_local.core.bone import FnBone
+from mmd_tools_local.properties import patch_library_overridable
 
 
-def _updateMMDBoneAdditionalTransform(prop, context):
+def _mmd_bone_update_additional_transform(prop: "MMDBone", context: bpy.types.Context):
     prop["is_additional_transform_dirty"] = True
     p_bone = context.active_pose_bone
     if p_bone and p_bone.mmd_bone.as_pointer() == prop.as_pointer():
         FnBone.apply_additional_transformation(prop.id_data)
 
 
-def _updateAdditionalTransformInfluence(prop, context):
-    p_bone = context.active_pose_bone
-    if p_bone and p_bone.mmd_bone.as_pointer() == prop.as_pointer():
-        FnBone(p_bone).update_additional_transform_influence()
+def _mmd_bone_update_additional_transform_influence(prop: "MMDBone", context: bpy.types.Context):
+    pose_bone = context.active_pose_bone
+    if pose_bone and pose_bone.mmd_bone.as_pointer() == prop.as_pointer():
+        FnBone.update_additional_transform_influence(pose_bone)
     else:
         prop["is_additional_transform_dirty"] = True
 
 
-def _getAdditionalTransformBone(prop):
+def _mmd_bone_get_additional_transform_bone(prop: "MMDBone"):
     arm = prop.id_data
     bone_id = prop.get("additional_transform_bone_id", -1)
     if bone_id < 0:
         return ""
-    fnBone = FnBone.from_bone_id(arm, bone_id)
-    if not fnBone:
+    pose_bone = FnBone.find_pose_bone_by_bone_id(arm, bone_id)
+    if pose_bone is None:
         return ""
-    return fnBone.pose_bone.name
+    return pose_bone.name
 
 
-def _setAdditionalTransformBone(prop, value):
+def _mmd_bone_set_additional_transform_bone(prop: "MMDBone", value: str):
     arm = prop.id_data
     prop["is_additional_transform_dirty"] = True
     if value not in arm.pose.bones.keys():
         prop["additional_transform_bone_id"] = -1
         return
     pose_bone = arm.pose.bones[value]
-    bone = FnBone(pose_bone)
-    prop["additional_transform_bone_id"] = bone.bone_id
+    prop["additional_transform_bone_id"] = FnBone.get_or_assign_bone_id(pose_bone)
 
 
 class MMDBone(bpy.types.PropertyGroup):
@@ -145,28 +146,28 @@ class MMDBone(bpy.types.PropertyGroup):
         name="Additional Rotation",
         description="Additional rotation",
         default=False,
-        update=_updateMMDBoneAdditionalTransform,
+        update=_mmd_bone_update_additional_transform,
     )
 
     has_additional_location: bpy.props.BoolProperty(
         name="Additional Location",
         description="Additional location",
         default=False,
-        update=_updateMMDBoneAdditionalTransform,
+        update=_mmd_bone_update_additional_transform,
     )
 
     additional_transform_bone: bpy.props.StringProperty(
         name="Additional Transform Bone",
         description="Additional transform bone",
-        set=_setAdditionalTransformBone,
-        get=_getAdditionalTransformBone,
-        update=_updateMMDBoneAdditionalTransform,
+        set=_mmd_bone_set_additional_transform_bone,
+        get=_mmd_bone_get_additional_transform_bone,
+        update=_mmd_bone_update_additional_transform,
     )
 
     additional_transform_bone_id: bpy.props.IntProperty(
         name="Additional Transform Bone ID",
         default=-1,
-        update=_updateMMDBoneAdditionalTransform,
+        update=_mmd_bone_update_additional_transform,
     )
 
     additional_transform_influence: bpy.props.FloatProperty(
@@ -175,7 +176,7 @@ class MMDBone(bpy.types.PropertyGroup):
         default=1,
         soft_min=-1,
         soft_max=1,
-        update=_updateAdditionalTransformInfluence,
+        update=_mmd_bone_update_additional_transform_influence,
     )
 
     is_additional_transform_dirty: bpy.props.BoolProperty(name="", default=True)
@@ -183,21 +184,32 @@ class MMDBone(bpy.types.PropertyGroup):
     def is_id_unique(self):
         return self.bone_id < 0 or not next((b for b in self.id_data.pose.bones if b.mmd_bone != self and b.mmd_bone.bone_id == self.bone_id), None)
 
+    @staticmethod
+    def register():
+        bpy.types.PoseBone.mmd_bone = patch_library_overridable(bpy.props.PointerProperty(type=MMDBone))
+        bpy.types.PoseBone.is_mmd_shadow_bone = patch_library_overridable(bpy.props.BoolProperty(name="is_mmd_shadow_bone", default=False))
+        bpy.types.PoseBone.mmd_shadow_bone_type = patch_library_overridable(bpy.props.StringProperty(name="mmd_shadow_bone_type"))
+        bpy.types.PoseBone.mmd_ik_toggle = patch_library_overridable(
+            bpy.props.BoolProperty(
+                name="MMD IK Toggle",
+                description="MMD IK toggle is used to import/export animation of IK on-off",
+                update=_pose_bone_update_mmd_ik_toggle,
+                default=True,
+            )
+        )
 
-def _mmd_ik_toggle_get(prop):
-    return prop.get("mmd_ik_toggle", True)
+    @staticmethod
+    def unregister():
+        del bpy.types.PoseBone.mmd_ik_toggle
+        del bpy.types.PoseBone.mmd_shadow_bone_type
+        del bpy.types.PoseBone.is_mmd_shadow_bone
+        del bpy.types.PoseBone.mmd_bone
 
 
-def _mmd_ik_toggle_set(prop, v):
-    if v != prop.get("mmd_ik_toggle", None):
-        prop["mmd_ik_toggle"] = v
-        _mmd_ik_toggle_update(prop, None)
-
-
-def _mmd_ik_toggle_update(prop, context):
+def _pose_bone_update_mmd_ik_toggle(prop: bpy.types.PoseBone, _context):
     v = prop.mmd_ik_toggle
-    # logging.debug('_mmd_ik_toggle_update %s %s', v, prop.name)
-    for b in prop.id_data.pose.bones:
+    armature_object = cast(bpy.types.Object, prop.id_data)
+    for b in armature_object.pose.bones:
         for c in b.constraints:
             if c.type == "IK" and c.subtarget == prop.name:
                 # logging.debug('   %s %s', b.name, c.name)

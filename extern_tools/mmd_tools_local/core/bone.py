@@ -3,7 +3,7 @@
 # This file is part of MMD Tools.
 
 import math
-from typing import Iterable
+from typing import Iterable, Optional
 
 import bpy
 from mathutils import Vector
@@ -41,37 +41,26 @@ class FnBone:
     AUTO_LOCAL_AXIS_FINGERS = ("親指", "人指", "中指", "薬指", "小指")
     AUTO_LOCAL_AXIS_SEMI_STANDARD_ARMS = ("左腕捩", "左手捩", "左肩P", "左ダミー", "右腕捩", "右手捩", "右肩P", "右ダミー")
 
-    def __init__(self, pose_bone=None):
-        if pose_bone is not None and not isinstance(pose_bone, bpy.types.PoseBone):
-            raise ValueError
-        self.__bone = pose_bone
+    def __init__(self):
+        raise NotImplementedError("This class cannot be instantiated.")
 
-    @classmethod
-    def from_bone_id(cls, armature_object: bpy.types.Object, bone_id):
+    @staticmethod
+    def find_pose_bone_by_bone_id(armature_object: bpy.types.Object, bone_id: int) -> Optional[bpy.types.PoseBone]:
         for bone in armature_object.pose.bones:
-            if bone.mmd_bone.bone_id == bone_id:
-                return cls(bone)
+            if bone.mmd_bone.bone_id != bone_id:
+                continue
+            return bone
         return None
 
-    @property
-    def bone_id(self):
-        mmd_bone = self.__bone.mmd_bone
-        if mmd_bone.bone_id < 0:
-            max_id = -1
-            for bone in self.__bone.id_data.pose.bones:
-                max_id = max(max_id, bone.mmd_bone.bone_id)
-            mmd_bone.bone_id = max_id + 1
-        return mmd_bone.bone_id
+    @staticmethod
+    def __new_bone_id(armature_object: bpy.types.Object) -> int:
+        return max(b.mmd_bone.bone_id for b in armature_object.pose.bones) + 1
 
-    def __get_pose_bone(self):
-        return self.__bone
-
-    def __set_pose_bone(self, pose_bone):
-        if not isinstance(pose_bone, bpy.types.PoseBone):
-            raise ValueError
-        self.__bone = pose_bone
-
-    pose_bone = property(__get_pose_bone, __set_pose_bone)
+    @staticmethod
+    def get_or_assign_bone_id(pose_bone: bpy.types.PoseBone) -> int:
+        if pose_bone.mmd_bone.bone_id < 0:
+            pose_bone.mmd_bone.bone_id = FnBone.__new_bone_id(pose_bone.id_data)
+        return pose_bone.mmd_bone.bone_id
 
     @staticmethod
     def __get_selected_pose_bones(armature_object: bpy.types.Object) -> Iterable[bpy.types.PoseBone]:
@@ -163,7 +152,7 @@ class FnBone:
         root_object: bpy.types.Object = FnModel.find_root(armature_object)
         mmd_root = root_object.mmd_root
 
-        bones = armature_object.data.bones
+        bones = armature.bones
         used_groups = set()
         unassigned_bone_names = {b.name for b in bones}
 
@@ -423,10 +412,10 @@ class FnBone:
 
         return shadow_bone
 
-    def update_additional_transform_influence(self):
-        p_bone = self.__bone
-        influence = p_bone.mmd_bone.additional_transform_influence
-        constraints = p_bone.constraints
+    @staticmethod
+    def update_additional_transform_influence(pose_bone: bpy.types.PoseBone):
+        influence = pose_bone.mmd_bone.additional_transform_influence
+        constraints = pose_bone.constraints
         c = constraints.get("mmd_additional_rotation", None)
         TransformConstraintOp.update_min_max(c, math.pi, influence)
         c = constraints.get("mmd_additional_location", None)

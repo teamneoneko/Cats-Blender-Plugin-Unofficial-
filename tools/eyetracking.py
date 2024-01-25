@@ -451,34 +451,22 @@ def fix_eye_position(context, old_eye, new_eye, head, right_side):
             length = (p1 - p2).length
             print(length)  # TODO calculate scale if bone is too close to center of the eye
 
-    # dist = math.sqrt((coords_eye[0] - head.head[x_cord]) ** 2 + (coords_eye[1] - head.head[y_cord]) ** 2 + (coords_eye[2] - head.head[z_cord]) ** 2)
-    # dist2 = np.linalg.norm(coords_eye - head.head)
-    # dist3 = math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2 + (p1[2] - p2[2]) ** 2)
-    # dist4 = np.linalg.norm(p1 - p2)
-    # print(dist)
-    # print(dist2)
-    # print(2 ** 2)
-    # print(dist4)
-
-    # Check if bone matrix == world matrix, important for xps models
-    x_cord, y_cord, z_cord, fbx = Common.get_bone_orientations(Common.get_armature())
-
     if context.scene.disable_eye_movement:
         if head is not None:
             if right_side:
-                new_eye.head[x_cord] = head.head[x_cord] + 0.05
+                new_eye.head.x = head.head.x + 0.05
             else:
-                new_eye.head[x_cord] = head.head[x_cord] - 0.05
-            new_eye.head[y_cord] = head.head[y_cord]
-            new_eye.head[z_cord] = head.head[z_cord]
+                new_eye.head.x = head.head.x - 0.05
+            new_eye.head.y = head.head.y
+            new_eye.head.z = head.head.z
     else:
-        new_eye.head[x_cord] = old_eye.head[x_cord] + scale * (coords_eye[0] - old_eye.head[x_cord])
-        new_eye.head[y_cord] = old_eye.head[y_cord] + scale * (coords_eye[1] - old_eye.head[y_cord])
-        new_eye.head[z_cord] = old_eye.head[z_cord] + scale * (coords_eye[2] - old_eye.head[z_cord])
+        new_eye.head.x = old_eye.head.x + scale * (coords_eye[0] - old_eye.head.x)
+        new_eye.head.y = old_eye.head.y + scale * (coords_eye[1] - old_eye.head.y)
+        new_eye.head.z = old_eye.head.z + scale * (coords_eye[2] - old_eye.head.z)
 
-    new_eye.tail[x_cord] = new_eye.head[x_cord]
-    new_eye.tail[y_cord] = new_eye.head[y_cord]
-    new_eye.tail[z_cord] = new_eye.head[z_cord] + 0.1
+    new_eye.tail.x = new_eye.head.x
+    new_eye.tail.y = new_eye.head.y
+    new_eye.tail.z = new_eye.head.z + 0.1
 
 
 # Repair vrc shape keys

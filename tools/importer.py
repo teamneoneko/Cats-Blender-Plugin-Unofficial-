@@ -2039,7 +2039,7 @@ class ExportModel(bpy.types.Operator):
                     if mat_slot and mat_slot.material and mat_slot.material.users and mat_slot.material.name not in _mat_list:
                         _mat_list.append(mat_slot.material.name)
                         _textures_found = True
-                            
+                        
                 if Common.has_shapekeys(mesh):
                     # Check if there are broken shapekeys
                     for shapekey in mesh.data.shape_keys.key_blocks[1:]:
