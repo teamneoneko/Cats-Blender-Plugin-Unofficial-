@@ -1811,8 +1811,8 @@ def unify_materials():
                         node_prinipled.label = 'Cats Emission'
                         node_prinipled.inputs['Specular IOR Level'].default_value = 0
                         node_prinipled.inputs['Roughness'].default_value = 0
-                        node_prinipled.inputs['Sheen Tint'].default_value = 0
-                        node_prinipled.inputs['Clearcoat Roughness'].default_value = 0
+                        node_prinipled.inputs["Sheen Tint"].default_value = (1.0, 1.0, 1.0, 1.0)
+                        node_prinipled.inputs['Coat Roughness'].default_value = 0
                         node_prinipled.inputs['IOR'].default_value = 0
 
                         # Create Transparency BSDF node
@@ -2055,8 +2055,8 @@ def add_principled_shader(mesh: Object, bake_mmd=True):
                 cats_principled_bsdf.location = principled_shader_pos
                 cats_principled_bsdf.inputs["Specular IOR Level"].default_value = 0
                 cats_principled_bsdf.inputs["Roughness"].default_value = 0
-                cats_principled_bsdf.inputs["Sheen Tint"].default_value = 0
-                cats_principled_bsdf.inputs["Clearcoat Roughness"].default_value = 0
+                cats_principled_bsdf.inputs["Sheen Tint"].default_value = (1.0, 1.0, 1.0, 1.0)
+                cats_principled_bsdf.inputs["Coat Roughness"].default_value = 0
                 cats_principled_bsdf.inputs["IOR"].default_value = 0
 
                 # Create Material Output node if it doesn't exist
