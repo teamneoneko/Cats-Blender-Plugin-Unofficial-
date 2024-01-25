@@ -5,7 +5,7 @@
 import itertools
 import logging
 import time
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Optional, Set, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, Iterator, List, Optional, Set, TypeGuard, Union, cast
 
 import bpy
 import idprop
@@ -78,14 +78,27 @@ class FnModel:
         return next(filter(lambda o: o.type == "MESH" and "mmd_bone_order_override" in o.modifiers, armature_object.children), None)
 
     @staticmethod
-    def all_children(obj: bpy.types.Object) -> Iterable[bpy.types.Object]:
+    def find_mesh_by_name(root_object: bpy.types.Object, name: str) -> Optional[bpy.types.Object]:
+        armature_object = FnModel.find_armature(root_object)
+        if armature_object is None:
+            return None
+        for o in FnModel.child_meshes(armature_object):
+            if o.name != name:
+                continue
+            return o
+        return None
+
+    @staticmethod
+    def all_children(obj: bpy.types.Object) -> Iterator[bpy.types.Object]:
         child: bpy.types.Object
         for child in obj.children:
             yield child
             yield from FnModel.all_children(child)
 
     @staticmethod
-    def filtered_children(condition_function: Callable[[bpy.types.Object], bool], obj: bpy.types.Object) -> Iterable[bpy.types.Object]:
+    def filtered_children(condition_function: Callable[[bpy.types.Object], bool], obj: Optional[bpy.types.Object]) -> Iterator[bpy.types.Object]:
+        if obj is None:
+            return
         child: bpy.types.Object
         for child in obj.children:
             if condition_function(child):
@@ -94,11 +107,11 @@ class FnModel:
                 yield from FnModel.filtered_children(condition_function, child)
 
     @staticmethod
-    def child_meshes(obj: bpy.types.Object) -> Iterable[bpy.types.Object]:
-        return FnModel.filtered_children(lambda x: x.type == "MESH" and x.mmd_type == "NONE", obj)
+    def child_meshes(obj: bpy.types.Object) -> Iterator[bpy.types.Object]:
+        return FnModel.filtered_children(FnModel.is_mesh_object, obj)
 
     @staticmethod
-    def iterate_rigid_body_objects(root_object: bpy.types.Object) -> Iterable[bpy.types.Object]:
+    def iterate_rigid_body_objects(root_object: bpy.types.Object) -> Iterator[bpy.types.Object]:
         if root_object.mmd_root.is_built:
             return itertools.chain(
                 FnModel.filtered_children(FnModel.is_rigid_body_object, FnModel.find_armature(root_object)),
@@ -107,35 +120,53 @@ class FnModel:
         return FnModel.filtered_children(FnModel.is_rigid_body_object, FnModel.find_rigid_group(root_object))
 
     @staticmethod
-    def iterate_joint_objects(root_object: bpy.types.Object) -> Iterable[bpy.types.Object]:
+    def iterate_joint_objects(root_object: bpy.types.Object) -> Iterator[bpy.types.Object]:
         return FnModel.filtered_children(FnModel.is_joint_object, FnModel.find_joint_group(root_object))
 
     @staticmethod
-    def iterate_temporary_objects(root_object: bpy.types.Object, rigid_track_only: bool = False) -> Iterable[bpy.types.Object]:
-        rigid_group_object = FnModel.find_rigid_group(root_object)
-        rigid_body_objects = [] if rigid_group_object is None else FnModel.filtered_children(FnModel.is_temporary_object, rigid_group_object)
+    def iterate_temporary_objects(root_object: bpy.types.Object, rigid_track_only: bool = False) -> Iterator[bpy.types.Object]:
+        rigid_body_objects = FnModel.filtered_children(FnModel.is_temporary_object, FnModel.find_rigid_group(root_object))
 
         if rigid_track_only:
             return rigid_body_objects
 
         temporary_group_object = FnModel.find_temporary_group(root_object)
-        return rigid_body_objects if temporary_group_object is None else itertools.chain(rigid_body_objects, FnModel.filtered_children(FnModel.is_temporary_object, temporary_group_object))
+        if temporary_group_object is None:
+            return rigid_body_objects
+        return itertools.chain(rigid_body_objects, FnModel.filtered_children(FnModel.is_temporary_object, temporary_group_object))
 
     @staticmethod
-    def is_root_object(obj: bpy.types.Object):
-        return obj and obj.mmd_type == "ROOT"
+    def iterate_materials(root_object: bpy.types.Object) -> Iterable[bpy.types.Material]:
+        armature_object = FnModel.find_armature(root_object)
+        if armature_object is None:
+            return []
+        return (material for mesh_object in FnModel.child_meshes(armature_object) for material in cast(bpy.types.Mesh, mesh_object.data).materials if material is not None)
 
     @staticmethod
-    def is_rigid_body_object(obj: bpy.types.Object):
-        return obj and obj.mmd_type == "RIGID_BODY"
+    def iterate_unique_materials(root_object: bpy.types.Object) -> Iterable[bpy.types.Material]:
+        materials: Dict[bpy.types.Material, None] = {}  # use dict because set does not guarantee the order
+        materials.update((material, None) for material in FnModel.iterate_materials(root_object))
+        return materials.keys()
 
     @staticmethod
-    def is_joint_object(obj: bpy.types.Object):
-        return obj and obj.mmd_type == "JOINT"
+    def is_root_object(obj: Optional[bpy.types.Object]) -> TypeGuard[bpy.types.Object]:
+        return obj is not None and obj.mmd_type == "ROOT"
 
     @staticmethod
-    def is_temporary_object(obj: bpy.types.Object):
-        return obj and obj.mmd_type in {"TRACK_TARGET", "NON_COLLISION_CONSTRAINT", "SPRING_CONSTRAINT", "SPRING_GOAL"}
+    def is_rigid_body_object(obj: Optional[bpy.types.Object]) -> TypeGuard[bpy.types.Object]:
+        return obj is not None and obj.mmd_type == "RIGID_BODY"
+
+    @staticmethod
+    def is_joint_object(obj: Optional[bpy.types.Object]) -> TypeGuard[bpy.types.Object]:
+        return obj is not None and obj.mmd_type == "JOINT"
+
+    @staticmethod
+    def is_temporary_object(obj: Optional[bpy.types.Object]) -> TypeGuard[bpy.types.Object]:
+        return obj is not None and obj.mmd_type in {"TRACK_TARGET", "NON_COLLISION_CONSTRAINT", "SPRING_CONSTRAINT", "SPRING_GOAL"}
+
+    @staticmethod
+    def is_mesh_object(obj: Optional[bpy.types.Object]) -> TypeGuard[bpy.types.Object]:
+        return obj is not None and obj.type == "MESH" and obj.mmd_type == "NONE"
 
     @staticmethod
     def get_rigid_body_size(obj: bpy.types.Object):
@@ -655,7 +686,7 @@ class Model:
         if bounce:
             rb.restitution = bounce
 
-        obj.select = False
+        obj.select_set(False)
         return obj
 
     def createJointPool(self, counts):
@@ -758,7 +789,7 @@ class Model:
         obj.mmd_joint.spring_linear = spring_linear
         obj.mmd_joint.spring_angular = spring_angular
 
-        obj.select = False
+        obj.select_set(False)
         return obj
 
     def create_ik_constraint(self, bone, ik_target):
@@ -779,7 +810,7 @@ class Model:
         ik_const.subtarget = ik_target_name
         return ik_const
 
-    def allObjects(self, obj: Optional[bpy.types.Object] = None) -> Iterable[bpy.types.Object]:
+    def allObjects(self, obj: Optional[bpy.types.Object] = None) -> Iterator[bpy.types.Object]:
         if obj is None:
             obj: bpy.types.Object = self.__root
         yield obj
@@ -804,7 +835,8 @@ class Model:
                 SceneOp(bpy.context).link_object(rigids)
                 rigids.mmd_type = "RIGID_GRP_OBJ"
                 rigids.parent = self.__root
-                rigids.hide = rigids.hide_select = True
+                rigids.hide_set(True)
+                rigids.hide_select = True
                 rigids.lock_rotation = rigids.lock_location = rigids.lock_scale = [True, True, True]
                 self.__rigid_grp = rigids
         return self.__rigid_grp
@@ -820,7 +852,8 @@ class Model:
                 SceneOp(bpy.context).link_object(joints)
                 joints.mmd_type = "JOINT_GRP_OBJ"
                 joints.parent = self.__root
-                joints.hide = joints.hide_select = True
+                joints.hide_set(True)
+                joints.hide_select = True
                 joints.lock_rotation = joints.lock_location = joints.lock_scale = [True, True, True]
                 self.__joint_grp = joints
         return self.__joint_grp
@@ -836,7 +869,8 @@ class Model:
                 SceneOp(bpy.context).link_object(temporarys)
                 temporarys.mmd_type = "TEMPORARY_GRP_OBJ"
                 temporarys.parent = self.__root
-                temporarys.hide = temporarys.hide_select = True
+                temporarys.hide_set(True)
+                temporarys.hide_select = True
                 temporarys.lock_rotation = temporarys.lock_location = temporarys.lock_scale = [True, True, True]
                 self.__temporary_grp = temporarys
         return self.__temporary_grp
@@ -847,7 +881,7 @@ class Model:
             return []
         return FnModel.child_meshes(arm)
 
-    def attachMeshes(self, meshes: Iterable[bpy.types.Object], add_armature_modifier: bool = True):
+    def attachMeshes(self, meshes: Iterator[bpy.types.Object], add_armature_modifier: bool = True):
         FnModel.attach_meshes(self.rootObject(), meshes, add_armature_modifier)
 
     def firstMesh(self):
@@ -1013,10 +1047,12 @@ class Model:
         except Exception:
             pass
         for i in bpy.context.selected_objects:
-            i.select = False
+            i.select_set(False)
         for i in tmp_grp_obj.children:
-            i.hide_select = i.hide = False
-            i.select = i.layers[layer_index] = True
+            i.hide_select = False
+            i.hide_set(False)
+            i.select_set(True)
+            i.layers[layer_index] = True
         assert len(bpy.context.selected_objects) == tmp_cnt
         bpy.ops.object.delete()
         assert len(bpy.data.objects) == total_cnt - tmp_cnt
@@ -1174,7 +1210,7 @@ class Model:
                     setattr(empty, Props.empty_display_type, "ARROWS")
                     setattr(empty, Props.empty_display_size, 0.1 * getattr(self.__root, Props.empty_display_size))
                     empty.mmd_type = "TRACK_TARGET"
-                    empty.hide = True
+                    empty.hide_set(True)
                     empty.parent = self.temporaryGroupObject()
 
                     rigid_obj.mmd_rigid.bone = bone_name
@@ -1234,7 +1270,8 @@ class Model:
         for ncc_obj, pair in zip(ncc_objs, nonCollisionJointTable):
             rbc = ncc_obj.rigid_body_constraint
             rbc.object1, rbc.object2 = pair
-            ncc_obj.hide = ncc_obj.hide_select = True
+            ncc_obj.hide_set(True)
+            ncc_obj.hide_select = True
         logging.debug(" finish in %f seconds.", time.time() - start_time)
         logging.debug("-" * 60)
 

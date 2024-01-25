@@ -6,6 +6,8 @@ import math
 
 import bpy
 
+from mmd_tools_local.properties import patch_library_overridable
+
 
 class MMDCamera(bpy.types.PropertyGroup):
     angle: bpy.props.FloatProperty(
@@ -23,3 +25,11 @@ class MMDCamera(bpy.types.PropertyGroup):
         description="Is perspective",
         default=True,
     )
+
+    @staticmethod
+    def register():
+        bpy.types.Object.mmd_camera = patch_library_overridable(bpy.props.PointerProperty(type=MMDCamera))
+
+    @staticmethod
+    def unregister():
+        del bpy.types.Object.mmd_camera

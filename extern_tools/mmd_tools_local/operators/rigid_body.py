@@ -63,19 +63,19 @@ class SelectRigidBody(bpy.types.Operator):
                     if tuple(i.mmd_rigid.collision_group_mask) != prop_value:
                         selection.remove(i)
                         if self.hide_others:
-                            i.select = False
-                            i.hide = True
+                            i.select_set(False)
+                            i.hide_set(True)
             else:
                 for i in selection.copy():
                     if getattr(i.mmd_rigid, prop_name) != prop_value:
                         selection.remove(i)
                         if self.hide_others:
-                            i.select = False
-                            i.hide = True
+                            i.select_set(False)
+                            i.hide_set(True)
 
         for i in selection:
-            i.hide = False
-            i.select = True
+            i.hide_set(False)
+            i.select_set(True)
 
         return {"FINISHED"}
 
@@ -226,7 +226,7 @@ class AddRigidBody(bpy.types.Operator):
         arm = rig.armature()
         if obj != arm:
             utils.selectAObject(root)
-            root.select = False
+            root.select_set(False)
         elif arm.mode != "POSE":
             bpy.ops.object.mode_set(mode="POSE")
 
@@ -234,14 +234,14 @@ class AddRigidBody(bpy.types.Operator):
         if context.selected_pose_bones:
             selected_pose_bones = context.selected_pose_bones
 
-        arm.select = False
+        arm.select_set(False)
         if len(selected_pose_bones) > 0:
             for pose_bone in selected_pose_bones:
                 rigid = self.__add_rigid_body(rig, arm, pose_bone)
-                rigid.select = True
+                rigid.select_set(True)
         else:
             rigid = self.__add_rigid_body(rig)
-            rigid.select = True
+            rigid.select_set(True)
         return {"FINISHED"}
 
     def invoke(self, context, event):
@@ -428,13 +428,13 @@ class AddJoint(bpy.types.Operator):
             return {"CANCELLED"}
 
         utils.selectAObject(root)
-        root.select = False
+        root.select_set(False)
         if context.scene.rigidbody_world is None:
             bpy.ops.rigidbody.world_add()
 
         for pair in self.__enumerate_rigid_pair(bone_map):
             joint = self.__add_joint(rig, pair, bone_map)
-            joint.select = True
+            joint.select_set(True)
 
         return {"FINISHED"}
 

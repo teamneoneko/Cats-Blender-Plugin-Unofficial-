@@ -2,11 +2,14 @@
 # Copyright 2014 MMD Tools authors
 # This file is part of MMD Tools.
 
+"""Properties for rigid bodies and joints"""
+
 import bpy
 
 from mmd_tools_local import bpyutils
 from mmd_tools_local.core import rigid_body
 from mmd_tools_local.core.model import FnModel
+from mmd_tools_local.properties import patch_library_overridable
 
 
 def _updateCollisionGroup(prop, context):
@@ -219,6 +222,14 @@ class MMDRigidBody(bpy.types.PropertyGroup):
         set=_set_size,
     )
 
+    @staticmethod
+    def register():
+        bpy.types.Object.mmd_rigid = patch_library_overridable(bpy.props.PointerProperty(type=MMDRigidBody))
+
+    @staticmethod
+    def unregister():
+        del bpy.types.Object.mmd_rigid
+
 
 def _updateSpringLinear(prop, context):
     obj = prop.id_data
@@ -270,3 +281,11 @@ class MMDJoint(bpy.types.PropertyGroup):
         step=0.1,
         update=_updateSpringAngular,
     )
+
+    @staticmethod
+    def register():
+        bpy.types.Object.mmd_joint = patch_library_overridable(bpy.props.PointerProperty(type=MMDJoint))
+
+    @staticmethod
+    def unregister():
+        del bpy.types.Object.mmd_joint

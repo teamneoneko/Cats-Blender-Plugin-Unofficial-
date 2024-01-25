@@ -400,19 +400,19 @@ class ResetObjectVisibility(bpy.types.Operator):
         mmd_root_object = mmd_model.Model.findRoot(active_object)
         mmd_root = mmd_root_object.mmd_root
 
-        mmd_root_object.hide = False
+        mmd_root_object.hide_set(False)
 
         rigid_group_object = mmd_model.FnModel.find_rigid_group(mmd_root_object)
         if rigid_group_object:
-            rigid_group_object.hide = True
+            rigid_group_object.hide_set(True)
 
         joint_group_object = mmd_model.FnModel.find_joint_group(mmd_root_object)
         if joint_group_object:
-            joint_group_object.hide = True
+            joint_group_object.hide_set(True)
 
         temporary_group_object = mmd_model.FnModel.find_temporary_group(mmd_root_object)
         if temporary_group_object:
-            temporary_group_object.hide = True
+            temporary_group_object.hide_set(True)
 
         mmd_root.show_meshes = True
         mmd_root.show_armature = True

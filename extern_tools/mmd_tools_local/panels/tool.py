@@ -646,7 +646,7 @@ class UL_ObjectsMixIn:
 
         if self.visible_only:
             for i, obj in enumerate(objects):
-                if obj.hide and flt_flags[i] == self.bitflag_filter_item:
+                if obj.hide_get() and flt_flags[i] == self.bitflag_filter_item:
                     flt_flags[i] = ~self.bitflag_filter_item
 
         indices = (i for i, x in enumerate(flt_flags) if x == self.bitflag_filter_item)

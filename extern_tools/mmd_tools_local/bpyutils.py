@@ -21,7 +21,7 @@ class __EditMode:
             raise ValueError
         self.__prevMode = obj.mode
         self.__obj = obj
-        self.__obj_select = obj.select
+        self.__obj_select = obj.select_get()
         with select_object(obj):
             if obj.mode != "EDIT":
                 bpy.ops.object.mode_set(mode="EDIT")
@@ -33,7 +33,7 @@ class __EditMode:
         if self.__prevMode == "EDIT":
             bpy.ops.object.mode_set(mode="OBJECT")  # update edited data
         bpy.ops.object.mode_set(mode=self.__prevMode)
-        self.__obj.select = self.__obj_select
+        self.__obj.select_set(self.__obj_select)
 
 
 class __SelectObjects:
@@ -46,7 +46,7 @@ class __SelectObjects:
             pass
 
         for i in bpy.context.selected_objects:
-            i.select = False
+            i.select_set(False)
 
         self.__active_object = active_object
         self.__selected_objects = tuple(set(selected_objects) | set([active_object]))
@@ -54,7 +54,7 @@ class __SelectObjects:
         self.__hides = []
         scene = SceneOp(bpy.context)
         for i in self.__selected_objects:
-            self.__hides.append(i.hide)
+            self.__hides.append(i.hide_get())
             scene.select_object(i)
         scene.active_object = active_object
 
@@ -63,7 +63,7 @@ class __SelectObjects:
 
     def __exit__(self, type, value, traceback):
         for i, j in zip(self.__selected_objects, self.__hides):
-            i.hide = j
+            i.hide_set(j)
 
 
 def find_user_layer_collection(target_object: bpy.types.Object) -> Optional[bpy.types.LayerCollection]:
@@ -151,6 +151,7 @@ def select_object(obj, objects=[]):
     return __SelectObjects(obj, objects)
 
 
+# TODO: change method name to ...override
 def activate_layer_collection(target: Union[bpy.types.Object, bpy.types.LayerCollection, None]):
     if isinstance(target, bpy.types.Object):
         layer_collection = find_user_layer_collection(target)
@@ -164,8 +165,8 @@ def activate_layer_collection(target: Union[bpy.types.Object, bpy.types.LayerCol
 
 def duplicateObject(obj, total_len):
     for i in bpy.context.selected_objects:
-        i.select = False
-    obj.select = True
+        i.select_set(False)
+    obj.select_set(True)
     assert len(bpy.context.selected_objects) == 1
     assert bpy.context.selected_objects[0] == obj
     last_selected = objs = [obj]
@@ -176,10 +177,10 @@ def duplicateObject(obj, total_len):
         if remain < 0:
             last_selected = bpy.context.selected_objects
             for i in range(-remain):
-                last_selected[i].select = False
+                last_selected[i].select_set(False)
         else:
             for i in range(min(remain, len(last_selected))):
-                last_selected[i].select = True
+                last_selected[i].select_set(True)
         last_selected = bpy.context.selected_objects
     assert len(objs) == total_len
     return objs
@@ -480,3 +481,59 @@ class SceneOp:
     @property
     def id_objects(self):
         return self.__scene.objects
+
+
+class FnContext:
+    @staticmethod
+    def get_active_object(context: bpy.types.Context) -> Optional[bpy.types.Object]:
+        return context.active_object
+
+    @staticmethod
+    def set_active_object(context: bpy.types.Context, obj: bpy.types.Object) -> None:
+        context.view_layer.objects.active = obj
+
+    @staticmethod
+    def get_scene_objects(context: bpy.types.Context) -> bpy.types.SceneObjects:
+        return context.scene.objects
+
+    @staticmethod
+    def ensure_selectable(context: bpy.types.Context, obj: bpy.types.Object) -> bpy.types.Object:
+        obj.hide_viewport = False
+        obj.hide_select = False
+        obj.hide_set(False)
+
+        if obj not in context.selectable_objects:
+
+            def __layer_check(layer_collection: bpy.types.LayerCollection):
+                for lc in layer_collection.children:
+                    if __layer_check(lc):
+                        lc.hide_viewport = False
+                        lc.collection.hide_viewport = False
+                        lc.collection.hide_select = False
+                        return True
+                if obj in layer_collection.collection.objects.values():
+                    if layer_collection.exclude:
+                        layer_collection.exclude = False
+                    return True
+                return False
+
+            selected_objects = context.selected_objects
+            __layer_check(context.view_layer.layer_collection)
+            if len(context.selected_objects) != len(selected_objects):
+                for i in context.selected_objects:
+                    if i not in selected_objects:
+                        i.select_set(False)
+
+        return obj
+
+    @staticmethod
+    def select_object(context: bpy.types.Context, obj: bpy.types.Object) -> bpy.types.Object:
+        FnContext.ensure_selectable(context, obj)
+        obj.select_set(True)
+        return obj
+
+    @staticmethod
+    def select_single_object(context: bpy.types.Context, obj: bpy.types.Object) -> bpy.types.Object:
+        for i in context.selected_objects:
+            i.select_set(False)
+        return FnContext.select_object(context, obj)

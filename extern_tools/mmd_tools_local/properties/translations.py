@@ -2,7 +2,7 @@
 # Copyright 2021 MMD Tools authors
 # This file is part of MMD Tools.
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import bpy
 
@@ -32,7 +32,7 @@ class MMDTranslationElementIndex(bpy.types.PropertyGroup):
     value: bpy.props.IntProperty()
 
 
-BATCH_OPERATION_SCRIPT_PRESETS: Dict[str, Tuple[str, str, str, int]] = {
+BATCH_OPERATION_SCRIPT_PRESETS: Dict[str, Tuple[Optional[str], str, str, int]] = {
     "NOTHING": ("", "", "", 1),
     "CLEAR": (None, "Clear", '""', 10),
     "TO_ENGLISH": ("BLENDER", "Translate to English", "to_english(name)", 2),

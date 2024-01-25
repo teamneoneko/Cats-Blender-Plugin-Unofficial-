@@ -13,6 +13,7 @@ if "bpy" not in locals():
     from . import optimization
     from . import scale
     from . import eye_tracking
+    from . import legacy
     from . import copy_protection
     from . import settings_updates
     from . import credits
@@ -29,6 +30,7 @@ else:
     importlib.reload(optimization)
     importlib.reload(scale)
     importlib.reload(eye_tracking)
+    importlib.reload(legacy)
     importlib.reload(copy_protection)
     importlib.reload(settings_updates)
     importlib.reload(credits)

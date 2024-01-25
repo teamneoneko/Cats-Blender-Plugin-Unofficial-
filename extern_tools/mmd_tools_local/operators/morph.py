@@ -582,7 +582,7 @@ class ViewUVMorph(Operator):
 
         bpy.ops.mmd_tools_local.clear_uv_morph_view()
 
-        selected = meshObj.select
+        selected = meshObj.select_get()
         with bpyutils.select_object(meshObj) as data:
             morph = mmd_root.uv_morphs[mmd_root.active_morph]
             mesh = meshObj.data
@@ -615,8 +615,8 @@ class ViewUVMorph(Operator):
 
             uv_textures.active = uv_tex
             uv_tex.active_render = True
-        meshObj.hide = False
-        meshObj.select = selected
+        meshObj.hide_set(False)
+        meshObj.select_set(selected)
         return {"FINISHED"}
 
 
@@ -696,7 +696,7 @@ class EditUVMorph(Operator):
                 polygons.active = getattr(next((p for p in polygons if all(vertices[i].select for i in p.vertices)), None), "index", polygons.active)
 
             bpy.ops.object.mode_set(mode="EDIT")
-        meshObj.select = selected
+        meshObj.select_set(selected)
         return {"FINISHED"}
 
 
@@ -749,7 +749,7 @@ class ApplyUVMorph(Operator):
             FnMorph.store_uv_morph_data(meshObj, morph, offsets.values(), axis_type)
             morph.data_type = "VERTEX_GROUP"
 
-        meshObj.select = selected
+        meshObj.select_set(selected)
         return {"FINISHED"}
 
 

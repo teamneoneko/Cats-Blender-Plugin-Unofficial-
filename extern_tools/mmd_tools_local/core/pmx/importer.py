@@ -492,7 +492,7 @@ class PMXImporter:
                 bounce=rigid.bounce,
                 bone=None if rigid.bone == -1 or rigid.bone is None else self.__boneTable[rigid.bone].name,
             )
-            obj.hide = True
+            obj.hide_set(True)
             MoveObject.set_index(obj, i)
             self.__rigidTable[i] = obj
 
@@ -520,7 +520,7 @@ class PMXImporter:
                 spring_linear=Vector(joint.spring_constant).xzy,
                 spring_angular=Vector(joint.spring_rotation_constant).xzy,
             )
-            obj.hide = True
+            obj.hide_set(True)
             MoveObject.set_index(obj, i)
 
         logging.debug("Finished importing joints in %f seconds.", time.time() - start_time)
@@ -812,7 +812,7 @@ class PMXImporter:
     def __fixRepeatedMorphName(self):
         used_names = set()
         for m in self.__model.morphs:
-            m.name = utils.uniqueName(m.name or "Morph", used_names)
+            m.name = utils.unique_name(m.name or "Morph", used_names)
             used_names.add(m.name)
 
     def execute(self, **args):
