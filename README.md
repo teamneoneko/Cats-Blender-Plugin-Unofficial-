@@ -1,8 +1,15 @@
 # Cats Blender Plugin.
 
 If you are using blender 3.6 please use the latest release [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases). Blender 3.6 is the current recomended blender version to use!
+You can find the development version for Blender 3.6 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-36-dev).
 
-If you are using blender 4.x please download this version [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-4.0), please note blender 4.x version can be unstable and there will be bugs due to mmd tools not being fully updated for 4.x yet, plase note the blender 4.x version will not be released unto the 4.2 LTS is out later this year, the 4.x branch is UNDER DEVELOPMENT and is not finished and WILL have issues. I highly recomend you use blender 3.6 instead. Blender 4.x is currently not my prioty for fixes. 
+### Warning for Blender 4.0 users:
+Though we have updated cats to blender 4.0, please note there are still some issues with MMD Tools which may break some plugin functionilty, this is not a cats issue so please redirect those issues to MMD Tools. Blender 4.0 is not our priority and will be behind the blender 3.6 version. We HIGHLY recommend using blender 3.6 for the time being unless you REALLY need the new features in 4.0, which if your just making VRChat models or doing MMD stuff you most likely don't.
+
+Belnder 4.0 is also buggy and does have issues as well, we won't be recommending use of blender 4.x unto the first LTS comes out later this year.
+
+However if you must use blender 4.0 you can download it from this branch [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-40).
+You can find the development version for Blender 4.0 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-40-dev).
 
 The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat.
 Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
