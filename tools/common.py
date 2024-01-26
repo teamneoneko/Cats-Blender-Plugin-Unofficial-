@@ -41,20 +41,7 @@ from mmd_tools_local.panels import tool as mmd_tool
 from mmd_tools_local.panels import util_tools as mmd_util_tools
 from mmd_tools_local.panels import view_prop as mmd_view_prop
 
-# TODO:
-#  - Add check if hips bone really needs to be rotated
-#  - Reset Pivot
-#  - Manual bone selection button for root bones
-#  - Checkbox for eye blinking/moving
-#  - Translate progress bar
 
-
-def version_2_79_or_older():
-    return bpy.app.version < (2, 80)
-
-def version_2_93_or_older():
-    return bpy.app.version < (2, 90)
-    
 def version_3_6_or_older():
     return bpy.app.version < (3, 7)
 
@@ -207,8 +194,6 @@ def select(obj, sel=True):
         
 
 def is_selected(obj):
-    if version_2_79_or_older():
-        return obj.select
     return obj.select_get()
 
 
@@ -253,14 +238,12 @@ def set_default_stage_old():
 
 def set_default_stage():
     """
-
     Selects the armature, unhides everything and sets the modes of every object to object mode
-
     :return: the armature
     """
 
     # Remove rigidbody collections, as they cause issues if they are not in the view_layer
-    if not version_2_79_or_older() and bpy.context.scene.remove_rigidbodies_joints:
+    if bpy.context.scene.remove_rigidbodies_joints:
         print('Collections:')
         for collection in bpy.data.collections:
             print(' ' + collection.name, collection.name.lower())
@@ -285,8 +268,7 @@ def set_default_stage():
     armature = get_armature()
     if armature:
         set_active(armature)
-        if version_2_79_or_older():
-            armature.layers[0] = True
+        armature.data.layers[0] = True
 
     return armature
 
@@ -759,7 +741,7 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
     # Modes:
     # 0 - Join all meshes
     # 1 - Join selected only
-
+    
     if not armature_name:
         armature_name = bpy.context.scene.armature
 
@@ -779,7 +761,7 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
     # Apply existing decimation modifiers and select the meshes for joining
     for mesh in meshes_to_join:
         set_active(mesh)
-
+        
         # Apply decimation modifiers
         for mod in mesh.modifiers:
             if mod.type == 'DECIMATE':
@@ -789,7 +771,7 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
                 if mod.decimate_type == 'UNSUBDIV' and mod.iterations == 0:
                     mesh.modifiers.remove(mod)
                     continue
-
+                    
                 if has_shapekeys(mesh):
                     bpy.ops.object.shape_key_remove(all=True)
                 apply_modifier(mod)
@@ -799,18 +781,10 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
                 if not has_shapekeys(mesh):
                     apply_modifier(mod)
 
-        # Standardize UV maps name
-        if version_2_79_or_older():
-            if mesh.data.uv_textures:
-                mesh.data.uv_textures[0].name = 'UVMap'
-            for mat_slot in mesh.material_slots:
-                if mat_slot and mat_slot.material:
-                    for tex_slot in mat_slot.material.texture_slots:
-                        if tex_slot and tex_slot.texture and tex_slot.texture_coords == 'UV':
-                            tex_slot.uv_layer = 'UVMap'
-        else:
-            if mesh.data.uv_layers:
-                mesh.data.uv_layers[0].name = 'UVMap'
+
+        if mesh.data.uv_layers:
+            mesh.data.uv_layers[0].name = 'UVMap'
+            
 
     # Get the name of the active mesh in order to check if it was deleted later
     active_mesh_name = get_active().name
@@ -820,6 +794,7 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
         bpy.ops.object.join()
     else:
         print('NO MESH COMBINED!')
+        
 
     # Delete meshes that somehow weren't deleted. Both pre and post join mesh deletion methods are needed!
     for mesh in get_meshes_objects(armature_name=armature_name):
@@ -1738,8 +1713,6 @@ def has_shapekeys(mesh):
 
 
 def matmul(a, b):
-    if version_2_79_or_older():
-        return a * b
     return a @ b
 
 
@@ -2236,8 +2209,7 @@ def toggle_mmd_tabs(shutdown_plugin=False):
         mmd_view_prop.MMDSDEFPanel,
     ]
 
-    if not version_2_79_or_older():
-        mmd_cls = mmd_cls + mmd_cls_shading
+    mmd_cls = mmd_cls + mmd_cls_shading
 
     # If the plugin is shutting down, load the mmd_tools tabs before that, to avoid issues when unregistering mmd_tools
     if bpy.context.scene.show_mmd_tabs or shutdown_plugin:
@@ -2486,53 +2458,52 @@ def _fix_out_of_bounds_enum_choices(property_holder, scene, choices, property_na
             # outside of UI drawing. This causes the temporary duplicates to be visible in the UI. Though, selecting
             # any of the temporary duplicates poses no problem as it causes the property to be updated outside of UI
             # drawing, thus fixing the out-of-bounds index and causing the temporary duplicates to disappear.
-            if not version_2_79_or_older():
-                # No modification is allowed when called as part of drawing UI, so we must schedule a task instead
-                # First check if a fix has not already been scheduled, otherwise around 4 or 5 tasks could get scheduled
-                # before the first one fixes the invalid choice
-                scene_name = scene.name
-                # _enum_choice_fix_scheduled is a global variable
-                scheduled_property_set = _enum_choice_fix_scheduled.setdefault(scene_name, set())
-                if property_path not in scheduled_property_set:
-                    replacement_identifier = replacement_choice[0]
+            # No modification is allowed when called as part of drawing UI, so we must schedule a task instead
+            # First check if a fix has not already been scheduled, otherwise around 4 or 5 tasks could get scheduled
+            # before the first one fixes the invalid choice
+            scene_name = scene.name
+            # _enum_choice_fix_scheduled is a global variable
+            scheduled_property_set = _enum_choice_fix_scheduled.setdefault(scene_name, set())
+            if property_path not in scheduled_property_set:
+                replacement_identifier = replacement_choice[0]
 
-                    scheduled_property_set.add(property_path)
+                scheduled_property_set.add(property_path)
 
-                    # Closure task to fix the property
-                    def fix_out_of_bounds_enum_choice_task():
-                        scene_by_name = bpy.data.scenes.get(scene_name)
-                        # It's unlikely, but it is possible that the scene could have been deleted or renamed by the
-                        # time the task executes. If it was renamed, another task would end up getting scheduled with
-                        # the new name, so no problems there.
-                        if scene_by_name:
-                            # False argument to not coerce into a Python object (the value of the property) and instead
-                            # return the prop itself
-                            prop = scene_by_name.path_resolve(property_path, False)
-                            # .id_data is the owner of the property, the scene in this case, and .data is the holder of
-                            # the property
-                            prop_holder = prop.data
-                            # Setting the index
-                            #   prop_holder[property_name] = replacement_idx
-                            # doesn't cause UI to update the list of items.
-                            # However, setting the property itself does, and since this is scheduled and called
-                            # separately, there's no issue of causing infinite recursion.
-                            # This will result in fix_invalid_enum_choices getting called again, but that will only fix
-                            # the index and not cause the UI to update.
-                            # Equivalent to: scene_by_name.property = replacement_identifier
-                            setattr(prop_holder, property_name, replacement_identifier)
-                            # print(f"Fixed '{property_path}' EnumProperty in '{scene_name}'")
-                        else:
-                            print("An EnumProperty fix was scheduled to set '{}.{}' to '{}', but the scene '{}' could not be found."
-                                  .format(scene_name, property_path, replacement_identifier, scene_name))
-                        scheduled_property_set.remove(property_path)
-                        # Returning None indicates that the timer should be removed after being executed; here for
-                        # clarity.
-                        return None
+                # Closure task to fix the property
+                def fix_out_of_bounds_enum_choice_task():
+                    scene_by_name = bpy.data.scenes.get(scene_name)
+                    # It's unlikely, but it is possible that the scene could have been deleted or renamed by the
+                    # time the task executes. If it was renamed, another task would end up getting scheduled with
+                    # the new name, so no problems there.
+                    if scene_by_name:
+                        # False argument to not coerce into a Python object (the value of the property) and instead
+                        # return the prop itself
+                        prop = scene_by_name.path_resolve(property_path, False)
+                        # .id_data is the owner of the property, the scene in this case, and .data is the holder of
+                        # the property
+                        prop_holder = prop.data
+                        # Setting the index
+                        #   prop_holder[property_name] = replacement_idx
+                        # doesn't cause UI to update the list of items.
+                        # However, setting the property itself does, and since this is scheduled and called
+                        # separately, there's no issue of causing infinite recursion.
+                        # This will result in fix_invalid_enum_choices getting called again, but that will only fix
+                        # the index and not cause the UI to update.
+                        # Equivalent to: scene_by_name.property = replacement_identifier
+                        setattr(prop_holder, property_name, replacement_identifier)
+                        # print(f"Fixed '{property_path}' EnumProperty in '{scene_name}'")
+                    else:
+                        print("An EnumProperty fix was scheduled to set '{}.{}' to '{}', but the scene '{}' could not be found."
+                              .format(scene_name, property_path, replacement_identifier, scene_name))
+                    scheduled_property_set.remove(property_path)
+                    # Returning None indicates that the timer should be removed after being executed; here for
+                    # clarity.
+                    return None
 
-                    # Schedule the task to immediately execute when possible (this will be after UI drawing has
-                    # finished)
-                    bpy.app.timers.register(fix_out_of_bounds_enum_choice_task)
-                    # print(f"Detected '{property_path}' enum in '{scene_name}' with an invalid value during UI drawing, a fix has been scheduled")
+                # Schedule the task to immediately execute when possible (this will be after UI drawing has
+                # finished)
+                bpy.app.timers.register(fix_out_of_bounds_enum_choice_task)
+                # print(f"Detected '{property_path}' enum in '{scene_name}' with an invalid value during UI drawing, a fix has been scheduled")
 
     return choices
 
