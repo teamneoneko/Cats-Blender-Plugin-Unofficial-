@@ -274,10 +274,8 @@ def register():
     # Register Scene types
     extentions.register()
     
-    # Load supporter and settings icons and buttons
-    tools.supporter.load_other_icons()
-    tools.supporter.load_supporters()
-    tools.supporter.register_dynamic_buttons()
+    # Load Icon Loader and settings icons and buttons
+    tools.iconloader.load_other_icons()
 
     # Load the dictionaries and check if they are found.
     globs.dict_found = tools.translate.load_translations()
@@ -354,8 +352,7 @@ def unregister():
     print('Unregistered', count, 'CATS classes.')
 
     # Unregister all dynamic buttons and icons
-    tools.supporter.unregister_dynamic_buttons()
-    tools.supporter.unload_icons()
+    tools.iconloader.unload_icons()
 
     # Remove shapekey button from shapekey menu
     try:

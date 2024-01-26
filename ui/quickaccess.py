@@ -8,7 +8,8 @@ from .main import ToolPanel
 from ..tools import common as Common
 from ..tools import armature as Armature
 from ..tools import importer as Importer
-from ..tools import supporter as Supporter
+from ..tools import iconloader as Iconloader
+from ..tools import material as Material
 from ..tools import eyetracking as Eyetracking
 from ..tools import armature_manual as Armature_manual
 from ..tools.register import register_wrap
@@ -16,9 +17,9 @@ from ..tools.translations import t
 
 
 @register_wrap
-class ArmaturePanel(ToolPanel, bpy.types.Panel):
-    bl_idname = 'VIEW3D_PT_armature_v3'
-    bl_label = t('ArmaturePanel.label')
+class QuickAccessPanel(ToolPanel, bpy.types.Panel):
+    bl_idname = 'VIEW3D_PT_quickaccess_v3'
+    bl_label = t('QuickAccess.label')
 
     def draw(self, context):
         layout = self.layout
@@ -33,13 +34,13 @@ class ArmaturePanel(ToolPanel, bpy.types.Panel):
             col.separator()
             row = col.row(align=True)
             row.scale_y = 0.75
-            row.label(text=t('ArmaturePanel.warn.oldBlender1'), icon='ERROR')
+            row.label(text=t('QuickAccess.warn.oldBlender1'), icon='ERROR')
             row = col.row(align=True)
             row.scale_y = 0.75
-            row.label(text=t('ArmaturePanel.warn.oldBlender2'), icon='BLANK1')
+            row.label(text=t('QuickAccess.warn.oldBlender2'), icon='BLANK1')
             row = col.row(align=True)
             row.scale_y = 0.75
-            row.label(text=t('ArmaturePanel.warn.oldBlender3'), icon='BLANK1')
+            row.label(text=t('QuickAccess.warn.oldBlender3'), icon='BLANK1')
             col.separator()
             col.separator()
 
@@ -47,13 +48,13 @@ class ArmaturePanel(ToolPanel, bpy.types.Panel):
             col.separator()
             row = col.row(align=True)
             row.scale_y = 0.75
-            row.label(text=t('ArmaturePanel.warn.newBlender1'), icon='ERROR')
+            row.label(text=t('QuickAccess.warn.newBlender1'), icon='ERROR')
             row = col.row(align=True)
             row.scale_y = 0.75
-            row.label(text=t('ArmaturePanel.warn.newBlender2'), icon='BLANK1')
+            row.label(text=t('QuickAccess.warn.newBlender2'), icon='BLANK1')
             row = col.row(align=True)
             row.scale_y = 0.75
-            row.label(text=t('ArmaturePanel.warn.newBlender3'), icon='BLANK1')
+            row.label(text=t('QuickAccess.warn.newBlender3'), icon='BLANK1')
             col.separator()
             col.separator()
 
@@ -61,13 +62,13 @@ class ArmaturePanel(ToolPanel, bpy.types.Panel):
             col.separator()
             row = col.row(align=True)
             row.scale_y = 0.75
-            row.label(text=t('ArmaturePanel.warn.noDict1'), icon='INFO')
+            row.label(text=t('QuickAccess.warn.noDict1'), icon='INFO')
             row = col.row(align=True)
             row.scale_y = 0.75
-            row.label(text=t('ArmaturePanel.warn.noDict2'), icon='BLANK1')
+            row.label(text=t('QuickAccess.warn.noDict2'), icon='BLANK1')
             row = col.row(align=True)
             row.scale_y = 0.75
-            row.label(text=t('ArmaturePanel.warn.noDict3'), icon='BLANK1')
+            row.label(text=t('QuickAccess.warn.noDict3'), icon='BLANK1')
             col.separator()
             col.separator()
 
@@ -76,7 +77,7 @@ class ArmaturePanel(ToolPanel, bpy.types.Panel):
             split = col.row(align=True)
             row = split.row(align=True)
             row.scale_y = 1.7
-            row.operator(Importer.ImportAnyModel.bl_idname, text=t('ArmaturePanel.ImportAnyModel.label'), icon='ARMATURE_DATA')
+            row.operator(Importer.ImportAnyModel.bl_idname, text=t('QuickAccess.ImportAnyModel.label'), icon='ARMATURE_DATA')
             row = split.row(align=True)
             row.alignment = 'RIGHT'
             row.scale_y = 1.7
@@ -86,7 +87,7 @@ class ArmaturePanel(ToolPanel, bpy.types.Panel):
             split = col.row(align=True)
             row = split.row(align=True)
             row.scale_y = 1.4
-            row.operator(Importer.ImportAnyModel.bl_idname, text=t('ArmaturePanel.ImportAnyModel.label'), icon='ARMATURE_DATA')
+            row.operator(Importer.ImportAnyModel.bl_idname, text=t('QuickAccess.ImportAnyModel.label'), icon='ARMATURE_DATA')
             row.operator(Importer.ExportModel.bl_idname, icon='ARMATURE_DATA').action = 'CHECK'
             row = split.row(align=True)
             row.scale_y = 1.4
@@ -110,7 +111,13 @@ class ArmaturePanel(ToolPanel, bpy.types.Panel):
         sub.label(text=t("FixLegacy.info1"), icon='INFO')
         sub.label(text=t("FixLegacy.info2"), icon='BLANK1')
         row.scale_y = 1.5
-
+        col.separator()
+        col.separator()
+        split = col.row(align=True)
+        row = split.row(align=True)
+        row.scale_y = 1.1
+        row.operator(Material.CombineMaterialsButton.bl_idname, text=t('QuickAccess.CombineMats.label'), icon='MATERIAL')
+        row.operator(Armature_manual.JoinMeshes.bl_idname, text=t('QuickAccess.JoinMeshes.label'), icon_value=Iconloader.preview_collections["custom_icons"]["mesh"].icon_id)
         col.separator()
         col.separator()
 

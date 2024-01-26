@@ -9,7 +9,7 @@ from .main import ToolPanel
 from ..tools import common as Common
 from ..tools import armature as Armature
 from ..tools import importer as Importer
-from ..tools import supporter as Supporter
+from ..tools import iconloader as Iconloader
 from ..tools import eyetracking as Eyetracking
 from ..tools import armature_manual as Armature_manual
 from ..tools.register import register_wrap
@@ -82,7 +82,7 @@ class LegacyStuff(ToolPanel, bpy.types.Panel):
         split = col.row(align=True)
         row = split.row(align=True)
         row.scale_y = 1.5
-        row.operator(LegacyReadButton.bl_idname, icon_value=Supporter.preview_collections["custom_icons"]["help1"].icon_id)
+        row.operator(LegacyReadButton.bl_idname, icon_value=Iconloader.preview_collections["custom_icons"]["help1"].icon_id)
         
         col.separator()
         col.separator()
@@ -148,8 +148,8 @@ class ModelSettings(bpy.types.Operator):
         row.label(text=t('ModelSettings.warn.fbtFix1'), icon='INFO')
         row = col.row(align=True)
         row.scale_y = 0.7
-        row.label(text=t('ModelSettings.warn.fbtFix2'), icon_value=Supporter.preview_collections["custom_icons"]["empty"].icon_id)
+        row.label(text=t('ModelSettings.warn.fbtFix2'), icon_value=Iconloader.preview_collections["custom_icons"]["empty"].icon_id)
         row = col.row(align=True)
         row.scale_y = 0.7
-        row.label(text=t('ModelSettings.warn.fbtFix3'), icon_value=Supporter.preview_collections["custom_icons"]["empty"].icon_id)
+        row.label(text=t('ModelSettings.warn.fbtFix3'), icon_value=Iconloader.preview_collections["custom_icons"]["empty"].icon_id)
         col.separator()

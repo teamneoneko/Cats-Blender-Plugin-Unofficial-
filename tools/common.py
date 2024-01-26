@@ -27,7 +27,7 @@ from html.entities import name2codepoint
 from typing import Optional, Set, Dict, Any
 
 from . import common as Common
-from . import supporter as Supporter
+from . import iconloader as Iconloader
 from . import decimation as Decimation
 from . import translate as Translate
 from . import armature_bones as Bones
@@ -1639,7 +1639,7 @@ class ShowError(bpy.types.Operator):
                     row.label(text=line, icon='ERROR')
                     first_line = True
                 else:
-                    row.label(text=line, icon_value=Supporter.preview_collections["custom_icons"]["empty"].icon_id)
+                    row.label(text=line, icon_value=Iconloader.preview_collections["custom_icons"]["empty"].icon_id)
 
 
 def remove_doubles(mesh, threshold, save_shapes=True):

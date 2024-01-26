@@ -5,7 +5,7 @@ import bpy
 from .main import ToolPanel
 from .. import globs
 from ..tools import common as Common
-from ..tools import supporter as Supporter
+from ..tools import iconloader as Iconloader
 from ..tools import armature_bones as Armature_bones
 from ..tools import armature_custom as Armature_custom
 from ..tools.register import register_wrap
@@ -170,7 +170,7 @@ class CustomPanel(ToolPanel, bpy.types.Panel):
             row = col.row(align=True)
             row.scale_y = 1.05
             row.label(text=t('CustomPanel.toMerge'))
-            row.operator(SearchMenuOperator_merge_armature.bl_idname,text = context.scene.merge_armature, icon_value=Supporter.preview_collections["custom_icons"]["UP_ARROW"].icon_id)
+            row.operator(SearchMenuOperator_merge_armature.bl_idname,text = context.scene.merge_armature, icon_value=Iconloader.preview_collections["custom_icons"]["UP_ARROW"].icon_id)
 
             if not context.scene.merge_same_bones:
                 found = False
@@ -221,7 +221,7 @@ class CustomPanel(ToolPanel, bpy.types.Panel):
             row = col.row(align=True)
             row.scale_y = 1.05
             row.label(text=t('CustomPanel.attachMesh2'))
-            row.operator(SearchMenuOperator_attach_mesh.bl_idname, text=context.scene.attach_mesh, icon_value=Supporter.preview_collections["custom_icons"]["UP_ARROW"].icon_id)
+            row.operator(SearchMenuOperator_attach_mesh.bl_idname, text=context.scene.attach_mesh, icon_value=Iconloader.preview_collections["custom_icons"]["UP_ARROW"].icon_id)
 
             row = col.row(align=True)
             row.scale_y = 1.05

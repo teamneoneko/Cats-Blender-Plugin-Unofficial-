@@ -7,7 +7,7 @@ from importlib import import_module
 from .. import globs
 from .main import ToolPanel
 from ..tools import common as Common
-from ..tools import supporter as Supporter
+from ..tools import iconloader as Iconloader
 from ..tools import atlas as Atlas
 from ..tools import material as Material
 from ..tools import bonemerge as Bonemerge
@@ -96,7 +96,7 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
             split = col.row(align=True)
             row = split.row(align=True)
             row.scale_y = 0.9
-            row.label(text=t('OptimizePanel.atlasAuthor'), icon_value=Supporter.preview_collections["custom_icons"]["heart1"].icon_id)
+            row.label(text=t('OptimizePanel.atlasAuthor'), icon_value=Iconloader.preview_collections["custom_icons"]["heart1"].icon_id)
             row = split.row(align=True)
             row.alignment = 'RIGHT'
             row.scale_y = 0.9

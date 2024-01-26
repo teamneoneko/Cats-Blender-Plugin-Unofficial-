@@ -62,17 +62,19 @@ Blender를 다시 시작하고 Cats Plugin를 다시 활성화하세요!
 "
 ToolPanel.label,Cats Blender Plugin,Cats ブレンダープラグイン,
 ToolPanel.category,CATS,,
-ArmaturePanel.label,Model,モデル,모델
-ArmaturePanel.warn.newBlender1,Potentially unsupported Blender version detected!
-ArmaturePanel.warn.newBlender2,Some features might not work!
-ArmaturePanel.warn.newBlender3,CATS currently supports up to Blender 4.0.
-ArmaturePanel.warn.oldBlender1,Old Blender version detected!,古いブレンダーバージョンが検出されました!,이전 블렌더 버전이 발견되었습니다!
-ArmaturePanel.warn.oldBlender2,Some features might not work!,一部の機能は動作しない可能性があります!,일부 기능이 작동하지 않을 수 있습니다!
-ArmaturePanel.warn.oldBlender3,Please update to Blender 3.6!,ブレンダー3.1以上にアップデートしてください!,블렌더 3.1 버전으로 업데이트하세요!
-ArmaturePanel.warn.noDict1,Dictionary not found!,辞書が見つかりません!,사전파일(Dictionary)을 찾을 수 없습니다!
-ArmaturePanel.warn.noDict2,"Translations will work, but are not optimized.",翻訳は機能しますが、最適化されません。,번역은 되지만 최적화되지는 않습니다.
-ArmaturePanel.warn.noDict3,Reinstall Cats to fix this.,これを修正するためにCatsを再インストールします。,이 문제를 해결하려면 Cats를 다시 설치하세요.
-ArmaturePanel.ImportAnyModel.label,Import Model,モデルのインポート,모델 불러오기
+QuickAccess.label,Quick Access,迅速なアクセス,빠른 접근
+QuickAccess.warn.newBlender1,Potentially unsupported Blender version detected!
+QuickAccess.warn.newBlender2,Some features might not work, CATS currently 
+QuickAccess.warn.newBlender3,supports up to Blender 4.0 see github for the 4.0 one.
+QuickAccess.warn.oldBlender1,Old Blender version detected!,古いブレンダーバージョンが検出されました!,이전 블렌더 버전이 발견되었습니다!
+QuickAccess.warn.oldBlender2,Some features might not work!,一部の機能は動作しない可能性があります!,일부 기능이 작동하지 않을 수 있습니다!
+QuickAccess.warn.oldBlender3,Please update to Blender 3.6!,ブレンダー3.1以上にアップデートしてください!,블렌더 3.1 버전으로 업데이트하세요!
+QuickAccess.warn.noDict1,Dictionary not found!,辞書が見つかりません!,사전파일(Dictionary)을 찾을 수 없습니다!
+QuickAccess.warn.noDict2,"Translations will work, but are not optimized.",翻訳は機能しますが、最適化されません。,번역은 되지만 최적화되지는 않습니다.
+QuickAccess.warn.noDict3,Reinstall Cats to fix this.,これを修正するためにCatsを再インストールします。,이 문제를 해결하려면 Cats를 다시 설치하세요.
+QuickAccess.ImportAnyModel.label,Import Model,モデルのインポート,모델 불러오기
+QuickAccess.JoinMeshes.label,Join all meshes,すべてのメッシュを結合する,모든 메쉬에 합류
+QuickAccess.CombineMats.label,Combine Materials,材料を組み合わせる,재료 결합
 ModelSettings.label,Fix Model Settings,モデル設定の修正,모델 고치기 설정
 ModelSettings.warn.fbtFix1,The Full Body Tracking Fix,フル ボディトラッキングの修正,풀바디 트래킹 수정
 ModelSettings.warn.fbtFix2,is no longer needed for VRChat.,もはやVrChatのために必要とされていません。,VRChat에 더 이상 필요하지 않음.
@@ -719,14 +721,6 @@ ShapeKeyApplier.error.recursiveRelativeToLoop,"Shapekey ""{name}"" is recursivel
 ShapeKeyApplier.successRemoved,"Successfully removed shapekey ""{name}"" from the Basis.",,
 ShapeKeyApplier.successSet,"Successfully applied shapekey ""{name}"" to the Basis.",,
 addToShapekeyMenu.ShapeKeyApplier.label,Apply Selected Shapekey to Basis,選択したシェイプキーをBasisに適用,선택된 쉐이프키를 Basis에 적용
-PatreonButton.label,Become a Patron,パトロンになる,후원하기
-PatreonButton.URL,https://www.patreon.com/catsblenderplugin,,
-PatreonButton.success,Patreon page opened.,,
-ReloadButton.label,Reload List,リストを再読み込み,목록 새로고침
-ReloadButton.desc,Reloads the supporter list,,후원자 목록을 다시 불러옵니다
-DynamicPatronButton.label,Supporter Name,サポーター名,후원자 이름
-DynamicPatronButton.desc,This is an awesome supporter,,이것은 멋진 후원자입니다!
-register_dynamic_buttons.desc,{name} is an awesome supporter,,{name}는 멋진 후원자입니다!
 TranslateShapekeyButton.label,Translate Shape Keys,シェイプキーを翻訳する,쉐이프키 이름 번역
 TranslateShapekeyButton.desc,Translates all shape keys using the internal dictionary and Google Translate into English,Translates all shape keys using the internal dictionary and Google Translate,모든 쉐이프키들을 내장된 사전과 구글번역을 이용해 영어로 번역합니다.
 TranslateShapekeyButton.success,Translated {number} shape keys.,,{number}개의 쉐이프키들이 번역되었습니다.

@@ -4,7 +4,7 @@ if "bpy" not in locals():
     # print('STARTUP UI!!')
     import bpy
     from . import main
-    from . import armature
+    from . import quickaccess
     from . import manual
     from . import custom
     from . import decimation
@@ -21,7 +21,7 @@ else:
     # print('RELOAD UI!!')
     import importlib
     importlib.reload(main)
-    importlib.reload(armature)
+    importlib.reload(quickaccess)
     importlib.reload(manual)
     importlib.reload(custom)
     importlib.reload(decimation)
