@@ -13,9 +13,9 @@ from ..tools.translations import t
 
 
 @register_wrap
-class ManualPanel(ToolPanel, bpy.types.Panel):
-    bl_idname = 'VIEW3D_PT_manual_v3'
-    bl_label = t('ManualPanel.label')
+class OtherOptionsPanel(ToolPanel, bpy.types.Panel):
+    bl_idname = 'VIEW3D_PT_OtherOptionsPanel_v3'
+    bl_label = t('OtherOptionsPanel.label')
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
@@ -27,21 +27,21 @@ class ManualPanel(ToolPanel, bpy.types.Panel):
         row = layout_split(col, factor=0.32, align=True)
         row.scale_y = button_height
         row.label(text="Separate by:", icon='MESH_DATA')
-        row.operator(Armature_manual.SeparateByMaterials.bl_idname, text=t('ManualPanel.SeparateByMaterials.label'))
-        row.operator(Armature_manual.SeparateByLooseParts.bl_idname, text=t('ManualPanel.SeparateByLooseParts.label'))
-        row.operator(Armature_manual.SeparateByShapekeys.bl_idname, text=t('ManualPanel.SeparateByShapekeys.label'))
+        row.operator(Armature_manual.SeparateByMaterials.bl_idname, text=t('OtherOptionsPanel.SeparateByMaterials.label'))
+        row.operator(Armature_manual.SeparateByLooseParts.bl_idname, text=t('OtherOptionsPanel.SeparateByLooseParts.label'))
+        row.operator(Armature_manual.SeparateByShapekeys.bl_idname, text=t('OtherOptionsPanel.SeparateByShapekeys.label'))
 
         row = layout_split(col, factor=0.4, align=True)
         row.scale_y = button_height
-        row.label(text=t('ManualPanel.joinMeshes'), icon='AUTOMERGE_ON')
-        row.operator(Armature_manual.JoinMeshes.bl_idname, text=t('ManualPanel.JoinMeshes.label'))
-        row.operator(Armature_manual.JoinMeshesSelected.bl_idname, text=t('ManualPanel.JoinMeshesSelected.label'))
+        row.label(text=t('OtherOptionsPanel.joinMeshes'), icon='AUTOMERGE_ON')
+        row.operator(Armature_manual.JoinMeshes.bl_idname, text=t('OtherOptionsPanel.JoinMeshes.label'))
+        row.operator(Armature_manual.JoinMeshesSelected.bl_idname, text=t('OtherOptionsPanel.JoinMeshesSelected.label'))
 
         row = layout_split(col, factor=0.4, align=True)
         row.scale_y = button_height
-        row.label(text=t('ManualPanel.mergeWeights'), icon='BONE_DATA')
-        row.operator(Armature_manual.MergeWeights.bl_idname, text=t('ManualPanel.MergeWeights.label'))
-        row.operator(Armature_manual.MergeWeightsToActive.bl_idname, text=t('ManualPanel.MergeWeightsToActive.label'))
+        row.label(text=t('OtherOptionsPanel.mergeWeights'), icon='BONE_DATA')
+        row.operator(Armature_manual.MergeWeights.bl_idname, text=t('OtherOptionsPanel.MergeWeights.label'))
+        row.operator(Armature_manual.MergeWeightsToActive.bl_idname, text=t('OtherOptionsPanel.MergeWeightsToActive.label'))
 
         row = col.row(align=True)
         row.scale_y = 0.75
@@ -53,7 +53,7 @@ class ManualPanel(ToolPanel, bpy.types.Panel):
         # Translate
         col.separator()
         row = col.row(align=True)
-        row.label(text=t('ManualPanel.translate'), icon='FILE_REFRESH')
+        row.label(text=t('OtherOptionsPanel.translate'), icon='FILE_REFRESH')
 
         row = col.row(align=True)
         row.scale_y = button_height
@@ -63,15 +63,15 @@ class ManualPanel(ToolPanel, bpy.types.Panel):
 
         row = split.row(align=True)
         row.scale_y = 2
-        row.operator(Translate.TranslateAllButton.bl_idname, text=t('ManualPanel.TranslateAllButton.label'), icon=globs.ICON_ALL)
+        row.operator(Translate.TranslateAllButton.bl_idname, text=t('OtherOptionsPanel.TranslateAllButton.label'), icon=globs.ICON_ALL)
 
         row = split.column(align=True)
-        row.operator(Translate.TranslateShapekeyButton.bl_idname, text=t('ManualPanel.TranslateShapekeyButton.label'), icon='SHAPEKEY_DATA')
-        row.operator(Translate.TranslateObjectsButton.bl_idname, text=t('ManualPanel.TranslateObjectsButton.label'), icon='MESH_DATA')
+        row.operator(Translate.TranslateShapekeyButton.bl_idname, text=t('OtherOptionsPanel.TranslateShapekeyButton.label'), icon='SHAPEKEY_DATA')
+        row.operator(Translate.TranslateObjectsButton.bl_idname, text=t('OtherOptionsPanel.TranslateObjectsButton.label'), icon='MESH_DATA')
 
         row = split.column(align=True)
-        row.operator(Translate.TranslateBonesButton.bl_idname, text=t('ManualPanel.TranslateBonesButton.label'), icon='BONE_DATA')
-        row.operator(Translate.TranslateMaterialsButton.bl_idname, text=t('ManualPanel.TranslateMaterialsButton.label'), icon='MATERIAL')
+        row.operator(Translate.TranslateBonesButton.bl_idname, text=t('OtherOptionsPanel.TranslateBonesButton.label'), icon='BONE_DATA')
+        row.operator(Translate.TranslateMaterialsButton.bl_idname, text=t('OtherOptionsPanel.TranslateMaterialsButton.label'), icon='MATERIAL')
 
         col.separator()
         row = col.row(align=True)
@@ -85,15 +85,15 @@ class ManualPanel(ToolPanel, bpy.types.Panel):
             col.separator()
             row = layout_split(col, factor=0.24, align=True)
             row.scale_y = button_height
-            row.label(text=t('ManualPanel.delete'), icon='X')
+            row.label(text=t('OtherOptionsPanel.delete'), icon='X')
             row2 = layout_split(row, factor=0.61, align=True)
-            row2.operator(Armature_manual.RemoveZeroWeightBones.bl_idname, text=t('ManualPanel.RemoveZeroWeightBones.label'))
-            row2.operator(Armature_manual.RemoveConstraints.bl_idname, text=t('ManualPanel.RemoveConstraints'))
+            row2.operator(Armature_manual.RemoveZeroWeightBones.bl_idname, text=t('OtherOptionsPanel.RemoveZeroWeightBones.label'))
+            row2.operator(Armature_manual.RemoveConstraints.bl_idname, text=t('OtherOptionsPanel.RemoveConstraints'))
 
             row = layout_split(col, factor=0.24, align=True)
             row.scale_y = button_height
             row.label(text="")
-            row.operator(Armature_manual.RemoveZeroWeightGroups.bl_idname, text=t('ManualPanel.RemoveZeroWeightGroups'))
+            row.operator(Armature_manual.RemoveZeroWeightGroups.bl_idname, text=t('OtherOptionsPanel.RemoveZeroWeightGroups'))
 
             col.separator()
             row = col.row(align=True)
@@ -106,9 +106,9 @@ class ManualPanel(ToolPanel, bpy.types.Panel):
             col.separator()
             row = layout_split(col, factor=0.27, align=True)
             row.scale_y = button_height
-            row.label(text=t('ManualPanel.normals'), icon='SNAP_NORMAL')
-            row.operator(Armature_manual.RecalculateNormals.bl_idname, text=t('ManualPanel.RecalculateNormals.label'))
-            row.operator(Armature_manual.FlipNormals.bl_idname, text=t('ManualPanel.FlipNormals.label'))
+            row.label(text=t('OtherOptionsPanel.normals'), icon='SNAP_NORMAL')
+            row.operator(Armature_manual.RecalculateNormals.bl_idname, text=t('OtherOptionsPanel.RecalculateNormals.label'))
+            row.operator(Armature_manual.FlipNormals.bl_idname, text=t('OtherOptionsPanel.FlipNormals.label'))
 
             add_button_with_small_button(col, Armature_manual.ApplyTransformations.bl_idname, 'OUTLINER_DATA_ARMATURE',
                                               Armature_manual.ApplyAllTransformations.bl_idname, globs.ICON_ALL, scale=button_height)
