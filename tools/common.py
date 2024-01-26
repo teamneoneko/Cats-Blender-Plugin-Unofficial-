@@ -165,7 +165,6 @@ def unhide_all():
         hide(obj, False)
         set_unselectable(obj, False)
 
-    if not version_2_79_or_older():
         unhide_all_unnecessary()
 
 
@@ -202,13 +201,14 @@ def get_active():
 
 
 def select(obj, sel=True):
-    if sel:
-        hide(obj, False)
-    if version_2_79_or_older():
-        obj.select = sel
-    else:
-        obj.select_set(sel)
-
+    if obj is not None:
+        if sel:
+            hide(obj, False)
+        if version_2_79_or_older():
+            obj.select = sel
+        else:
+            obj.select_set(sel)
+            
 
 def is_selected(obj):
     if version_2_79_or_older():
@@ -216,17 +216,23 @@ def is_selected(obj):
     return obj.select_get()
 
 
+def is_selected(obj):
+    return obj.select_get()
+
+
 def hide(obj, val=True):
-    if hasattr(obj, 'hide'):
-        obj.hide = val
-    if not version_2_79_or_older():
+    if hasattr(obj, 'hide_set'):
         obj.hide_set(val)
+    elif hasattr(obj, 'hide'):
+        obj.hide = val
 
 
 def is_hidden(obj):
-    if version_2_79_or_older():
+    if hasattr(obj, 'hide_get'):
+        return obj.hide_get()
+    elif hasattr(obj, 'hide'):
         return obj.hide
-    return obj.hide_get()
+    return False  # Return a default value if the hide state cannot be determined
 
 
 def set_unselectable(obj, val=True):
@@ -1454,16 +1460,26 @@ def delete_zero_weight(armature_name=None, ignore=''):
 
 def remove_unused_objects():
     default_scene_objects = []
+    
     for obj in get_objects():
-        if (obj.type == 'CAMERA' and obj.name == 'Camera') \
-                or (obj.type == 'LAMP' and obj.name == 'Lamp') \
-                or (obj.type == 'LIGHT' and obj.name == 'Light') \
-                or (obj.type == 'MESH' and obj.name == 'Cube'):
+        if obj.type in {'CAMERA', 'LAMP', 'LIGHT', 'MESH'} and is_default_object(obj):
             default_scene_objects.append(obj)
 
     if len(default_scene_objects) == 3:
         for obj in default_scene_objects:
             delete_hierarchy(obj)
+
+def is_default_object(obj):
+    # Check if the object is one of the default objects based on type
+    if obj.type == 'CAMERA' and obj.data.name == 'Camera':
+        return True
+    elif obj.type == 'LAMP' and obj.data.name == 'Lamp':
+        return True
+    elif obj.type == 'LIGHT' and obj.data.name == 'Light':
+        return True
+    elif obj.type == 'MESH' and obj.data.name == 'Cube':
+        return True
+    return False
 
 
 def remove_no_user_objects():
