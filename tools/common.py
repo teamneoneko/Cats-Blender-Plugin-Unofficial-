@@ -202,13 +202,9 @@ def get_active():
 
 def select(obj, sel=True):
     if obj is not None:
-        if sel:
-            hide(obj, False)
-        if version_2_79_or_older():
-            obj.select = sel
-        else:
-            obj.select_set(sel)
-            
+        hide(obj, False)
+        obj.select_set(sel)
+        
 
 def is_selected(obj):
     if version_2_79_or_older():
