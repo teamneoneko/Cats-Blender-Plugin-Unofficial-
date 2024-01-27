@@ -75,10 +75,32 @@ QuickAccess.warn.noDict3,Reinstall Cats to fix this.,これを修正するため
 QuickAccess.ImportAnyModel.label,Import Model,モデルのインポート,모델 불러오기
 QuickAccess.JoinMeshes.label,Join all meshes,すべてのメッシュを結合する,모든 메쉬에 합류
 QuickAccess.CombineMats.label,Combine Materials,材料を組み合わせる,재료 결합
+mmdoptions.FixMaterialsButton.label,Fix Materials,固定材料,재료 수정
+FixMaterialsButton.label,Fix Materials,固定材料,재료 수정
+FixMaterialsButton.desc,"This will apply some vrchat related fixes to materials
+
+- You shouldn't use this if your model has already 
+been set up for Unity.
+- Don't use this if your materials go black, though 
+alot of issues has been fixed when it comes to materials
+there maybe some left.","これにより、いくつかの vrchat 関連の修正がマテリアルに適用されます
+
+- モデルにすでに機能がある場合は、これを使用しないでください。
+Unity用にセットアップされています。
+- ただし、素材が黒くなった場合は使用しないでください。
+マテリアルに関して多くの問題が修正されました
+もしかしたら残っているかもしれない","이렇게 하면 일부 vrchat 관련 수정 사항이 자료에 적용됩니다.
+
+- 모델이 이미 사용하고 있는 경우에는 이 방법을 사용하면 안 됩니다.
+Unity용으로 설정되었습니다.
+- 재료가 검게 변하는 경우에는 이것을 사용하지 마십시오.
+재료와 관련된 많은 문제가 수정되었습니다.
+아마 좀 남아있을 거예요."
+
 ModelSettings.label,Fix Model Settings,モデル設定の修正,모델 고치기 설정
 ModelSettings.warn.fbtFix1,The Full Body Tracking Fix,フル ボディトラッキングの修正,풀바디 트래킹 수정
 ModelSettings.warn.fbtFix2,is no longer needed for VRChat.,もはやVrChatのために必要とされていません。,VRChat에 더 이상 필요하지 않음.
-ModelSettings.warn.fbtFix3,It's still available in Model Options.,モデル オプションで引き続き使用できます。.,이것은 모델옵션에서 여전히 이용가능.
+ModelSettings.warn.fbtFix3,It's still available in Legacy Features.,従来の機能では引き続き利用可能です。.,레거시 기능에서는 계속 사용할 수 있습니다.
 cats_twist.tutorial_button.label,Twist Bones Tutotial,,
 OtherOptionsPanel.label,Other Options,モデル オプション,모델 옵션
 OtherOptionsPanel.separateBy,Separate by:,別に:,메쉬 분리:
@@ -162,17 +184,21 @@ Scene.eye_left.label,Left Eye,左目,왼쪽 눈
 Scene.eye_left.desc,The models left eye bone,,
 Scene.eye_right.label,Right Eye,右目,오른쪽 눈
 Scene.eye_right.desc,The models right eye bone,,
-FixLegacy.info1,Fix Model Button has been moved.,「モデルを修正」ボタンが移動されました,모델 수정 버튼이 이동되었습니다
-FixLegacy.info2,to legacy features submenu.,従来の機能のサブメニューへ。,레거시 기능 하위 메뉴로 이동합니다.
+FixLegacy.info1,Fix Model Button has been removed.,「モデルを修正」ボタンが削除されました。,모델 수정 버튼이 제거되었습니다.
+FixLegacy.info2,please see mmd options for alternatives.,代替案については mmd オプションを参照してください。,대안은 mmd 옵션을 참조하세요.
 LegacyStuff.label,Legacy Features,レガシーなもの,레거시 물건
 LegacyStuff.info1,End of Life features,この領域はサポート終了機能に関するものです,이 영역은 단종 기능을 위한 것입니다.
 LegacyStuff.info2,Might be removed in the future,これらの機能は将来のアップデートで削除される可能性があります,이러한 기능은 향후 업데이트에서 제거될 수 있습니다.
-FixLegacyStuff.info1,Fix model should only be,修正モデルは次のとおりです,수정 모델은 다음과 같아야 합니다
-FixLegacyStuff.info2,used for older MMD models.,古いMMDモデルに使用されます。,구형 MMD 모델에 사용됩니다.
-FixLegacyStuff.info3,You should not be using,使用すべきではありません,당신은 사용해서는 안됩니다
-FixLegacyStuff.info4,this for VRChat models at all!,これは VRChat モデルにとってはまったくのことです。,이것은 VRChat 모델을 위한 것입니다!
-FixLegacyStuff.info5,Use the customs options instead!,代わりにカスタム オプションを使用してください。,대신 세관 옵션을 사용하세요!
-OtherOptionsPanel.fbtFix1,Not needed for vrchat anymore!,vrchatにはもう必要ありません,vrchat에는 더 이상 필요하지 않습니다.
+MMDOptions.label,MMD Options,レガシーなもの,레거시 물건
+MMDOptions.info1,Warning:,警告：,경고:
+MMDOptions.info2,This submenu is where the old mmd options,このサブメニューには古い mmd オプションが含まれています,이 하위 메뉴는 이전 mmd 옵션이 있는 곳입니다.
+MMDOptions.info3,"are, these should only be used on newly","つまり、これらは新規にのみ使用する必要があります","즉, 새로 사용해야만 하는 것입니다."
+MMDOptions.info4,imported mmd and vrm models. do not use,mmdとvrmモデルをインポートしました。使ってはいけません,수입된 mmd 및 vrm 모델. 사용하지 마세요
+MMDOptions.info5,these on models already set up for Unity,これらはすでに Unity 用にセットアップされているモデル上にあります,Unity용으로 이미 설정된 모델의 경우
+MMDOptions.info6,and VRChat or it may break your model.,VRChat を使用しないと、モデルが壊れる可能性があります。,VRChat을 사용하지 않으면 모델이 손상될 수 있습니다.
+MMDOptions.FixMaterialinfo1,This will apply some vrchat fixes,これにより、いくつかの vrchat 修正が適用されます,이것은 일부 vrchat 수정 사항을 적용합니다.
+MMDOptions.FixMaterialinfo2,to materials,材料に,재료에.
+OtherOptionsPanel.fbtFix1,Not needed for vrchat anymore!,,
 OptimizePanel.label,Optimization,最適化,최적화
 OptimizePanel.atlasDesc,A greatly improved Atlas Generator.,アトラスジェネレータを大幅に改良。,텍스처들을 결합시켜주는 더욱 향상된 아틀라스 생성기입니다.
 OptimizePanel.atlasAuthor,Made by Shotariya,shotaryiaによって作られた,제작자: Shotariya
@@ -515,6 +541,9 @@ HelpButton.success,Github wiki opened.,,
 LegacyReadButton.label,Legacy features wiki,従来の機能の Wiki,레거시 기능 위키
 LegacyReadButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Legacy-Features,,
 LegacyReadButton.success,Github wiki opened.,,
+MMDOptionswiki.label,Legacy features wiki,従来の機能の Wiki,레거시 기능 위키
+MMDOptionswiki.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Legacy-Features,,
+MMDOptionswiki.success,Github wiki opened.,,
 PatchnotesButton.label,Latest Patchnotes,最新のパッチノート,최신 패치노트
 PatchnotesButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases,,
 PatchnotesButton.success,Patchnotes opened.,,

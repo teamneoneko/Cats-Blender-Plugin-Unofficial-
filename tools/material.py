@@ -4,6 +4,9 @@ import bpy
 from . import common as Common
 from .register import register_wrap
 from .translations import t
+from mmd_tools_local.operators import morph as Morph
+from . import armature as Armature
+mmd_tools_local_installed = True
 
 
 @register_wrap
@@ -244,6 +247,43 @@ class CombineMaterialsButton(bpy.types.Operator):
             self.report({'INFO'}, t('CombineMaterialsButton.success', number=str(i)))
 
         return {'FINISHED'}
+
+
+@register_wrap
+class FixMaterialsButton(bpy.types.Operator):
+    bl_idname = 'cats_material.fix'
+    bl_label = t('FixMaterialsButton.label')
+    bl_description = t('FixMaterialsButton.desc')
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
+
+    @classmethod
+    def poll(cls, context):
+        if not Common.get_armature():
+            return False
+
+        if len(Common.get_armature_objects()) == 0:
+            return False
+
+        return True
+
+    def execute(self, context):
+        armature = Common.get_armature()
+        meshes = Common.get_meshes_objects()
+        # If all materials are transparent, make them visible. Also set transparency always to Z-Transparency
+        if context.scene.fix_materials:
+            # Make materials exportable in Blender 2.80 and remove glossy mmd shader look
+            # Common.remove_toon_shader(mesh)
+            for mesh in meshes:
+                if mmd_tools_local_installed:
+                    Common.fix_mmd_shader(mesh)
+                Common.fix_vrm_shader(mesh)
+                Common.add_principled_shader(mesh)
+                for mat_slot in mesh.material_slots:  # Fix transparency per polygon and general garbage look in blender. Asthetic purposes to fix user complaints.
+                    mat_slot.material.shadow_method = "HASHED"
+                    mat_slot.material.blend_method = "HASHED"
+        
+        materials = set() 
+        return materials
 
 @register_wrap
 class ConvertAllToPngButton(bpy.types.Operator):
