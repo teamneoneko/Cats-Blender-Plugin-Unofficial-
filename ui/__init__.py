@@ -7,8 +7,8 @@ if "bpy" not in locals():
     from . import quickaccess
     from . import optimization
     from . import custom
-    from . import otheroptions
     from . import mmdoptions
+    from . import otheroptions
     from . import decimation
     from . import visemes
     from . import bone_root
@@ -26,8 +26,8 @@ else:
     importlib.reload(quickaccess)
     importlib.reload(optimization)
     importlib.reload(custom)
-    importlib.reload(otheroptions)
     importlib.reload(mmdoptions)
+    importlib.reload(otheroptions)
     importlib.reload(decimation)
     importlib.reload(visemes)
     importlib.reload(bone_root)
