@@ -62,28 +62,7 @@ class OtherOptionsPanel(ToolPanel, bpy.types.Panel):
             row.prop(context.scene, 'show_more_options', icon=globs.ICON_ADD, emboss=True, expand=False, toggle=False, event=False)
         else:
             row.prop(context.scene, 'show_more_options', icon=globs.ICON_REMOVE, emboss=True, expand=False, toggle=False, event=False)
-
-            col.separator()
-            row = layout_split(col, factor=0.24, align=True)
-            row.scale_y = button_height
-            row.label(text=t('OtherOptionsPanel.delete'), icon='X')
-            row2 = layout_split(row, factor=0.61, align=True)
-            row2.operator(Armature_manual.RemoveZeroWeightBones.bl_idname, text=t('OtherOptionsPanel.RemoveZeroWeightBones.label'))
-            row2.operator(Armature_manual.RemoveConstraints.bl_idname, text=t('OtherOptionsPanel.RemoveConstraints'))
-
-            row = layout_split(col, factor=0.24, align=True)
-            row.scale_y = button_height
-            row.label(text="")
-            row.operator(Armature_manual.RemoveZeroWeightGroups.bl_idname, text=t('OtherOptionsPanel.RemoveZeroWeightGroups'))
-
-            col.separator()
-            row = col.row(align=True)
-            row.scale_y = button_height
-            row.operator(Armature_manual.DuplicateBonesButton.bl_idname, icon='GROUP_BONE')
-            row = col.row(align=True)
-            row.scale_y = button_height
-            row.operator(Armature_manual.ConnectBonesButton.bl_idname, icon='CONSTRAINT_BONE')
-
+            
             col.separator()
             row = layout_split(col, factor=0.27, align=True)
             row.scale_y = button_height
@@ -94,9 +73,6 @@ class OtherOptionsPanel(ToolPanel, bpy.types.Panel):
             add_button_with_small_button(col, Armature_manual.ApplyTransformations.bl_idname, 'OUTLINER_DATA_ARMATURE',
                                               Armature_manual.ApplyAllTransformations.bl_idname, globs.ICON_ALL, scale=button_height)
 
-            row = col.row(align=True)
-            row.scale_y = button_height
-            row.operator(Armature_manual.RemoveDoubles.bl_idname, icon='X')
             row = col.row(align=True)
             row.scale_y = button_height
             row.operator(Armature_manual.RepairShapekeys.bl_idname, icon='MESH_DATA')

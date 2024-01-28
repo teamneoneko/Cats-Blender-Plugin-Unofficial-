@@ -13,6 +13,7 @@ from ..tools import material as Material
 from ..tools import bonemerge as Bonemerge
 from ..tools import rootbone as Rootbone
 from ..tools import armature_manual as Armature_manual
+from ..tools import armature_bones as Armature_bones
 
 from ..tools.register import register_wrap
 from ..tools.translations import t
@@ -214,6 +215,11 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
             row.operator(Armature_manual.JoinMeshes.bl_idname, text=t('OtherOptionsPanel.JoinMeshes.label'))
             row.operator(Armature_manual.JoinMeshesSelected.bl_idname, text=t('OtherOptionsPanel.JoinMeshesSelected.label'))
             col.separator()
+            
+            col = box.column(align=True)
+            row = col.row(align=True)
+            row.scale_y = 1.1
+            row.operator(Armature_manual.RemoveDoubles.bl_idname, icon='X')
 
         elif context.scene.optimize_mode == 'BONEMERGING':
             if len(Common.get_meshes_objects(check=False)) > 1:
@@ -239,10 +245,33 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
             row.scale_y = 1.1
             row.operator(Armature_manual.MergeWeights.bl_idname, text=t('OtherOptionsPanel.MergeWeights.label'))
             row.operator(Armature_manual.MergeWeightsToActive.bl_idname, text=t('OtherOptionsPanel.MergeWeightsToActive.label'))
-
+            
+            col.separator()
             row = col.row(align=True)
             row.scale_y = 0.75
             row.prop(context.scene, 'keep_merged_bones')
             row = col.row(align=True)
             row.scale_y = 0.75
             row.prop(context.scene, 'merge_visible_meshes_only')
+            
+            col.separator()
+            col = box.column(align=True)
+            row = col.row(align=True)
+            row.scale_y = 1.1
+            row.label(text=t('OtherOptionsPanel.delete'), icon='X')
+            col = box.column(align=True)
+            row = col.row(align=True)
+            row.scale_y = 1.1
+            row.operator(Armature_manual.RemoveZeroWeightBones.bl_idname, text=t('OtherOptionsPanel.RemoveZeroWeightBones.label'))
+            row.operator(Armature_manual.RemoveConstraints.bl_idname, text=t('OtherOptionsPanel.RemoveConstraints'))
+            row.operator(Armature_manual.RemoveZeroWeightGroups.bl_idname, text=t('OtherOptionsPanel.RemoveZeroWeightGroups'))
+
+            col.separator()
+            col = box.column(align=True)
+            row = col.row(align=True)
+            row.scale_y = 1.1
+            row.operator(Armature_manual.DuplicateBonesButton.bl_idname, icon='GROUP_BONE')
+            col = box.column(align=True)
+            row = col.row(align=True)
+            row.scale_y = 1.1
+            row.operator(Armature_manual.ConnectBonesButton.bl_idname, icon='CONSTRAINT_BONE')
