@@ -1,4 +1,4 @@
-# GPL License
+# MIT License
 
 bl_info = {
     'name': 'Cats Blender Plugin',

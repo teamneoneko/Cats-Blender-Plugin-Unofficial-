@@ -1,4 +1,4 @@
-# GPL License
+# MIT License
 
 if "bpy" not in locals():
     # print('STARTUP UI!!')
@@ -16,7 +16,6 @@ if "bpy" not in locals():
     from . import scale
     from . import eye_tracking
     from . import legacy
-    from . import copy_protection
     from . import settings_updates
     from . import credits
 else:
@@ -34,6 +33,5 @@ else:
     importlib.reload(scale)
     importlib.reload(eye_tracking)
     importlib.reload(legacy)
-    importlib.reload(copy_protection)
     importlib.reload(settings_updates)
     importlib.reload(credits)

@@ -1,4 +1,4 @@
-# GPL License
+# MIT License
 
 import re
 import bpy

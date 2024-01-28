@@ -1,4 +1,4 @@
-# GPL License
+# MIT License
 
 if "bpy" not in locals():
     # print('STARTUP TOOLS!!')
@@ -11,7 +11,6 @@ if "bpy" not in locals():
     from . import atlas
     from . import bonemerge
     from . import common
-    from . import copy_protection
     from . import credits
     from . import decimation
     from . import eyetracking
@@ -37,7 +36,6 @@ else:
     importlib.reload(atlas)
     importlib.reload(bonemerge)
     importlib.reload(common)
-    importlib.reload(copy_protection)
     importlib.reload(credits)
     importlib.reload(decimation)
     importlib.reload(eyetracking)

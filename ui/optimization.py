@@ -1,4 +1,4 @@
-# GPL License
+# MIT License
 
 import bpy
 import addon_utils
@@ -72,7 +72,7 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
 
         if context.scene.optimize_mode == 'ATLAS':
 
-            col.label(text="For PBR/Normal maps, use Bake.", icon='INFO')
+            col.label(text="For PBR/Normal maps, use Tuxedo Blender Plugin.", icon='INFO')
 
             col.separator()
             col = box.column(align=True)
