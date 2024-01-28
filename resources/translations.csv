@@ -232,14 +232,15 @@ CreditsPanel.desc1,Cats Blender Plugin (,,
 CreditsPanel.desc2,Created by Hotox and GiveMeAllYourCats,HotoxとGiveMeAllYourCatsによって作成,멋진 VRChat 커뮤니티를 위해서
 CreditsPanel.desc3,For the awesome VRChat community <3,素晴らしいVRChatコミュニティのために <3,Hotox와 GiveMeAllYourCats에 의해 제작됨 <3
 CreditsPanel.desc4,Special thanks to:,特別な感謝: ShotariyaとNeitri,다음 분들께 특별한 감사를 전합니다:
-CreditsPanel.descContributors,"Feilen, Jordo, Ruubick, 989onan, triazo,","Feilen、Jordo、Ruubick、989onan、triazo、","Feilen, Jordo, Ruubick, 989onan, triazo,"
+CreditsPanel.descContributors,"Feilen, Jordo, Ruubick, 989onan, triazo,","Feilen、Jordo、Ruubick、989onan、triazo、","Feilen, Jordo, Ruubick, 989onan, triazo, Mysteryem"
 CreditsPanel.descContributors2,"Shotariya and Neitri","ShotariyaとNeitri","Shotariya와 Neitri"
 CreditsPanel.desc5,Unoffical Maintainer - Yusarina,非公式メンテナ - Yusarina,비공식 유지관리자 - Yusarina
 CreditsPanel.desc6,Do you need help or found a bug?,助けが必要ですか、バグを見つけましたか?,도움이 필요하시거나 혹시 버그를 찾으셨나요?
-FixArmature.label,Fix Model,モデル修正,모델 고치기
+FixArmature.label,Fix MMD Model,MMDモデルを修正,MMD 모델 수정
 FixArmature.desc,"WARNING: DO NOT USE THIS UNLESS YOU ARE
-IMPORTING A OLDER MMD MODEL, DO NOT YOU USE 
-THIS FOR VRCHAT MODELS!
+IMPORTING A NEW MMD MODEL, DO NOT USE 
+THIS FOR MODELS ALREADY SET UP FOR 
+UNITY AND VRCHAT!
 
 Automatically:
 - Reparents bones
@@ -247,11 +248,10 @@ Automatically:
 - Translates and renames bones & objects
 - Merges weight paints
 - Corrects the hips
-- Joins meshes
-- Converts morphs into shapes
-- Corrects shading","「警告: そうでない場合はこれを使用しないでください
-古い MMD モデルをインポートしています。使用しないでください
-VRCHATモデルの場合はこちら！
+- Converts morphs into shapes","警告: そうでない場合はこれを使用しないでください。
+新しい MMD モデルをインポートしています。使用しないでください
+すでにセットアップされているモデルの場合はこちら
+ユニティとVRCHAT！
 
 自動的に：
 - 親の骨
@@ -259,21 +259,18 @@ VRCHATモデルの場合はこちら！
 - ボーンとオブジェクトの翻訳と名前変更
 - ウェイトペイントをマージします
 - ヒップを補正します
-- メッシュを結合します
-- モーフをシェイプに変換します
-- シェーディングを修正します」","警告: そうでない場合はこれを使用しないでください。
-古い MMD モデルをインポートしています。使用しないでください
-VRCHATモデルの場合はこちら！
+- モーフをシェイプに変換します","경고: 귀하가 아닌 이상 이것을 사용하지 마십시오
+새로운 MMD 모델 가져오기, 사용하지 마세요
+이미 설정된 모델에 대한 내용입니다.
+유니티와 VRCHAT!
 
-자동으로 아래의 항목들이 고쳐집니다:
-- 본들의 부모 재설정
-- 필요하지 않는 본들, 오브젝트들, 그룹들과 컨스트레인트들을 제거
-- 본들과 오브젝트들을 영어로 번역하고 이름들을 바꿈
-- 웨이트 페인트들을 통합
-- 'hips'본을 고침
-- 메쉬 통합
-- morphs를 shapes로 변환
-- 쉐이딩을 고침"
+자동으로:
+- 부모 뼈
+- 불필요한 뼈, 개체, 그룹 및 제약 조건을 제거합니다.
+- 뼈와 물체를 번역하고 이름을 바꿉니다.
+- 웨이트 페인트 병합
+- 엉덩이를 바로잡는다
+- 모프를 모양으로 변환합니다."
 FixArmature.error.noMesh,"No mesh inside the armature found!
 If there are meshes outside of the armature,
 set the armature as the parent of the meshes.",,"뼈대(Armature) 안에 메쉬가 없습니다!
@@ -541,7 +538,7 @@ HelpButton.success,Github wiki opened.,,
 LegacyReadButton.label,Legacy features wiki,従来の機能の Wiki,레거시 기능 위키
 LegacyReadButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Legacy-Features,,
 LegacyReadButton.success,Github wiki opened.,,
-MMDOptionswiki.label,Legacy features wiki,従来の機能の Wiki,레거시 기능 위키
+MMDOptionswiki.label,MMD Options Wiki,従来の機能の Wiki,레거시 기능 위키
 MMDOptionswiki.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Legacy-Features,,
 MMDOptionswiki.success,Github wiki opened.,,
 PatchnotesButton.label,Latest Patchnotes,最新のパッチノート,최신 패치노트
@@ -1005,10 +1002,10 @@ Scene.optimize_mode.label,Optimize Mode,最適化モード,최적화 모드
 Scene.optimize_mode.desc,Mode,,
 Scene.optimize_mode.atlas.label,Atlas,アトラス,
 Scene.optimize_mode.atlas.desc,Allows you to make a texture atlas.,,
-Scene.optimize_mode.material.label,Material,マテリアル,매테리얼
-Scene.optimize_mode.material.desc,Some various options on material manipulation.,,
-Scene.optimize_mode.bonemerging.label,Bone Merging,骨のマージ,본 통합
-Scene.optimize_mode.bonemerging.desc,Allows child bones to be merged into their parents.,,
+Scene.optimize_mode.material.label,Material And Meshes,マテリアル,매테리얼
+Scene.optimize_mode.material.desc,Some various options on material and mesh manipulation.,,
+Scene.optimize_mode.bonemerging.label,Bones,骨のマージ,본 통합
+Scene.optimize_mode.bonemerging.desc,Options for Bones.,,
 Scene.merge_ratio.label,Merge Ratio,マージ率,통합 비율
 Scene.merge_ratio.desc,"Higher = more bones will be merged
 Lower = less bones will be merged

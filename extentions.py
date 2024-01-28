@@ -34,12 +34,6 @@ def register():
         default=True
     )
 
-    Scene.combine_mats = BoolProperty(
-        name=t('Scene.combine_mats.label'),
-        description=t('Scene.combine_mats.desc'),
-        default=True
-    )
-
     Scene.remove_zero_weight = BoolProperty(
         name=t('Scene.remove_zero_weight.label'),
         description=t('Scene.remove_zero_weight.desc'),
@@ -64,21 +58,9 @@ def register():
         default=True
     )
 
-    Scene.join_meshes = BoolProperty(
-        name=t('Scene.join_meshes.label'),
-        description=t('Scene.join_meshes.desc'),
-        default=True
-    )
-
     Scene.connect_bones = BoolProperty(
         name=t('Scene.connect_bones.label'),
         description=t('Scene.connect_bones.desc'),
-        default=True
-    )
-
-    Scene.fix_materials = BoolProperty(
-        name=t('Scene.fix_materials.label'),
-        description=t('Scene.fix_materials.desc'),
         default=True
     )
 

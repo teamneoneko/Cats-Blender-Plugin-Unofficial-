@@ -12,6 +12,7 @@ from ..tools import atlas as Atlas
 from ..tools import material as Material
 from ..tools import bonemerge as Bonemerge
 from ..tools import rootbone as Rootbone
+from ..tools import armature_manual as Armature_manual
 
 from ..tools.register import register_wrap
 from ..tools.translations import t
@@ -36,11 +37,7 @@ def check_for_smc():
         if mod.bl_info['name'] == "Shotariya's Material Combiner":
             # print(mod.__name__, mod.bl_info['version'])
             # print(addon_utils.check(mod.__name__))
-            if mod.bl_info['version'] < (2, 1, 1, 2):
-                old_smc_version = True
-                # print('TOO OLD!')
-                continue
-            if bpy.app.version >= (2, 93) and mod.bl_info['version'] < (2, 1, 1, 8):
+            if mod.bl_info['version'] < (2, 1, 2, 6):
                 old_smc_version = True
                 # print('TOO OLD!')
                 continue
@@ -55,18 +52,7 @@ def check_for_smc():
             found_very_old_smc = False
             draw_smc_ui = getattr(import_module(mod.__name__ + '.operators.ui.include'), 'draw_ui')
             break
-
-
-# @register_wrap
-# class AtlasList(bpy.types.UIList):
-#     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-#         mat = item.material
-#         row = layout.row()
-#         row.prop(mat, 'name', emboss=False, text='', icon_value=layout.icon(mat))
-#         sub_row = row.row()
-#         sub_row.scale_x = 0.2
-#         row.prop(mat, 'add_to_atlas', text='')
-
+            
 
 @register_wrap
 class OptimizePanel(ToolPanel, bpy.types.Panel):
@@ -107,51 +93,6 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
             # row.scale_y = 0.9
             # row.operator(Atlas.AtlasHelpButton.bl_idname, text="", icon='QUESTION')
             col.separator()
-
-            # Draw v1.0 mat comb ui
-            # if found_very_old_smc and not draw_smc_ui:
-            #     col.separator()
-            #
-            #     box2 = col.box()
-            #     col2 = box2.column(align=True)
-            #
-            #     row = col2.row(align=True)
-            #     row.scale_y = 0.75
-            #     row.label(text="Old Combiner version, consider upgrading:", icon='INFO')
-            #     col2.separator()
-            #     row = col2.row(align=True)
-            #     row.operator(Atlas.ShotariyaButton.bl_idname, text='Download Material Combiner v2.0', icon=globs.ICON_URL)
-            #     col.separator()
-            #
-            #     if len(context.scene.material_list) == 0:
-            #         col.separator()
-            #         row = col.row(align=True)
-            #         row.scale_y = 1.2
-            #         row.operator(Atlas.GenerateMaterialListButton.bl_idname, icon='TRIA_RIGHT')
-            #         col.separator()
-            #     else:
-            #         # row = col.row(align=True)
-            #         # row.scale_y = 0.75
-            #         # row.label(text='Select Materials to Combine:')
-            #         row = col.row(align=True)
-            #         row.template_list('AtlasList', '', context.scene, 'material_list', context.scene, 'material_list_index', rows=8, type='DEFAULT')
-            #
-            #         row = layout_split(col, factor=0.8, align=True)
-            #         row.scale_y = 1.2
-            #         row.operator(Atlas.GenerateMaterialListButton.bl_idname, text='Update Material List', icon='FILE_REFRESH')
-            #         if context.scene.clear_materials:
-            #             row.operator(Atlas.CheckMaterialListButton.bl_idname, text='', icon='CHECKBOX_HLT')
-            #         else:
-            #             row.operator(Atlas.CheckMaterialListButton.bl_idname, text='', icon='CHECKBOX_DEHLT')
-            #
-            #         row.operator(Atlas.ClearMaterialListButton.bl_idname, text='', icon='X')
-            #         col.separator()
-            #
-            #     row = col.row(align=True)
-            #     row.scale_y = 1.7
-            #     row.operator(Atlas.AutoAtlasNewButton.bl_idname, icon='TRIA_RIGHT')
-            #     check_for_smc()
-            #     return
 
             # If supported version is outdated
             if smc_is_disabled:
@@ -261,6 +202,18 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
             row = col.row(align=True)
             row.scale_y = 1.1
             row.operator(Material.ConvertAllToPngButton.bl_idname, icon='IMAGE_RGB_ALPHA')
+            col.separator()
+            col.separator()
+            col = box.column(align=True)
+            row = col.row(align=True)
+            row.scale_y = 1.1
+            row.label(text=t('OtherOptionsPanel.joinMeshes'), icon='AUTOMERGE_ON')
+            col = box.column(align=True)
+            row = col.row(align=True)
+            row.scale_y = 1.1
+            row.operator(Armature_manual.JoinMeshes.bl_idname, text=t('OtherOptionsPanel.JoinMeshes.label'))
+            row.operator(Armature_manual.JoinMeshesSelected.bl_idname, text=t('OtherOptionsPanel.JoinMeshesSelected.label'))
+            col.separator()
 
         elif context.scene.optimize_mode == 'BONEMERGING':
             if len(Common.get_meshes_objects(check=False)) > 1:
@@ -274,3 +227,22 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
             col.separator()
             row.operator(Rootbone.RefreshRootButton.bl_idname, icon='FILE_REFRESH')
             row.operator(Bonemerge.BoneMergeButton.bl_idname, icon='AUTOMERGE_ON')
+            
+            col.separator()
+            col.separator()
+            col = box.column(align=True)
+            row = col.row(align=True)
+            row.scale_y = 1.1
+            row.label(text=t('OtherOptionsPanel.mergeWeights'), icon='BONE_DATA')
+            col = box.column(align=True)
+            row = col.row(align=True)
+            row.scale_y = 1.1
+            row.operator(Armature_manual.MergeWeights.bl_idname, text=t('OtherOptionsPanel.MergeWeights.label'))
+            row.operator(Armature_manual.MergeWeightsToActive.bl_idname, text=t('OtherOptionsPanel.MergeWeightsToActive.label'))
+
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.prop(context.scene, 'keep_merged_bones')
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.prop(context.scene, 'merge_visible_meshes_only')

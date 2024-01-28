@@ -31,25 +31,6 @@ class OtherOptionsPanel(ToolPanel, bpy.types.Panel):
         row.operator(Armature_manual.SeparateByLooseParts.bl_idname, text=t('OtherOptionsPanel.SeparateByLooseParts.label'))
         row.operator(Armature_manual.SeparateByShapekeys.bl_idname, text=t('OtherOptionsPanel.SeparateByShapekeys.label'))
 
-        row = layout_split(col, factor=0.4, align=True)
-        row.scale_y = button_height
-        row.label(text=t('OtherOptionsPanel.joinMeshes'), icon='AUTOMERGE_ON')
-        row.operator(Armature_manual.JoinMeshes.bl_idname, text=t('OtherOptionsPanel.JoinMeshes.label'))
-        row.operator(Armature_manual.JoinMeshesSelected.bl_idname, text=t('OtherOptionsPanel.JoinMeshesSelected.label'))
-
-        row = layout_split(col, factor=0.4, align=True)
-        row.scale_y = button_height
-        row.label(text=t('OtherOptionsPanel.mergeWeights'), icon='BONE_DATA')
-        row.operator(Armature_manual.MergeWeights.bl_idname, text=t('OtherOptionsPanel.MergeWeights.label'))
-        row.operator(Armature_manual.MergeWeightsToActive.bl_idname, text=t('OtherOptionsPanel.MergeWeightsToActive.label'))
-
-        row = col.row(align=True)
-        row.scale_y = 0.75
-        row.prop(context.scene, 'keep_merged_bones')
-        row = col.row(align=True)
-        row.scale_y = 0.75
-        row.prop(context.scene, 'merge_visible_meshes_only')
-
         # Translate
         col.separator()
         row = col.row(align=True)

@@ -6,6 +6,7 @@ import math
 from mathutils import Matrix
 
 from . import common as Common
+from . import material as Material
 from . import translate as Translate
 from . import armature_bones as Bones
 from .common import version_3_6_or_older
@@ -336,29 +337,9 @@ class FixArmature(bpy.types.Operator):
         # Apply transforms of this model
         Common.apply_transforms()
 
-        # Puts all meshes into a list and joins them if selected
-        if context.scene.join_meshes:
-            meshes = [Common.join_meshes()]
-        else:
-            meshes = Common.get_meshes_objects()
-
-        for mesh in meshes:
-            Common.unselect_all()
-            Common.set_active(mesh)
-
-            # Unlock all mesh transforms
-            for i in range(0, 3):
-                mesh.lock_location[i] = False
-                mesh.lock_rotation[i] = False
-                mesh.lock_scale[i] = False
-
-            # Set layer of mesh to 0
-            if hasattr(mesh, 'layers'):
-                mesh.layers[0] = True
-
             # Fix Source Shapekeys
-            if source_engine and Common.has_shapekeys(mesh):
-                mesh.data.shape_keys.key_blocks[0].name = "Basis"
+        if source_engine and Common.has_shapekeys(mesh):
+            mesh.data.shape_keys.key_blocks[0].name = "Basis"
 
             # Fix VRM shapekeys
             if is_vrm and Common.has_shapekeys(mesh):
@@ -376,29 +357,12 @@ class FixArmature(bpy.types.Operator):
                 Common.sort_shape_keys(mesh.name, shapekey_order)
 
 
-             # Clean material names. Combining mats would do this too
+            # Clean material names. Combining mats would do this too
             Common.clean_material_names(mesh)
-
-            # If all materials are transparent, make them visible. Also set transparency always to Z-Transparency
-            if context.scene.fix_materials:
-                # Make materials exportable in Blender 2.80 and remove glossy mmd shader look
-                # Common.remove_toon_shader(mesh)
-                if mmd_tools_local_installed:
-                    Common.fix_mmd_shader(mesh)
-                Common.fix_vrm_shader(mesh)
-                Common.add_principled_shader(mesh)
-                for mat_slot in mesh.material_slots:  # Fix transparency per polygon and general garbage look in blender. Asthetic purposes to fix user complaints.
-                    mat_slot.material.shadow_method = "HASHED"
-                    mat_slot.material.blend_method = "HASHED"
 
 			# Remove empty shape keys and then save the shape key order
             Common.clean_shapekeys(mesh)
             Common.save_shapekey_order(mesh.name)
-
-            # Combines same materials
-            if context.scene.combine_mats:
-                bpy.ops.cats_material.combine_mats()
-
 
             # Reorders vrc shape keys to the correct order
             Common.sort_shape_keys(mesh.name)
@@ -955,6 +919,8 @@ class FixArmature(bpy.types.Operator):
 
         # Merged bones that should be deleted
         bones_to_delete = []
+        
+        meshes = Common.get_meshes_objects()
 
         # Mixing the weights
         for mesh in meshes:
@@ -1224,6 +1190,8 @@ class FixArmature(bpy.types.Operator):
 
         # Armature should be named correctly (has to be at the end because of multiple armatures)
         Common.fix_armature_names()
+        
+        fixed_uv_coords = False
 
         # Fix shading (check for runtime error because of ci tests)
         if not source_engine:
