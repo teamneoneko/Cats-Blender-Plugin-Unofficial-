@@ -431,8 +431,8 @@ def get_github_releases(repo):
     if not data:
         return False
     
-    if bpy.app.version >= (3, 6) and bpy.app.version < (3, 7):
-        tag_prefix = "3.6."
+    if bpy.app.version >= (4, 0) and bpy.app.version < (4, 3):
+        tag_prefix = "4.0."
 
     for version in data:
         full_tag = version.get('tag_name')
