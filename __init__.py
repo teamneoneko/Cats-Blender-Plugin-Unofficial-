@@ -183,6 +183,11 @@ def check_unsupported_blender_versions():
         unregister()
         sys.tracebacklimit = 0
         raise ImportError(t('Main.error.29unsupportedVersion'))
+     
+    # Don't allow 4.0+
+    if bpy.app.version >= (4, 0):
+        sys.tracebacklimit = 0
+        raise ImportError(t('Main.error.40unsupportedVersion'))
 
 def set_cats_version_string():
     version = bl_info.get('version')
