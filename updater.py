@@ -430,21 +430,26 @@ def get_github_releases(repo):
         return False
     if not data:
         return False
+    
+    if bpy.app.version >= (3, 6) and bpy.app.version < (3, 7):
+        tag_prefix = "3.6."
 
     for version in data:
-        if 'yanked' in version.get('name').lower() or version_list.get(version.get('tag_name')):
-            continue
-
-        version_tag = version.get('tag_name').replace('-', '.')
-        if version_tag.startswith('v.'):
-            version_tag = version_tag[2:]
-        if version_tag.startswith('v'):
-            version_tag = version_tag[1:]
-
-        version_list[version_tag] = [version.get('zipball_url'), version.get('body'), version.get('published_at').split('T')[0]]
-
-    # for version, info in version_list.items():
-    #     print(version, info[0], info[2])
+        full_tag = version.get('tag_name')
+        if not full_tag.startswith(tag_prefix):
+            continue   
+            
+        version_tag = full_tag[len(tag_prefix):]
+        
+        # Normalize version_tag 
+        version_tag = version_tag.replace('-', '.')
+        
+        # Store full tag  
+        version_list[full_tag] = [
+            version['zipball_url'],
+            version['body'],
+            version['published_at'].split('T')[0]
+        ]
 
     return True
 
