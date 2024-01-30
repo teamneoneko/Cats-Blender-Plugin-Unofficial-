@@ -1,5 +1,7 @@
 # Cats Blender Plugin.
 
+The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat. Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
+
 #### Warning, Cats has changed UI wise, please [click here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Features) to see the new UI features.
 #### If your plugin is trying to update to a blender 4.0 version or is stuck in a update loop please ensure you using the latest version of the plugin for you blender version from the releases tab [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases).
 
@@ -15,9 +17,6 @@ Blender 4.0 is also buggy and does have issues as well, we won't be recommending
 However if you must use blender 4.0 you can download it from this branch [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-40).
 
 You can find the development version for Blender 4.0 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-40-dev).
-
-The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat.
-Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
 
 With Cats it takes only a few minutes to upload your model into VRChat.
 All the hours long processes of fixing your models are compressed into a few functions!
