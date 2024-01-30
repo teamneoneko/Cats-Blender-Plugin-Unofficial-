@@ -575,6 +575,15 @@ class JoinMeshesSelected(bpy.types.Operator):
         Common.unselect_all()
         Common.set_active(mesh)
         self.report({'INFO'}, t('JoinMeshesSelected.success'))
+        
+            for i in range(0, 3):
+            mesh.lock_location[i] = False
+            mesh.lock_rotation[i] = False
+            mesh.lock_scale[i] = False
+
+        # Set layer of mesh to 0
+        if hasattr(mesh, 'layers'):
+            mesh.layers[0] = True
         return {'FINISHED'}
 
 
