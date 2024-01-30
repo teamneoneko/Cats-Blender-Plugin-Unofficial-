@@ -1,6 +1,7 @@
 # Cats Blender Plugin.
 
-### Warning, the unofficial version of cats is going through a large overhaul and things will change especially UI wise.
+#### Warning, Cats has changed UI wise, please [click here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Features) to see the new UI features.
+#### If your plugin is trying to update to a blender 4.0 version or is stuck in a update loop please ensure you using the latest version of the plugin for you blender version from the releases tab [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases).
 
 If you are using blender 3.6 please use the latest release [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases). Blender 3.6 is the current recomended blender version to use!  
 
