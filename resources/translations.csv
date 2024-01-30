@@ -577,6 +577,16 @@ ImportAnyModel.importantInfo.desc,"If you want to modify the import settings, us
 
 ",,
 ImportAnyModel.error.emptyZip,The selected zip file contains no importable models.,,
+ImportAnyModel.desc2.8,"Import a model of any supported type.
+
+Supported types:
+- MMD: .pmx/.pmd
+- XNALara: .xps/.mesh/.ascii
+- Source: .smd/.qc/.vta/.dmx
+- VRM: .vrm
+- FBX: .fbx
+- DAE: .dae 
+- ZIP: .zip",,
 DecimationLegacy.info1,Decimation will be made a legacy,デシメーションは遺産となるだろう,학살은 유산이 될 것입니다
 DecimationLegacy.info2,Compoment Soon we recomend using,すぐに使用することをお勧めします,곧 우리는 다음을 사용하는 것이 좋습니다
 DecimationLegacy.info3,Tuxedo instead!,代わりにタキシード！,대신 턱시도!

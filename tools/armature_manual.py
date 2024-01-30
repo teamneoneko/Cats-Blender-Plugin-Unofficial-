@@ -576,7 +576,7 @@ class JoinMeshesSelected(bpy.types.Operator):
         Common.set_active(mesh)
         self.report({'INFO'}, t('JoinMeshesSelected.success'))
         
-            for i in range(0, 3):
+        for i in range(0, 3):
             mesh.lock_location[i] = False
             mesh.lock_rotation[i] = False
             mesh.lock_scale[i] = False
