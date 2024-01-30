@@ -62,49 +62,73 @@ Blender를 다시 시작하고 Cats Plugin를 다시 활성화하세요!
 "
 ToolPanel.label,Cats Blender Plugin,Cats ブレンダープラグイン,
 ToolPanel.category,CATS,,
-ArmaturePanel.label,Model,モデル,모델
-ArmaturePanel.warn.newBlender1,Potentially unsupported Blender version detected!
-ArmaturePanel.warn.newBlender2,Some features might not work!
-ArmaturePanel.warn.newBlender3,CATS currently supports up to Blender 4.0.
-ArmaturePanel.warn.oldBlender1,Old Blender version detected!,古いブレンダーバージョンが検出されました!,이전 블렌더 버전이 발견되었습니다!
-ArmaturePanel.warn.oldBlender2,Some features might not work!,一部の機能は動作しない可能性があります!,일부 기능이 작동하지 않을 수 있습니다!
-ArmaturePanel.warn.oldBlender3,Please update to Blender 3.6!,ブレンダー3.1以上にアップデートしてください!,블렌더 3.1 버전으로 업데이트하세요!
-ArmaturePanel.warn.noDict1,Dictionary not found!,辞書が見つかりません!,사전파일(Dictionary)을 찾을 수 없습니다!
-ArmaturePanel.warn.noDict2,"Translations will work, but are not optimized.",翻訳は機能しますが、最適化されません。,번역은 되지만 최적화되지는 않습니다.
-ArmaturePanel.warn.noDict3,Reinstall Cats to fix this.,これを修正するためにCatsを再インストールします。,이 문제를 해결하려면 Cats를 다시 설치하세요.
-ArmaturePanel.ImportAnyModel.label,Import Model,モデルのインポート,모델 불러오기
+QuickAccess.label,Quick Access,迅速なアクセス,빠른 접근
+QuickAccess.warn.newBlender1,Potentially unsupported Blender version detected!
+QuickAccess.warn.newBlender2,Some features might not work, CATS currently 
+QuickAccess.warn.newBlender3,supports up to Blender 4.0 see github for the 4.0 one.
+QuickAccess.warn.oldBlender1,Old Blender version detected!,古いブレンダーバージョンが検出されました!,이전 블렌더 버전이 발견되었습니다!
+QuickAccess.warn.oldBlender2,Some features might not work!,一部の機能は動作しない可能性があります!,일부 기능이 작동하지 않을 수 있습니다!
+QuickAccess.warn.oldBlender3,Please update to Blender 3.6!,ブレンダー3.1以上にアップデートしてください!,블렌더 3.1 버전으로 업데이트하세요!
+QuickAccess.warn.noDict1,Dictionary not found!,辞書が見つかりません!,사전파일(Dictionary)을 찾을 수 없습니다!
+QuickAccess.warn.noDict2,"Translations will work, but are not optimized.",翻訳は機能しますが、最適化されません。,번역은 되지만 최적화되지는 않습니다.
+QuickAccess.warn.noDict3,Reinstall Cats to fix this.,これを修正するためにCatsを再インストールします。,이 문제를 해결하려면 Cats를 다시 설치하세요.
+QuickAccess.ImportAnyModel.label,Import Model,モデルのインポート,모델 불러오기
+QuickAccess.JoinMeshes.label,Join all meshes,すべてのメッシュを結合する,모든 메쉬에 합류
+QuickAccess.CombineMats.label,Combine Materials,材料を組み合わせる,재료 결합
+mmdoptions.FixMaterialsButton.label,Fix Materials,固定材料,재료 수정
+FixMaterialsButton.label,Fix Materials,固定材料,재료 수정
+FixMaterialsButton.desc,"This will apply some vrchat related fixes to materials
+
+- You shouldn't use this if your model has already 
+been set up for Unity.
+- Don't use this if your materials go black, though 
+alot of issues has been fixed when it comes to materials
+there maybe some left.","これにより、いくつかの vrchat 関連の修正がマテリアルに適用されます
+
+- モデルにすでに機能がある場合は、これを使用しないでください。
+Unity用にセットアップされています。
+- ただし、素材が黒くなった場合は使用しないでください。
+マテリアルに関して多くの問題が修正されました
+もしかしたら残っているかもしれない","이렇게 하면 일부 vrchat 관련 수정 사항이 자료에 적용됩니다.
+
+- 모델이 이미 사용하고 있는 경우에는 이 방법을 사용하면 안 됩니다.
+Unity용으로 설정되었습니다.
+- 재료가 검게 변하는 경우에는 이것을 사용하지 마십시오.
+재료와 관련된 많은 문제가 수정되었습니다.
+아마 좀 남아있을 거예요."
+
 ModelSettings.label,Fix Model Settings,モデル設定の修正,모델 고치기 설정
 ModelSettings.warn.fbtFix1,The Full Body Tracking Fix,フル ボディトラッキングの修正,풀바디 트래킹 수정
 ModelSettings.warn.fbtFix2,is no longer needed for VRChat.,もはやVrChatのために必要とされていません。,VRChat에 더 이상 필요하지 않음.
-ModelSettings.warn.fbtFix3,It's still available in Model Options.,モデル オプションで引き続き使用できます。.,이것은 모델옵션에서 여전히 이용가능.
+ModelSettings.warn.fbtFix3,It's still available in Legacy Features.,従来の機能では引き続き利用可能です。.,레거시 기능에서는 계속 사용할 수 있습니다.
 cats_twist.tutorial_button.label,Twist Bones Tutotial,,
-ManualPanel.label,Model Options,モデル オプション,모델 옵션
-ManualPanel.separateBy,Separate by:,別に:,메쉬 분리:
-ManualPanel.SeparateByMaterials.label,Materials,材料,매테리얼별로
-ManualPanel.SeparateByLooseParts.label,Loose Parts,緩い部品,느슨한 부분별로
-ManualPanel.SeparateByShapekeys.label,Shapes,図形,쉐이프별로
-ManualPanel.joinMeshes,Join Meshes:,メッシュに参加する:,메쉬 통합:
-ManualPanel.JoinMeshes.label,All,すべて,모두
-ManualPanel.JoinMeshesSelected.label,Selected,選択,선택된 메쉬들
-ManualPanel.mergeWeights,Merge Weights:,ウェイトをマージする:,웨이트 통합:
-ManualPanel.MergeWeights.label,To Parents,親へ,부모 본으로
-ManualPanel.MergeWeightsToActive.label,To Active,アクティブに,활성화된 본으로
-ManualPanel.translate,Translate:,翻訳する:,일본어를 영어로 번역:
-ManualPanel.TranslateAllButton.label,All,すべて,모두
-ManualPanel.TranslateShapekeyButton.label,Shape Keys,シェイプキー,쉐이프키
-ManualPanel.TranslateObjectsButton.label,Objects,オブジェクト,오브젝트
-ManualPanel.TranslateBonesButton.label,Bones,骨,본
-ManualPanel.TranslateMaterialsButton.label,Materials,材料,매테리얼
-ManualPanel.delete,Delete:,削除:,제거:
-ManualPanel.RemoveZeroWeightBones.label,Zero Weight Bones,ゼロウェイト ボーン,제로 웨이트 본
-ManualPanel.RemoveConstraints,Constraints,制約,컨스트레이트
-ManualPanel.RemoveZeroWeightGroups,Zero Weight Vertex Groups,ゼロウェイト頂点グループ,제로 웨이트 버텍스 그룹
-ManualPanel.normals,Normals:,法線:,노말:
-ManualPanel.RecalculateNormals.label,Recalculate,再計算,재계산
-ManualPanel.FlipNormals.label,Flip,フリップ,뒤집기
-ManualPanel.fbtFix,Full Body Tracking Fix:,フル ボディ トラッキングの修正:,풀바디 트래킹 수정:
-ManualPanel.FixFBTButton.label,Add,追加,추가
-ManualPanel.RemoveFBTButton.label,Remove,削除,제거
+OtherOptionsPanel.label,Other Options,モデル オプション,모델 옵션
+OtherOptionsPanel.separateBy,Separate by:,別に:,메쉬 분리:
+OtherOptionsPanel.SeparateByMaterials.label,Materials,材料,매테리얼별로
+OtherOptionsPanel.SeparateByLooseParts.label,Loose Parts,緩い部品,느슨한 부분별로
+OtherOptionsPanel.SeparateByShapekeys.label,Shapes,図形,쉐이프별로
+OtherOptionsPanel.joinMeshes,Join Meshes:,メッシュに参加する:,메쉬 통합:
+OtherOptionsPanel.JoinMeshes.label,All,すべて,모두
+OtherOptionsPanel.JoinMeshesSelected.label,Selected,選択,선택된 메쉬들
+OtherOptionsPanel.mergeWeights,Merge Weights:,ウェイトをマージする:,웨이트 통합:
+OtherOptionsPanel.MergeWeights.label,To Parents,親へ,부모 본으로
+OtherOptionsPanel.MergeWeightsToActive.label,To Active,アクティブに,활성화된 본으로
+OtherOptionsPanel.translate,Translate:,翻訳する:,일본어를 영어로 번역:
+OtherOptionsPanel.TranslateAllButton.label,All,すべて,모두
+OtherOptionsPanel.TranslateShapekeyButton.label,Shape Keys,シェイプキー,쉐이프키
+OtherOptionsPanel.TranslateObjectsButton.label,Objects,オブジェクト,오브젝트
+OtherOptionsPanel.TranslateBonesButton.label,Bones,骨,본
+OtherOptionsPanel.TranslateMaterialsButton.label,Materials,材料,매테리얼
+OtherOptionsPanel.delete,Delete:,削除:,제거:
+OtherOptionsPanel.RemoveZeroWeightBones.label,Zero Weight Bones,ゼロウェイト ボーン,제로 웨이트 본
+OtherOptionsPanel.RemoveConstraints,Constraints,制約,컨스트레이트
+OtherOptionsPanel.RemoveZeroWeightGroups,Zero Weight Vertex Groups,ゼロウェイト頂点グループ,제로 웨이트 버텍스 그룹
+OtherOptionsPanel.normals,Normals:,法線:,노말:
+OtherOptionsPanel.RecalculateNormals.label,Recalculate,再計算,재계산
+OtherOptionsPanel.FlipNormals.label,Flip,フリップ,뒤집기
+OtherOptionsPanel.fbtFix,Full Body Tracking Fix:,フル ボディ トラッキングの修正:,풀바디 트래킹 수정:
+OtherOptionsPanel.FixFBTButton.label,Add,追加,추가
+OtherOptionsPanel.RemoveFBTButton.label,Remove,削除,제거
 CustomPanel.label,Custom Model Creation,カスタム モデルの作成,커스텀 모델 제작
 CustomPanel.mergeArmatures,Merge Armatures:,マージアーマチュア:,뼈대(Armature) 통합:
 CustomPanel.warn.twoArmatures,Two armatures are required!,2つのアーマチュアが必要です!,두개의 뼈대(Armature)가 필요합니다!
@@ -156,17 +180,25 @@ Av3EyeTrackingRotateEyeBones.poll.noBones,No bones,骨がない,뼈가 없다
 Av3EyeTrackingRotateEyeBones.poll.notInCurrentEditMode,"{armature} is not in the current Edit mode, either exit the current Edit mode or open {armature} in Edit mode","{armature} は現在の編集モードではありません。現在の編集モードを終了するか、編集モードで {armature} を開いてください.","{armature}가 현재 편집 모드에 있지 않습니다. 현재 편집 모드를 종료하거나 편집 모드에서 {armature}를 엽니다."
 Av3EyeTrackingRotateEyeBones.info.noChanges,"Eye bones are already rotated for VRChat, no changes were made.","目のボーンは VRChat 用にすでに回転されており、変更は加えられません.","VRChat에서는 눈 뼈가 이미 회전되어 있어 변경 사항이 없습니다."
 Av3EyeTrackingRotateEyeBones.success,Eye bones rotated.,目の骨が回転しました.,눈뼈가 회전했습니다.
-FixLegacy.info1,Fix Model Button has been moved.,「モデルを修正」ボタンが移動されました,모델 수정 버튼이 이동되었습니다
-FixLegacy.info2,to legacy features submenu.,従来の機能のサブメニューへ。,레거시 기능 하위 메뉴로 이동합니다.
+Scene.eye_left.label,Left Eye,左目,왼쪽 눈
+Scene.eye_left.desc,The models left eye bone,,
+Scene.eye_right.label,Right Eye,右目,오른쪽 눈
+Scene.eye_right.desc,The models right eye bone,,
+FixLegacy.info1,Fix Model Button has been removed.,「モデルを修正」ボタンが削除されました。,모델 수정 버튼이 제거되었습니다.
+FixLegacy.info2,please see mmd options for alternatives.,代替案については mmd オプションを参照してください。,대안은 mmd 옵션을 참조하세요.
 LegacyStuff.label,Legacy Features,レガシーなもの,레거시 물건
 LegacyStuff.info1,End of Life features,この領域はサポート終了機能に関するものです,이 영역은 단종 기능을 위한 것입니다.
 LegacyStuff.info2,Might be removed in the future,これらの機能は将来のアップデートで削除される可能性があります,이러한 기능은 향후 업데이트에서 제거될 수 있습니다.
-FixLegacyStuff.info1,Fix model should only be,修正モデルは次のとおりです,수정 모델은 다음과 같아야 합니다
-FixLegacyStuff.info2,used for older MMD models.,古いMMDモデルに使用されます。,구형 MMD 모델에 사용됩니다.
-FixLegacyStuff.info3,You should not be using,使用すべきではありません,당신은 사용해서는 안됩니다
-FixLegacyStuff.info4,this for VRChat models at all!,これは VRChat モデルにとってはまったくのことです。,이것은 VRChat 모델을 위한 것입니다!
-FixLegacyStuff.info5,Use the customs options instead!,代わりにカスタム オプションを使用してください。,대신 세관 옵션을 사용하세요!
-ManualPanel.fbtFix1,Not needed for vrchat anymore!,vrchatにはもう必要ありません,vrchat에는 더 이상 필요하지 않습니다.
+MMDOptions.label,MMD Options,レガシーなもの,레거시 물건
+MMDOptions.info1,Warning:,警告：,경고:
+MMDOptions.info2,This submenu is where the old mmd options,このサブメニューには古い mmd オプションが含まれています,이 하위 메뉴는 이전 mmd 옵션이 있는 곳입니다.
+MMDOptions.info3,"are, these should only be used on newly","つまり、これらは新規にのみ使用する必要があります","즉, 새로 사용해야만 하는 것입니다."
+MMDOptions.info4,imported mmd and vrm models. do not use,mmdとvrmモデルをインポートしました。使ってはいけません,수입된 mmd 및 vrm 모델. 사용하지 마세요
+MMDOptions.info5,these on models already set up for Unity,これらはすでに Unity 用にセットアップされているモデル上にあります,Unity용으로 이미 설정된 모델의 경우
+MMDOptions.info6,and VRChat or it may break your model.,VRChat を使用しないと、モデルが壊れる可能性があります。,VRChat을 사용하지 않으면 모델이 손상될 수 있습니다.
+MMDOptions.FixMaterialinfo1,This will apply some vrchat fixes,これにより、いくつかの vrchat 修正が適用されます,이것은 일부 vrchat 수정 사항을 적용합니다.
+MMDOptions.FixMaterialinfo2,to materials,材料に,재료에.
+OtherOptionsPanel.fbtFix1,Not needed for vrchat anymore!,,
 OptimizePanel.label,Optimization,最適化,최적화
 OptimizePanel.atlasDesc,A greatly improved Atlas Generator.,アトラスジェネレータを大幅に改良。,텍스처들을 결합시켜주는 더욱 향상된 아틀라스 생성기입니다.
 OptimizePanel.atlasAuthor,Made by Shotariya,shotaryiaによって作られた,제작자: Shotariya
@@ -200,14 +232,15 @@ CreditsPanel.desc1,Cats Blender Plugin (,,
 CreditsPanel.desc2,Created by Hotox and GiveMeAllYourCats,HotoxとGiveMeAllYourCatsによって作成,멋진 VRChat 커뮤니티를 위해서
 CreditsPanel.desc3,For the awesome VRChat community <3,素晴らしいVRChatコミュニティのために <3,Hotox와 GiveMeAllYourCats에 의해 제작됨 <3
 CreditsPanel.desc4,Special thanks to:,特別な感謝: ShotariyaとNeitri,다음 분들께 특별한 감사를 전합니다:
-CreditsPanel.descContributors,"Feilen, Jordo, Ruubick, 989onan, triazo,","Feilen、Jordo、Ruubick、989onan、triazo、","Feilen, Jordo, Ruubick, 989onan, triazo,"
+CreditsPanel.descContributors,"Feilen, Jordo, Ruubick, 989onan, triazo, Mysteryem","Feilen、Jordo、Ruubick、989onan、triazo、Mysteryem","Feilen, Jordo, Ruubick, 989onan, triazo, Mysteryem"
 CreditsPanel.descContributors2,"Shotariya and Neitri","ShotariyaとNeitri","Shotariya와 Neitri"
 CreditsPanel.desc5,Unoffical Maintainer - Yusarina,非公式メンテナ - Yusarina,비공식 유지관리자 - Yusarina
 CreditsPanel.desc6,Do you need help or found a bug?,助けが必要ですか、バグを見つけましたか?,도움이 필요하시거나 혹시 버그를 찾으셨나요?
-FixArmature.label,Fix Model,モデル修正,모델 고치기
+FixArmature.label,Fix MMD Model,MMDモデルを修正,MMD 모델 수정
 FixArmature.desc,"WARNING: DO NOT USE THIS UNLESS YOU ARE
-IMPORTING A OLDER MMD MODEL, DO NOT YOU USE 
-THIS FOR VRCHAT MODELS!
+IMPORTING A NEW MMD MODEL, DO NOT USE 
+THIS FOR MODELS ALREADY SET UP FOR 
+UNITY AND VRCHAT!
 
 Automatically:
 - Reparents bones
@@ -215,11 +248,10 @@ Automatically:
 - Translates and renames bones & objects
 - Merges weight paints
 - Corrects the hips
-- Joins meshes
-- Converts morphs into shapes
-- Corrects shading","「警告: そうでない場合はこれを使用しないでください
-古い MMD モデルをインポートしています。使用しないでください
-VRCHATモデルの場合はこちら！
+- Converts morphs into shapes","警告: そうでない場合はこれを使用しないでください。
+新しい MMD モデルをインポートしています。使用しないでください
+すでにセットアップされているモデルの場合はこちら
+ユニティとVRCHAT！
 
 自動的に：
 - 親の骨
@@ -227,21 +259,18 @@ VRCHATモデルの場合はこちら！
 - ボーンとオブジェクトの翻訳と名前変更
 - ウェイトペイントをマージします
 - ヒップを補正します
-- メッシュを結合します
-- モーフをシェイプに変換します
-- シェーディングを修正します」","警告: そうでない場合はこれを使用しないでください。
-古い MMD モデルをインポートしています。使用しないでください
-VRCHATモデルの場合はこちら！
+- モーフをシェイプに変換します","경고: 귀하가 아닌 이상 이것을 사용하지 마십시오
+새로운 MMD 모델 가져오기, 사용하지 마세요
+이미 설정된 모델에 대한 내용입니다.
+유니티와 VRCHAT!
 
-자동으로 아래의 항목들이 고쳐집니다:
-- 본들의 부모 재설정
-- 필요하지 않는 본들, 오브젝트들, 그룹들과 컨스트레인트들을 제거
-- 본들과 오브젝트들을 영어로 번역하고 이름들을 바꿈
-- 웨이트 페인트들을 통합
-- 'hips'본을 고침
-- 메쉬 통합
-- morphs를 shapes로 변환
-- 쉐이딩을 고침"
+자동으로:
+- 부모 뼈
+- 불필요한 뼈, 개체, 그룹 및 제약 조건을 제거합니다.
+- 뼈와 물체를 번역하고 이름을 바꿉니다.
+- 웨이트 페인트 병합
+- 엉덩이를 바로잡는다
+- 모프를 모양으로 변환합니다."
 FixArmature.error.noMesh,"No mesh inside the armature found!
 If there are meshes outside of the armature,
 set the armature as the parent of the meshes.",,"뼈대(Armature) 안에 메쉬가 없습니다!
@@ -509,6 +538,9 @@ HelpButton.success,Github wiki opened.,,
 LegacyReadButton.label,Legacy features wiki,従来の機能の Wiki,레거시 기능 위키
 LegacyReadButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Legacy-Features,,
 LegacyReadButton.success,Github wiki opened.,,
+MMDOptionswiki.label,MMD Options Wiki,従来の機能の Wiki,레거시 기능 위키
+MMDOptionswiki.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Legacy-Features,,
+MMDOptionswiki.success,Github wiki opened.,,
 PatchnotesButton.label,Latest Patchnotes,最新のパッチノート,최신 패치노트
 PatchnotesButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases,,
 PatchnotesButton.success,Patchnotes opened.,,
@@ -539,55 +571,22 @@ decimate.disableFingers,or disable 'Save Fingers'.,,
 decimate.noDecimationNeeded,The model already has less than {number} tris. Nothing had to be decimated.,,
 decimate.cantDecimate1,The model could not be decimated to {number} tris.,,
 decimate.cantDecimate2,It got decimated as much as possible within the limits.,,
-CreateEyesButton.label,Create Eye Tracking,アイトラッキングを作成する,눈 추적(Eye Tracking) 생성
-CreateEyesButton.desc,"This will let you track someone when they come close to you and it enables blinking.
-You should do decimation before this operation.
-Test the resulting eye movement in the 'Testing' tab.",,"누군가가 가까이 왔을 때 그 사람을 추적 할 수 있고 눈 깜박임을 가능하게합니다.
-데시메이션이 필요하다면 이 작업 이전에 해야합니다.
-눈 움직임을 'Testing' 탭에서 테스트하세요."
-CreateEyesButton.error.noShapeSelected,"You have no shape keys selected.
-Please choose a mesh containing shape keys or check ""Disable Eye Blinking"".",,"선택된 쉐이프키가 없습니다.
-쉐이프키가 포함 된 메쉬를 선택하거나 ""눈 깜빡임 비활성화""에 체크하세요."
-CreateEyesButton.error.missingBone,"The bone ""{bone}"" does not exist.",,
-CreateEyesButton.error.noVertex,"The bone ""{bone}"" has no existing vertex group or no vertices assigned to it.
-This might be because you selected the wrong mesh or the wrong bone.
-Also make sure that the selected eye bones actually move the eyes in pose mode.",,
-CreateEyesButton.error.dontUse,"Please do not use ""{eyeName}"" as the input bone.
-If you are sure that you want to use that bone please rename it to ""{eyeNameShort}"".",,
-CreateEyesButton.error.hierarchy,"Eye tracking will not work unless the bone hierarchy is exactly as following: Hips > Spine > Chest > Neck > Head
-Furthermore the mesh containing the eyes has to be called ""Body"" and the armature ""Armature"".",,
-CreateEyesButton.success,Created eye tracking!,,
-StartTestingButton.label,Start Eye Testing,スタートアイテスト,눈 움직임 테스트 시작
-StartTestingButton.desc,"This will let you test how the eye movement will look ingame.
-Don't forget to stop the Testing process afterwards.
-Bones ""LeftEye"" and ""RightEye"" are required.",,
-StopTestingButton.label,Stop Eye Testing,ストップアイテスト,눈 움직임 테스트 중지
-StopTestingButton.desc,Stops the testing process.,,
-StopTestingButton.error.tryAgain,Something went wrong. Please try eye testing again.,,
-ResetRotationButton.label,Reset Rotation,回転をリセットする,회전 초기화
-ResetRotationButton.desc,This resets the eye positions.,,
-AdjustEyesButton.label,Set Range,目の範囲を設定,범위 설정
-AdjustEyesButton.desc,"Lets you re-adjust the movement range of the eyes.
-This gets saved",,
-AdjustEyesButton.error.noVertex,"The bone ""{bone}"" has no existing vertex group or no vertices assigned to it.
-This might be because you selected the wrong mesh or the wrong bone.
-Also make sure to join your meshes before creating eye tracking and make sure that the eye bones actually move the eyes in pose mode.",,
-StartIrisHeightButton.label,Start Iris Height Adjustment,アイリスの高さの調整を開始,눈동자 높이 조정 시작
-StartIrisHeightButton.desc,"Lets you readjust the distance of the iris from the eye ball.
-Use this to fix clipping of the iris into the eye ball.
-This gets saved.",,
-TestBlinking.label,Test,テスト,테스트
-TestBlinking.desc,This lets you see how eye blinking will look in-game.,,게임 중에 눈 깜박임이 어떻게 보이는 지 확인할 수 있습니다.
-TestLowerlid.label,Test,テスト,테스트
-TestLowerlid.desc,This lets you see how lowerlids will look in-game.,,게임 중에 아래 눈꺼풀이 어떻게 보이는 지 확인할 수 있습니다.
-ResetBlinkTest.label,Reset Shapes,図形をリセットする,쉐이프 초기화
-ResetBlinkTest.desc,This resets the blink testing.,,눈깜빡임 테스트를 초기화한다.
 ImportAnyModel.label,Import Any Model,任意のモデルをインポート,아무 모델 불러오기
 ImportAnyModel.importantInfo.label,IMPORTANT INFO (hover here),重要な情報(ここにホバー),
 ImportAnyModel.importantInfo.desc,"If you want to modify the import settings, use the button next to the Import button.
 
 ",,
 ImportAnyModel.error.emptyZip,The selected zip file contains no importable models.,,
+ImportAnyModel.desc2.8,"Import a model of any supported type.
+
+Supported types:
+- MMD: .pmx/.pmd
+- XNALara: .xps/.mesh/.ascii
+- Source: .smd/.qc/.vta/.dmx
+- VRM: .vrm
+- FBX: .fbx
+- DAE: .dae 
+- ZIP: .zip",,
 DecimationLegacy.info1,Decimation will be made a legacy,デシメーションは遺産となるだろう,학살은 유산이 될 것입니다
 DecimationLegacy.info2,Compoment Soon we recomend using,すぐに使用することをお勧めします,곧 우리는 다음을 사용하는 것이 좋습니다
 DecimationLegacy.info3,Tuxedo instead!,代わりにタキシード！,대신 턱시도!
@@ -719,14 +718,6 @@ ShapeKeyApplier.error.recursiveRelativeToLoop,"Shapekey ""{name}"" is recursivel
 ShapeKeyApplier.successRemoved,"Successfully removed shapekey ""{name}"" from the Basis.",,
 ShapeKeyApplier.successSet,"Successfully applied shapekey ""{name}"" to the Basis.",,
 addToShapekeyMenu.ShapeKeyApplier.label,Apply Selected Shapekey to Basis,選択したシェイプキーをBasisに適用,선택된 쉐이프키를 Basis에 적용
-PatreonButton.label,Become a Patron,パトロンになる,후원하기
-PatreonButton.URL,https://www.patreon.com/catsblenderplugin,,
-PatreonButton.success,Patreon page opened.,,
-ReloadButton.label,Reload List,リストを再読み込み,목록 새로고침
-ReloadButton.desc,Reloads the supporter list,,후원자 목록을 다시 불러옵니다
-DynamicPatronButton.label,Supporter Name,サポーター名,후원자 이름
-DynamicPatronButton.desc,This is an awesome supporter,,이것은 멋진 후원자입니다!
-register_dynamic_buttons.desc,{name} is an awesome supporter,,{name}는 멋진 후원자입니다!
 TranslateShapekeyButton.label,Translate Shape Keys,シェイプキーを翻訳する,쉐이프키 이름 번역
 TranslateShapekeyButton.desc,Translates all shape keys using the internal dictionary and Google Translate into English,Translates all shape keys using the internal dictionary and Google Translate,모든 쉐이프키들을 내장된 사전과 구글번역을 이용해 영어로 번역합니다.
 TranslateShapekeyButton.success,Translated {number} shape keys.,,{number}개의 쉐이프키들이 번역되었습니다.
@@ -903,14 +894,6 @@ Scene.merge_armatures_cleanup_shape_keys.desc,"Cleans up the meshes shape keys.
 Uncheck this if shape keys you want to keep got deleted",,
 Scene.decimation_mode.label,Decimation Mode,単純化モード,
 Scene.decimation_mode.desc,Decimation Mode,,
-Scene.decimation_mode.smart.label,Smart,スマート,
-Scene.decimation_mode.smart.desc,"Best results - repair shape keys after decimation
-
-This will decimate your whole model and attempt to undo the warping caused by Blender's decimation.
-This will give the best results and keep blinking and lip syncing, but may have issues on some models.",,"최고의 결과 - 데시메이션 이후 쉐이프키들을 복구함
-
-This will decimate your whole model and attempt to undo the warping caused by Blender's decimation.
-This will give the best results and keep blinking and lip syncing, but may have issues on some models."
 Scene.decimation_mode.safe.label,Safe,安全,안전
 Scene.decimation_mode.safe.desc,"Decent results - no shape key loss
 
@@ -1008,56 +991,8 @@ Scene.decimation_retain_separated_meshes.label,Retain Separated Meshes,,
 Scene.decimation_retain_separated_meshes.desc,Experimental option. Keep existing meshes as separate objects throughout decimation,,
 Scene.max_tris.label,Tris,トリス,삼각폴리곤(Tris)
 Scene.max_tris.desc,The target amount of tris after decimation,,
-Scene.eye_mode.label,Eye Mode,アイモード,
-Scene.eye_mode.desc,Mode,,
-Scene.eye_mode.creation.label,Creation,創作,생성
-Scene.eye_mode.creation.desc,Here you can create eye tracking.,,
-Scene.eye_mode.testing.label,Testing,テスティング,테스트
-Scene.eye_mode.testing.desc,Here you can test how eye tracking will look in-game.,,
-Scene.mesh_name_eye.label,Mesh,メッシュ,메쉬
-Scene.mesh_name_eye.desc,The mesh with the eyes vertex groups,,
 Scene.head.label,Head,頭,머리
 Scene.head.desc,The head bone containing the eye bones,,
-Scene.eye_left.label,Left Eye,左目,왼쪽 눈
-Scene.eye_left.desc,The models left eye bone,,
-Scene.eye_right.label,Right Eye,右目,오른쪽 눈
-Scene.eye_right.desc,The models right eye bone,,
-Scene.wink_left.label,Blink Left,左点滅,왼쪽 깜빡임
-Scene.wink_left.desc,The shape key containing a blink with the left eye,,
-Scene.wink_right.label,Blink Right,右点滅,오른쪽 깜빡임
-Scene.wink_right.desc,The shape key containing a blink with the right eye,,
-Scene.lowerlid_left.label,Lowerlid Left,下まぶた左,왼쪽 아래 눈꺼풀
-Scene.lowerlid_left.desc,"The shape key containing a slightly raised left lower lid.
-Can be set to ""Basis"" to disable lower lid movement",,
-Scene.lowerlid_right.label,Lowerlid Right,下まぶた右,오른쪽 아래 눈꺼풀
-Scene.lowerlid_right.desc,"The shape key containing a slightly raised right lower lid.
-Can be set to ""Basis"" to disable lower lid movement",,
-Scene.disable_eye_movement.label,Disable Eye Movement,目の動きを無効にする,눈 움직임 비활성화
-Scene.disable_eye_movement.desc,"IMPORTANT: Do your decimation first if you check this!
-
-Disables eye movement. Useful if you only want blinking.
-This creates eye bones with no movement bound to them.
-You still have to assign ""LeftEye"" and ""RightEye"" to the eyes in Unity",,
-Scene.disable_eye_blinking.label,Disable Eye Blinking,瞬きを無効にする,눈 깜빡임 비활성화
-Scene.disable_eye_blinking.desc,"Disables eye blinking. Useful if you only want eye movement.
-This will create the necessary shape keys but leaves them empty",,
-Scene.eye_distance.label,Eye Movement Range,眼球運動範囲,눈 움직임 범위
-Scene.eye_distance.desc,"Higher = more eye movement
-Lower = less eye movement
-Warning: Too little or too much range can glitch the eyes.
-Test your results in the ""Eye Testing""-Tab!
-",,
-Scene.eye_rotation_x.label,Up - Down,上 - 下,위 - 아래
-Scene.eye_rotation_x.desc,Rotate the eye bones on the vertical axis,,
-Scene.eye_rotation_y.label,Left - Right,左 - 右,왼쪽 - 오른쪽
-Scene.eye_rotation_y.desc,"Rotate the eye bones on the horizontal axis.
-This is from your own point of view",,
-Scene.iris_height.label,Iris Height,アイリスの高さ,눈동자 높이
-Scene.iris_height.desc,Moves the iris away from the eye ball,,
-Scene.eye_blink_shape.label,Blink Strength,まばたきの強さ,깜빡임 강도
-Scene.eye_blink_shape.desc,Test the blinking of the eye,,
-Scene.eye_lowerlid_shape.label,Lowerlid Strength,下まぶたの強さ,아래 눈꺼풀 강도
-Scene.eye_lowerlid_shape.desc,Test the lowerlid blinking of the eye,,
 Scene.mesh_name_viseme.label,Mesh,メッシュ,메쉬
 Scene.mesh_name_viseme.desc,The mesh with the mouth shape keys,,
 Scene.mouth_a.label,Viseme AA,バイセム AA,발음 아(AA)
@@ -1077,10 +1012,10 @@ Scene.optimize_mode.label,Optimize Mode,最適化モード,최적화 모드
 Scene.optimize_mode.desc,Mode,,
 Scene.optimize_mode.atlas.label,Atlas,アトラス,
 Scene.optimize_mode.atlas.desc,Allows you to make a texture atlas.,,
-Scene.optimize_mode.material.label,Material,マテリアル,매테리얼
-Scene.optimize_mode.material.desc,Some various options on material manipulation.,,
-Scene.optimize_mode.bonemerging.label,Bone Merging,骨のマージ,본 통합
-Scene.optimize_mode.bonemerging.desc,Allows child bones to be merged into their parents.,,
+Scene.optimize_mode.material.label,Material And Meshes,マテリアル,매테리얼
+Scene.optimize_mode.material.desc,Some various options on material and mesh manipulation.,,
+Scene.optimize_mode.bonemerging.label,Bones,骨のマージ,본 통합
+Scene.optimize_mode.bonemerging.desc,Options for Bones.,,
 Scene.merge_ratio.label,Merge Ratio,マージ率,통합 비율
 Scene.merge_ratio.desc,"Higher = more bones will be merged
 Lower = less bones will be merged

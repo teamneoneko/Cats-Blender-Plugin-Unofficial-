@@ -1,4 +1,4 @@
-# GPL License
+# MIT License
 
 bl_info = {
     'name': 'Cats Blender Plugin',
@@ -12,7 +12,7 @@ bl_info = {
     'tracker_url': 'https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/issues',
     'warning': '',
 }
-dev_branch = False
+dev_branch = True
 
 import os
 import sys
@@ -183,6 +183,11 @@ def check_unsupported_blender_versions():
         unregister()
         sys.tracebacklimit = 0
         raise ImportError(t('Main.error.29unsupportedVersion'))
+     
+    # Don't allow 4.0+
+    if bpy.app.version >= (4, 0):
+        sys.tracebacklimit = 0
+        raise ImportError(t('Main.error.40unsupportedVersion'))
 
 def set_cats_version_string():
     version = bl_info.get('version')
@@ -274,10 +279,8 @@ def register():
     # Register Scene types
     extentions.register()
     
-    # Load supporter and settings icons and buttons
-    tools.supporter.load_other_icons()
-    tools.supporter.load_supporters()
-    tools.supporter.register_dynamic_buttons()
+    # Load Icon Loader and settings icons and buttons
+    tools.iconloader.load_other_icons()
 
     # Load the dictionaries and check if they are found.
     globs.dict_found = tools.translate.load_translations()
@@ -354,8 +357,7 @@ def unregister():
     print('Unregistered', count, 'CATS classes.')
 
     # Unregister all dynamic buttons and icons
-    tools.supporter.unregister_dynamic_buttons()
-    tools.supporter.unload_icons()
+    tools.iconloader.unload_icons()
 
     # Remove shapekey button from shapekey menu
     try:

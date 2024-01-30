@@ -1,4 +1,4 @@
-# GPL License
+# MIT License
 
 import bpy
 from . import common as Common

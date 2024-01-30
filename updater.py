@@ -1,4 +1,4 @@
-# GPL License
+# MIT License
 
 import os
 import ssl
@@ -50,9 +50,6 @@ for mod in addon_utils.modules():
 
 # Icons for UI
 ICON_URL = 'URL'
-if bpy.app.version < (2, 79, 9):
-    ICON_URL = 'LOAD_FACTORY'
-
 
 class CheckForUpdateButton(bpy.types.Operator):
     bl_idname = 'cats_updater.check_for_update'
