@@ -1,10 +1,10 @@
-# GPL License
+# MIT License
 
 import bpy
 
 from .. import globs
 from .main import ToolPanel
-from ..tools import supporter as Supporter
+from ..tools import iconloader as Iconloader
 from ..tools import credits as Credits
 from ..tools.register import register_wrap
 from ..tools.translations import t
@@ -21,7 +21,7 @@ class CreditsPanel(ToolPanel, bpy.types.Panel):
         col = box.column(align=True)
         row = col.row(align=True)
 
-        row.label(text=t('CreditsPanel.desc1') + globs.version_str + ')', icon_value=Supporter.preview_collections["custom_icons"]["cats1"].icon_id)
+        row.label(text=t('CreditsPanel.desc1') + globs.version_str + ')', icon_value=Iconloader.preview_collections["custom_icons"]["cats1"].icon_id)
         col.separator()
         row = col.row(align=True)
         row.label(text=t('CreditsPanel.desc2'))
@@ -43,6 +43,6 @@ class CreditsPanel(ToolPanel, bpy.types.Panel):
 
         row = col.row(align=True)
         row.scale_y = 1.4
-        row.operator(Credits.HelpButton.bl_idname, icon_value=Supporter.preview_collections["custom_icons"]["help1"].icon_id)
+        row.operator(Credits.HelpButton.bl_idname, icon_value=Iconloader.preview_collections["custom_icons"]["help1"].icon_id)
         row = col.row(align=True)
         row.operator(Credits.PatchnotesButton.bl_idname, icon='WORDWRAP_ON')

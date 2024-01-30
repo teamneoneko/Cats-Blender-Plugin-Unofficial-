@@ -1,4 +1,4 @@
-# GPL License
+# MIT License
 
 from ..tools.translations import t
 

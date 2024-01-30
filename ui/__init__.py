@@ -1,12 +1,14 @@
-# GPL License
+# MIT License
 
 if "bpy" not in locals():
     # print('STARTUP UI!!')
     import bpy
     from . import main
-    from . import armature
-    from . import manual
+    from . import quickaccess
+    from . import optimization
     from . import custom
+    from . import mmdoptions
+    from . import otheroptions
     from . import decimation
     from . import visemes
     from . import bone_root
@@ -14,23 +16,22 @@ if "bpy" not in locals():
     from . import scale
     from . import eye_tracking
     from . import legacy
-    from . import copy_protection
     from . import settings_updates
     from . import credits
 else:
     # print('RELOAD UI!!')
     import importlib
     importlib.reload(main)
-    importlib.reload(armature)
-    importlib.reload(manual)
+    importlib.reload(quickaccess)
+    importlib.reload(optimization)
     importlib.reload(custom)
+    importlib.reload(mmdoptions)
+    importlib.reload(otheroptions)
     importlib.reload(decimation)
     importlib.reload(visemes)
     importlib.reload(bone_root)
-    importlib.reload(optimization)
     importlib.reload(scale)
     importlib.reload(eye_tracking)
     importlib.reload(legacy)
-    importlib.reload(copy_protection)
     importlib.reload(settings_updates)
     importlib.reload(credits)

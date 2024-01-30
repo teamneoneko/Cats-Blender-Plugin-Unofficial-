@@ -1,4 +1,4 @@
-# GPL License
+# MIT License
 
 import bpy
 import operator
@@ -518,6 +518,9 @@ class JoinMeshes(bpy.types.Operator):
         return meshes and len(meshes) > 0
 
     def execute(self, context):
+        # Apply transforms of this model
+        Common.apply_transforms()
+        
         saved_data = Common.SavedData()
         mesh = Common.join_meshes()
         if not mesh:
@@ -528,6 +531,16 @@ class JoinMeshes(bpy.types.Operator):
         saved_data.load()
         Common.unselect_all()
         Common.set_active(mesh)
+        
+        for i in range(0, 3):
+            mesh.lock_location[i] = False
+            mesh.lock_rotation[i] = False
+            mesh.lock_scale[i] = False
+
+        # Set layer of mesh to 0
+        if hasattr(mesh, 'layers'):
+            mesh.layers[0] = True
+            
         self.report({'INFO'}, t('JoinMeshes.success'))
         return {'FINISHED'}
 
@@ -562,6 +575,15 @@ class JoinMeshesSelected(bpy.types.Operator):
         Common.unselect_all()
         Common.set_active(mesh)
         self.report({'INFO'}, t('JoinMeshesSelected.success'))
+        
+        for i in range(0, 3):
+            mesh.lock_location[i] = False
+            mesh.lock_rotation[i] = False
+            mesh.lock_scale[i] = False
+
+        # Set layer of mesh to 0
+        if hasattr(mesh, 'layers'):
+            mesh.layers[0] = True
         return {'FINISHED'}
 
 
