@@ -1,4 +1,4 @@
-# GPL License
+# MIT License
 
 import bpy
 import webbrowser
@@ -7,7 +7,7 @@ from .. import globs
 from .main import ToolPanel
 from .main import layout_split
 from ..tools import common as Common
-from ..tools import supporter as Supporter
+from ..tools import iconloader as Iconloader
 from ..tools import decimation as Decimation
 from ..tools import armature_manual as Armature_manual
 from ..tools.register import register_wrap
@@ -65,7 +65,7 @@ class DecimationPanel(ToolPanel, bpy.types.Panel):
         col.separator()       
         row = col.row(align=True)
         row.scale_y = 1.5
-        row.operator(LegacyDecimationButton.bl_idname, icon_value=Supporter.preview_collections['custom_icons']['help1'].icon_id)
+        row.operator(LegacyDecimationButton.bl_idname, icon_value=Iconloader.preview_collections['custom_icons']['help1'].icon_id)
         col.separator()
         col.separator() 
         row = col.row(align=True)
@@ -176,7 +176,7 @@ class DecimationPanel(ToolPanel, bpy.types.Panel):
         col.separator()       
         row = col.row(align=True)
         row.scale_y = 1.5
-        row.operator(DecimationHelpButton.bl_idname, icon_value=Supporter.preview_collections['custom_icons']['help1'].icon_id)
+        row.operator(DecimationHelpButton.bl_idname, icon_value=Iconloader.preview_collections['custom_icons']['help1'].icon_id)
         col.separator()
 
 @register_wrap
