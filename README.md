@@ -5,18 +5,15 @@ The non official version of Cats Blender Plugin which is maintained by Yusarina,
 #### Warning, Cats has changed UI wise, please [click here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Features) to see the new UI features.
 #### If your plugin is trying to update to a blender 4.0 version or is stuck in a update loop please ensure you using the latest version of the plugin for you blender version from the releases tab [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases).
 
-If you are using blender 3.6 please use the latest release [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases). Blender 3.6 is the current recomended blender version to use!  
+You can find both 3.6 and 4.0 blender releases [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases), ensure you are using the one for your blender version!  
 
 You can find the development version for Blender 3.6 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-36-dev).
+You can find the development version for Blender 4.0 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-40-dev).
 
 ### Warning for Blender 4.0 users:
 Though we have updated cats to blender 4.0, please note there are still some issues with MMD Tools which may break some plugin functionality, this is not a cats issue so please redirect those issues to MMD Tools. Blender 4.0 is not our priority and will be behind the blender 3.6 version. We HIGHLY recommend using blender 3.6 for the time being unless you REALLY need the new features in 4.0, which if your just making VRChat models or doing MMD stuff you most likely don't.
 
 Blender 4.0 is also buggy and does have issues as well, we won't be recommending use of blender 4.x unto the first LTS comes out later this year.
-
-However if you must use blender 4.0 you can download it from this branch [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-40).
-
-You can find the development version for Blender 4.0 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-40-dev).
 
 With Cats it takes only a few minutes to upload your model into VRChat.
 All the hours long processes of fixing your models are compressed into a few functions!
