@@ -73,7 +73,7 @@ class MMDOptions(ToolPanel, bpy.types.Panel):
         
 @register_wrap
 class MMDOptionswiki(bpy.types.Operator):
-    bl_idname = 'legacy_read.help'
+    bl_idname = 'mmdoptionwiki_read.help'
     bl_label = t('MMDOptionswiki.label')
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
