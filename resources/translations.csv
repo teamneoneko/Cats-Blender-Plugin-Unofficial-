@@ -539,7 +539,7 @@ LegacyReadButton.label,Legacy features wiki,従来の機能の Wiki,레거시 �
 LegacyReadButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Legacy-Features,,
 LegacyReadButton.success,Github wiki opened.,,
 MMDOptionswiki.label,MMD Options Wiki,従来の機能の Wiki,레거시 기능 위키
-MMDOptionswiki.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Legacy-Features,,
+MMDOptionswiki.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Features#mmd-options,,
 MMDOptionswiki.success,Github wiki opened.,,
 PatchnotesButton.label,Latest Patchnotes,最新のパッチノート,최신 패치노트
 PatchnotesButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases,,
