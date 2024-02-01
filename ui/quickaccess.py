@@ -140,7 +140,7 @@ class QuickAccessPanel(ToolPanel, bpy.types.Panel):
             row.alignment = 'RIGHT'
             row.scale_y = 1.1
             row.operator(Armature_manual.StopPoseModeNoReset.bl_idname, text='', icon=globs.ICON_POSE_MODE)
-            if not Eyetracking.eye_left:
+            if armature_obj or armature_obj.mode != 'POSE':
                 row = col.row(align=True)
                 row.scale_y = 0.9
                 row.operator(Armature_manual.PoseToShape.bl_idname, icon='SHAPEKEY_DATA')
