@@ -685,14 +685,19 @@ def get_meshes_objects(armature_name=None, mode=0, check=True, visible_only=Fals
             armature_name = armature.name
 
     meshes = []
+    
     for ob in get_objects():
-        if ob.type == 'MESH':
-            if mode == 0 or mode == 5:
-                if ob.parent:
-                    if ob.parent.type == 'ARMATURE' and ob.parent.name == armature_name:
-                        meshes.append(ob)
-                    elif ob.parent.parent and ob.parent.parent.type == 'ARMATURE' and ob.parent.parent.name == armature_name:
-                        meshes.append(ob)
+        if ob is None:
+                continue
+        if ob.type != 'MESH':
+                continue
+
+        if mode == 0 or mode == 5: 
+            if ob.parent:
+                if ob.parent.type == 'ARMATURE' and ob.parent.name == armature_name:
+                    meshes.append(ob)
+                elif ob.parent.parent and ob.parent.parent.type == 'ARMATURE' and ob.parent.parent.name == armature_name:
+                    meshes.append(ob)
 
             elif mode == 1:
                 if not ob.parent:
