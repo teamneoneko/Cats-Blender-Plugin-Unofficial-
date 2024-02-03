@@ -1,4 +1,4 @@
-# Cats Blender Plugin Blender 3.6 Dev.
+# Cats Blender Plugin Blender 3.6 Main.
 
 ### This is the Development version for blender 3.6 only! this version could be unstable or have issues, please use an released version if you encounter issues.
 
