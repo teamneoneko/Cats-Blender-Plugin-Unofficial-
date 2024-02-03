@@ -1941,6 +1941,17 @@ def bake_mmd_colors(node_base_tex: ShaderNodeTexImage, node_mmd_shader: ShaderNo
         baked_image.file_format = 'PNG'
         # Set the colorspace to match the original image
         baked_image.colorspace_settings.name = base_tex_image.colorspace_settings.name
+        
+        expected_len = baked_image.size[0] * baked_image.size[1] * 4
+
+        pixels = np.empty(np.prod(base_tex_image.size) * 4, dtype=np.single)
+        base_tex_image.pixels.foreach_get(pixels)
+
+        # Resize pixels to expected length
+        pixels.resize(expected_len) 
+
+        print(f"Pixels length: {len(pixels)}, Expected: {expected_len}")
+        
         # Replace the existing image in the node with the new, baked image
         node_base_tex.image = baked_image
 

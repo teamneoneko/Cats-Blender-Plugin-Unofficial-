@@ -285,7 +285,9 @@ class FixMaterialsButton(bpy.types.Operator):
                 mat_slot.material.blend_method = "HASHED"
         
         materials = set() 
-        return materials
+        
+        self.report({'INFO'}, "Fixed materials")
+        return {'FINISHED'} 
 
 @register_wrap
 class ConvertAllToPngButton(bpy.types.Operator):
