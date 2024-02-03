@@ -24,6 +24,8 @@ All the hours long processes of fixing your models are compressed into a few fun
 - See my github: https://github.com/Yusarina
 - See all my social media sites here: https://yusarina.xyz
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R1SDNNP)
+
 ## Blender version support policies.
 Please [Click Here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Blender-Version-Support-Policies) to view which versions of blender we support.
 
