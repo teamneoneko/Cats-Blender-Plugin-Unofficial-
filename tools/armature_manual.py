@@ -1246,24 +1246,25 @@ class OptimizeStaticShapekeys(bpy.types.Operator):
 
         if len([obj for obj in objs if obj.type == 'MESH']) > 1:
             self.report({'ERROR'}, "Meshes must first be combined for this to be beneficial.")
-
+            
         for mesh in objs:
             if mesh.type == 'MESH' and mesh.data.shape_keys is not None:
                 context.view_layer.objects.active = mesh
 
-                # Ensure auto-smooth is enabled, set custom normals from faces
-                if not mesh.data.use_auto_smooth:
-                    mesh.data.use_auto_smooth = True
-                    mesh.data.auto_smooth_angle = 3.1416
-                # TODO: if autosmooth is already enabled, set sharp from edges?
-
-                if not mesh.data.has_custom_normals:
-                    bpy.ops.object.mode_set(mode = 'EDIT')
+                # Ensure corner normals exist
+                if not mesh.data.corner_normals:
+                    bpy.ops.object.mode_set(mode='EDIT')
                     bpy.ops.mesh.select_mode(type="VERT")
-                    bpy.ops.mesh.select_all(action = 'SELECT')
-                    # TODO: un-smooth objects aren't handled correctly. A workaround is to run 'split
-                    # normals' on all un-smooth objects before baking
+                    bpy.ops.mesh.select_all(action='SELECT')
                     bpy.ops.mesh.set_normals_from_faces(keep_sharp=True)
+
+                        # Set custom normals from corner normals
+                    normal_list = []
+                    for corner_normal in mesh.data.corner_normals:
+                        normal_list.append(corner_normal.normal)
+            
+                        mesh.data.normals_split_custom_set(normal_list)
+                        mesh.data.update()
 
                 # Separate non-animating
                 bpy.ops.object.mode_set(mode = 'EDIT')
