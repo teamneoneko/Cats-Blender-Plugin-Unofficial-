@@ -685,14 +685,19 @@ def get_meshes_objects(armature_name=None, mode=0, check=True, visible_only=Fals
             armature_name = armature.name
 
     meshes = []
+    
     for ob in get_objects():
-        if ob.type == 'MESH':
-            if mode == 0 or mode == 5:
-                if ob.parent:
-                    if ob.parent.type == 'ARMATURE' and ob.parent.name == armature_name:
-                        meshes.append(ob)
-                    elif ob.parent.parent and ob.parent.parent.type == 'ARMATURE' and ob.parent.parent.name == armature_name:
-                        meshes.append(ob)
+        if ob is None:
+                continue
+        if ob.type != 'MESH':
+                continue
+
+        if mode == 0 or mode == 5: 
+            if ob.parent:
+                if ob.parent.type == 'ARMATURE' and ob.parent.name == armature_name:
+                    meshes.append(ob)
+                elif ob.parent.parent and ob.parent.parent.type == 'ARMATURE' and ob.parent.parent.name == armature_name:
+                    meshes.append(ob)
 
             elif mode == 1:
                 if not ob.parent:
@@ -1936,6 +1941,17 @@ def bake_mmd_colors(node_base_tex: ShaderNodeTexImage, node_mmd_shader: ShaderNo
         baked_image.file_format = 'PNG'
         # Set the colorspace to match the original image
         baked_image.colorspace_settings.name = base_tex_image.colorspace_settings.name
+        
+        expected_len = baked_image.size[0] * baked_image.size[1] * 4
+
+        pixels = np.empty(np.prod(base_tex_image.size) * 4, dtype=np.single)
+        base_tex_image.pixels.foreach_get(pixels)
+
+        # Resize pixels to expected length
+        pixels.resize(expected_len) 
+
+        print(f"Pixels length: {len(pixels)}, Expected: {expected_len}")
+        
         # Replace the existing image in the node with the new, baked image
         node_base_tex.image = baked_image
 
