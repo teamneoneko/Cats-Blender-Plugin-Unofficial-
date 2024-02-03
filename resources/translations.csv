@@ -63,9 +63,12 @@ Blender를 다시 시작하고 Cats Plugin를 다시 활성화하세요!
 ToolPanel.label,Cats Blender Plugin,Cats ブレンダープラグイン,
 ToolPanel.category,CATS,,
 QuickAccess.label,Quick Access,迅速なアクセス,빠른 접근
-QuickAccess.warn.newBlender1,Potentially unsupported Blender version detected!
-QuickAccess.warn.newBlender2,Some features might not work, CATS currently 
-QuickAccess.warn.newBlender3,supports up to Blender 4.0 see github for the 4.0 one.
+QuickAccess.warn.newBlender1,Potentially unsupported Blender version detected!,サポートされていない可能性のある Blender バージョンが検出されました,잠재적으로 지원되지 않는 Blender 버전이 감지되었습니다!
+QuickAccess.warn.newBlender2,Some features might not work CATS currently,現在 CATS では一部の機能が動作しない可能性があります,일부 기능은 현재 CATS에서 작동하지 않을 수 있습니다.
+QuickAccess.warn.newBlender3,supports up to Blender 4.1 see github for the 4.1 one.,4.1 버전까지 지원합니다. github에서 4.1 버전을 다운로드할 수 있습니다.,Blender 4.1까지 지원 4.1에 대해서는 github 참조
+QuickAccess.warn.newBlender1,Blender 4.1 Aplha or Beta version detected!,Blender 4.1 Aplha or Beta バージョンが検出されました,Blender 4.1 알파 또는 베타 버전이 감지되었습니다!
+QuickAccess.warn.newBlender2,Some features might not work CATS currently,現在 CATS では一部の機能が動作しない可能性があります,일부 기능은 현재 CATS에서 작동하지 않을 수 있습니다.
+QuickAccess.warn.newBlender3,If you have issues please downgrade to 4.0.,4.0 버전으로 다운그레이드하여 문제가 발생하면 알려주세요.,4.0 버전으로 다운그레이드하여 문제가 발생하면 알려주세요.
 QuickAccess.warn.oldBlender1,Old Blender version detected!,古いブレンダーバージョンが検出されました!,이전 블렌더 버전이 발견되었습니다!
 QuickAccess.warn.oldBlender2,Some features might not work!,一部の機能は動作しない可能性があります!,일부 기능이 작동하지 않을 수 있습니다!
 QuickAccess.warn.oldBlender3,Please update to Blender 3.6!,ブレンダー3.1以上にアップデートしてください!,블렌더 3.1 버전으로 업데이트하세요!
@@ -348,9 +351,7 @@ Warning: Never decimate something where you might need the shape keys later (fac
 경고: 나중에 쉐이프키가 필요한 것들은 절대 데시메이트하지 마십시오. (얼굴, 입, 눈 등..)"
 SeparateByMaterials.success,Successfully separated by materials.,,성공적으로 매테리얼별로 분리됐습니다.
 SeparateByLooseParts.label,Separate by Loose Parts,ルーズパーツに分離する,느슨한 부분들로 분리하기
-SeparateByLooseParts.desc,"Separates selected mesh by loose parts.
-This acts like separating by materials but creates more meshes for more precision",,"선택된 메쉬를 느슨한 부분들별로 나눕니다.
-이것은 매테리얼별로 분리시키는 것과 같지만 보다 높은 정확도를 위해 더 많은 메쉬들을 만듭니다"
+SeparateByLooseParts.desc,"Separates selected mesh by loose parts. This acts like separating by materials but creates more meshes for more precision","선택된 메쉬를 느슨한 부분들로 나눕니다. これはマテリアルごとに分離するように機能しますが、より正確にするためにより多くのメッシュを作成します。","선택된 메쉬를 느슨한 부분들로 나눕니다. 이것은 매테리얼별로 분리하는 것처럼 작동하지만 더 정밀한 작업을 위해 더 많은 메"
 SeparateByLooseParts.success,Successfully separated by loose parts.,,성공적으로 느슨한 부분들로 분리됐습니다.
 SeparateByShapekeys.label,Separate by Shape Keys,シェイプキーに区切る,쉐이프키별로 분리하기
 SeparateByShapekeys.desc,"Separates selected mesh into two parts,
@@ -427,9 +428,9 @@ This is exactly like doing it manually",,"선택한 메시의 중복 면들(face
 This is exactly like doing it manually"
 RemoveDoublesNormal.success,Removed {number} vertices.,,
 FixVRMShapesButton.label,Fix Koikatsu Shapekeys,コイカツシェイプキーを修正,코이카츠 쉐이프키 고치기
-FixVRMShapesButton.desc,Fixes the shapekeys of Koikatsu models,,
-FixVRMShapesButton.warn.notDetected,No shapekeys detected!,,
-FixVRMShapesButton.success,Fixed VRM shapekeys.,,
+FixVRMShapesButton.desc,Fixes the shapekeys of Koikatsu models,コイカツモデルのシェイプキーを修正,코이카츠 모델의 쉐이프키 고치기
+FixVRMShapesButton.warn.notDetected,No shapekeys detected!,シェイプキーが検出されませんでした。,쉐이프키가 발견되지 않음!
+FixVRMShapesButton.success,Fixed VRM shapekeys.,VRM シェイプキーを修正しました。,VRM 쉐이프키 고쳤습니다.
 FixFBTButton.label,Fix Full Body Tracking,全身追跡を修正,풀바디 트래킹 적용
 FixFBTButton.desc,"WARNING: This fix is no longer needed for vrchat, 
 you shouldn't use it unless you know what you are doing!
@@ -440,8 +441,8 @@ FixFBTButton.error.bonesNotFound,"Required bones could not be found!
 Please make sure that your armature contains the following bones:
  - Hips, Spine, Left leg, Right leg
 Exact names are required!",,
-FixFBTButton.error.alreadyApplied,Full Body Tracking Fix already applied!,,
-FixFBTButton.success,Successfully applied the Full Body Tracking fix.,,
+FixFBTButton.error.alreadyApplied,Full Body Tracking Fix already applied!,フルボディトラッキング修正はすでに適用されています。,전신 추적 수정 사항이 이미 적용되어 있습니다.
+FixFBTButton.success,Successfully applied the Full Body Tracking fix.,フルボディトラッキング修正が正常に適用されました。,전신 추적 수정 사항을 성공적으로 적용했습니다.
 RemoveFBTButton.label,Remove Full Body Tracking Fix,全身追跡の修正を削除,풀바디 트래킹 적용 제거
 RemoveFBTButton.desc,"Removes the fix for Full Body Tracking, since it is no longer advised to use it.
 
@@ -451,10 +452,10 @@ RemoveFBTButton.error.bonesNotFound,"Required bones could not be found!
 Please make sure that your armature contains the following bones:
  - Hips, Spine, Left leg, Right leg, Left leg 2, Right leg 2
 Exact names are required!",,
-RemoveFBTButton.error.notApplied,The Full Body Tracking Fix is not applied!,,
-RemoveFBTButton.success,Successfully removed the Full Body Tracking fix.,,
+RemoveFBTButton.error.notApplied,The Full Body Tracking Fix is not applied!,フルボディトラッキング修正は適用されていません。,전신 추적 수정 사항이 적용되지 않았습니다.
+RemoveFBTButton.success,Successfully removed the Full Body Tracking fix.,フルボディトラッキング修正が正常に削除されました。,전신 추적 수정 사항을 성공적으로 제거했습니다.
 DuplicateBonesButton.label,Duplicate Bones,ボーンの複製,본 복사
-DuplicateBonesButton.desc,Duplicates the selected bones including their weight and renames them to _L and _R,,
+DuplicateBonesButton.desc,Duplicates the selected bones including their weight and renames them to _L and _R,
 DuplicateBonesButton.success,Successfully duplicated {number} bones.,,
 MergeArmature.label,Merge Armatures,マージアーマチュア,뼈대(Armatures) 통합
 MergeArmature.desc,"Merges the selected merge armature into the base armature.
@@ -493,27 +494,27 @@ AtlasHelpButton.desc,Open useful Atlas Tips,,
 AtlasHelpButton.URL,https://github.com/michaeldegroot/cats-blender-plugin/#texture-atlas,,
 AtlasHelpButton.success,Atlas Help opened.,,
 InstallShotariya.label,Error while loading Material Combiner:,マテリアルコンバイナ読み込み中にエラーが発生しました:,매테리얼 통합기를 로드하는 중 오류 발생:
-InstallShotariya.error.install1,Material Combiner is not installed!,,
-InstallShotariya.error.install2,The plugin 'Material Combiner' by Shotariya is required for this function.,,
-InstallShotariya.error.install3,Please download and install it manually:,,
-InstallShotariya.error.enable1,Material Combiner is not enabled!,,
-InstallShotariya.error.enable2,The plugin 'Material Combiner' by Shotariya is required for this function.,,
-InstallShotariya.error.enable3,Please enable it in your User Preferences.,,
-InstallShotariya.error.version1,Material Combiner is outdated!,,
-InstallShotariya.error.version2,The latest version is required for this function.,,
-InstallShotariya.error.version3,Please download and install it manually:,,
+InstallShotariya.error.install1,Material Combiner is not installed!,マテリアルコンバイナーがインストールされていません!,재료 결합기가 설치되지 않았습니다!
+InstallShotariya.error.install2,The plugin 'Material Combiner' by Shotariya is required for this function.,この機能を利用するには、しょたり屋さんのプラグイン「マテリアルコンバイナー」が必要です。,이 기능을 사용하려면 Shotariya의 'Material Combiner' 플러그인이 필요합니다.
+InstallShotariya.error.install3,Please download and install it manually:,手動でダウンロードしてインストールしてください:,자동으로 다운로드 및 설치하세요:
+InstallShotariya.error.enable1,Material Combiner is not enabled!,マテリアルコンバイナーが有効になっていません!,재료 결합기가 활성화되지 않
+InstallShotariya.error.enable2,The plugin 'Material Combiner' by Shotariya is required for this function.,この機能を利用するには、しょたり屋さんのプラグイン「マテリアルコンバイナー」が必要です。,이 기능을 사용하려면 Shotariya의 'Material Combiner' 플러그인이 필요합니다
+InstallShotariya.error.enable3,Please enable it in your User Preferences.,手動で有効にしてください:,자동으로 활성화하세요:
+InstallShotariya.error.version1,Material Combiner is outdated!,マテリアルコンバイナーが古いです!,재료 결합기가 최신 버전이 아닙니다.
+InstallShotariya.error.version2,The latest version is required for this function.,この機能を利用するには、最新バージョンが必要です。,이 기능을 사용하려면 최신 버전이 필요합니다.
+InstallShotariya.error.version3,Please download and install it manually:,手動でダウンロードしてインストールしてください:,자동으로 다운로드 및 설치하세요:
 ShotariyaButton.label,Download Material Combiner,マテリアルコンバイナーをダウンロード,매테리얼 통합기 다운로드
 ShotariyaButton.success,Material Combiner link opened,,
 ImmersiveScalerButton.success,Immersive Scaler link opened,,
-ImmersiveScalerButton.label,Download Immersive Scaler,,
+ImmersiveScalerButton.label,Download Immersive Scaler,イマーシブスケーラーをダウンロード,이미미스 스케일러 다운로드
 ImmersiveScalerButton.desc,Open latest Immersive Scaler release,,
 ImmersiveScalerHelpButton.URL,https://github.com/triazo/immersive_scaler,,
-ImmersiveScalerHelpButton.label,Immersive Scaler Help,,
+ImmersiveScalerHelpButton.label,Immersive Scaler Help,イマーシブスケーラー,이미미스 스케일러 도움말
 ImmersiveScalerHelpButton.desc,Open guide for Immersive Scaler,,
 ImmersiveScalerHelpButton.success,Immersive Scaler Readme opened,,
-EnableIMScale.label,Enable Immersive Scaler,,
-EnableIMScale.desc,Enable Immersive Scaler,,
-EnableIMScale.success,Enabled Immersive Scaler!,,
+EnableIMScale.label,Enable Immersive Scaler,イマーシブスケーラーを有効にする,이미미스 스케일러 활성화
+EnableIMScale.desc,Enable Immersive Scaler, イマーシブスケーラーを有効にする,이미미스 스케일러 활성화
+EnableIMScale.success,Enabled Immersive Scaler!,イマーシブスケーラーが有効になりました!,이미미스 스케일러가 활성화되었습니다!
 BoneMergeButton.label,Merge Bones,ボーンをマージする,뼈 통합
 BoneMergeButton.desc,"Merges the given percentage of bones together.
 This is useful to reduce the amount of bones used by Dynamic Bones.",,
@@ -558,19 +559,6 @@ This means that this shape key is no longer decimation safe!",,
 RemoveMeshButton.label,Remove Mesh,,
 RemoveMeshButton.desc,"Removes the selected mesh from the whitelist.
 This means that this mesh will be decimated.",,
-AutoDecimateCatsButton.label,Quick Decimation,,버텍스 줄이기(Decimation)
-AutoDecimateCatsButton.desc,"This will automatically decimate your model while preserving the shape keys.
-You should manually remove unimportant meshes first.",,
-AutoDecimateCatsButton.error.noMesh,No meshes found!,,메쉬가 발견되지 않음!
-decimate.cantDecimateWithSettings,This model can not be decimated to {number} tris with the specified settings.,,
-decimate.safeTryOptions,"Try to use Custom, Half or Full Decimation.",,
-decimate.halfTryOptions,Try to use Custom or Full Decimation.,,
-decimate.customTryOptions,Select fewer shape keys and/or meshes or use Full Decimation.,,
-decimate.disableFingersOrIncrease,Disable 'Save Fingers' or increase the Tris Count.,,
-decimate.disableFingers,or disable 'Save Fingers'.,,
-decimate.noDecimationNeeded,The model already has less than {number} tris. Nothing had to be decimated.,,
-decimate.cantDecimate1,The model could not be decimated to {number} tris.,,
-decimate.cantDecimate2,It got decimated as much as possible within the limits.,,
 ImportAnyModel.label,Import Any Model,任意のモデルをインポート,아무 모델 불러오기
 ImportAnyModel.importantInfo.label,IMPORTANT INFO (hover here),重要な情報(ここにホバー),
 ImportAnyModel.importantInfo.desc,"If you want to modify the import settings, use the button next to the Import button.
@@ -587,15 +575,6 @@ Supported types:
 - FBX: .fbx
 - DAE: .dae 
 - ZIP: .zip",,
-DecimationLegacy.info1,Decimation will be made a legacy,デシメーションは遺産となるだろう,학살은 유산이 될 것입니다
-DecimationLegacy.info2,Compoment Soon we recomend using,すぐに使用することをお勧めします,곧 우리는 다음을 사용하는 것이 좋습니다
-DecimationLegacy.info3,Tuxedo instead!,代わりにタキシード！,대신 턱시도!
-LegacyDecimationButton.label,Get Tuxedo!,タキシードをゲット！,턱시도 획득!
-LegacyDecimationButton.URL,https://github.com/feilen/tuxedo-blender-plugin/releases,,
-DecimationHelpButton.success,Opened Github,,
-DecimationHelpButton.label,Decimation Wiki,デシメーション Wiki,데시메이션 위키
-DecimationHelpButton.URL,https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Decimation,,
-DecimationHelpButton.success,Opened Wiki,,
 ImportAnyModel.error.unsupportedFBX,"The FBX file version is unsupported!
 Please use a tool such as the ""Autodesk FBX Converter"" to make it compatible.",,
 ZipPopup.label,Zip Model Selection:,圧縮モデルの選択:,Zip 모델 선택:
@@ -640,9 +619,9 @@ ExportModel.desc,"Export this model as .fbx for Unity.
 Automatically sets the optimal export settings",,
 ExportModel.error.notEnabled,FBX Exporter not enabled! Please enable it in your User Preferences.,,
 ErrorDisplay.label,Warning:,警告:,경고:
-ErrorDisplay.polygons1,Too many polygons!,,
+ErrorDisplay.polygons1,Too many polygons!,ポリゴンが多すぎる！,폴리곤이 너무 많아요!
 ErrorDisplay.polygons2,"You have {number} tris in this model, but you shouldn't have more than 70,000!",,
-ErrorDisplay.polygons3,You should decimate before you export this model.,,
+ErrorDisplay.polygons3,You should decimate before you export this model.,このモデルをエクスポートする前に、間引きを行う必要があります。,이 모델을 내보내기 전에 멸종시켜야 합니다.
 ErrorDisplay.materials1,Model not optimized!,,
 ErrorDisplay.materials2,This model has {number} materials!,,
 ErrorDisplay.materials3,You should try to have a maximum of 4 materials on your model.,,
@@ -892,99 +871,8 @@ Uncheck this if bones or vertex groups that you want to keep got deleted",,
 Scene.merge_armatures_cleanup_shape_keys.label,Cleanup Shape Keys,
 Scene.merge_armatures_cleanup_shape_keys.desc,"Cleans up the meshes shape keys.
 Uncheck this if shape keys you want to keep got deleted",,
-Scene.decimation_mode.label,Decimation Mode,単純化モード,
-Scene.decimation_mode.desc,Decimation Mode,,
-Scene.decimation_mode.safe.label,Safe,安全,안전
-Scene.decimation_mode.safe.desc,"Decent results - no shape key loss
-
-This will only decimate meshes with no shape keys.
-The results are decent and you won't lose any shape keys.
-Eye Tracking and Lip Syncing will be fully preserved.",,"괜찮은 결과 - 쉐이프키 손실 없음
-
-This will only decimate meshes with no shape keys.
-The results are decent and you won't lose any shape keys.
-Eye Tracking and Lip Syncing will be fully preserved."
-Scene.decimation_mode.half.label,Half,ハーフ,반
-Scene.decimation_mode.half.desc,"Good results - minimal shape key loss
-
-This will only decimate meshes with less than 4 shape keys as those are often not used.
-The results are better but you will lose the shape keys in some meshes.
-Eye Tracking and Lip Syncing should still work.",,"나쁘지 않은 결과, - 최소한의 쉐이프키 손실됨
-
-This will only decimate meshes with less than 4 shape keys as those are often not used.
-The results are better but you will lose the shape keys in some meshes.
-Eye Tracking and Lip Syncing should still work."
-Scene.decimation_mode.full.label,Full,フル,전체
-Scene.decimation_mode.full.desc,"Consistent results - full shape key loss
-
-This will decimate your whole model deleting all shape keys in the process.
-This will give consistent results but you will lose the ability to add blinking and Lip Syncing.
-Eye Tracking will still work if you disable Eye Blinking.",,"일관된 결과 - 모든 쉐이프키들이 손실됨
-
-This will decimate your whole model deleting all shape keys in the process.
-This will give consistent results but you will lose the ability to add blinking and Lip Syncing.
-Eye Tracking will still work if you disable Eye Blinking."
-Scene.decimation_mode.custom.label,Custom,カスタム,커스텀
-Scene.decimation_mode.custom.desc,"Custom results - custom shape key loss
-
-This will let you choose which meshes and shape keys should not be decimated.
-",,"커스텀 결과 - 커스텀 쉐이프키 손실
-
-This will let you choose which meshes and shape keys should not be decimated.
-"
 Scene.selection_mode.label,Selection Mode,選択モード,선택 모드
 Scene.selection_mode.desc,Selection Mode,,
-Scene.selection_mode.shapekeys.label,Shape Keys,シェイプキー,쉐이프키
-Scene.selection_mode.shapekeys.desc,Select all the shape keys you want to preserve here.,,
-Scene.selection_mode.meshes.label,Meshes,メッシュ,메쉬
-Scene.selection_mode.meshes.desc,Select all the meshes you don't want to decimate here.,,
-Scene.add_shape_key.label,Shape,形状,쉐이프키
-Scene.add_shape_key.desc,The shape key you want to keep,,
-Scene.add_mesh.label,Mesh,メッシュ,메쉬
-Scene.add_mesh.desc,The mesh you want to leave untouched by the decimation,,
-Scene.decimate_fingers.label,Save Fingers,指を救う,손가락 유지
-Scene.decimate_fingers.desc,"Check this if you don't want to decimate your fingers!
-Results will be worse but there will be no issues with finger movement.
-This is probably only useful if you have a VR headset.
-
-This operation requires the finger bones to be named specifically:
-Thumb(0-2)_(L/R)
-IndexFinger(1-3)_(L/R)
-MiddleFinger(1-3)_(L/R)
-RingFinger(1-3)_(L/R)
-LittleFinger(1-3)_(L/R)",,"손가락의 버텍스를 줄여 망치고 싶지 않다면 이것을 체크하세요!
-결과는 더 나빠질 수 있지만 손의 움직임에는 문제가 없습니다.
-아마 VR을 사용하는 경우에만 유용 할 것입니다.
-
-이 작업을 수행하려면 손가락과 손 뼈의 이름을 구체적으로 지정해야합니다.
-Left/Right wrist
-Thumb(0-2)_(L/R)
-IndexFinger(1-3)_(L/R)
-MiddleFinger(1-3)_(L/R)
-RingFinger(1-3)_(L/R)
-LittleFinger(1-3)_(L/R)"
-Scene.decimate_hands.label,Save Hands,手を救う,손 유지
-Scene.decimate_hands.desc,"Check this if you don't want to decimate your full hands!
-Results will be worse but there will be no issues with hand movement.
-This is probably only useful if you have a VR headset.
-
-This operation requires the finger and hand bones to be named specifically:
-Left/Right wrist
-Thumb(0-2)_(L/R)
-IndexFinger(1-3)_(L/R)
-MiddleFinger(1-3)_(L/R)
-RingFinger(1-3)_(L/R)
-LittleFinger(1-3)_(L/R)",,"손의 버텍스를 줄여 망치고 싶지 않다면 이것을 체크하세요!
-결과는 더 나빠질 수 있지만 손의 움직임에는 문제가 없습니다.
-아마 VR을 사용하는 경우에만 유용 할 것입니다.
-
-이 작업을 수행하려면 손가락과 손 뼈의 이름을 구체적으로 지정해야합니다.
-Left/Right wrist
-Thumb(0-2)_(L/R)
-IndexFinger(1-3)_(L/R)
-MiddleFinger(1-3)_(L/R)
-RingFinger(1-3)_(L/R)
-LittleFinger(1-3)_(L/R)"
 Scene.decimation_remove_doubles.label,Remove Doubles,重複を削除,이중 제거
 Scene.decimation_remove_doubles.desc,Uncheck this if you get issues with this checked,Uncheck this if you got issues with with this checked,문제가 될 시 체크를 해제하세요
 Scene.decimation_retain_separated_meshes.label,Retain Separated Meshes,,

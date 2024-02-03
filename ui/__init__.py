@@ -9,7 +9,6 @@ if "bpy" not in locals():
     from . import custom
     from . import mmdoptions
     from . import otheroptions
-    from . import decimation
     from . import visemes
     from . import bone_root
     from . import optimization
@@ -27,7 +26,6 @@ else:
     importlib.reload(custom)
     importlib.reload(mmdoptions)
     importlib.reload(otheroptions)
-    importlib.reload(decimation)
     importlib.reload(visemes)
     importlib.reload(bone_root)
     importlib.reload(scale)

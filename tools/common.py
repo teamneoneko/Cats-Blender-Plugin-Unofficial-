@@ -28,7 +28,6 @@ from typing import Optional, Set, Dict, Any
 
 from . import common as Common
 from . import iconloader as Iconloader
-from . import decimation as Decimation
 from . import translate as Translate
 from . import armature_bones as Bones
 from . import settings as Settings
@@ -464,22 +463,6 @@ def get_armature_merge_list(self, context):
     return choices
 
 
-def get_meshes_decimation(self, context):
-    choices = []
-
-    for object in bpy.context.scene.objects:
-        if object.type == 'MESH':
-            if object.parent and object.parent.type == 'ARMATURE' and object.parent.name == bpy.context.scene.armature:
-                if object.name in Decimation.ignore_meshes:
-                    continue
-                # 1. Will be returned by context.scene
-                # 2. Will be shown in lists
-                # 3. will be shown in the hover description (below description)
-                choices.append((object.name, object.name, object.name))
-
-    return choices
-
-
 def get_bones_head(self, context):
     return get_bones(names=['Head'])
 
@@ -564,28 +547,14 @@ def get_shapekeys_eye_low_r(self, context):
     return get_shapekeys(context, ['Basis'], False, False, False, False)
 
 
-def get_shapekeys_decimation(self, context):
-    return get_shapekeys(context,
-                         ['MTH A', 'Ah', 'A', 'MTH U', 'Oh', 'O', 'Your', 'MTH I', 'Glue', 'Ch', 'I', 'There', 'Wink 2', 'Wink', 'Wink left', 'Wink Left', 'Blink (Left)', 'Wink 2 right',
-                          'EYE Close R', 'EYE Close L', 'Wink 2 Right', 'Wink right 2', 'Wink Right 2', 'Wink right', 'Wink Right', 'Blink (Right)', 'Blink'], False, True, True, False)
-
-
-def get_shapekeys_decimation_list(self, context):
-    return get_shapekeys(context,
-                         ['MTH A', 'Ah', 'A', 'MTH U', 'Oh', 'O', 'Your', 'MTH I', 'Glue', 'Ch', 'I', 'There', 'Wink 2', 'Wink', 'Wink left', 'Wink Left', 'Blink (Left)', 'Wink 2 right',
-                          'EYE Close R', 'EYE Close L', 'Wink 2 Right', 'Wink right 2', 'Wink Right 2', 'Wink right', 'Wink Right', 'Blink (Right)', 'Blink'], False, True, True, True)
-
-
 # names - The first object will be the first one in the list. So the first one has to be the one that exists in the most models
 # no_basis - If this is true the Basis will not be available in the list
-def get_shapekeys(context, names, is_mouth, no_basis, decimation, return_list):
+def get_shapekeys(context, names, is_mouth, no_basis, return_list):
     choices = []
     choices_simple = []
     meshes_list = get_meshes_objects(check=False)
 
-    if decimation:
-        meshes = meshes_list
-    elif meshes_list:
+    if meshes_list:
         if is_mouth:
             meshes = [get_objects().get(context.scene.mesh_name_viseme)]
         else:
@@ -603,8 +572,6 @@ def get_shapekeys(context, names, is_mouth, no_basis, decimation, return_list):
                 continue
             if no_basis and name == 'Basis':
                 continue
-            if decimation and name in Decimation.ignore_shapes:
-                continue
             # 1. Will be returned by context.scene
             # 2. Will be shown in lists
             # 3. will be shown in the hover description (below description)
@@ -616,9 +583,8 @@ def get_shapekeys(context, names, is_mouth, no_basis, decimation, return_list):
     choices2 = []
     for name in names:
         if name in choices_simple and len(choices) > 1 and choices[0][0] != name:
-            if decimation and name in Decimation.ignore_shapes:
-                continue
-            choices2.append((name, name, name))
+            continue
+        choices2.append((name, name, name))
 
     choices2.extend(choices)
 
@@ -762,22 +728,14 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
 
     unselect_all()
 
-    # Apply existing decimation modifiers and select the meshes for joining
+
     for mesh in meshes_to_join:
         set_active(mesh)
         
-        # Apply decimation modifiers
+        
         for mod in mesh.modifiers:
-            if mod.type == 'DECIMATE':
-                if mod.decimate_type == 'COLLAPSE' and mod.ratio == 1:
-                    mesh.modifiers.remove(mod)
-                    continue
-                if mod.decimate_type == 'UNSUBDIV' and mod.iterations == 0:
-                    mesh.modifiers.remove(mod)
-                    continue
-                    
-                if has_shapekeys(mesh):
-                    bpy.ops.object.shape_key_remove(all=True)
+            if has_shapekeys(mesh):
+                bpy.ops.object.shape_key_remove(all=True)
                 apply_modifier(mod)
             elif mod.type == 'SUBSURF':
                 mesh.modifiers.remove(mod)
@@ -786,8 +744,8 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
                     apply_modifier(mod)
 
 
-        if mesh.data.uv_layers:
-            mesh.data.uv_layers[0].name = 'UVMap'
+    if mesh.data.uv_layers:
+        mesh.data.uv_layers[0].name = 'UVMap'
             
 
     # Get the name of the active mesh in order to check if it was deleted later
@@ -1079,10 +1037,7 @@ def prepare_separation(mesh):
     set_active(mesh)
 
     for mod in mesh.modifiers:
-        if mod.type == 'DECIMATE':
-            mesh.modifiers.remove(mod)
-        else:
-            mod.show_expanded = False
+        mod.show_expanded = False
 
     clean_material_names(mesh)
 

@@ -159,19 +159,6 @@ def register():
         default=True
     )
 
-    # Decimation
-    Scene.decimation_mode = EnumProperty(
-        name=t('Scene.decimation_mode.label'),
-        description=t('Scene.decimation_mode.desc'),
-        items=[
-            ("SAFE", t('Scene.decimation_mode.safe.label'), t('Scene.decimation_mode.safe.desc')),
-            ("HALF", t('Scene.decimation_mode.half.label'), t('Scene.decimation_mode.half.desc')),
-            ("FULL", t('Scene.decimation_mode.full.label'), t('Scene.decimation_mode.full.desc')),
-            ("CUSTOM", t('Scene.decimation_mode.custom.label'), t('Scene.decimation_mode.custom.desc'))
-        ],
-        default='SAFE'
-    )
-
     Scene.selection_mode = EnumProperty(
         name=t('Scene.selection_mode.label'),
         description=t('Scene.selection_mode.desc'),
@@ -179,48 +166,6 @@ def register():
             ("SHAPES", t('Scene.selection_mode.shapekeys.label'), t('Scene.selection_mode.shapekeys.desc')),
             ("MESHES", t('Scene.selection_mode.meshes.label'), t('Scene.selection_mode.meshes.desc'))
         ]
-    )
-
-    Scene.add_shape_key = EnumProperty(
-        name=t('Scene.add_shape_key.label'),
-        description=t('Scene.add_shape_key.desc'),
-        items=wrap_dynamic_enum_items(Common.get_shapekeys_decimation, 'add_shape_key'),
-    )
-
-    Scene.add_mesh = EnumProperty(
-        name=t('Scene.add_mesh.label'),
-        description=t('Scene.add_mesh.desc'),
-        items=wrap_dynamic_enum_items(Common.get_meshes_decimation, 'add_mesh'),
-    )
-
-    Scene.decimate_fingers = BoolProperty(
-        name=t('Scene.decimate_fingers.label'),
-        description=t('Scene.decimate_fingers.desc')
-    )
-
-    Scene.decimate_hands = BoolProperty(
-        name=t('Scene.decimate_hands.label'),
-        description=t('Scene.decimate_hands.desc')
-    )
-
-    Scene.decimation_remove_doubles = BoolProperty(
-        name=t('Scene.decimation_remove_doubles.label'),
-        description=t('Scene.decimation_remove_doubles.desc'),
-        default=True
-    )
-
-    Scene.decimation_retain_separated_meshes = BoolProperty(
-        name=t('Scene.decimation_retain_separated_meshes.label'),
-        description=t('Scene.decimation_retain_separated_meshes.desc'),
-        default=False
-    )
-
-    Scene.max_tris = IntProperty(
-        name=t('Scene.max_tris.label'),
-        description=t('Scene.max_tris.desc'),
-        default=70000,
-        min=1,
-        max=500000
     )
 
     # Eye Tracking
