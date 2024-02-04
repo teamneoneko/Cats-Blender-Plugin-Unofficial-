@@ -198,7 +198,7 @@ MMDOptions.info5,these on models already set up for Unity,これらはすでに 
 MMDOptions.info6,and VRChat or it may break your model.,VRChat を使用しないと、モデルが壊れる可能性があります。,VRChat을 사용하지 않으면 모델이 손상될 수 있습니다.
 MMDOptions.FixMaterialinfo1,This will apply some vrchat fixes,これにより、いくつかの vrchat 修正が適用されます,이것은 일부 vrchat 수정 사항을 적용합니다.
 MMDOptions.FixMaterialinfo2,to materials,材料に,재료에.
-OtherOptionsPanel.fbtFix1,Not needed for vrchat anymore!,,
+OtherOptionsPanel.fbtFix1,Not needed for vrchat anymore!,VRChat では不要になったので、不要です！,VRChat에서 더 이상 필요하지 않습니다!
 OptimizePanel.label,Optimization,最適化,최적화
 OptimizePanel.atlasDesc,A greatly improved Atlas Generator.,アトラスジェネレータを大幅に改良。,텍스처들을 결합시켜주는 더욱 향상된 아틀라스 생성기입니다.
 OptimizePanel.atlasAuthor,Made by Shotariya,shotaryiaによって作られた,제작자: Shotariya
@@ -587,9 +587,13 @@ Supported types:
 - FBX: .fbx
 - DAE: .dae 
 - ZIP: .zip",,
-DecimationLegacy.info1,Decimation will be made a legacy,デシメーションは遺産となるだろう,학살은 유산이 될 것입니다
-DecimationLegacy.info2,Compoment Soon we recomend using,すぐに使用することをお勧めします,곧 우리는 다음을 사용하는 것이 좋습니다
-DecimationLegacy.info3,Tuxedo instead!,代わりにタキシード！,대신 턱시도!
+DecimationLegacy.info1,Decimation will be removed in,デシメーションは次の期間に削除されます,다음 기간에 Decimation이 제거됩니다.
+DecimationLegacy.info2,Blender 3.1 please use Tuxdo,Blender 3.1 では Tuxdo を使用してください,블렌더 3.1은 Tuxdo를 사용하세요
+DecimationLegacy.info3,Blender Plugin instead!,代わりに Blender プラグインを使用してください。,대신 블렌더 플러그인을 사용하세요!
+DecimationMoved1.info1,Decimation has been moved to,,
+DecimationMoved1.info2,to legacy features please start,,
+DecimationMoved1.info3,using tuxedo instead as this is,,
+DecimationMoved1.info4,an obslolete system in cats,,
 LegacyDecimationButton.label,Get Tuxedo!,タキシードをゲット！,턱시도 획득!
 LegacyDecimationButton.URL,https://github.com/feilen/tuxedo-blender-plugin/releases,,
 DecimationHelpButton.success,Opened Github,,
