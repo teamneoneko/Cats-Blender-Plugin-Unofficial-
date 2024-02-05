@@ -1420,7 +1420,12 @@ def delete_zero_weight(armature_name=None, ignore=''):
     not_used_bone_names = bone_names_to_work_on - vertex_group_names_used
 
     count = 0
+    keep_twists = bpy.context.scene.delete_zero_weight_keep_twists
+
     for bone_name in not_used_bone_names:
+        if keep_twists and ("_twist" in bone_name.lower() or "Twist" in bone_name):
+            continue
+        
         if not bpy.context.scene.keep_end_bones or not is_end_bone(bone_name, armature_name):
             if bone_name not in Bones.dont_delete_these_bones and 'Root_' not in bone_name and bone_name != ignore:
                 armature.data.edit_bones.remove(bone_name_to_edit_bone[bone_name])  # delete bone
