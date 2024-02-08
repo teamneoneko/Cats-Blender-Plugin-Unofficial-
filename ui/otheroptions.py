@@ -26,7 +26,7 @@ class OtherOptionsPanel(ToolPanel, bpy.types.Panel):
         col = box.column(align=True)
         row = layout_split(col, factor=0.32, align=True)
         row.scale_y = button_height
-        row.label(text="Separate by:", icon='MESH_DATA')
+        row.label(text=t('OtherOptionsPanel.separateBy'), icon='MESH_DATA')
         row.operator(Armature_manual.SeparateByMaterials.bl_idname, text=t('OtherOptionsPanel.SeparateByMaterials.label'))
         row.operator(Armature_manual.SeparateByLooseParts.bl_idname, text=t('OtherOptionsPanel.SeparateByLooseParts.label'))
         row.operator(Armature_manual.SeparateByShapekeys.bl_idname, text=t('OtherOptionsPanel.SeparateByShapekeys.label'))
