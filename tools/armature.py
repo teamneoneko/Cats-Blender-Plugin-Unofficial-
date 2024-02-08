@@ -900,7 +900,7 @@ class FixArmature(bpy.types.Operator):
             hips = armature.pose.bones.get('Hips')
 
             obj = hips.id_data
-            matrix_final = Common.matmul(obj.matrix_world, hips.matrix)
+            matrix_final = obj.matrix_world @ hips.matrix
             # print(matrix_final)
             # print(matrix_final[2][3])
             # print(fbx)
@@ -909,7 +909,7 @@ class FixArmature(bpy.types.Operator):
                 # print(hips.head[0], hips.head[1], hips.head[2])
                 # Rotation of -180 around the X-axis
                 rot_x_neg180 = Matrix.Rotation(-math.pi, 4, 'X')
-                armature.matrix_world = Common.matmul(rot_x_neg180, armature.matrix_world)
+                armature.matrix_world = rot_x_neg180 @ armature.matrix_world
 
                 for mesh in meshes:
                     mesh.rotation_euler = (math.radians(180), 0, 0)

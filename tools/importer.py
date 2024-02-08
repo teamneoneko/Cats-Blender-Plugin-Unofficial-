@@ -17,7 +17,6 @@ from .. import globs
 from . import armature_manual
 from . import common as Common
 from . import settings as Settings
-from . import fbx_patch as Fbx_patch
 from .register import register_wrap
 from .translations import t
 
@@ -30,10 +29,6 @@ except:
 
 current_blender_version = str(bpy.app.version[:2])[1:-1].replace(', ', '.')
 
-# In blender 2.79 this string gets cut off after char 63, so don't go over that limit
-# Bug Report: https://blender.stackexchange.com/questions/110788/file-browser-filter-not-working-correctly
-#             <                                                               > Don't go outside these brackets
-formats_279 = '*.pm*;*.xps;*.mesh;*.ascii;*.smd;*.qc;*.fbx;*.dae;*.vrm;*.zip'
 formats = '*.pmx;*.pmd;*.xps;*.mesh;*.ascii;*.smd;*.qc;*.qci;*.vta;*.dmx;*.fbx;*.dae;*.vrm;*.zip'
 format_list = formats.replace('*.', '').split(';')
 zip_files = {}
@@ -62,10 +57,6 @@ class ImportAnyModel(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
         has_zip_file = False
 
         Common.remove_unused_objects()
-
-        # Make sure that the first layer is visible
-        if hasattr(context.scene, 'layers'):
-            context.scene.layers[0] = True
 
         # Save all current objects to check which armatures got added by the importer
         pre_import_objects = [obj for obj in bpy.data.objects if obj.type == 'ARMATURE']
@@ -392,10 +383,6 @@ class ImportMMD(bpy.types.Operator):
     def execute(self, context):
         Common.remove_unused_objects()
 
-        # Make sure that the first layer is visible
-        if hasattr(context.scene, 'layers'):
-            context.scene.layers[0] = True
-
         if not mmd_tools_local_installed:
             bpy.ops.cats_importer.enable_mmd('INVOKE_DEFAULT')
             return {'FINISHED'}
@@ -436,10 +423,6 @@ class ImportMMDAnimation(bpy.types.Operator,bpy_extras.io_utils.ImportHelper):
 
     def execute(self, context):
         Common.remove_unused_objects()
-
-        # Make sure that the first layer is visible
-        if hasattr(context.scene, 'layers'):
-            context.scene.layers[0] = True
 
         if not mmd_tools_local_installed:
             bpy.ops.cats_importer.enable_mmd('INVOKE_DEFAULT')
@@ -541,10 +524,6 @@ class ImportXPS(bpy.types.Operator):
     def execute(self, context):
         Common.remove_unused_objects()
 
-        # Make sure that the first layer is visible
-        if hasattr(context.scene, 'layers'):
-            context.scene.layers[0] = True
-
         try:
             bpy.ops.xps_tools.import_model('INVOKE_DEFAULT')
         except AttributeError:
@@ -563,10 +542,6 @@ class ImportSource(bpy.types.Operator):
     def execute(self, context):
         Common.remove_unused_objects()
 
-        # Make sure that the first layer is visible
-        if hasattr(context.scene, 'layers'):
-            context.scene.layers[0] = True
-
         try:
             bpy.ops.import_scene.smd('INVOKE_DEFAULT')
         except AttributeError:
@@ -584,10 +559,6 @@ class ImportFBX(bpy.types.Operator):
 
     def execute(self, context):
         Common.remove_unused_objects()
-
-        # Make sure that the first layer is visible
-        if hasattr(context.scene, 'layers'):
-            context.scene.layers[0] = True
 
         # Enable fbx if it isn't enabled yet
         fbx_is_enabled = addon_utils.check('io_scene_fbx')[1]
@@ -614,10 +585,6 @@ class ImportVRM(bpy.types.Operator):
 
     def execute(self, context):
         Common.remove_unused_objects()
-
-        # Make sure that the first layer is visible
-        if hasattr(context.scene, 'layers'):
-            context.scene.layers[0] = True
 
         try:
             bpy.ops.import_scene.vrm('INVOKE_DEFAULT')
@@ -2074,10 +2041,6 @@ class ExportModel(bpy.types.Operator):
                 return {'FINISHED'}
 
         # Continue if there are no errors or the check was skipped
-
-        # Monkey patch FBX exporter again to import empty shape keys
-        Fbx_patch.patch_fbx_exporter()
-
         # Check if copy protection is enabled
         mesh_smooth_type = 'OFF'
         protected_export = False

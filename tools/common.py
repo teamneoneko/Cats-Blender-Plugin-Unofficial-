@@ -55,20 +55,21 @@ class SavedData:
     __active_object = None
 
     def __init__(self):
+        context = bpy.context
         # initialize as instance attributes rather than class attributes
         self.__object_properties = {}
         self.__active_object = None
 
         for obj in get_objects():
             mode = obj.mode
-            selected = is_selected(obj)
+            selected = obj.select_get()
             hidden = is_hidden(obj)
             pose = None
             if obj.type == 'ARMATURE':
                 pose = obj.data.pose_position
             self.__object_properties[obj.name] = [mode, selected, hidden, pose]
 
-            active = get_active()
+            active = context.view_layer.objects.active
             if active:
                 self.__active_object = active.name
 
@@ -106,7 +107,8 @@ class SavedData:
 
         # Set the active object
         if load_active and self.__active_object and get_objects().get(self.__active_object):
-            if self.__active_object not in ignore and self.__active_object != get_active():
+            context = bpy.context
+            if self.__active_object not in ignore and self.__active_object != context.view_layer.objects.active:
                 set_active(get_objects().get(self.__active_object), skip_sel=True)
 
 
@@ -183,23 +185,11 @@ def set_active(obj, skip_sel=False):
         bpy.context.view_layer.objects.active = obj
 
 
-def get_active():
-    return bpy.context.view_layer.objects.active
-
-
 def select(obj, sel=True):
     if obj is not None:
         hide(obj, False)
         obj.select_set(sel)
         
-
-def is_selected(obj):
-    return obj.select_get()
-
-
-def is_selected(obj):
-    return obj.select_get()
-
 
 def hide(obj, val=True):
     if hasattr(obj, 'hide_set'):
@@ -221,7 +211,9 @@ def set_unselectable(obj, val=True):
 
 
 def switch(new_mode, check_mode=True):
-    if check_mode and get_active() and get_active().mode == new_mode:
+    context = bpy.context
+    active = context.view_layer.objects.active
+    if check_mode and active and active.mode == new_mode:
         return
     if bpy.ops.object.mode_set.poll():
         bpy.ops.object.mode_set(mode=new_mode, toggle=False)
@@ -664,16 +656,8 @@ def fix_armature_names(armature_name=None):
         pass
 
 
-def get_texture_sizes(self, context):
-    # Format is (identifier, name, description)
-    return [
-        ("1024", "1024 (low)", "1024"),
-        ("2048", "2048 (medium)", "2048"),
-        ("4096", "4096 (high)", "4096")
-    ]
-
-
 def get_meshes_objects(armature_name=None, mode=0, check=True, visible_only=False):
+    context = bpy.context
     # Modes:
     # 0 = With armatures only
     # 1 = Top level only
@@ -708,7 +692,7 @@ def get_meshes_objects(armature_name=None, mode=0, check=True, visible_only=Fals
                 meshes.append(ob)
 
             elif mode == 3:
-                if is_selected(ob):
+                if ob.select_get():
                     meshes.append(ob)
 
     if visible_only:
@@ -718,14 +702,14 @@ def get_meshes_objects(armature_name=None, mode=0, check=True, visible_only=Fals
 
     # Check for broken meshes and delete them
     if check:
-        current_active = get_active()
+        current_active = context.view_layer.objects.active
         to_remove = []
         for mesh in meshes:
-            selected = is_selected(mesh)
+            selected = mesh.select_get()
             # print(mesh.name, mesh.users)
             set_active(mesh)
 
-            if not get_active():
+            if not context.view_layer.objects.active:
                 to_remove.append(mesh)
 
             if not selected:
@@ -746,6 +730,7 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
     # Modes:
     # 0 - Join all meshes
     # 1 - Join selected only
+    context = bpy.context
     
     if not armature_name:
         armature_name = bpy.context.scene.armature
@@ -792,7 +777,7 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
             
 
     # Get the name of the active mesh in order to check if it was deleted later
-    active_mesh_name = get_active().name
+    active_mesh_name = context.view_layer.objects.active.name
 
     # Join the meshes
     if bpy.ops.object.join.poll():
@@ -810,7 +795,7 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
             print('DELETED', mesh.name, mesh.users)
 
     # Rename result to Body and correct modifiers
-    mesh = get_active()
+    mesh = context.view_layer.objects.active
     if mesh:
         # If its the only mesh in the armature left, rename it to Body
         if len(get_meshes_objects(armature_name=armature_name)) == 1:
@@ -880,25 +865,6 @@ def apply_all_transforms():
     for obj in get_objects():
         if not obj.parent:
             apply_transforms_with_children(obj)
-
-
-def reset_transforms(armature_name=None):
-    if not armature_name:
-        armature_name = bpy.context.scene.armature
-    armature = get_armature(armature_name=armature_name)
-
-    # Reset transforms on armature
-    for i in range(0, 3):
-        armature.location[i] = 0
-        armature.rotation_euler[i] = 0
-        armature.scale[i] = 1
-
-    # Apply transforms of meshes
-    for mesh in get_meshes_objects(armature_name=armature_name):
-        for i in range(0, 3):
-            mesh.location[i] = 0
-            mesh.rotation_euler[i] = 0
-            mesh.scale[i] = 1
 
 
 def separate_by_materials(context, mesh):
@@ -997,9 +963,9 @@ def separate_by_shape_keys(context, mesh):
 
     for ob in context.selected_objects:
         if ob.type == 'MESH':
-            if ob != get_active():
+            active_tmp = context.view_layer.objects.active
+            if ob != active_tmp:
                 print('not active', ob.name)
-                active_tmp = get_active()
                 ob.name = ob.name.replace('.001', '') + '.no_shapes'
                 set_active(ob)
                 bpy.ops.object.shape_key_remove(all=True)
@@ -1046,9 +1012,9 @@ def separate_by_cats_protection(context, mesh):
 
     for ob in context.selected_objects:
         if ob.type == 'MESH':
-            if ob != get_active():
+            active_tmp = context.view_layer.objects.active
+            if ob != active_tmp:
                 print('not active', ob.name)
-                active_tmp = get_active()
                 ob.name = ob.name.replace('.001', '') + '.no_shapes'
                 set_active(ob)
                 bpy.ops.object.shape_key_remove(all=True)
@@ -1107,20 +1073,6 @@ def can_remove_shapekey(key_block):
         if v0.co != v1.co:
             return False
     return True
-
-
-def separate_by_verts():
-    for obj in bpy.context.selected_objects:
-        if obj.type == 'MESH' and len(obj.vertex_groups) > 0:
-            Common.set_active(obj)
-        bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.mesh.select_mode(type='VERT')
-        for vgroup in obj.vertex_groups:
-            bpy.ops.mesh.select_all(action='DESELECT')
-            bpy.ops.object.vertex_group_set_active(group=vgroup.name)
-            bpy.ops.object.vertex_group_select()
-            bpy.ops.mesh.separate(type='SELECTED')
-        bpy.ops.object.mode_set(mode='OBJECT')
 
 
 def save_shapekey_order(mesh_name):
@@ -1303,44 +1255,6 @@ def sort_shape_keys(mesh_name, shape_key_order=None):
 
     wm.progress_end()
 
-
-def isEmptyGroup(group_name):
-    mesh = get_objects().get('Body')
-    if mesh is None:
-        return True
-    vgroup = mesh.vertex_groups.get(group_name)
-    if vgroup is None:
-        return True
-
-    for vert in mesh.data.vertices:
-        for group in vert.groups:
-            if group.group == vgroup.index:
-                if group.weight > 0:
-                    return False
-
-    return True
-
-
-def removeEmptyGroups(obj, thres=0):
-    z = []
-    for v in obj.data.vertices:
-        for g in v.groups:
-            if g.weight > thres:
-                if g not in z:
-                    z.append(obj.vertex_groups[g.group])
-    for r in obj.vertex_groups:
-        if r not in z:
-            obj.vertex_groups.remove(r)
-
-
-def removeZeroVerts(obj, thres=0):
-    for v in obj.data.vertices:
-        z = []
-        for g in v.groups:
-            if not g.weight > thres:
-                z.append(g)
-        for r in z:
-            obj.vertex_groups[g.group].remove([v.index])
 
 def delete_hierarchy(parent):
     unselect_all()
@@ -1722,10 +1636,6 @@ def has_shapekeys(mesh):
     return hasattr(mesh.data.shape_keys, 'key_blocks')
 
 
-def matmul(a, b):
-    return a @ b
-
-
 def ui_refresh():
     # A way to refresh the ui
     refreshed = False
@@ -1772,79 +1682,6 @@ def update_material_list(self=None, context=None):
             bpy.ops.smc.refresh_ob_data()
     except AttributeError:
         print('Material Combiner not found')
-
-
-def unify_materials():
-    textures = []  # TODO
-
-    for ob in get_objects():
-        if ob.type == "MESH":
-            for mat_slot in ob.material_slots:
-                if mat_slot.material:
-                    mat_slot.material.blend_method = 'HASHED'
-                    # mat_slot.material.blend_method = 'BLEND'  # Use this for transparent textures only
-                    print('MAT: ', mat_slot.material.name)
-                    if mat_slot.material.node_tree:
-                        nodes = mat_slot.material.node_tree.nodes
-                        image = None
-                        for node in nodes:
-                            # print(' ' + node.name + ', ' + node.type + ', ' + node.label)
-                            if node.type == 'TEX_IMAGE' and 'toon' not in node.name and 'sphere' not in node.name:
-                                image = node.image
-                                # textures.append(node.image.name)
-                            mat_slot.material.node_tree.nodes.remove(node)
-
-                        # Create Image node
-                        node_texture = nodes.new(type='ShaderNodeTexImage')
-                        node_texture.location = 0, 0
-                        node_texture.image = image
-                        node_texture.label = 'Cats Texture'
-
-                        # Create Principled BSDF node
-                        node_prinipled = nodes.new(type='ShaderNodeBsdfPrincipled')
-                        node_prinipled.location = 300, -220
-                        node_prinipled.label = 'Cats Emission'
-                        node_prinipled.inputs['Specular'].default_value = 0
-                        node_prinipled.inputs['Roughness'].default_value = 0
-                        node_prinipled.inputs['Sheen Tint'].default_value = 0
-                        node_prinipled.inputs['Clearcoat Roughness'].default_value = 0
-                        node_prinipled.inputs['IOR'].default_value = 0
-
-                        # Create Transparency BSDF node
-                        node_transparent = nodes.new(type='ShaderNodeBsdfTransparent')
-                        node_transparent.location = 325, -100
-                        node_transparent.label = 'Cats Transparency'
-
-                        # Create Mix Shader node
-                        node_mix = nodes.new(type='ShaderNodeMixShader')
-                        node_mix.location = 600, 0
-                        node_mix.label = 'Cats Mix'
-
-                        # Create Output node
-                        node_output = nodes.new(type='ShaderNodeOutputMaterial')
-                        node_output.location = 800, 0
-                        node_output.label = 'Cats Output'
-
-                        # Create 2nd Output node
-                        node_output2 = nodes.new(type='ShaderNodeOutputMaterial')
-                        node_output2.location = 800, -200
-                        node_output2.label = 'Cats Export'
-
-                        # Link nodes together
-                        mat_slot.material.node_tree.links.new(node_texture.outputs['Color'], node_prinipled.inputs['Base Color'])
-                        mat_slot.material.node_tree.links.new(node_texture.outputs['Alpha'], node_mix.inputs['Fac'])
-
-                        mat_slot.material.node_tree.links.new(node_prinipled.outputs['BSDF'], node_mix.inputs[2])
-                        mat_slot.material.node_tree.links.new(node_transparent.outputs['BSDF'], node_mix.inputs[1])
-
-                        mat_slot.material.node_tree.links.new(node_mix.outputs['Shader'], node_output.inputs['Surface'])
-
-                        mat_slot.material.node_tree.links.new(node_prinipled.outputs['BSDF'], node_output2.inputs['Surface'])
-
-                    # break
-
-    print(textures, len(textures))
-    return {'FINISHED'}
 
 
 def bake_mmd_colors(node_base_tex: ShaderNodeTexImage, node_mmd_shader: ShaderNodeGroup):
@@ -2603,77 +2440,3 @@ else:
             args.append(undo)
 
         return operator(*args, **operator_args)
-
-""" === THIS CODE COULD BE USEFUL === """
-
-# def addvertex(meshname, shapekey_name):
-#     mesh = get_objects()[meshname].data
-#     bm = bmesh.new()
-#     bm.from_mesh(mesh)
-#     bm.verts.ensure_lookup_table()
-#
-#     print(" ")
-#     if shapekey_name in bm.verts.layers.shape.keys():
-#         val = bm.verts.layers.shape.get(shapekey_name)
-#         print("%s = %s" % (shapekey_name, val))
-#         sk = mesh.shape_keys.key_blocks[shapekey_name]
-#         print("v=%f, f=%f" % (sk.value, sk.frame))
-#         for i in range(len(bm.verts)):
-#             v = bm.verts[i]
-#             delta = v[val] - v.co
-#             if (delta.length > 0):
-#                 print("v[%d]+%s" % (i, delta))
-#
-#     print(" ")
-
-# === THIS CODE COULD BE USEFUL ===
-
-# Check which shape keys will be deleted on export by Blender
-# def checkshapekeys():
-#     for ob in get_objects():
-#         if ob.type == 'MESH':
-#             mesh = ob
-#     bm = bmesh.new()
-#     bm.from_mesh(mesh.data)
-#     bm.verts.ensure_lookup_table()
-#
-#     deleted_shapes = []
-#     for key in bm.verts.layers.shape.keys():
-#         if key == 'Basis':
-#             continue
-#         val = bm.verts.layers.shape.get(key)
-#         delete = True
-#         for vert in bm.verts:
-#             delta = vert[val] - vert.co
-#             if delta.length > 0:
-#                 delete = False
-#                 break
-#         if delete:
-#             deleted_shapes.append(key)
-#
-#     return deleted_shapes
-
-# # Repair vrc shape keys old
-# def repair_shapekeys():
-#     for ob in get_objects():
-#         if ob.type == 'MESH':
-#             mesh = ob
-#             bm = bmesh.new()
-#             bm.from_mesh(mesh.data)
-#             bm.verts.ensure_lookup_table()
-#
-#             for key in bm.verts.layers.shape.keys():
-#                 if not key.startswith('vrc'):
-#                     continue
-#
-#                 value = bm.verts.layers.shape.get(key)
-#                 for vert in bm.verts:
-#                     shapekey = vert
-#                     shapekey_coords = mesh.matrix_world * shapekey[value]
-#                     shapekey_coords[2] -= 0.00001
-#                     shapekey[value] = mesh.matrix_world.inverted() * shapekey_coords
-#                     break
-#
-#             bm.to_mesh(mesh.data)
-
-# === THIS CODE COULD BE USEFUL ===

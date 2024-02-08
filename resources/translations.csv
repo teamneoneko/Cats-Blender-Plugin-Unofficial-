@@ -672,18 +672,6 @@ ErrorDisplay.eyes3,"If you want Eye Tracking to work, rename this mesh to 'Body'
 ErrorDisplay.eyes3_alt,Make sure that the mesh containing the eyes is named 'Body' in order,,
 ErrorDisplay.eyes4_alt,to get Eye Tracking to work.,,
 ErrorDisplay.continue,Continue to Export,,
-OneTexPerMatButton.label,One Material Texture,1つのマテリアルテクスチャ,매테리얼당 하나의 텍스처
-OneTexPerMatButton.desc,Have all material slots ignore extra texture slots as these are not used by VRChat.,,
-OneTexPerMatOnlyButton.label,One Material Texture,1つのマテリアルテクスチャ,매테리얼당 하나의 텍스처
-OneTexPerMatOnlyButton.desc,"Have all material slots ignore extra texture slots as these are not used by VRChat.
-Also removes the textures from the material instead of disabling it.
-This makes no difference, but cleans the list for the perfectionists",,
-ToolsMaterial.error.notCompatible,This function is not yet compatible with Blender 2.8!,,
-OneTexPerXButton.success,All materials have one texture now.,,
-StandardizeTextures.label,Standardize Textures,テクスチャを標準化する,텍스처들 표준화
-StandardizeTextures.desc,"Enables Color and Alpha on every texture, sets the blend method to Multiply
-and changes the materials transparency to Z-Transparency",,
-StandardizeTextures.success,All textures are now standardized.,,
 CombineMaterialsButton.label,Combine Same Materials,同じマテリアルを組み合わせる,같은 매테리얼들을 통합
 CombineMaterialsButton.desc,"Combines similar materials into one, reducing draw calls.
 Your avatar should visibly look the same after this operation.
