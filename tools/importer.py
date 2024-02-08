@@ -2041,19 +2041,6 @@ class ExportModel(bpy.types.Operator):
                 return {'FINISHED'}
 
         # Continue if there are no errors or the check was skipped
-        # Check if copy protection is enabled
-        mesh_smooth_type = 'OFF'
-        protected_export = False
-        for mesh in meshes:
-            if protected_export:
-                break
-            if Common.has_shapekeys(mesh):
-                for shapekey in mesh.data.shape_keys.key_blocks:
-                    if shapekey.name == 'Basis Original':
-                        protected_export = True
-                        break
-        if protected_export:
-            mesh_smooth_type = 'FACE'
 
         # Check if textures are found and if they should be embedded
         path_mode = 'AUTO'
@@ -2071,8 +2058,7 @@ class ExportModel(bpy.types.Operator):
                                          bake_anim=False,
                                          apply_scale_options='FBX_SCALE_ALL',
                                          path_mode=path_mode,
-                                         embed_textures=True,
-                                         mesh_smooth_type=mesh_smooth_type)
+                                         embed_textures=True,)
             else:
                 bpy.ops.export_scene.fbx('INVOKE_DEFAULT',
                                          object_types={'EMPTY', 'ARMATURE', 'MESH', 'OTHER'},
@@ -2081,8 +2067,7 @@ class ExportModel(bpy.types.Operator):
                                          bake_anim=False,
                                          apply_scale_options='FBX_SCALE_ALL',
                                          path_mode=path_mode,
-                                         embed_textures=True,
-                                         mesh_smooth_type=mesh_smooth_type)
+                                         embed_textures=True,)
         except (TypeError, ValueError):
             bpy.ops.export_scene.fbx('INVOKE_DEFAULT')
         except AttributeError:

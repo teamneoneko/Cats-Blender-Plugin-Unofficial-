@@ -103,7 +103,3 @@ class OtherOptionsPanel(ToolPanel, bpy.types.Panel):
                 row = col.row(align=True)
                 row.scale_y = button_height
                 row.operator(Armature_manual.TestButton.bl_idname)
-
-            # row = col.row(align=True)
-            # row.scale_y = button_height
-            # row.operator(Armature_manual.SeparateByCopyProtection.bl_idname, icon='SHAPEKEY_DATA')
