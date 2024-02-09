@@ -1591,12 +1591,9 @@ def get_tricount(obj):
 
 def clean_material_names(mesh):
     for j, mat in enumerate(mesh.material_slots):
-        if mat.name.endswith('.001'):
+        if mat.name.endswith(('.0+', ' 0+')):
             mesh.active_material_index = j
-            mesh.active_material.name = mat.name[:-4]
-        if mat.name.endswith(('. 001', ' .001')):
-            mesh.active_material_index = j
-            mesh.active_material.name = mat.name[:-5]
+            mesh.active_material.name = mat.name[:-len(mat.name.rstrip('0')) - 1]
 
 
 def mix_weights(mesh, vg_from, vg_to, mix_strength=1.0, mix_mode='ADD', delete_old_vg=True):
