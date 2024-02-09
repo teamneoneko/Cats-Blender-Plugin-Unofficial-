@@ -6,7 +6,7 @@ bl_info = {
     'author': 'GiveMeAllYourCats & Hotox, Unofficial version maintained by Yusarina',
     'location': 'View 3D > Tool Shelf > CATS',
     'description': 'A tool designed to shorten steps needed to import and optimize models into VRChat',
-    'version': (3, 6, 5, 2),  # Has to be (x, x, x) not [x, x, x]!! Only change this version and the dev branch var right before publishing the new update!
+    'version': (3, 6, 6, 0),  # Has to be (x, x, x) not [x, x, x]!! Only change this version and the dev branch var right before publishing the new update!
     'blender': (3, 6, 0),
     'wiki_url': 'https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki',
     'tracker_url': 'https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/issues',
@@ -295,16 +295,10 @@ def register():
     bpy.context.window_manager.addon_support = {'OFFICIAL', 'COMMUNITY'}
 
     # Add shapekey button to shapekey menu
-    if hasattr(bpy.types, 'MESH_MT_shape_key_specials'):  # pre 2.80
-        bpy.types.MESH_MT_shape_key_specials.append(tools.shapekey.addToShapekeyMenu)
-    else:
-        bpy.types.MESH_MT_shape_key_context_menu.append(tools.shapekey.addToShapekeyMenu)
+    bpy.types.MESH_MT_shape_key_context_menu.append(tools.shapekey.addToShapekeyMenu)
 
     # Disable request warning when using google translate
     requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-
-    # Monkey patch fbx exporter to include empty shapekeys
-    tools.fbx_patch.start_patch_fbx_exporter_timer()
 
     # Apply the settings after a short time, because you can't change checkboxes during register process
     tools.settings.start_apply_settings_timer()

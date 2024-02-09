@@ -153,6 +153,12 @@ def register():
         default=True
     )
 
+    Scene.delete_zero_weight_keep_twists = BoolProperty(
+        name=t('Scene.delete_zero_weight_keep_twists.label'),
+        description=t('Scene.delete_zero_weight_keep_twists.desc'),
+        default=False
+    )
+
     Scene.merge_armatures_cleanup_shape_keys = BoolProperty(
         name=t('Scene.merge_armatures_cleanup_shape_keys.label'),
         description=t('Scene.merge_armatures_cleanup_shape_keys.desc'),
