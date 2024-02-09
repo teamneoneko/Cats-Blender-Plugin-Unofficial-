@@ -1925,14 +1925,30 @@ def remove_toon_shader(mesh):
                     #     nodes.remove(node)
 
 
-def fix_mmd_shader(mesh):
-    for mat_slot in mesh.material_slots:
-        if mat_slot.material and mat_slot.material.node_tree:
-            nodes = mat_slot.material.node_tree.nodes
-            for node in nodes:
-                if node.name == 'mmd_shader':
-                    node.inputs['Reflect'].default_value = 1
+def fix_mmd_shader(mesh_obj: bpy.types.Object):
+    # Iterate through each material slot in the mesh object
+    for mat_slot in mesh_obj.material_slots:
+        # Skip the current iteration if the material or its node tree is missing
+        material = mat_slot.material
+        if not material or not material.node_tree:
+            continue
 
+        # Get the nodes of the material's node tree
+        mmd_shader_node = material.node_tree.nodes.get("mmd_shader")
+        # If the 'mmd_shader' node doesn't exist, skip the current iteration
+        if not mmd_shader_node:
+            continue
+
+        # Get the 'Reflect' input of the 'mmd_shader' node
+        reflect_input = mmd_shader_node.inputs.get("Reflect")
+        # If the 'Reflect' input doesn't exist, skip the current iteration
+        if not reflect_input:
+            continue
+
+        # Set the default value of the 'Reflect' input to 1
+        reflect_input.default_value = 1
+        # Exit the loop once the 'mmd_shader' node is found
+        break
 
 def fix_vrm_shader(mesh):
     for mat_slot in mesh.material_slots:
