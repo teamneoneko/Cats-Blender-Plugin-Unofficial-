@@ -1950,50 +1950,47 @@ def fix_mmd_shader(mesh_obj: bpy.types.Object):
         # Exit the loop once the 'mmd_shader' node is found
         break
 
-def fix_vrm_shader(mesh):
+
+def fix_vrm_shader(mesh: bpy.types.Mesh):
+    # Iterate through each material slot in the mesh
     for mat_slot in mesh.material_slots:
-        if mat_slot.material and mat_slot.material.node_tree:
-            is_vrm_mat = False
-            nodes = mat_slot.material.node_tree.nodes
-            for node in nodes:
-                if hasattr(node, 'node_tree') and 'MToon_unversioned' in node.node_tree.name:
-                    node.location[0] = 200
-                    node.inputs['ReceiveShadow_Texture_alpha'].default_value = -10000
-                    node.inputs['ShadeTexture'].default_value = (1.0, 1.0, 1.0, 1.0)
-                    node.inputs['Emission_Texture'].default_value = (0.0, 0.0, 0.0, 0.0)
-                    node.inputs['SphereAddTexture'].default_value = (0.0, 0.0, 0.0, 0.0)
+        # Skip this iteration if the material or its node tree is missing
+        if not mat_slot.material or not mat_slot.material.node_tree:
+            continue
 
-                    # Support typo in old vrm importer
-                    node_input = node.inputs.get('NomalmapTexture') or node.inputs.get('NormalmapTexture')
-                    node_input.default_value = (1.0, 1.0, 1.0, 1.0)
+        is_vrm_mat = False
+        nodes = mat_slot.material.node_tree.nodes
+        # Iterate through each node in the material's node tree
+        for node in nodes:
+            # Check if the node has a node tree and its name contains 'MToon_unversioned'
+            if hasattr(node, 'node_tree') and 'MToon_unversioned' in node.node_tree.name:
+                # Set the node's location and default values for certain inputs
+                node.location[0] = 200
+                node.inputs['ReceiveShadow_Texture_alpha'].default_value = -10000
+                node.inputs['ShadeTexture'].default_value = (1.0, 1.0, 1.0, 1.0)
+                node.inputs['Emission_Texture'].default_value = (0.0, 0.0, 0.0, 0.0)
+                node.inputs['SphereAddTexture'].default_value = (0.0, 0.0, 0.0, 0.0)
 
-                    is_vrm_mat = True
-                    break
-            if not is_vrm_mat:
-                continue
+                node_input = node.inputs.get('NomalmapTexture') or node.inputs.get('NormalmapTexture')
+                node_input.default_value = (1.0, 1.0, 1.0, 1.0)
 
-            nodes_to_keep = ['DiffuseColor', 'MainTexture', 'Emission_Texture']
-            if 'HAIR' in mat_slot.material.name:
-                nodes_to_keep = ['DiffuseColor', 'MainTexture', 'Emission_Texture', 'SphereAddTexture']
+                is_vrm_mat = True
+                break
 
-            for node in nodes:
-                # Delete all unneccessary nodes
-                if 'RGB' in node.name \
-                        or 'Value' in node.name \
-                        or 'Image Texture' in node.name \
-                        or 'UV Map' in node.name \
-                        or 'Mapping' in node.name:
-                    if node.label not in nodes_to_keep:
-                        for output in node.outputs:
-                            for link in output.links:
-                                mat_slot.material.node_tree.links.remove(link)
-                        continue
+        if not is_vrm_mat:
+            continue
 
-                # if hasattr(node, 'node_tree') and 'matcap_vector' in node.node_tree.name:
-                #     for output in node.outputs:
-                #         for link in output.links:
-                #             mat_slot.material.node_tree.links.remove(link)
-                #     continue
+        nodes_to_keep = ['DiffuseColor', 'MainTexture', 'Emission_Texture']
+        if 'HAIR' in mat_slot.material.name:
+            nodes_to_keep = ['DiffuseColor', 'MainTexture', 'Emission_Texture', 'SphereAddTexture']
+
+        # Iterate through each node in the material's node tree again
+        for node in nodes:
+            # Check if the node's name contains certain keywords and its label is not in the list of nodes to keep
+            if 'RGB' in node.name or 'Value' in node.name or 'Image Texture' in node.name or 'UV Map' in node.name or 'Mapping' in node.name:
+                if node.label not in nodes_to_keep:
+                    # Remove all links connected to the node
+                    mat_slot.material.node_tree.links = [link for link in mat_slot.material.node_tree.links if not (link.from_node == node or link.to_node == node)]
 
 
 def fix_twist_bones(mesh, bones_to_delete):
