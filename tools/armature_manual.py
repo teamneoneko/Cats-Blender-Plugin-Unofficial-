@@ -827,7 +827,9 @@ def merge_weights(armature, parenting_list):
     # Delete merged bones
     if not bpy.context.scene.keep_merged_bones:
         for bone in parenting_list.keys():
-            armature.data.edit_bones.remove(armature.data.edit_bones.get(bone))
+            edited_bone = armature.data.edit_bones.get(bone)
+            if edited_bone is not None:
+                armature.data.edit_bones.remove(edited_bone)
 
 
 @register_wrap
