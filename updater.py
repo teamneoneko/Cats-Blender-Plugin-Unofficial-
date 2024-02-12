@@ -89,8 +89,8 @@ class UpdateToLatestButton(bpy.types.Operator):
 
 class UpdateToSelectedButton(bpy.types.Operator):
     bl_idname = 'cats_updater.update_selected'
-    bl_label = 'Update to Selected version'
-    bl_description = 'Updates CATS to the selected version'
+    bl_label = t('UpdateToSelectedButton.label')
+    bl_description = t('UpdateToSelectedButton.desc')
     bl_options = {'INTERNAL'}
 
     @classmethod
@@ -757,8 +757,6 @@ def get_user_preferences():
 
 
 def layout_split(layout, factor=0.0, align=False):
-    if bpy.app.version < (2, 79, 9):
-        return layout.split(percentage=factor, align=align)
     return layout.split(factor=factor, align=align)
 
 

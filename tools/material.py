@@ -8,109 +8,6 @@ from mmd_tools_local.operators import morph as Morph
 from . import armature as Armature
 mmd_tools_local_installed = True
 
-
-@register_wrap
-class OneTexPerMatButton(bpy.types.Operator):
-    bl_idname = 'cats_material.one_tex'
-    bl_label = t('OneTexPerMatButton.label')
-    bl_description = t('OneTexPerMatButton.desc')
-    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
-
-    @classmethod
-    def poll(cls, context):
-        if Common.get_armature() is None:
-            return False
-        return len(Common.get_meshes_objects(check=False)) > 0
-
-    def execute(self, context):
-        self.report({'ERROR'}, t('ToolsMaterial.error.notCompatible'))
-        return {'CANCELLED'}
-
-        saved_data = Common.SavedData()
-
-        Common.set_default_stage()
-
-        for mesh in Common.get_meshes_objects():
-            for mat_slot in mesh.material_slots:
-                for i, tex_slot in enumerate(mat_slot.material.texture_slots):
-                    if i > 0 and tex_slot:
-                        mat_slot.material.use_textures[i] = False
-
-        saved_data.load()
-
-        self.report({'INFO'}, t('OneTexPerMatButton.success'))
-        return {'FINISHED'}
-
-@register_wrap
-class OneTexPerMatOnlyButton(bpy.types.Operator):
-    bl_idname = 'cats_material.one_tex_only'
-    bl_label = t('OneTexPerMatOnlyButton.label')
-    bl_description = t('OneTexPerMatOnlyButton.desc')
-    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
-
-    @classmethod
-    def poll(cls, context):
-        if Common.get_armature() is None:
-            return False
-        return len(Common.get_meshes_objects(check=False)) > 0
-
-    def execute(self, context):
-        self.report({'ERROR'}, t('ToolsMaterial.error.notCompatible'))
-        return {'CANCELLED'}
-
-        saved_data = Common.SavedData()
-
-        Common.set_default_stage()
-
-        for mesh in Common.get_meshes_objects():
-            for mat_slot in mesh.material_slots:
-                for i, tex_slot in enumerate(mat_slot.material.texture_slots):
-                    if i > 0 and tex_slot:
-                        tex_slot.texture = None
-
-        saved_data.load()
-
-        self.report({'INFO'}, t('OneTexPerXButton.success'))
-        return {'FINISHED'}
-
-@register_wrap
-class StandardizeTextures(bpy.types.Operator):
-    bl_idname = 'cats_material.standardize_textures'
-    bl_label = t('StandardizeTextures.label')
-    bl_description = t('StandardizeTextures.desc')
-    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
-
-    @classmethod
-    def poll(cls, context):
-        if Common.get_armature() is None:
-            return False
-        return len(Common.get_meshes_objects(check=False)) > 0
-
-    def execute(self, context):
-        self.report({'ERROR'}, t('ToolsMaterial.error.notCompatible'))
-        return {'CANCELLED'}
-        
-        saved_data = Common.SavedData()
-
-        Common.set_default_stage()
-
-        for mesh in Common.get_meshes_objects():
-            for mat_slot in mesh.material_slots:
-
-                mat_slot.material.transparency_method = 'Z_TRANSPARENCY'
-                mat_slot.material.alpha = 1
-
-                for tex_slot in mat_slot.material.texture_slots:
-                    if tex_slot:
-                        tex_slot.use_map_alpha = True
-                        tex_slot.use_map_color_diffuse = True
-                        tex_slot.blend_type = 'MULTIPLY'
-
-        saved_data.load()
-
-        self.report({'INFO'}, t('StandardizeTextures.success'))
-        return {'FINISHED'}
-
 @register_wrap
 class CombineMaterialsButton(bpy.types.Operator):
     bl_idname = 'cats_material.combine_mats'
@@ -127,8 +24,9 @@ class CombineMaterialsButton(bpy.types.Operator):
         return len(Common.get_meshes_objects(check=False)) > 0
 
     def assignmatslots(self, ob, matlist):
+        context = bpy.context
         scn = bpy.context.scene
-        ob_active = Common.get_active()
+        ob_active = context.view_layer.objects.active
         Common.set_active(ob)
 
         for s in ob.material_slots:
@@ -285,7 +183,7 @@ class FixMaterialsButton(bpy.types.Operator):
                 mat_slot.material.blend_method = "HASHED"
         
         materials = set() 
-        
+
         self.report({'INFO'}, "Fixed materials")
         return {'FINISHED'} 
 

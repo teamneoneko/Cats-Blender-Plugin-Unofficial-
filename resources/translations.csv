@@ -46,8 +46,8 @@ Blender 3.6 버전 이상을 사용하세요.
 "
 Main.error.40unsupportedVersion,"
 
-Blender 42 is not supported by this version of cats.
-Please use Blender 4.0.
+Blender 4.1+ is not supported by this version of cats.
+Please use Blender 4.0 you can download a 4.1 version on my github.
 ",,"
 
 이 버전의 고양이에서는 블렌더 4.0이 지원되지 않습니다..
@@ -213,10 +213,6 @@ OptimizePanel.matCombOutdated5_2.8,right.,右側にあります。。,오른쪽�
 OptimizePanel.matCombOutdated6,Or download and install it manually:,または手動でダウンロードしてインストールする:,혹은 직접 다운로드와 설치하기:
 OptimizePanel.matCombOutdated6_alt,Download and install it manually:,手動でダウンロードしてインストールする:,직접 다운로드와 설치하기:
 OptimizePanel.matCombNotInstalled,Material Combiner is not installed!,マテリアル コンバイナーがインストールされていません!,매테리얼 통합기가 설치되지 않았습니다!
-CopyProtectionPanel.label,Copy Protection,コピープロテクション,복사핵 방지
-CopyProtectionPanel.desc1,Tries to protect your avatar from Unity cache ripping.,Unity キャッシュリッピングからアバターを保護しようとします。,유니티 캐쉬뜨기로부터 당신의 아바타를 보호하세요.
-CopyProtectionPanel.desc2,This protection is not 100% safe!,この保護は100%安全ではありません!,이 방법도 100% 안전하지는 않습니다!
-CopyProtectionPanel.desc3,Before use: Read the documentation!,使用前: ドキュメントを読んでください!,사용 전에: 문서를 읽어주세요!
 ScalingPanel.label,Model Scaling,,
 ScalingPanel.imscaleDisabled1,Immersive Scaler is not enabled!,,
 ScalingPanel.imscaleDisabled2,Enable it in your user preferences:,,
@@ -361,15 +357,6 @@ Very useful for manual decimation",,"선택된 메쉬를 두 부분으로 나누
 
 수동으로 데시메이션을 할 시 매우 유용합니다"
 SeparateByShapekeys.success,Successfully separated by shape keys.,,성공적으로 쉐이프키별로 분리됐습니다.
-SeparateByCopyProtection.label,Separate by Copy Protection,コピープロテクションに分離する,복사핵 방지로 분리하기
-SeparateByCopyProtection.desc,"Separates selected mesh into two parts,
-depending on whether it is effected by the Cats Copy Protection or not.
-
-Useful if you have the Copy Protection enabled on multiple selected parts of your model",,"선택된 메쉬를 두 부분으로 나누는데,
-Cats의 복사핵 방지의 영향을 받는지 여부에 따라 결정됩니다.
-
-모델의 여러 부분에서 복사 방지를 활성화 한 경우 유용합니다."
-SeparateByCopyProtection.success,Successfully separated by shape keys.,,성공적으로 쉐이프키별로 분리됐습니다.
 SeparateByX.error.noMesh,No meshes found!,,메쉬가 발견되지 않음!
 SeparateByX.error.multipleMesh,"Multiple meshes found!
 Please select the mesh you want to separate!",,"여러 메쉬들이 발견됨!
@@ -519,16 +506,6 @@ BoneMergeButton.desc,"Merges the given percentage of bones together.
 This is useful to reduce the amount of bones used by Dynamic Bones.",,
 BoneMergeButton.success,Merged bones.,,
 ShowError.label,Report: Error,レポート: エラー,
-CopyProtectionEnable.label,Enable Protection,保護を有効にする,보호 활성화
-CopyProtectionEnable.desc,"Protects your model from piracy. NOT a 100% safe protection!
-Read the documentation before use",,
-CopyProtectionEnable.success,Model secured!,,
-CopyProtectionDisable.label,Disable Protection,保護を無効にする,보호 비활성화
-CopyProtectionDisable.desc,Removes the copy protections from this model.,,
-CopyProtectionDisable.success,Model un-secured!,,
-ProtectionTutorialButton.label,Go to Documentation,ドキュメントに移動,문서로 이동
-ProtectionTutorialButton.URL,https://github.com/michaeldegroot/cats-blender-plugin#copy-protection,,
-ProtectionTutorialButton.success,Documentation,,
 ForumButton.label,Go to the Forums,フォーラムに移動する,포럼으로 가기
 ForumButton.URL,https://vrcat.club/threads/cats-blender-plugin.6/,,
 ForumButton.success,Forum opened.,,
@@ -672,18 +649,6 @@ ErrorDisplay.eyes3,"If you want Eye Tracking to work, rename this mesh to 'Body'
 ErrorDisplay.eyes3_alt,Make sure that the mesh containing the eyes is named 'Body' in order,,
 ErrorDisplay.eyes4_alt,to get Eye Tracking to work.,,
 ErrorDisplay.continue,Continue to Export,,
-OneTexPerMatButton.label,One Material Texture,1つのマテリアルテクスチャ,매테리얼당 하나의 텍스처
-OneTexPerMatButton.desc,Have all material slots ignore extra texture slots as these are not used by VRChat.,,
-OneTexPerMatOnlyButton.label,One Material Texture,1つのマテリアルテクスチャ,매테리얼당 하나의 텍스처
-OneTexPerMatOnlyButton.desc,"Have all material slots ignore extra texture slots as these are not used by VRChat.
-Also removes the textures from the material instead of disabling it.
-This makes no difference, but cleans the list for the perfectionists",,
-ToolsMaterial.error.notCompatible,This function is not yet compatible with Blender 2.8!,,
-OneTexPerXButton.success,All materials have one texture now.,,
-StandardizeTextures.label,Standardize Textures,テクスチャを標準化する,텍스처들 표준화
-StandardizeTextures.desc,"Enables Color and Alpha on every texture, sets the blend method to Multiply
-and changes the materials transparency to Z-Transparency",,
-StandardizeTextures.success,All textures are now standardized.,,
 CombineMaterialsButton.label,Combine Same Materials,同じマテリアルを組み合わせる,같은 매테리얼들을 통합
 CombineMaterialsButton.desc,"Combines similar materials into one, reducing draw calls.
 Your avatar should visibly look the same after this operation.
@@ -843,7 +808,7 @@ This will not change how the bones function in any way, it just improves the aes
 뼈의 기능에는 영향을 주지 않으며 뼈대(armature)의 미관을 개선할 뿐입니다."
 Scene.fix_materials.label,Fix Materials,マテリアルを修正する,매테리얼 고치기
 Scene.fix_materials.desc,This will apply some VRChat related fixes to materials,,매테리얼에 일부 VRChat 관련 픽스가 적용됩니다.
-Scene.delete_zero_weight_keep_twists.label,Experimental: Keep bones with _twist,実験的: _twist でボーンを維持する,실험: _twist를 사용하여 뼈 유지
+Scene.delete_zero_weight_keep_twists.label,Keep bones with _twist,_twist でボーンを維持する,_twist를 사용하여 뼈 유지
 Scene.delete_zero_weight_keep_twists.desc,When checked any bones with _twist or Twist in it's name will be kept. This is too ensure twist bones are kept,チェックすると、名前に _twist または Twist が含まれるボーンが保持されます。これにより、ツイストボーンが確実に保持されます,선택하면 이름에 _twist 또는 Twist가 포함된 뼈대가 유지됩니다. 이는 트위스트 뼈가 유지되도록 보장하는 것이기도 합니다.
 Scene.remove_rigidbodies_joints.label,Remove Rigidbodies and Joints,リジッドボディとジョイントを除去,Rigidbodies와 Joints 제거
 Scene.remove_rigidbodies_joints.desc,"Rigidbodies and joints are used by MMD software to simulate physics.

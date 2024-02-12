@@ -88,11 +88,6 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
             row.alignment = 'RIGHT'
             row.scale_y = 0.9
             row.operator(Atlas.AtlasHelpButton.bl_idname, text="", icon='QUESTION')
-            # row.separator()
-            # row = split.row(align=False)
-            # row.alignment = 'RIGHT'
-            # row.scale_y = 0.9
-            # row.operator(Atlas.AtlasHelpButton.bl_idname, text="", icon='QUESTION')
             col.separator()
 
             # If supported version is outdated
