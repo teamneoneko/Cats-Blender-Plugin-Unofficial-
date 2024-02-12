@@ -37,19 +37,6 @@ class FixArmature(bpy.types.Operator):
         return True
 
     def execute(self, context):
-        # Todo: Remove this
-        # armature = Common.get_armature()
-        # Common.switch('EDIT')
-        #
-        # for bone in armature.data.edit_bones:
-        #     bone.tail = bone.head
-        #     bone.tail[2] += 0.1
-        #
-        # Common.switch('OBJECT')
-        #
-        #
-        # return {'FINISHED'}
-
         saved_data = Common.SavedData()
 
         is_vrm = False
@@ -241,34 +228,13 @@ class FixArmature(bpy.types.Operator):
                 Common.switch('OBJECT')
                 Common.delete_hierarchy(bpy.data.objects[obj_name])
 
-        # Remove objects from different layers and things that are not meshes
-        get_current_layers = []
-        if hasattr(bpy.context.scene, 'layers'):
-            for i, layer in enumerate(bpy.context.scene.layers):
-                if layer:
-                    get_current_layers.append(i)
-
         if len(armature.children) > 1:
             for child in armature.children:
                 for child2 in child.children:
                     if child2.type != 'MESH':
                         Common.delete(child2)
-                        continue
-                    in_layer = False
-                    for i in get_current_layers:
-                        if child2.layers[i]:
-                            in_layer = True
-                    if not in_layer:
-                        Common.delete(child2)
 
                 if child.type != 'MESH':
-                    Common.delete(child)
-                    continue
-                in_layer = False
-                for i in get_current_layers:
-                    if child.layers[i]:
-                        in_layer = True
-                if not in_layer and hasattr(bpy.context.scene, 'layers'):
                     Common.delete(child)
 
         # Unlock all transforms
@@ -900,7 +866,7 @@ class FixArmature(bpy.types.Operator):
             hips = armature.pose.bones.get('Hips')
 
             obj = hips.id_data
-            matrix_final = Common.matmul(obj.matrix_world, hips.matrix)
+            matrix_final = obj.matrix_world @ hips.matrix
             # print(matrix_final)
             # print(matrix_final[2][3])
             # print(fbx)
@@ -909,7 +875,7 @@ class FixArmature(bpy.types.Operator):
                 # print(hips.head[0], hips.head[1], hips.head[2])
                 # Rotation of -180 around the X-axis
                 rot_x_neg180 = Matrix.Rotation(-math.pi, 4, 'X')
-                armature.matrix_world = Common.matmul(rot_x_neg180, armature.matrix_world)
+                armature.matrix_world = rot_x_neg180 @ armature.matrix_world
 
                 for mesh in meshes:
                     mesh.rotation_euler = (math.radians(180), 0, 0)
@@ -1201,6 +1167,7 @@ class FixArmature(bpy.types.Operator):
             except RuntimeError:
                 pass
 
+        armature.show_in_front = False
         wm.progress_end()
 
         if not hierarchy_check_hips['result']:
