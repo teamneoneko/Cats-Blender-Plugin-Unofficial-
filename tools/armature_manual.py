@@ -1163,7 +1163,7 @@ class RemoveDoubles(bpy.types.Operator):
         Common.set_default_stage()
 
         for mesh in meshes:
-            removed_tris += Common.remove_doubles(mesh, 0.0001, save_shapes=True)
+            removed_tris += Common.remove_doubles(mesh, 0.00002, save_shapes=True)
 
         Common.set_default_stage()
 
