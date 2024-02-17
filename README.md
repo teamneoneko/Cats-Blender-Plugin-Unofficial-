@@ -9,11 +9,12 @@ You can find both 3.6 and 4.0 blender releases [here](https://github.com/Yusarin
 
 You can find the development version for Blender 3.6 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-36-dev).
 You can find the development version for Blender 4.0 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-40-dev).
+You can find the development version for Blender 4.1 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-41-dev)
 
-### Warning for Blender 4.0 users:
-Though we have updated cats to blender 4.0, please note there are still some issues with MMD Tools which may break some plugin functionality, this is not a cats issue so please redirect those issues to MMD Tools. Blender 4.0 is not our priority and will be behind the blender 3.6 version. We HIGHLY recommend using blender 3.6 for the time being unless you REALLY need the new features in 4.0, which if your just making VRChat models or doing MMD stuff you most likely don't.
+### Warning for Blender 4.0 and 4.1 users:
+Though we have updated cats to blender 4.0 and 4.1, please note there are still some issues with MMD Tools which may break some plugin functionality, this is not a cats issue so please redirect those issues to MMD Tools. Blender 4.0 and 4.1 is not our priority and will be behind the blender 3.6 version. We HIGHLY recommend using blender 3.6 for the time being unless you REALLY need the new features in 4.0 and 4.1, which if your just making VRChat models or doing MMD stuff you most likely don't.
 
-Blender 4.0 is also buggy and does have issues as well, we won't be recommending use of blender 4.x unto the first LTS comes out later this year.
+Blender 4.1 is also buggy and does have issues as well, we won't be recommending use of blender 4.x unto the first LTS comes out later this year.
 
 With Cats it takes only a few minutes to upload your model into VRChat.
 All the hours long processes of fixing your models are compressed into a few functions!
