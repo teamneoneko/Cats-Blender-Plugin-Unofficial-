@@ -9,6 +9,7 @@ You can find both 3.6 and 4.0 blender releases [here](https://github.com/Yusarin
 
 You can find the development version for Blender 3.6 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-36-dev).
 You can find the development version for Blender 4.0 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-40-dev).
+
 You can find the development version for Blender 4.1 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-41-dev).
 
 ### Warning for Blender 4.0 and 4.1 users:
