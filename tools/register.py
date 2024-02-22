@@ -33,6 +33,7 @@ def make_annotations(cls):
         for k, v in bl_props.items():
             annotations[k] = v
             delattr(cls, k)
+    return cls
 
 
 def order_classes():
