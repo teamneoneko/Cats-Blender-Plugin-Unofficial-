@@ -220,15 +220,6 @@ def switch(new_mode, check_mode=True):
         bpy.ops.object.mode_set(mode=new_mode, toggle=False)
 
 
-def set_default_stage_old():
-    switch('OBJECT')
-    unhide_all()
-    unselect_all()
-    armature = get_armature()
-    set_active(armature)
-    return armature
-
-
 def set_default_stage():
     """
     Selects the armature, unhides everything and sets the modes of every object to object mode
@@ -294,15 +285,6 @@ def remove_empty():
         unselect_all()
 
 
-def get_bone_angle(p1, p2):
-    try:
-        ret = degrees((p1.head - p1.tail).angle(p2.head - p2.tail))
-    except ValueError:
-        ret = 0
-
-    return ret
-
-
 def remove_unused_vertex_groups(ignore_main_bones=False):
     remove_count = 0
     unselect_all()
@@ -322,25 +304,6 @@ def remove_unused_vertex_groups(ignore_main_bones=False):
                     continue
                 mesh.vertex_groups.remove(mesh.vertex_groups[i])
                 remove_count += 1
-    return remove_count
-
-
-def remove_unused_vertex_groups_of_mesh(mesh):
-    remove_count = 0
-    unselect_all()
-    mesh.update_from_editmode()
-
-    vgroup_used = {i: False for i, k in enumerate(mesh.vertex_groups)}
-
-    for v in mesh.data.vertices:
-        for g in v.groups:
-            if g.weight > 0.0:
-                vgroup_used[g.group] = True
-
-    for i, used in sorted(vgroup_used.items(), reverse=True):
-        if not used:
-            mesh.vertex_groups.remove(mesh.vertex_groups[i])
-            remove_count += 1
     return remove_count
 
 
@@ -410,16 +373,6 @@ def get_top_meshes(self, context):
         choices.append((mesh.name, mesh.name, mesh.name))
 
     return choices
-
-
-# currently unused
-def get_all_meshes(self, context):
-    choices = []
-
-    for mesh in get_meshes_objects(mode=2, check=False):
-        choices.append((mesh.name, mesh.name, mesh.name))
-
-    return _sort_enum_choices_by_identifier_lower(choices)
 
 
 def get_armature_list(self, context):
@@ -1235,12 +1188,6 @@ def delete(obj):
     objs.remove(objs[obj.name], do_unlink=True)
 
 
-def days_between(d1, d2, time_format):
-    d1 = datetime.strptime(d1, time_format)
-    d2 = datetime.strptime(d2, time_format)
-    return abs((d2 - d1).days)
-
-
 def delete_bone_constraints(armature_name=None):
     if not armature_name:
         armature_name = bpy.context.scene.armature
@@ -1327,33 +1274,6 @@ def is_default_object(obj):
     elif obj.type == 'MESH' and obj.data.name == 'Cube':
         return True
     return False
-
-
-def remove_no_user_objects():
-    # print('\nREMOVE OBJECTS')
-    for block in get_objects():
-        # print(block.name, block.users)
-        if block.users == 0:
-            print('Removing obj ', block.name)
-            delete(block)
-    # print('\nREMOVE MESHES')
-    for block in bpy.data.meshes:
-        # print(block.name, block.users)
-        if block.users == 0:
-            print('Removing mesh ', block.name)
-            bpy.data.meshes.remove(block)
-    # print('\nREMOVE MATERIALS')
-    for block in bpy.data.materials:
-        # print(block.name, block.users)
-        if block.users == 0:
-            print('Removing material ', block.name)
-            bpy.data.materials.remove(block)
-
-    # print('\nREMOVE MATS')
-    # for block in bpy.data.materials:
-    #     print(block.name, block.users)
-    #     if block.users == 0:
-    #         bpy.data.materials.remove(block)
 
 
 def is_end_bone(name, armature_name):
@@ -1904,25 +1824,6 @@ def add_principled_shader(mesh: Object, bake_mmd=True):
                     cats_principled_bsdf.inputs["Base Color"].default_value = principled_base_color
                 # Link principled BSDF node's output to the material output
                 node_tree.links.new(cats_principled_bsdf.outputs["BSDF"], cats_material_output.inputs["Surface"])
-
-
-def remove_toon_shader(mesh):
-    for mat_slot in mesh.material_slots:
-        if mat_slot.material and mat_slot.material.node_tree:
-            nodes = mat_slot.material.node_tree.nodes
-            for node in nodes:
-                if node.name == 'mmd_toon_tex':
-                    print('Toon tex removed from material', mat_slot.material.name)
-                    nodes.remove(node)
-                    # if not node.image or not node.image.filepath:
-                    #     print('Toon tex removed: Empty, from material', mat_slot.material.name)
-                    #     nodes.remove(node)
-                    #     continue
-                    #
-                    # image_filepath = bpy.path.abspath(node.image.filepath)
-                    # if not os.path.isfile(image_filepath):
-                    #     print('Toon tex removed:', node.image.name, 'from material', mat_slot.material.name)
-                    #     nodes.remove(node)
 
 
 def fix_mmd_shader(mesh_obj: bpy.types.Object):
