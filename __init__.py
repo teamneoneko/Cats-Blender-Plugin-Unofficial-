@@ -12,7 +12,7 @@ bl_info = {
     'tracker_url': 'https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/issues',
     'warning': '',
 }
-dev_branch = False
+dev_branch = True
 import os
 import sys
 

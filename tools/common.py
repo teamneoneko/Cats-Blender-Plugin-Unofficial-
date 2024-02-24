@@ -1563,10 +1563,19 @@ def ui_refresh():
 def fix_zero_length_bones(armature: bpy.types.Object):
     if armature.mode != 'EDIT':
         return
-
-    for bone in armature.data.edit_bones:
-        if all(round(h, 4) == round(t, 4) for h, t in zip(bone.head, bone.tail)):
-            bone.tail.z += 0.1
+        
+    edit_bones = armature.data.edit_bones[:]
+    
+    for bone in edit_bones:
+        length = (bone.head - bone.tail).length
+        if length > 0.0001:
+            continue
+            
+        head_rounded = [round(x, 4) for x in bone.head] 
+        tail_rounded = [round(x, 4) for x in bone.tail]
+        
+        if head_rounded == tail_rounded:
+            bone.tail.translate(Vector((0, 0, 0.1)))
 
 
 def fix_bone_orientations(armature):
