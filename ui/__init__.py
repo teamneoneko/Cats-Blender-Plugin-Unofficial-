@@ -9,13 +9,11 @@ if "bpy" not in locals():
     from . import custom
     from . import mmdoptions
     from . import otheroptions
-    from . import decimation
     from . import visemes
     from . import bone_root
     from . import optimization
     from . import scale
     from . import eye_tracking
-    from . import legacy
     from . import settings_updates
     from . import credits
 else:
@@ -27,11 +25,9 @@ else:
     importlib.reload(custom)
     importlib.reload(mmdoptions)
     importlib.reload(otheroptions)
-    importlib.reload(decimation)
     importlib.reload(visemes)
     importlib.reload(bone_root)
     importlib.reload(scale)
     importlib.reload(eye_tracking)
-    importlib.reload(legacy)
     importlib.reload(settings_updates)
     importlib.reload(credits)

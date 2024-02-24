@@ -12,9 +12,7 @@ if "bpy" not in locals():
     from . import bonemerge
     from . import common
     from . import credits
-    from . import decimation
     from . import eyetracking
-    from . import fbx_patch
     from . import importer
     from . import material
     from . import rootbone
@@ -37,9 +35,7 @@ else:
     importlib.reload(bonemerge)
     importlib.reload(common)
     importlib.reload(credits)
-    importlib.reload(decimation)
     importlib.reload(eyetracking)
-    importlib.reload(fbx_patch)
     importlib.reload(importer)
     importlib.reload(material)
     importlib.reload(rootbone)

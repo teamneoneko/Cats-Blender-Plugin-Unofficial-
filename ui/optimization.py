@@ -88,11 +88,6 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
             row.alignment = 'RIGHT'
             row.scale_y = 0.9
             row.operator(Atlas.AtlasHelpButton.bl_idname, text="", icon='QUESTION')
-            # row.separator()
-            # row = split.row(align=False)
-            # row.alignment = 'RIGHT'
-            # row.scale_y = 0.9
-            # row.operator(Atlas.AtlasHelpButton.bl_idname, text="", icon='QUESTION')
             col.separator()
 
             # If supported version is outdated
@@ -265,6 +260,11 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
             row.operator(Armature_manual.RemoveZeroWeightBones.bl_idname, text=t('OtherOptionsPanel.RemoveZeroWeightBones.label'))
             row.operator(Armature_manual.RemoveConstraints.bl_idname, text=t('OtherOptionsPanel.RemoveConstraints'))
             row.operator(Armature_manual.RemoveZeroWeightGroups.bl_idname, text=t('OtherOptionsPanel.RemoveZeroWeightGroups'))
+            col = box.column(align=True)
+            row = col.row(align=True)
+            row.scale_y = 1.1
+            col.separator()
+            row.prop(context.scene, "delete_zero_weight_keep_twists")
 
             col.separator()
             col = box.column(align=True)
