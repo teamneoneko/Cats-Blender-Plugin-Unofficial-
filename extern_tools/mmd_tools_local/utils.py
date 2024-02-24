@@ -108,32 +108,33 @@ def mergeVertexGroup(meshObj, src_vertex_group_name, dest_vertex_group_name):
 
 
 def __getCustomNormalKeeper(mesh):
-    if mesh.corner_normals:
+    if hasattr(mesh, "has_custom_normals") and mesh.use_auto_smooth:
+
         class _CustomNormalKeeper:
             def __init__(self, mesh):
-                self.__normals = mesh.corner_normals  
+                mesh.calc_normals_split()
+                self.__normals = tuple(zip((l.normal.copy() for l in mesh.loops), (p.material_index for p in mesh.polygons for v in p.vertices)))
+                mesh.free_normals_split()
                 self.__material_map = {}
                 materials = mesh.materials
                 for i, m in enumerate(materials):
                     if m is None or m.name in self.__material_map:
-                        materials[i] = bpy.data.materials.new("_mmd_tmp_")   
+                        materials[i] = bpy.data.materials.new("_mmd_tmp_")
                     self.__material_map[materials[i].name] = (i, getattr(m, "name", ""))
 
             def restore_custom_normals(self, mesh):
                 materials = mesh.materials
-                for i, m in enumerate(materials):        
-                
-                    if len(materials) == 1:
-                        normal_list = []
-                        for corner_normal in self.__normals:
-                            if corner_normal.material_index == mat_id:
-                                normal_list.append(corner_normal.normal)
-                
-                        mesh.normals_split_custom_set(normal_list)
-                        mesh.update()
+                for i, m in enumerate(materials):
+                    mat_id, mat_name_orig = self.__material_map[m.name]
+                    if m.name != mat_name_orig:
+                        materials[i] = bpy.data.materials.get(mat_name_orig, None)
+                        m.user_clear()
+                        bpy.data.materials.remove(m)
+                if len(materials) == 1:
+                    mesh.normals_split_custom_set([n for n, x in self.__normals if x == mat_id])
+                    mesh.update()
 
-        return _CustomNormalKeeper(mesh)
-        
+        return _CustomNormalKeeper(mesh)  # This fixes the issue that "SeparateByMaterials" could break custom normals
     return None
 
 

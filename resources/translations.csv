@@ -46,8 +46,8 @@ Blender 3.6 버전 이상을 사용하세요.
 "
 Main.error.40unsupportedVersion,"
 
-Blender 42 is not supported by this version of cats.
-Please use Blender 4.0.
+Blender 4.2+ is not supported by this version of cats.
+Please use Blender 4.1 you can download a 4.2 version on my github.
 ",,"
 
 이 버전의 고양이에서는 블렌더 4.0이 지원되지 않습니다..
@@ -63,12 +63,9 @@ Blender를 다시 시작하고 Cats Plugin를 다시 활성화하세요!
 ToolPanel.label,Cats Blender Plugin,Cats ブレンダープラグイン,
 ToolPanel.category,CATS,,
 QuickAccess.label,Quick Access,迅速なアクセス,빠른 접근
-QuickAccess.warn.newBlender1,Potentially unsupported Blender version detected!,サポートされていない可能性のある Blender バージョンが検出されました,잠재적으로 지원되지 않는 Blender 버전이 감지되었습니다!
-QuickAccess.warn.newBlender2,Some features might not work CATS currently,現在 CATS では一部の機能が動作しない可能性があります,일부 기능은 현재 CATS에서 작동하지 않을 수 있습니다.
-QuickAccess.warn.newBlender3,supports up to Blender 4.1 see github for the 4.1 one.,4.1 버전까지 지원합니다. github에서 4.1 버전을 다운로드할 수 있습니다.,Blender 4.1까지 지원 4.1에 대해서는 github 참조
-QuickAccess.warn.newBlender1,Blender 4.1 Aplha or Beta version detected!,Blender 4.1 Aplha or Beta バージョンが検出されました,Blender 4.1 알파 또는 베타 버전이 감지되었습니다!
-QuickAccess.warn.newBlender2,Some features might not work CATS currently,現在 CATS では一部の機能が動作しない可能性があります,일부 기능은 현재 CATS에서 작동하지 않을 수 있습니다.
-QuickAccess.warn.newBlender3,If you have issues please downgrade to 4.0.,4.0 버전으로 다운그레이드하여 문제가 발생하면 알려주세요.,4.0 버전으로 다운그레이드하여 문제가 발생하면 알려주세요.
+QuickAccess.warn.newBlender1,Potentially unsupported Blender version detected!
+QuickAccess.warn.newBlender2,Some features might not work, CATS currently 
+QuickAccess.warn.newBlender3,supports up to Blender 4.1 see github for the 4.1 one.
 QuickAccess.warn.oldBlender1,Old Blender version detected!,古いブレンダーバージョンが検出されました!,이전 블렌더 버전이 발견되었습니다!
 QuickAccess.warn.oldBlender2,Some features might not work!,一部の機能は動作しない可能性があります!,일부 기능이 작동하지 않을 수 있습니다!
 QuickAccess.warn.oldBlender3,Please update to Blender 3.6!,ブレンダー3.1以上にアップデートしてください!,블렌더 3.1 버전으로 업데이트하세요!
@@ -201,7 +198,6 @@ MMDOptions.info5,these on models already set up for Unity,これらはすでに 
 MMDOptions.info6,and VRChat or it may break your model.,VRChat を使用しないと、モデルが壊れる可能性があります。,VRChat을 사용하지 않으면 모델이 손상될 수 있습니다.
 MMDOptions.FixMaterialinfo1,This will apply some vrchat fixes,これにより、いくつかの vrchat 修正が適用されます,이것은 일부 vrchat 수정 사항을 적용합니다.
 MMDOptions.FixMaterialinfo2,to materials,材料に,재료에.
-OtherOptionsPanel.fbtFix1,Not needed for vrchat anymore!,,
 OptimizePanel.label,Optimization,最適化,최적화
 OptimizePanel.atlasDesc,A greatly improved Atlas Generator.,アトラスジェネレータを大幅に改良。,텍스처들을 결합시켜주는 더욱 향상된 아틀라스 생성기입니다.
 OptimizePanel.atlasAuthor,Made by Shotariya,shotaryiaによって作られた,제작자: Shotariya
@@ -216,10 +212,6 @@ OptimizePanel.matCombOutdated5_2.8,right.,右側にあります。。,오른쪽�
 OptimizePanel.matCombOutdated6,Or download and install it manually:,または手動でダウンロードしてインストールする:,혹은 직접 다운로드와 설치하기:
 OptimizePanel.matCombOutdated6_alt,Download and install it manually:,手動でダウンロードしてインストールする:,직접 다운로드와 설치하기:
 OptimizePanel.matCombNotInstalled,Material Combiner is not installed!,マテリアル コンバイナーがインストールされていません!,매테리얼 통합기가 설치되지 않았습니다!
-CopyProtectionPanel.label,Copy Protection,コピープロテクション,복사핵 방지
-CopyProtectionPanel.desc1,Tries to protect your avatar from Unity cache ripping.,Unity キャッシュリッピングからアバターを保護しようとします。,유니티 캐쉬뜨기로부터 당신의 아바타를 보호하세요.
-CopyProtectionPanel.desc2,This protection is not 100% safe!,この保護は100%安全ではありません!,이 방법도 100% 안전하지는 않습니다!
-CopyProtectionPanel.desc3,Before use: Read the documentation!,使用前: ドキュメントを読んでください!,사용 전에: 문서를 읽어주세요!
 ScalingPanel.label,Model Scaling,,
 ScalingPanel.imscaleDisabled1,Immersive Scaler is not enabled!,,
 ScalingPanel.imscaleDisabled2,Enable it in your user preferences:,,
@@ -351,7 +343,9 @@ Warning: Never decimate something where you might need the shape keys later (fac
 경고: 나중에 쉐이프키가 필요한 것들은 절대 데시메이트하지 마십시오. (얼굴, 입, 눈 등..)"
 SeparateByMaterials.success,Successfully separated by materials.,,성공적으로 매테리얼별로 분리됐습니다.
 SeparateByLooseParts.label,Separate by Loose Parts,ルーズパーツに分離する,느슨한 부분들로 분리하기
-SeparateByLooseParts.desc,"Separates selected mesh by loose parts. This acts like separating by materials but creates more meshes for more precision","선택된 메쉬를 느슨한 부분들로 나눕니다. これはマテリアルごとに分離するように機能しますが、より正確にするためにより多くのメッシュを作成します。","선택된 메쉬를 느슨한 부분들로 나눕니다. 이것은 매테리얼별로 분리하는 것처럼 작동하지만 더 정밀한 작업을 위해 더 많은 메"
+SeparateByLooseParts.desc,"Separates selected mesh by loose parts.
+This acts like separating by materials but creates more meshes for more precision",,"선택된 메쉬를 느슨한 부분들별로 나눕니다.
+이것은 매테리얼별로 분리시키는 것과 같지만 보다 높은 정확도를 위해 더 많은 메쉬들을 만듭니다"
 SeparateByLooseParts.success,Successfully separated by loose parts.,,성공적으로 느슨한 부분들로 분리됐습니다.
 SeparateByShapekeys.label,Separate by Shape Keys,シェイプキーに区切る,쉐이프키별로 분리하기
 SeparateByShapekeys.desc,"Separates selected mesh into two parts,
@@ -362,15 +356,6 @@ Very useful for manual decimation",,"선택된 메쉬를 두 부분으로 나누
 
 수동으로 데시메이션을 할 시 매우 유용합니다"
 SeparateByShapekeys.success,Successfully separated by shape keys.,,성공적으로 쉐이프키별로 분리됐습니다.
-SeparateByCopyProtection.label,Separate by Copy Protection,コピープロテクションに分離する,복사핵 방지로 분리하기
-SeparateByCopyProtection.desc,"Separates selected mesh into two parts,
-depending on whether it is effected by the Cats Copy Protection or not.
-
-Useful if you have the Copy Protection enabled on multiple selected parts of your model",,"선택된 메쉬를 두 부분으로 나누는데,
-Cats의 복사핵 방지의 영향을 받는지 여부에 따라 결정됩니다.
-
-모델의 여러 부분에서 복사 방지를 활성화 한 경우 유용합니다."
-SeparateByCopyProtection.success,Successfully separated by shape keys.,,성공적으로 쉐이프키별로 분리됐습니다.
 SeparateByX.error.noMesh,No meshes found!,,메쉬가 발견되지 않음!
 SeparateByX.error.multipleMesh,"Multiple meshes found!
 Please select the mesh you want to separate!",,"여러 메쉬들이 발견됨!
@@ -428,34 +413,11 @@ This is exactly like doing it manually",,"선택한 메시의 중복 면들(face
 This is exactly like doing it manually"
 RemoveDoublesNormal.success,Removed {number} vertices.,,
 FixVRMShapesButton.label,Fix Koikatsu Shapekeys,コイカツシェイプキーを修正,코이카츠 쉐이프키 고치기
-FixVRMShapesButton.desc,Fixes the shapekeys of Koikatsu models,コイカツモデルのシェイプキーを修正,코이카츠 모델의 쉐이프키 고치기
-FixVRMShapesButton.warn.notDetected,No shapekeys detected!,シェイプキーが検出されませんでした。,쉐이프키가 발견되지 않음!
-FixVRMShapesButton.success,Fixed VRM shapekeys.,VRM シェイプキーを修正しました。,VRM 쉐이프키 고쳤습니다.
-FixFBTButton.label,Fix Full Body Tracking,全身追跡を修正,풀바디 트래킹 적용
-FixFBTButton.desc,"WARNING: This fix is no longer needed for vrchat, 
-you shouldn't use it unless you know what you are doing!
-
-Applies a general fix for Full Body Tracking.
-Ignore the ""Spine length zero"" warning in Unity",,
-FixFBTButton.error.bonesNotFound,"Required bones could not be found!
-Please make sure that your armature contains the following bones:
- - Hips, Spine, Left leg, Right leg
-Exact names are required!",,
-FixFBTButton.error.alreadyApplied,Full Body Tracking Fix already applied!,フルボディトラッキング修正はすでに適用されています。,전신 추적 수정 사항이 이미 적용되어 있습니다.
-FixFBTButton.success,Successfully applied the Full Body Tracking fix.,フルボディトラッキング修正が正常に適用されました。,전신 추적 수정 사항을 성공적으로 적용했습니다.
-RemoveFBTButton.label,Remove Full Body Tracking Fix,全身追跡の修正を削除,풀바디 트래킹 적용 제거
-RemoveFBTButton.desc,"Removes the fix for Full Body Tracking, since it is no longer advised to use it.
-
-Requires bones:
- - Hips, Spine, Left leg, Right leg, Left leg 2, Right leg 2",,
-RemoveFBTButton.error.bonesNotFound,"Required bones could not be found!
-Please make sure that your armature contains the following bones:
- - Hips, Spine, Left leg, Right leg, Left leg 2, Right leg 2
-Exact names are required!",,
-RemoveFBTButton.error.notApplied,The Full Body Tracking Fix is not applied!,フルボディトラッキング修正は適用されていません。,전신 추적 수정 사항이 적용되지 않았습니다.
-RemoveFBTButton.success,Successfully removed the Full Body Tracking fix.,フルボディトラッキング修正が正常に削除されました。,전신 추적 수정 사항을 성공적으로 제거했습니다.
+FixVRMShapesButton.desc,Fixes the shapekeys of Koikatsu models,,
+FixVRMShapesButton.warn.notDetected,No shapekeys detected!,,
+FixVRMShapesButton.success,Fixed VRM shapekeys.,,
 DuplicateBonesButton.label,Duplicate Bones,ボーンの複製,본 복사
-DuplicateBonesButton.desc,Duplicates the selected bones including their weight and renames them to _L and _R,
+DuplicateBonesButton.desc,Duplicates the selected bones including their weight and renames them to _L and _R,,
 DuplicateBonesButton.success,Successfully duplicated {number} bones.,,
 MergeArmature.label,Merge Armatures,マージアーマチュア,뼈대(Armatures) 통합
 MergeArmature.desc,"Merges the selected merge armature into the base armature.
@@ -494,42 +456,32 @@ AtlasHelpButton.desc,Open useful Atlas Tips,,
 AtlasHelpButton.URL,https://github.com/michaeldegroot/cats-blender-plugin/#texture-atlas,,
 AtlasHelpButton.success,Atlas Help opened.,,
 InstallShotariya.label,Error while loading Material Combiner:,マテリアルコンバイナ読み込み中にエラーが発生しました:,매테리얼 통합기를 로드하는 중 오류 발생:
-InstallShotariya.error.install1,Material Combiner is not installed!,マテリアルコンバイナーがインストールされていません!,재료 결합기가 설치되지 않았습니다!
-InstallShotariya.error.install2,The plugin 'Material Combiner' by Shotariya is required for this function.,この機能を利用するには、しょたり屋さんのプラグイン「マテリアルコンバイナー」が必要です。,이 기능을 사용하려면 Shotariya의 'Material Combiner' 플러그인이 필요합니다.
-InstallShotariya.error.install3,Please download and install it manually:,手動でダウンロードしてインストールしてください:,자동으로 다운로드 및 설치하세요:
-InstallShotariya.error.enable1,Material Combiner is not enabled!,マテリアルコンバイナーが有効になっていません!,재료 결합기가 활성화되지 않
-InstallShotariya.error.enable2,The plugin 'Material Combiner' by Shotariya is required for this function.,この機能を利用するには、しょたり屋さんのプラグイン「マテリアルコンバイナー」が必要です。,이 기능을 사용하려면 Shotariya의 'Material Combiner' 플러그인이 필요합니다
-InstallShotariya.error.enable3,Please enable it in your User Preferences.,手動で有効にしてください:,자동으로 활성화하세요:
-InstallShotariya.error.version1,Material Combiner is outdated!,マテリアルコンバイナーが古いです!,재료 결합기가 최신 버전이 아닙니다.
-InstallShotariya.error.version2,The latest version is required for this function.,この機能を利用するには、最新バージョンが必要です。,이 기능을 사용하려면 최신 버전이 필요합니다.
-InstallShotariya.error.version3,Please download and install it manually:,手動でダウンロードしてインストールしてください:,자동으로 다운로드 및 설치하세요:
+InstallShotariya.error.install1,Material Combiner is not installed!,,
+InstallShotariya.error.install2,The plugin 'Material Combiner' by Shotariya is required for this function.,,
+InstallShotariya.error.install3,Please download and install it manually:,,
+InstallShotariya.error.enable1,Material Combiner is not enabled!,,
+InstallShotariya.error.enable2,The plugin 'Material Combiner' by Shotariya is required for this function.,,
+InstallShotariya.error.enable3,Please enable it in your User Preferences.,,
+InstallShotariya.error.version1,Material Combiner is outdated!,,
+InstallShotariya.error.version2,The latest version is required for this function.,,
+InstallShotariya.error.version3,Please download and install it manually:,,
 ShotariyaButton.label,Download Material Combiner,マテリアルコンバイナーをダウンロード,매테리얼 통합기 다운로드
 ShotariyaButton.success,Material Combiner link opened,,
 ImmersiveScalerButton.success,Immersive Scaler link opened,,
-ImmersiveScalerButton.label,Download Immersive Scaler,イマーシブスケーラーをダウンロード,이미미스 스케일러 다운로드
+ImmersiveScalerButton.label,Download Immersive Scaler,,
 ImmersiveScalerButton.desc,Open latest Immersive Scaler release,,
 ImmersiveScalerHelpButton.URL,https://github.com/triazo/immersive_scaler,,
-ImmersiveScalerHelpButton.label,Immersive Scaler Help,イマーシブスケーラー,이미미스 스케일러 도움말
+ImmersiveScalerHelpButton.label,Immersive Scaler Help,,
 ImmersiveScalerHelpButton.desc,Open guide for Immersive Scaler,,
 ImmersiveScalerHelpButton.success,Immersive Scaler Readme opened,,
-EnableIMScale.label,Enable Immersive Scaler,イマーシブスケーラーを有効にする,이미미스 스케일러 활성화
-EnableIMScale.desc,Enable Immersive Scaler, イマーシブスケーラーを有効にする,이미미스 스케일러 활성화
-EnableIMScale.success,Enabled Immersive Scaler!,イマーシブスケーラーが有効になりました!,이미미스 스케일러가 활성화되었습니다!
+EnableIMScale.label,Enable Immersive Scaler,,
+EnableIMScale.desc,Enable Immersive Scaler,,
+EnableIMScale.success,Enabled Immersive Scaler!,,
 BoneMergeButton.label,Merge Bones,ボーンをマージする,뼈 통합
 BoneMergeButton.desc,"Merges the given percentage of bones together.
 This is useful to reduce the amount of bones used by Dynamic Bones.",,
 BoneMergeButton.success,Merged bones.,,
 ShowError.label,Report: Error,レポート: エラー,
-CopyProtectionEnable.label,Enable Protection,保護を有効にする,보호 활성화
-CopyProtectionEnable.desc,"Protects your model from piracy. NOT a 100% safe protection!
-Read the documentation before use",,
-CopyProtectionEnable.success,Model secured!,,
-CopyProtectionDisable.label,Disable Protection,保護を無効にする,보호 비활성화
-CopyProtectionDisable.desc,Removes the copy protections from this model.,,
-CopyProtectionDisable.success,Model un-secured!,,
-ProtectionTutorialButton.label,Go to Documentation,ドキュメントに移動,문서로 이동
-ProtectionTutorialButton.URL,https://github.com/michaeldegroot/cats-blender-plugin#copy-protection,,
-ProtectionTutorialButton.success,Documentation,,
 ForumButton.label,Go to the Forums,フォーラムに移動する,포럼으로 가기
 ForumButton.URL,https://vrcat.club/threads/cats-blender-plugin.6/,,
 ForumButton.success,Forum opened.,,
@@ -562,8 +514,6 @@ This means that this mesh will be decimated.",,
 ImportAnyModel.label,Import Any Model,任意のモデルをインポート,아무 모델 불러오기
 ImportAnyModel.importantInfo.label,IMPORTANT INFO (hover here),重要な情報(ここにホバー),
 ImportAnyModel.importantInfo.desc,"If you want to modify the import settings, use the button next to the Import button.
-
-",,
 ImportAnyModel.error.emptyZip,The selected zip file contains no importable models.,,
 ImportAnyModel.desc2.8,"Import a model of any supported type.
 
@@ -619,9 +569,9 @@ ExportModel.desc,"Export this model as .fbx for Unity.
 Automatically sets the optimal export settings",,
 ExportModel.error.notEnabled,FBX Exporter not enabled! Please enable it in your User Preferences.,,
 ErrorDisplay.label,Warning:,警告:,경고:
-ErrorDisplay.polygons1,Too many polygons!,ポリゴンが多すぎる！,폴리곤이 너무 많아요!
+ErrorDisplay.polygons1,Too many polygons!,,
 ErrorDisplay.polygons2,"You have {number} tris in this model, but you shouldn't have more than 70,000!",,
-ErrorDisplay.polygons3,You should decimate before you export this model.,このモデルをエクスポートする前に、間引きを行う必要があります。,이 모델을 내보내기 전에 멸종시켜야 합니다.
+ErrorDisplay.polygons3,You should decimate before you export this model.,,
 ErrorDisplay.materials1,Model not optimized!,,
 ErrorDisplay.materials2,This model has {number} materials!,,
 ErrorDisplay.materials3,You should try to have a maximum of 4 materials on your model.,,
@@ -647,18 +597,6 @@ ErrorDisplay.eyes3,"If you want Eye Tracking to work, rename this mesh to 'Body'
 ErrorDisplay.eyes3_alt,Make sure that the mesh containing the eyes is named 'Body' in order,,
 ErrorDisplay.eyes4_alt,to get Eye Tracking to work.,,
 ErrorDisplay.continue,Continue to Export,,
-OneTexPerMatButton.label,One Material Texture,1つのマテリアルテクスチャ,매테리얼당 하나의 텍스처
-OneTexPerMatButton.desc,Have all material slots ignore extra texture slots as these are not used by VRChat.,,
-OneTexPerMatOnlyButton.label,One Material Texture,1つのマテリアルテクスチャ,매테리얼당 하나의 텍스처
-OneTexPerMatOnlyButton.desc,"Have all material slots ignore extra texture slots as these are not used by VRChat.
-Also removes the textures from the material instead of disabling it.
-This makes no difference, but cleans the list for the perfectionists",,
-ToolsMaterial.error.notCompatible,This function is not yet compatible with Blender 2.8!,,
-OneTexPerXButton.success,All materials have one texture now.,,
-StandardizeTextures.label,Standardize Textures,テクスチャを標準化する,텍스처들 표준화
-StandardizeTextures.desc,"Enables Color and Alpha on every texture, sets the blend method to Multiply
-and changes the materials transparency to Z-Transparency",,
-StandardizeTextures.success,All textures are now standardized.,,
 CombineMaterialsButton.label,Combine Same Materials,同じマテリアルを組み合わせる,같은 매테리얼들을 통합
 CombineMaterialsButton.desc,"Combines similar materials into one, reducing draw calls.
 Your avatar should visibly look the same after this operation.
@@ -818,6 +756,8 @@ This will not change how the bones function in any way, it just improves the aes
 뼈의 기능에는 영향을 주지 않으며 뼈대(armature)의 미관을 개선할 뿐입니다."
 Scene.fix_materials.label,Fix Materials,マテリアルを修正する,매테리얼 고치기
 Scene.fix_materials.desc,This will apply some VRChat related fixes to materials,,매테리얼에 일부 VRChat 관련 픽스가 적용됩니다.
+Scene.delete_zero_weight_keep_twists.label,Keep bones with _twist,_twist でボーンを維持する,_twist를 사용하여 뼈 유지
+Scene.delete_zero_weight_keep_twists.desc,When checked any bones with _twist or Twist in it's name will be kept. This is too ensure twist bones are kept,チェックすると、名前に _twist または Twist が含まれるボーンが保持されます。これにより、ツイストボーンが確実に保持されます,선택하면 이름에 _twist 또는 Twist가 포함된 뼈대가 유지됩니다. 이는 트위스트 뼈가 유지되도록 보장하는 것이기도 합니다.
 Scene.remove_rigidbodies_joints.label,Remove Rigidbodies and Joints,リジッドボディとジョイントを除去,Rigidbodies와 Joints 제거
 Scene.remove_rigidbodies_joints.desc,"Rigidbodies and joints are used by MMD software to simulate physics.
 They are completely useless for VRChat, so removing them is recommended for VRChat users!",,"Rigidbodies와 joints는 MMD software에서 물리연산을 위해 사용되는 것들입니다.

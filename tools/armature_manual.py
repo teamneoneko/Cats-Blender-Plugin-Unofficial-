@@ -715,51 +715,6 @@ class SeparateByShapekeys(bpy.types.Operator):
         self.report({'INFO'}, done_message)
         return {'FINISHED'}
 
-
-@register_wrap
-class SeparateByCopyProtection(bpy.types.Operator):
-    bl_idname = 'cats_manual.separate_by_copy_protection'
-    bl_label = t('SeparateByCopyProtection.label')
-    bl_description = t('SeparateByCopyProtection.desc')
-    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
-
-    @classmethod
-    def poll(cls, context):
-        obj = context.active_object
-
-        if obj and obj.type == 'MESH':
-            return True
-
-        meshes = Common.get_meshes_objects(check=False)
-        return meshes
-
-    def execute(self, context):
-        saved_data = Common.SavedData()
-        obj = context.active_object
-
-        if not obj or (obj and obj.type != 'MESH'):
-            Common.unselect_all()
-            meshes = Common.get_meshes_objects()
-            if len(meshes) == 0:
-                saved_data.load()
-                self.report({'ERROR'}, t('SeparateByX.error.noMesh'))
-                return {'FINISHED'}
-            if len(meshes) > 1:
-                saved_data.load()
-                self.report({'ERROR'}, t('SeparateByX.error.multipleMesh'))
-                return {'FINISHED'}
-            obj = meshes[0]
-        obj_name = obj.name
-
-        done_message = t('SeparateByCopyProtection.success')
-        if not Common.separate_by_cats_protection(context, obj):
-            done_message = t('SeparateByX.warn.noSeparation')
-
-        saved_data.load(ignore=[obj_name])
-        self.report({'INFO'}, done_message)
-        return {'FINISHED'}
-
-
 @register_wrap
 class MergeWeights(bpy.types.Operator):
     bl_idname = 'cats_manual.merge_weights'
@@ -872,7 +827,9 @@ def merge_weights(armature, parenting_list):
     # Delete merged bones
     if not bpy.context.scene.keep_merged_bones:
         for bone in parenting_list.keys():
-            armature.data.edit_bones.remove(armature.data.edit_bones.get(bone))
+            edited_bone = armature.data.edit_bones.get(bone)
+            if edited_bone is not None:
+                armature.data.edit_bones.remove(edited_bone)
 
 
 @register_wrap
@@ -1206,7 +1163,7 @@ class RemoveDoubles(bpy.types.Operator):
         Common.set_default_stage()
 
         for mesh in meshes:
-            removed_tris += Common.remove_doubles(mesh, 0.0001, save_shapes=True)
+            removed_tris += Common.remove_doubles(mesh, 0.00002, save_shapes=True)
 
         Common.set_default_stage()
 
@@ -1246,25 +1203,18 @@ class OptimizeStaticShapekeys(bpy.types.Operator):
 
         if len([obj for obj in objs if obj.type == 'MESH']) > 1:
             self.report({'ERROR'}, "Meshes must first be combined for this to be beneficial.")
-            
+
         for mesh in objs:
             if mesh.type == 'MESH' and mesh.data.shape_keys is not None:
                 context.view_layer.objects.active = mesh
 
-                # Ensure corner normals exist
-                if not mesh.data.corner_normals:
-                    bpy.ops.object.mode_set(mode='EDIT')
+                if not mesh.data.has_custom_normals:
+                    bpy.ops.object.mode_set(mode = 'EDIT')
                     bpy.ops.mesh.select_mode(type="VERT")
-                    bpy.ops.mesh.select_all(action='SELECT')
+                    bpy.ops.mesh.select_all(action = 'SELECT')
+                    # TODO: un-smooth objects aren't handled correctly. A workaround is to run 'split
+                    # normals' on all un-smooth objects before baking
                     bpy.ops.mesh.set_normals_from_faces(keep_sharp=True)
-
-                        # Set custom normals from corner normals
-                    normal_list = []
-                    for corner_normal in mesh.data.corner_normals:
-                        normal_list.append(corner_normal.normal)
-            
-                        mesh.data.normals_split_custom_set(normal_list)
-                        mesh.data.update()
 
                 # Separate non-animating
                 bpy.ops.object.mode_set(mode = 'EDIT')
@@ -1404,7 +1354,7 @@ class RemoveDoublesNormal(bpy.types.Operator):
         Common.set_default_stage()
 
         for mesh in meshes:
-            removed_tris += Common.remove_doubles(mesh, 0.0001, save_shapes=True)
+            removed_tris += Common.remove_doubles(mesh, 0.00002, save_shapes=True)
 
         Common.set_default_stage()
 

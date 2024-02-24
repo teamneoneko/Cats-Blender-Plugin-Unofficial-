@@ -49,6 +49,12 @@ class MMDOptions(ToolPanel, bpy.types.Panel):
         row.operator(ModelSettings.bl_idname, text="", icon='MODIFIER')
         col.separator()
         col.separator()
+        split = col.row(align=True)
+        row = split.row(align=True)
+        row.scale_y = 1.5
+        row.operator(Material.CombineMaterialsButton.bl_idname, icon='MATERIAL')
+        col.separator()
+        col.separator()
         sub = col.column(align=True)
         sub.scale_y = 0.75
         sub.label(text=t("MMDOptions.FixMaterialinfo1"), icon='INFO')

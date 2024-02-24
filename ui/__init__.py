@@ -14,7 +14,6 @@ if "bpy" not in locals():
     from . import optimization
     from . import scale
     from . import eye_tracking
-    from . import legacy
     from . import settings_updates
     from . import credits
 else:
@@ -30,6 +29,5 @@ else:
     importlib.reload(bone_root)
     importlib.reload(scale)
     importlib.reload(eye_tracking)
-    importlib.reload(legacy)
     importlib.reload(settings_updates)
     importlib.reload(credits)

@@ -13,7 +13,6 @@ if "bpy" not in locals():
     from . import common
     from . import credits
     from . import eyetracking
-    from . import fbx_patch
     from . import importer
     from . import material
     from . import rootbone
@@ -37,7 +36,6 @@ else:
     importlib.reload(common)
     importlib.reload(credits)
     importlib.reload(eyetracking)
-    importlib.reload(fbx_patch)
     importlib.reload(importer)
     importlib.reload(material)
     importlib.reload(rootbone)
