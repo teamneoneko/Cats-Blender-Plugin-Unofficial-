@@ -1208,13 +1208,20 @@ class OptimizeStaticShapekeys(bpy.types.Operator):
             if mesh.type == 'MESH' and mesh.data.shape_keys is not None:
                 context.view_layer.objects.active = mesh
 
-                if not mesh.data.has_custom_normals:
-                    bpy.ops.object.mode_set(mode = 'EDIT')
+                # Ensure corner normals exist
+                if not mesh.data.corner_normals:
+                    bpy.ops.object.mode_set(mode='EDIT')
                     bpy.ops.mesh.select_mode(type="VERT")
-                    bpy.ops.mesh.select_all(action = 'SELECT')
-                    # TODO: un-smooth objects aren't handled correctly. A workaround is to run 'split
-                    # normals' on all un-smooth objects before baking
+                    bpy.ops.mesh.select_all(action='SELECT')
                     bpy.ops.mesh.set_normals_from_faces(keep_sharp=True)
+
+                    # Set custom normals from corner normals
+                    normal_list = []
+                    for corner_normal in mesh.data.corner_normals:
+                        normal_list.append(corner_normal.normal)
+
+                        mesh.data.normals_split_custom_set(normal_list)
+                        mesh.data.update()
 
                 # Separate non-animating
                 bpy.ops.object.mode_set(mode = 'EDIT')
