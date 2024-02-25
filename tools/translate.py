@@ -9,11 +9,13 @@ import pathlib
 import traceback
 import collections
 import requests.exceptions
+import csv
 
 from datetime import datetime, timezone
 from collections import OrderedDict
 
 from . import common as Common
+from pathlib import Path
 from .register import register_wrap
 from .. import globs
 # from ..googletrans import Translator  # TODO Remove this
@@ -30,6 +32,11 @@ resources_dir = os.path.join(str(main_dir), "resources")
 dictionary_file = os.path.join(resources_dir, "dictionary.json")
 dictionary_google_file = os.path.join(resources_dir, "dictionary_google.json")
 
+documents_dir = Path.home() / "Documents"
+cats_dir = documents_dir / "cats"
+cats_dir.mkdir(exist_ok=True)
+
+export_path = os.path.join(str(cats_dir), "shapekeys.csv")
 
 @register_wrap
 class TranslateShapekeyButton(bpy.types.Operator):
@@ -39,10 +46,6 @@ class TranslateShapekeyButton(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
     def execute(self, context):
-        if bpy.app.version < (2, 79, 0):
-            self.report({'ERROR'}, t('TranslateX.error.wrongVersion'))
-            return {'FINISHED'}
-
         saved_data = Common.SavedData()
 
         to_translate = []
@@ -55,15 +58,33 @@ class TranslateShapekeyButton(bpy.types.Operator):
         update_dictionary(to_translate, translating_shapes=True, self=self)
 
         Common.update_shapekey_orders()
-
+        
+        shapekeys = []
         i = 0
         for mesh in Common.get_meshes_objects(mode=2):
             if Common.has_shapekeys(mesh):
                 for shapekey in mesh.data.shape_keys.key_blocks:
                     if 'vrc.' not in shapekey.name:
+                
+                        # Save original name
+                        original_name = shapekey.name  
+                
                         shapekey.name, translated = translate(shapekey.name, add_space=True, translating_shapes=True)
+                
                         if translated:
                             i += 1
+                            shapekeys.append({
+                                'mesh/object': mesh.name,
+                                'original': original_name,
+                                'translated': shapekey.name
+                            })
+
+        if context.scene.export_shapekeys_csv:
+            with open(export_path, 'w', newline='') as f:
+                writer = csv.writer(f)  
+                writer.writerow(['mesh/object', 'original', 'translated'])
+                for shapekey in shapekeys:
+                    writer.writerow([shapekey['mesh/object'], shapekey['original'], shapekey['translated']])
 
         Common.ui_refresh()
 

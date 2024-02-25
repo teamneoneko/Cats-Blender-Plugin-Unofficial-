@@ -15,6 +15,12 @@ from bpy.props import BoolProperty, EnumProperty, FloatProperty, IntProperty
 
 
 def register():
+    Scene.export_shapekeys_csv = BoolProperty(
+        name=t('Scene.shapekeycsv.label'),
+        description=t('Scene.shapekeycsv.desc'),
+        default = False
+    )
+    
     Scene.armature = EnumProperty(
         name=t('Scene.armature.label'),
         description=t('Scene.armature.desc'),

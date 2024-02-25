@@ -1007,6 +1007,8 @@ Scene.use_custom_mmd_tools.label,Use Custom mmd_tools,カスタムmmd_toolsを�
 Scene.use_custom_mmd_tools.desc,Enable this to use your own version of mmd_tools. This will disable the internal cats mmd_tools,,
 Scene.debug_translations.label,Debug Google Translations,Google翻訳をデバッグ,Google 번역 디버그
 Scene.debug_translations.desc,Tests the Google Translations and prints the Google response in case of error,,
+Scene.shapekeycsv.label,Export Shape Keys Translations CSV,シェイプキー翻訳CSVをエクスポート,쉐이프키 번역 CSV 내보내기
+Scene.shapekeycsv.desc,"When checked CATS will export shape keys translations to a CSV file located in Documents - cats - shapekeys.csv","チェックすると、CATS はシェイプ キーの翻訳をドキュメント - cats - Shapekeys.csv にある CSV ファイルにエクスポートします。","선택하면 CATS가 모양 키 번역을 문서 - cats - Shapekeys.csv에 있는 CSV 파일로 내보냅니다"
 CheckForUpdateButton.label,Check now for Update,今すぐアップデートを確認,업데이트 체크
 CheckForUpdateButton.desc,Checks if a new update is available for CATS,,
 UpdateToLatestButton.label,Update Now,今すぐアップデート,지금 업데이트
