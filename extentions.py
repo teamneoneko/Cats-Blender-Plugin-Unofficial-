@@ -1,6 +1,4 @@
 # MIT License
-import bpy
-
 from .tools import common as Common
 from .tools.common import wrap_dynamic_enum_items
 from .tools import atlas as Atlas
