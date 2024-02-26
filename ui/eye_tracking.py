@@ -200,13 +200,16 @@ class Av3EyeTrackingPanel(ToolPanel, bpy.types.Panel):
                 row.label(text=t('EyeTrackingPanel.error.noMesh'), icon='ERROR')
             elif mesh_count > 1:
                 col.separator()
-                row = col.row(align=True)
-                row.scale_y = 1.1
+                col.separator()
+                sub = col.column(align=True)
+                sub.scale_y = 0.75
                 sub.label(text=t("LegacyEyeTrackingPanel.info1"), icon='INFO')
                 sub.label(text=t("LegacyEyeTrackingPanel.info2"), icon='BLANK1')
                 sub.label(text=t("LegacyEyeTrackingPanel.info3"), icon='BLANK1')
                 sub.label(text=t("LegacyEyeTrackingPanel.info4"), icon='BLANK1')
                 sub.label(text=t("LegacyEyeTrackingPanel.info5"), icon='BLANK1')
+                row = col.row(align=True)
+                row.scale_y = 1.1
                 row.prop(context.scene, 'mesh_name_eye', icon='MESH_DATA')
 
             col.separator()
