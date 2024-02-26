@@ -427,6 +427,14 @@ def get_meshes_decimation(self, context):
     return choices
 
 
+def get_bone_orientations(armature):
+    x_cord = 0
+    y_cord = 1
+    z_cord = 2
+    fbx = False
+    return x_cord, y_cord, z_cord, fbx
+
+
 def get_bones_head(self, context):
     return get_bones(names=['Head'])
 
