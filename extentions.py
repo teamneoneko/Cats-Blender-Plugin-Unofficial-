@@ -236,22 +236,138 @@ def register():
     )
 
     # Eye Tracking
+    Scene.eye_mode = EnumProperty(
+        name=t('Scene.eye_mode.label'),
+        description=t('Scene.eye_mode.desc'),
+        items=[
+            ("CREATION", t('Scene.eye_mode.creation.label'), t('Scene.eye_mode.creation.desc')),
+            ("TESTING", t('Scene.eye_mode.testing.label'), t('Scene.eye_mode.testing.desc'))
+        ],
+        update=Eyetracking.stop_testing
+    )
+
+    Scene.mesh_name_eye = EnumProperty(
+        name=t('Scene.mesh_name_eye.label'),
+        description=t('Scene.mesh_name_eye.desc'),
+        # get_meshes is used elsewhere than for EnumProperty items so must contain the sorting itself
+        items=wrap_dynamic_enum_items(Common.get_meshes, 'mesh_name_eye', sort=False),
+    )
+
     Scene.head = EnumProperty(
         name=t('Scene.head.label'),
         description=t('Scene.head.desc'),
         items=wrap_dynamic_enum_items(Common.get_bones_head, 'head'),
     )
-    
     Scene.eye_left = EnumProperty(
         name=t('Scene.eye_left.label'),
         description=t('Scene.eye_left.desc'),
         items=wrap_dynamic_enum_items(Common.get_bones_eye_l, 'eye_left'),
     )
-
     Scene.eye_right = EnumProperty(
         name=t('Scene.eye_right.label'),
         description=t('Scene.eye_right.desc'),
         items=wrap_dynamic_enum_items(Common.get_bones_eye_r, 'eye_right'),
+    )
+
+    Scene.wink_left = EnumProperty(
+        name=t('Scene.wink_left.label'),
+        description=t('Scene.wink_left.desc'),
+        items=wrap_dynamic_enum_items(Common.get_shapekeys_eye_blink_l, 'wink_left', sort=False),
+    )
+
+    Scene.wink_right = EnumProperty(
+        name=t('Scene.wink_right.label'),
+        description=t('Scene.wink_right.desc'),
+        items=wrap_dynamic_enum_items(Common.get_shapekeys_eye_blink_r, 'wink_right', sort=False),
+    )
+
+    Scene.lowerlid_left = EnumProperty(
+        name=t('Scene.lowerlid_left.label'),
+        description=t('Scene.lowerlid_left.desc'),
+        items=wrap_dynamic_enum_items(Common.get_shapekeys_eye_low_l, 'lowerlid_left', sort=False),
+    )
+
+    Scene.lowerlid_right = EnumProperty(
+        name=t('Scene.lowerlid_right.label'),
+        description=t('Scene.lowerlid_right.desc'),
+        items=wrap_dynamic_enum_items(Common.get_shapekeys_eye_low_r, 'lowerlid_right', sort=False),
+    )
+
+    Scene.disable_eye_movement = BoolProperty(
+        name=t('Scene.disable_eye_movement.label'),
+        description=t('Scene.disable_eye_movement.desc'),
+        subtype='DISTANCE'
+    )
+
+    Scene.disable_eye_blinking = BoolProperty(
+        name=t('Scene.disable_eye_blinking.label'),
+        description=t('Scene.disable_eye_blinking.desc'),
+        subtype='NONE'
+    )
+
+    Scene.eye_distance = FloatProperty(
+        name=t('Scene.eye_distance.label'),
+        description=t('Scene.eye_distance.desc'),
+        default=0.8,
+        min=0.0,
+        max=2.0,
+        step=1.0,
+        precision=2,
+        subtype='FACTOR'
+    )
+
+    Scene.eye_rotation_x = IntProperty(
+        name=t('Scene.eye_rotation_x.label'),
+        description=t('Scene.eye_rotation_x.desc'),
+        default=0,
+        min=-19,
+        max=25,
+        step=1,
+        subtype='FACTOR',
+        update=Eyetracking.set_rotation
+    )
+
+    Scene.eye_rotation_y = IntProperty(
+        name=t('Scene.eye_rotation_y.label'),
+        description=t('Scene.eye_rotation_y.desc'),
+        default=0,
+        min=-19,
+        max=19,
+        step=1,
+        subtype='FACTOR',
+        update=Eyetracking.set_rotation
+    )
+
+    Scene.iris_height = IntProperty(
+        name=t('Scene.iris_height.label'),
+        description=t('Scene.iris_height.desc'),
+        default=0,
+        min=0,
+        max=100,
+        step=1,
+        subtype='FACTOR'
+    )
+
+    Scene.eye_blink_shape = FloatProperty(
+        name=t('Scene.eye_blink_shape.label'),
+        description=t('Scene.eye_blink_shape.desc'),
+        default=1.0,
+        min=0.0,
+        max=1.0,
+        step=1.0,
+        precision=2,
+        subtype='FACTOR'
+    )
+
+    Scene.eye_lowerlid_shape = FloatProperty(
+        name=t('Scene.eye_lowerlid_shape.label'),
+        description=t('Scene.eye_lowerlid_shape.desc'),
+        default=1.0,
+        min=0.0,
+        max=1.0,
+        step=1.0,
+        precision=2,
+        subtype='FACTOR'
     )
 
     # Visemes
