@@ -172,14 +172,20 @@ EyeTrackingPanel.warn.assignEyes2,      to the eyes in Unity!,      ユニティ
 VisemePanel.label,Visemes,バイセム,립싱크(Visemes)
 VisemePanel.error.noMesh,No meshes found!,メッシュが見つかりません!,메쉬가 발견되지 않음!
 BoneRootPanel.label,Bone Parenting,ボーンの子育て,본 부모설정
-Av3EyeTrackingPanel.info1,Eye tracking is set up in Unity,Unityでアイトラッキングを設定する,시선 추적은 Unity에서 설정됩니다.
-Av3EyeTrackingPanel.info2,Rotate eyes up to simplify setup,目を上に回転させてセットアップを簡素化,눈을 위로 회전시켜 설정을 단순화하세요
+Av3EyeTrackingPanel.info1,Eye Tracking for VRChat SDK3,VRChat SDK3用のアイトラッキング,VRChat SDK3용 시선 추적
+Av3EyeTrackingPanel.info2,is now setup in Unity this will,は Unity でセットアップされています。これにより、,이제는 Unity에서 설정됩니다.
+Av3EyeTrackingPanel.info3,Rotate eyes up to simplify setup,目を上に回転させてセットアップを簡素化,눈을 위로 회전시켜 설정을 단순화하세요
 Av3EyeTrackingRotateEyeBones.label,Rotate eye bones,目のボーンを回転させる,눈 뼈를 회전
 Av3EyeTrackingRotateEyeBones.desc,Rotate eye bones to point straight up with zero roll. This simplifies setting up VRChat Avatars 3.0 eye tracking in Unity,目のボーンを回転させて、ロールをゼロにして真っ直ぐ上を向くようにします。これにより、Unity での VRChat Avatars 3.0 アイトラッキングのセットアップが簡素化されます.,롤이 0인 상태에서 눈 뼈가 똑바로 위를 향하도록 회전합니다. 이는 Unity에서 VRChat Avatars 3.0 시선 추적 설정을 단순화합니다.
 Av3EyeTrackingRotateEyeBones.poll.noBones,No bones,骨がない,뼈가 없다
 Av3EyeTrackingRotateEyeBones.poll.notInCurrentEditMode,"{armature} is not in the current Edit mode, either exit the current Edit mode or open {armature} in Edit mode","{armature} は現在の編集モードではありません。現在の編集モードを終了するか、編集モードで {armature} を開いてください.","{armature}가 현재 편집 모드에 있지 않습니다. 현재 편집 모드를 종료하거나 편집 모드에서 {armature}를 엽니다."
 Av3EyeTrackingRotateEyeBones.info.noChanges,"Eye bones are already rotated for VRChat, no changes were made.","目のボーンは VRChat 用にすでに回転されており、変更は加えられません.","VRChat에서는 눈 뼈가 이미 회전되어 있어 변경 사항이 없습니다."
 Av3EyeTrackingRotateEyeBones.success,Eye bones rotated.,目の骨が回転しました.,눈뼈가 회전했습니다.
+LegacyEyeTrackingPanel.info1,This is the legacy Eye Tracking setup,これはレガシーな Eye Tracking のセットアップです,이것은 레거시 시선 추적 설정
+LegacyEyeTrackingPanel.info2,this should NOT be used for VRChat as,この設定は VRChat で使用しないでください,이것은 VRChat에서 사용하지 말아야 합니다.
+LegacyEyeTrackingPanel.info3,as eye tracking for VRChat is set up,VRChat のアイトラッキングは,VRChat의 시선 추적은
+LegacyEyeTrackingPanel.info4,in Unity. This is for other games that,in Unity で設定されます。これは他のゲームで使用されます。,Unity에서 설정됩니다. 이것은 다른 게임에서 사용됩니다.
+LegacyEyeTrackingPanel.info5,that need this system still like ChilloutVR.,そのためにこのシステムが必要です。,그러나 이 시스템은 ChilloutVR과 같은 게임에서
 Scene.eye_left.label,Left Eye,左目,왼쪽 눈
 Scene.eye_left.desc,The models left eye bone,,
 Scene.eye_right.label,Right Eye,右目,오른쪽 눈
@@ -611,6 +617,50 @@ This helps with transparency and compatibility issues.
 
 The converted image files will be saved next to the old ones",,
 ConvertAllToPngButton.success,Converted {number} to PNG files.,,
+CreateEyesButton.label,Create Eye Tracking,アイトラッキングを作成する,눈 추적(Eye Tracking) 생성
+CreateEyesButton.desc,"This will let you track someone when they come close to you and it enables blinking.
+You should do decimation before this operation.
+Test the resulting eye movement in the 'Testing' tab.
+DO NOT USE FOR VRCHAT SDK3 AVATARS",,"누군가가 가까이 왔을 때 그 사람을 추적 할 수 있고 눈 깜박임을 가능하게합니다.
+데시메이션이 필요하다면 이 작업 이전에 해야합니다.
+눈 움직임을 'Testing' 탭에서 테스트하세요."
+CreateEyesButton.error.noShapeSelected,"You have no shape keys selected.
+Please choose a mesh containing shape keys or check ""Disable Eye Blinking"".",,"선택된 쉐이프키가 없습니다.
+쉐이프키가 포함 된 메쉬를 선택하거나 ""눈 깜빡임 비활성화""에 체크하세요."
+CreateEyesButton.error.missingBone,"The bone ""{bone}"" does not exist.",,
+CreateEyesButton.error.noVertex,"The bone ""{bone}"" has no existing vertex group or no vertices assigned to it.
+This might be because you selected the wrong mesh or the wrong bone.
+Also make sure that the selected eye bones actually move the eyes in pose mode.",,
+CreateEyesButton.error.dontUse,"Please do not use ""{eyeName}"" as the input bone.
+If you are sure that you want to use that bone please rename it to ""{eyeNameShort}"".",,
+CreateEyesButton.error.hierarchy,"Eye tracking will not work unless the bone hierarchy is exactly as following: Hips > Spine > Chest > Neck > Head
+Furthermore the mesh containing the eyes has to be called ""Body"" and the armature ""Armature"".",,
+CreateEyesButton.success,Created eye tracking!,,
+StartTestingButton.label,Start Eye Testing,スタートアイテスト,눈 움직임 테스트 시작
+StartTestingButton.desc,"This will let you test how the eye movement will look ingame.
+Don't forget to stop the Testing process afterwards.
+Bones ""LeftEye"" and ""RightEye"" are required.",,
+StopTestingButton.label,Stop Eye Testing,ストップアイテスト,눈 움직임 테스트 중지
+StopTestingButton.desc,Stops the testing process.,,
+StopTestingButton.error.tryAgain,Something went wrong. Please try eye testing again.,,
+ResetRotationButton.label,Reset Rotation,回転をリセットする,회전 초기화
+ResetRotationButton.desc,This resets the eye positions.,,
+AdjustEyesButton.label,Set Range,目の範囲を設定,범위 설정
+AdjustEyesButton.desc,"Lets you re-adjust the movement range of the eyes.
+This gets saved",,
+AdjustEyesButton.error.noVertex,"The bone ""{bone}"" has no existing vertex group or no vertices assigned to it.
+This might be because you selected the wrong mesh or the wrong bone.
+Also make sure to join your meshes before creating eye tracking and make sure that the eye bones actually move the eyes in pose mode.",,
+StartIrisHeightButton.label,Start Iris Height Adjustment,アイリスの高さの調整を開始,눈동자 높이 조정 시작
+StartIrisHeightButton.desc,"Lets you readjust the distance of the iris from the eye ball.
+Use this to fix clipping of the iris into the eye ball.
+This gets saved.",,
+TestBlinking.label,Test,テスト,테스트
+TestBlinking.desc,This lets you see how eye blinking will look in-game.,,게임 중에 눈 깜박임이 어떻게 보이는 지 확인할 수 있습니다.
+TestLowerlid.label,Test,テスト,테스트
+TestLowerlid.desc,This lets you see how lowerlids will look in-game.,,게임 중에 아래 눈꺼풀이 어떻게 보이는 지 확인할 수 있습니다.
+ResetBlinkTest.label,Reset Shapes,図形をリセットする,쉐이프 초기화
+ResetBlinkTest.desc,This resets the blink testing.,,눈깜빡임 테스트를 초기화한다.
 RootButton.label,Parent Bones,親のボーンに接続する,부모 본
 RootButton.desc,"This will duplicate the parent of the bones and reparent them to the duplicate.
 Very useful for Dynamic Bones.",,
@@ -677,6 +727,56 @@ It will generate 15 shape keys from the 3 shape keys you specify",,"당신의 �
 AutoVisemeButton.error.noShapekeys,This mesh has no shapekeys!,,이 메쉬는 쉐이프키가 없습니다!
 AutoVisemeButton.error.selectShapekeys,"Please select the correct mouth shapekeys instead of ""Basis""!",,"""Basis"" 대신에 올바른 입모양 쉐이프키들을 선택하여 주세요!"
 AutoVisemeButton.success,Created mouth visemes!,,입모양 쉐이프키들을 생성했습니다!
+Scene.eye_mode.label,Eye Mode,アイモード,
+Scene.eye_mode.desc,Mode,,
+Scene.eye_mode.creation.label,Creation,創作,생성
+Scene.eye_mode.creation.desc,Here you can create eye tracking.,,
+Scene.eye_mode.testing.label,Testing,テスティング,테스트
+Scene.eye_mode.testing.desc,Here you can test how eye tracking will look in-game.,,
+Scene.mesh_name_eye.label,Mesh,メッシュ,메쉬
+Scene.mesh_name_eye.desc,The mesh with the eyes vertex groups,,
+Scene.head.label,Head,頭,머리
+Scene.head.desc,The head bone containing the eye bones,,
+Scene.eye_left.label,Left Eye,左目,왼쪽 눈
+Scene.eye_left.desc,The models left eye bone,,
+Scene.eye_right.label,Right Eye,右目,오른쪽 눈
+Scene.eye_right.desc,The models right eye bone,,
+Scene.wink_left.label,Blink Left,左点滅,왼쪽 깜빡임
+Scene.wink_left.desc,The shape key containing a blink with the left eye,,
+Scene.wink_right.label,Blink Right,右点滅,오른쪽 깜빡임
+Scene.wink_right.desc,The shape key containing a blink with the right eye,,
+Scene.lowerlid_left.label,Lowerlid Left,下まぶた左,왼쪽 아래 눈꺼풀
+Scene.lowerlid_left.desc,"The shape key containing a slightly raised left lower lid.
+Can be set to ""Basis"" to disable lower lid movement",,
+Scene.lowerlid_right.label,Lowerlid Right,下まぶた右,오른쪽 아래 눈꺼풀
+Scene.lowerlid_right.desc,"The shape key containing a slightly raised right lower lid.
+Can be set to ""Basis"" to disable lower lid movement",,
+Scene.disable_eye_movement.label,Disable Eye Movement,目の動きを無効にする,눈 움직임 비활성화
+Scene.disable_eye_movement.desc,"IMPORTANT: Do your decimation first if you check this!
+
+Disables eye movement. Useful if you only want blinking.
+This creates eye bones with no movement bound to them.
+You still have to assign ""LeftEye"" and ""RightEye"" to the eyes in Unity",,
+Scene.disable_eye_blinking.label,Disable Eye Blinking,瞬きを無効にする,눈 깜빡임 비활성화
+Scene.disable_eye_blinking.desc,"Disables eye blinking. Useful if you only want eye movement.
+This will create the necessary shape keys but leaves them empty",,
+Scene.eye_distance.label,Eye Movement Range,眼球運動範囲,눈 움직임 범위
+Scene.eye_distance.desc,"Higher = more eye movement
+Lower = less eye movement
+Warning: Too little or too much range can glitch the eyes.
+Test your results in the ""Eye Testing""-Tab!
+",,
+Scene.eye_rotation_x.label,Up - Down,上 - 下,위 - 아래
+Scene.eye_rotation_x.desc,Rotate the eye bones on the vertical axis,,
+Scene.eye_rotation_y.label,Left - Right,左 - 右,왼쪽 - 오른쪽
+Scene.eye_rotation_y.desc,"Rotate the eye bones on the horizontal axis.
+This is from your own point of view",,
+Scene.iris_height.label,Iris Height,アイリスの高さ,눈동자 높이
+Scene.iris_height.desc,Moves the iris away from the eye ball,,
+Scene.eye_blink_shape.label,Blink Strength,まばたきの強さ,깜빡임 강도
+Scene.eye_blink_shape.desc,Test the blinking of the eye,,
+Scene.eye_lowerlid_shape.label,Lowerlid Strength,下まぶたの強さ,아래 눈꺼풀 강도
+Scene.eye_lowerlid_shape.desc,Test the lowerlid blinking of the eye,,
 Scene.armature.label,Armature,アーマチュア,뼈대(Armature)
 Scene.armature.desc,Select the armature which will be used by Cats,,Cats에서 쓰여질 뼈대(Armature)를 선택해주세요.
 Scene.zip_content.label,Zip Content,コンテンツを圧縮する,Zip 내용물
