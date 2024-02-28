@@ -2360,3 +2360,16 @@ else:
             args.append(undo)
 
         return operator(*args, **operator_args)
+
+def set_material_shading():
+    # Set shading to 3D view
+    for area in bpy.context.screen.areas:  # iterate through areas in current screen
+        if area.type == 'VIEW_3D':
+            for space in area.spaces:  # iterate through spaces in current VIEW_3D area
+                if space.type == 'VIEW_3D':  # check if space is a 3D view
+                    space.shading.type = 'MATERIAL'  # set the viewport shading to rendered
+                    space.shading.studio_light = 'forest.exr'
+                    space.shading.studiolight_rotate_z = 0.0
+                    space.shading.studiolight_background_alpha = 0.0
+                    if bpy.app.version >= (2, 82):
+                        space.shading.render_pass = 'COMBINED'

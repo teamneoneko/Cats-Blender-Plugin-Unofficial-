@@ -167,6 +167,9 @@ class FixMaterialsButton(bpy.types.Operator):
     def execute(self, context):           
         armature = Common.get_armature()
         meshes = Common.get_meshes_objects()
+
+        Common.set_material_shading()
+
         # If all materials are transparent, make them visible. Also set transparency always to Z-Transparency
             # Make materials exportable in Blender 2.80 and remove glossy mmd shader look
             # Common.remove_toon_shader(mesh)
