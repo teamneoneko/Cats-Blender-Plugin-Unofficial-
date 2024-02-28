@@ -209,9 +209,6 @@ class FixArmature(bpy.types.Operator):
             except TypeError:
                 print('Color Management View Transform "Standard" not found!')
 
-            # Set shading to 3D view
-            set_material_shading()
-
         # Remove Rigidbodies and joints
         if context.scene.remove_rigidbodies_joints:
             to_delete = []
@@ -320,11 +317,7 @@ class FixArmature(bpy.types.Operator):
                         if shapekey.name.startswith(categorie):
                             shapekey_order.append(shapekey.name)
 
-                Common.sort_shape_keys(mesh.name, shapekey_order)
-
-
-            # Clean material names. Combining mats would do this too
-            Common.clean_material_names(mesh)
+                Common.sort_shape_keys(mesh.name, shapekey_order)        
 
 			# Remove empty shape keys and then save the shape key order
             Common.clean_shapekeys(mesh)
@@ -1236,17 +1229,3 @@ def check_hierarchy(check_parenting, correct_hierarchy_array):
                             return {'result': False, 'message': bone.name + t('FixArmature.notParentTo1') + previous + t('FixArmature.notParentTo2')}
 
     return {'result': True}
-
-
-def set_material_shading():
-    # Set shading to 3D view
-    for area in bpy.context.screen.areas:  # iterate through areas in current screen
-        if area.type == 'VIEW_3D':
-            for space in area.spaces:  # iterate through spaces in current VIEW_3D area
-                if space.type == 'VIEW_3D':  # check if space is a 3D view
-                    space.shading.type = 'MATERIAL'  # set the viewport shading to rendered
-                    space.shading.studio_light = 'forest.exr'
-                    space.shading.studiolight_rotate_z = 0.0
-                    space.shading.studiolight_background_alpha = 0.0
-                    if bpy.app.version >= (2, 82):
-                        space.shading.render_pass = 'COMBINED'
