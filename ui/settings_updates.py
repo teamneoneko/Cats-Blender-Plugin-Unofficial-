@@ -31,6 +31,7 @@ class UpdaterPanel(ToolPanel, bpy.types.Panel):
         row.prop(context.scene, 'embed_textures')
         row = col.row(align=True)
         row.prop(context.scene, "export_shapekeys_csv")
+        row = col.row(align=True)
         path = context.scene.custom_shapekeys_export_dir
         if path:
             custom_shapekeys_export_dir = path
