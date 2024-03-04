@@ -1,4 +1,6 @@
 # MIT License
+import os
+import pathlib
 
 from .tools import common as Common
 from .tools.common import wrap_dynamic_enum_items
@@ -11,10 +13,19 @@ from .tools import translations as Translations
 from .tools.translations import t
 
 from bpy.types import Scene
-from bpy.props import BoolProperty, EnumProperty, FloatProperty, IntProperty
+from bpy.props import BoolProperty, EnumProperty, FloatProperty, IntProperty, StringProperty
 
+documents_folder = pathlib.Path.home() / "Documents"
+default_exports_dir = os.path.join(documents_folder, "Cats")
 
 def register():
+    Scene.custom_shapekeys_export_dir = StringProperty(
+        name=t('Scene.customfoldershapekeycsv.label'),
+        description=t('Scene.customfoldershapekeycsv.desc'),
+        subtype = 'DIR_PATH',
+        default = default_exports_dir
+    )
+
     Scene.export_shapekeys_csv = BoolProperty(
         name=t('Scene.shapekeycsv.label'),
         description=t('Scene.shapekeycsv.desc'),
