@@ -1,4 +1,4 @@
-# GPL License
+# MIT License
 
 import re
 import os
@@ -32,10 +32,14 @@ resources_dir = os.path.join(str(main_dir), "resources")
 dictionary_file = os.path.join(resources_dir, "dictionary.json")
 dictionary_google_file = os.path.join(resources_dir, "dictionary_google.json")
 
-documents_dir = Path.home() / "Documents"
-cats_dir = documents_dir / "cats"
-cats_dir.mkdir(exist_ok=True)
-
+def get_cats_dir(context):
+    prefs = context.preferences.addons["cats-blender-plugin"].preferences
+    
+    if prefs.custom_shapekeys_export_dir: 
+        return prefs.custom_shapekeys_export_dir
+    
+    # Fallback to default cats directory
+    return os.path.join(bpy.utils.user_resource('DATAFILES'), "cats") 
 
 @register_wrap
 class TranslateShapekeyButton(bpy.types.Operator):
@@ -47,6 +51,23 @@ class TranslateShapekeyButton(bpy.types.Operator):
     def execute(self, context):
         saved_data = Common.SavedData()
 
+        cats_dir = context.scene.custom_shapekeys_export_dir
+        if not cats_dir:
+            # Fallback to default dir
+            cats_dir = get_cats_dir(context)  
+            
+        # Check if dir exists or can be created
+        if not os.path.exists(cats_dir):
+            try:
+                os.makedirs(cats_dir) 
+            except OSError:
+                self.report({'ERROR'}, "Unable to create export folder. Please manually set the export directory")
+                return {'CANCELLED'}
+                
+        if not os.path.exists(cats_dir) or not os.access(cats_dir, os.W_OK):  
+            self.report({'ERROR'}, "Unable to write to export folder. Please manually set the export directory")
+            return {'CANCELLED'}
+            
         if context.scene.export_shapekeys_csv:
             
             blend_path = bpy.context.blend_data.filepath
@@ -81,7 +102,7 @@ class TranslateShapekeyButton(bpy.types.Operator):
                                     'translated': key.name
                                 })
 
-            blend_name = os.path.splitext(os.path.basename(blend_path))[0]
+            blend_name = os.path.splitext(os.path.basename(blend_path))[0] 
             export_path = os.path.join(str(cats_dir), blend_name + "_shapekeys.csv")
             
             with open(export_path, 'w', newline='') as f:
