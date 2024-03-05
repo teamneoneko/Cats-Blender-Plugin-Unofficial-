@@ -30,6 +30,15 @@ class UpdaterPanel(ToolPanel, bpy.types.Panel):
         row.prop(context.scene, 'show_mmd_tabs')
         row = col.row(align=True)
         row.prop(context.scene, 'embed_textures')
+        row = col.row(align=True)
+        row.prop(context.scene, "export_shapekeys_csv")
+        row = col.row(align=True)
+        path = context.scene.custom_shapekeys_export_dir
+        if path:
+            custom_shapekeys_export_dir = path
+        else:
+            custom_shapekeys_export_dir = default_cats_dir
+        row.prop(context.scene, "custom_shapekeys_export_dir")
 
         col.separator()
 

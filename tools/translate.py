@@ -1,4 +1,4 @@
-# GPL License
+# MIT License
 
 import re
 import os
@@ -9,11 +9,13 @@ import pathlib
 import traceback
 import collections
 import requests.exceptions
+import csv
 
 from datetime import datetime, timezone
 from collections import OrderedDict
 
 from . import common as Common
+from pathlib import Path
 from .register import register_wrap
 from .. import globs
 # from ..googletrans import Translator  # TODO Remove this
@@ -30,6 +32,14 @@ resources_dir = os.path.join(str(main_dir), "resources")
 dictionary_file = os.path.join(resources_dir, "dictionary.json")
 dictionary_google_file = os.path.join(resources_dir, "dictionary_google.json")
 
+def get_cats_dir(context):
+    prefs = context.preferences.addons["cats-blender-plugin"].preferences
+    
+    if prefs.custom_shapekeys_export_dir: 
+        return prefs.custom_shapekeys_export_dir
+    
+    # Fallback to default cats directory
+    return os.path.join(bpy.utils.user_resource('DATAFILES'), "cats") 
 
 @register_wrap
 class TranslateShapekeyButton(bpy.types.Operator):
@@ -39,31 +49,88 @@ class TranslateShapekeyButton(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
     def execute(self, context):
-        if bpy.app.version < (2, 79, 0):
-            self.report({'ERROR'}, t('TranslateX.error.wrongVersion'))
-            return {'FINISHED'}
-
         saved_data = Common.SavedData()
 
-        to_translate = []
-        for mesh in Common.get_meshes_objects(mode=2):
-            if Common.has_shapekeys(mesh):
-                for shapekey in mesh.data.shape_keys.key_blocks:
-                    if 'vrc.' not in shapekey.name and shapekey.name not in to_translate:
-                        to_translate.append(shapekey.name)
+        cats_dir = context.scene.custom_shapekeys_export_dir
+        if not cats_dir:
+            # Fallback to default dir
+            cats_dir = get_cats_dir(context)  
+            
+        # Check if dir exists or can be created
+        if not os.path.exists(cats_dir):
+            try:
+                os.makedirs(cats_dir) 
+            except OSError:
+                self.report({'ERROR'}, "Unable to create export folder. Please manually set the export directory")
+                return {'CANCELLED'}
+                
+        if not os.path.exists(cats_dir) or not os.access(cats_dir, os.W_OK):  
+            self.report({'ERROR'}, "Unable to write to export folder. Please manually set the export directory")
+            return {'CANCELLED'}
+            
+        if context.scene.export_shapekeys_csv:
+            
+            blend_path = bpy.context.blend_data.filepath
+            if not blend_path:
+                self.report({'ERROR'}, "Please save blend first!")
+                return {'CANCELLED'}
+            
+            to_translate = []
+            for mesh in Common.get_meshes_objects(mode=2):
+                if Common.has_shapekeys(mesh):
+                    for key in mesh.data.shape_keys.key_blocks:
+                        if 'vrc.' not in key.name:
+                            to_translate.append(key.name)
 
-        update_dictionary(to_translate, translating_shapes=True, self=self)
+            update_dictionary(to_translate, translating_shapes=True, self=self)
+            Common.update_shapekey_orders()
+            
+            shapekeys = []
+            i = 0
+            for mesh in Common.get_meshes_objects(mode=2):
+                if Common.has_shapekeys(mesh):
+                    for key in mesh.data.shape_keys.key_blocks:
+                        if 'vrc.' not in key.name:  
+                            original_name = key.name
+                            key.name, translated = translate(key.name, add_space=True, translating_shapes=True)
+                
+                            if translated:
+                                i += 1
+                                shapekeys.append({
+                                    'mesh/object': mesh.name,
+                                    'original': original_name,
+                                    'translated': key.name
+                                })
 
-        Common.update_shapekey_orders()
+            blend_name = os.path.splitext(os.path.basename(blend_path))[0] 
+            export_path = os.path.join(str(cats_dir), blend_name + "_shapekeys.csv")
+            
+            with open(export_path, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(['mesh/object', 'original', 'translated'])
+                for key in shapekeys:
+                    writer.writerow([key['mesh/object'], key['original'], key['translated']])
 
-        i = 0
-        for mesh in Common.get_meshes_objects(mode=2):
-            if Common.has_shapekeys(mesh):
-                for shapekey in mesh.data.shape_keys.key_blocks:
-                    if 'vrc.' not in shapekey.name:
-                        shapekey.name, translated = translate(shapekey.name, add_space=True, translating_shapes=True)
-                        if translated:
-                            i += 1
+        else:
+            to_translate = []
+            for mesh in Common.get_meshes_objects(mode=2):
+                if Common.has_shapekeys(mesh):
+                    for shapekey in mesh.data.shape_keys.key_blocks:
+                        if 'vrc.' not in shapekey.name and shapekey.name not in to_translate:
+                            to_translate.append(shapekey.name)
+
+            update_dictionary(to_translate, translating_shapes=True, self=self)
+
+            Common.update_shapekey_orders()
+
+            i = 0
+            for mesh in Common.get_meshes_objects(mode=2):
+                if Common.has_shapekeys(mesh):
+                    for shapekey in mesh.data.shape_keys.key_blocks:
+                        if 'vrc.' not in shapekey.name:
+                            shapekey.name, translated = translate(shapekey.name, add_space=True, translating_shapes=True)
+                            if translated:
+                                i += 1
 
         Common.ui_refresh()
 
