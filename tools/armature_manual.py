@@ -281,6 +281,15 @@ def pose_to_shapekey(name):
     saved_data = Common.SavedData()
 
     for mesh in Common.get_meshes_objects():
+        # Disable shape key drivers
+        if mesh.data.shape_keys and mesh.data.shape_keys.animation_data:
+            for key_block in mesh.data.shape_keys.key_blocks:
+                data_path = 'key_blocks["%s"].value' % key_block.name  
+                if mesh.data.shape_keys.animation_data:
+                    for driver in mesh.data.shape_keys.animation_data.drivers:
+                        if driver.data_path == data_path:
+                            driver.mute = True
+
         Common.unselect_all()
         Common.set_active(mesh)
 
@@ -293,6 +302,15 @@ def pose_to_shapekey(name):
         mod = mesh.modifiers.new(name, 'ARMATURE')
         mod.object = Common.get_armature()
         Common.apply_modifier(mod, as_shapekey=True)
+
+        # Re-enable drivers
+        if mesh.data.shape_keys and mesh.data.shape_keys.animation_data:
+            for key_block in mesh.data.shape_keys.key_blocks:
+                data_path = 'key_blocks["%s"].value' % key_block.name
+                if mesh.data.shape_keys.animation_data:
+                    for driver in mesh.data.shape_keys.animation_data.drivers:
+                        if driver.data_path == data_path:
+                            driver.mute = False
 
     armature = Common.set_default_stage()
     Common.switch('POSE')
