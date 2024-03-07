@@ -1444,9 +1444,7 @@ def _get_shape_key_co(shape_key: ShapeKey) -> np.ndarray:
 def remove_doubles(mesh_obj: Object, threshold: float, save_shapes: bool = True) -> int:
     if not isinstance(mesh_obj, Object):
         raise TypeError("mesh_obj must be an instance of Object")
-    if threshold <= 0:
-        raise ValueError("Threshold must be positive")
-
+    
     mesh = mesh_obj.data
 
     if not has_shapekeys(mesh_obj) or len(mesh.shape_keys.key_blocks) == 1:
