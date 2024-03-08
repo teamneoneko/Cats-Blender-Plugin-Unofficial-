@@ -2,6 +2,11 @@
 
 The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat. Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
 
+- Visit my website: https://yusarina.xyz
+- See me on twitter/x: https://twitter.com/YusarinaVR
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R1SDNNP)
+
 #### Warning, Cats has changed UI wise, please [click here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Features) to see the new UI features.
 #### If your plugin is trying to update to a blender 4.0 version or is stuck in a update loop please ensure you using the latest version of the plugin for you blender version from the releases tab [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases).
 
@@ -19,13 +24,8 @@ Blender 4.1 is also buggy and does have issues as well, we won't be recommending
 With Cats it takes only a few minutes to upload your model into VRChat.
 All the hours long processes of fixing your models are compressed into a few functions!
 
-- See my gumroad: https://yusarina.gumroad.com
-- See my github: https://github.com/Yusarina
-- See all my social media sites here: https://yusarina.xyz
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R1SDNNP)
-
 ## Blender version support policies.
+
 Please [Click Here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Blender-Version-Support-Policies) to view which versions of blender we support.
 
 ## Features
