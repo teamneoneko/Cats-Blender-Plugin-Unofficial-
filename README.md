@@ -1,6 +1,6 @@
 # Cats Blender Plugin Unofficial.
 
-### PLEASE DO NOT ASK FOR HELP FOR THIS VERSION OF CATS IN THE OFFICIAL CATS DISCORD, THIS CATS IS NOT OFFICIAL AND SUPPORT MAY NOT BE GIVEN IN THE OFFICIAL CATS DISCORD FOR THIS VERSION, THE OFFICIAL CATS DISCORD IS FOR THE OFFICIAL CATS ONLY, IF YOU HAVE A BUG OR NEED HELP PLEASE START AN [ISSUE](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/issues) OR JOIN MY OWN DISCORD SERVER.
+#### PLEASE DO NOT ASK FOR HELP FOR THIS VERSION OF CATS IN THE OFFICIAL CATS DISCORD, THIS CATS IS NOT OFFICIAL AND SUPPORT MAY NOT BE GIVEN IN THE OFFICIAL CATS DISCORD FOR THIS VERSION, THE OFFICIAL CATS DISCORD IS FOR THE OFFICIAL CATS ONLY, IF YOU HAVE A BUG OR NEED HELP PLEASE START AN [ISSUE](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/issues) OR JOIN MY OWN DISCORD SERVER.
 
 The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat. Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
 
