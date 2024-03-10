@@ -19,6 +19,16 @@ documents_folder = pathlib.Path.home() / "Documents"
 default_exports_dir = os.path.join(documents_folder, "Cats")
 
 def register():
+    Scene.source_language = EnumProperty(
+        name='Source Language',
+        description='Select the source language for translation',
+        items=[
+            ('ja', 'Japanese', 'Japanese'),
+            ('ko', 'Korean', 'Korean')
+        ],
+        default='ja'
+    )
+        
     Scene.custom_shapekeys_export_dir = StringProperty(
         name=t('Scene.customfoldershapekeycsv.label'),
         description=t('Scene.customfoldershapekeycsv.desc'),
