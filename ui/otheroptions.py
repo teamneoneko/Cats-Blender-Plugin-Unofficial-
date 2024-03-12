@@ -39,7 +39,6 @@ class OtherOptionsPanel(ToolPanel, bpy.types.Panel):
         row = col.row(align=True)
         row.scale_y = button_height
         row = col.row(align=True)
-        row.prop(context.scene, 'source_language', text='')
         row.prop(context.scene, 'use_google_only')
 
         split = layout_split(col, factor=0.27, align=True)
