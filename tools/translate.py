@@ -401,54 +401,6 @@ class TranslateMaterialsButton(bpy.types.Operator):
         return {'FINISHED'}
 
 
-# @register_wrap
-# class TranslateTexturesButton(bpy.types.Operator):
-#     bl_idname = 'cats_translate.textures'
-#     bl_label = t('TranslateTexturesButton.label')
-#     bl_description = t('TranslateTexturesButton.desc')
-#     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
-#
-#     def execute(self, context):
-#         # It currently seems to do nothing. This should probably only added when the folder textures really get translated. Currently only the materials are important
-#         self.report({'INFO'}, t('TranslateTexturesButton.success_alt'))
-#         return {'FINISHED'}
-#
-#         translator = google_translator()
-#
-#         to_translate = []
-#         for ob in Common.get_objects():
-#             if ob.type == 'MESH':
-#                 for matslot in ob.material_slots:
-#                     for texslot in bpy.data.materials[matslot.name].texture_slots:
-#                         if texslot:
-#                             print(texslot.name)
-#                             to_translate.append(texslot.name)
-#
-#         translated = []
-#         try:
-#             translations = translator.translate(to_translate, lang_tgt='en')
-#         except SSLError:
-#             self.report({'ERROR'}, t('TranslateTexturesButton.error.noInternet'))
-#             return {'FINISHED'}
-#
-#         for translation in translations:
-#             translated.append(translation)
-#
-#         i = 0
-#         for ob in Common.get_objects():
-#             if ob.type == 'MESH':
-#                 for matslot in ob.material_slots:
-#                     for texslot in bpy.data.materials[matslot.name].texture_slots:
-#                         if texslot:
-#                             bpy.data.textures[texslot.name].name = translated[i]
-#                             i += 1
-#
-#         Common.unselect_all()
-#
-#         self.report({'INFO'}, t('TranslateTexturesButton.success', number=str(i)))
-#         return {'FINISHED'}
-
-
 @register_wrap
 class TranslateAllButton(bpy.types.Operator):
     bl_idname = 'cats_translate.all'
@@ -780,30 +732,3 @@ def reset_google_dict():
 def save_google_dict():
     with open(dictionary_google_file, 'w', encoding="utf8") as outfile:
         json.dump(dictionary_google, outfile, ensure_ascii=False, indent=4)
-
-# def cvs_to_json():
-#     temp_dict = OrderedDict()
-#
-#     # Load internal dictionary
-#     try:
-#         with open(dictionary_file, encoding="utf8") as file:
-#             data = csv.reader(file, delimiter=',')
-#             for row in data:
-#                 name = fix_jp_chars(str(row[0]))
-#                 translation = row[1]
-#
-#                 if translation.startswith(' "'):
-#                     translation = translation[2:-1]
-#                 if translation.startswith('"'):
-#                     translation = translation[1:-1]
-#
-#                 temp_dict[name] = translation
-#             print('DICTIONARY LOADED!')
-#     except FileNotFoundError:
-#         print('DICTIONARY NOT FOUND!')
-#         pass
-#
-#     # # Create json from cvs
-#     dictionary_file_new = os.path.join(resources_dir, "dictionary2.json")
-#     with open(dictionary_file_new, 'w', encoding="utf8") as outfile:
-#         json.dump(temp_dict, outfile, ensure_ascii=False, indent=4)
