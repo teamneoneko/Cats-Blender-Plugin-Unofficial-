@@ -962,12 +962,10 @@ Scene.ui_lang.label,Cats Language,,
 Scene.ui_lang.desc,Lets you select which language the Cats interface should have,,
 Scene.use_custom_mmd_tools.label,Use Custom mmd_tools,カスタムmmd_toolsを使用する,커스텀 mmd_tools 사용
 Scene.use_custom_mmd_tools.desc,Enable this to use your own version of mmd_tools. This will disable the internal cats mmd_tools,,
-Scene.debug_translations.label,Debug Google Translations,Google翻訳をデバッグ,Google 번역 디버그
-Scene.debug_translations.desc,Tests the Google Translations and prints the Google response in case of error,,
-Scene.shapekeycsv.label,Export Shape Keys Translations CSV,シェイプキー翻訳CSVをエクスポート,쉐이프키 번역 CSV 내보내기
-Scene.shapekeycsv.desc,"When checked CATS will export shape keys translations to a CSV file located in Documents - cats - shapekeys.csv","チェックすると、CATS はシェイプ キーの翻訳をドキュメント - cats - Shapekeys.csv にある CSV ファイルにエクスポートします。","선택하면 CATS가 모양 키 번역을 문서 - cats - Shapekeys.csv에 있는 CSV 파일로 내보냅니다"
-Scene.customfoldershapekeycsv.label,Custom CSV Export Location,カスタムCSVエクスポートの場所,커스텀 CSV 내보내기 위치
+Scene.shapekeycsv.label,Export Translations To CSV,シェイプキー翻訳CSVをエクスポート,쉐이프키 번역 CSV 내보내기
+Scene.customfoldershapekeycsv.label,Custom CSV Export Location,シェイプキー翻訳CSVのエクスポート先をカスタマイズ,쉐이프키 번역
 Scene.customfoldershapekeycsv.desc,Choose your own location to export for the shape keys CSV to be.,シェイプ キーの CSV をエクスポートする独自の場所を選択します。,선택한 위치에 쉐이프 키 CSV를 내보냅니다.
+Scene.shapekeycsv.desc,"When checked CATS will export translations to a CSV file located in documents - CATS. Note you can set your own path","チェックすると、CATS はドキュメント内の CSV ファイル (CATS) に翻訳をエクスポートします。独自のパスを設定できることに注意してください","선택하면 CATS가 문서에 있는 CSV 파일(CATS)로 번역을 내보냅니다. 자신만의 경로를 설정할 수 있습니다."
 CheckForUpdateButton.label,Check now for Update,今すぐアップデートを確認,업데이트 체크
 CheckForUpdateButton.desc,Checks if a new update is available for CATS,,
 UpdateToLatestButton.label,Update Now,今すぐアップデート,지금 업데이트
@@ -1024,8 +1022,7 @@ draw_updater_panel.UpdateToSelectedButton.label,Install version:,インストー
 draw_updater_panel.UpdateToDevButton.label,Install Development Version,開発バージョンのインストール,개발버전 설치
 draw_updater_panel.currentVersion,Current version: {name},,현재 버전: {name}
 bpy.types.Scene.cats_updater_version_list.label,Version,バージョン,버전
-bpy.types.Scene.cats_updater_version_list.desc,"Select the version you want to install
-",,
+bpy.types.Scene.cats_updater_version_list.desc,"Select the version you want to install",,
 bpy.types.Scene.cats_update_action.label,Choose action,アクションを選択,액션 선택
 bpy.types.Scene.cats_update_action.desc,Action,,
 bpy.types.Scene.cats_update_action.update.label,Update Now,今すぐアップデート,지금 업데이트
