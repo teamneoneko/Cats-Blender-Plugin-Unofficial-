@@ -100,6 +100,7 @@ class CombineMaterialsButton(bpy.types.Operator):
         saved_data = Common.SavedData()
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
         self.generate_combined_tex()
         Common.switch('OBJECT')
         i = 0
