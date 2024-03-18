@@ -200,8 +200,8 @@ Rigidbody コレクションが削除されないと問題が発生する可能�
 MMD の理由でリジッド ボディを維持する必要がある場合にのみオフにします。","버튼을 사용할 때마다 장면에서 모든 강체 및 관절을 제거합니다.
 이는 Rigidbodies 컬렉션이 제거되지 않은 것처럼 기본적으로 켜져 있으며 문제가 발생할 수 있습니다.
 MMD 이유로 인해 강체를 유지해야 하는 경우에만 끄십시오."
-FixLegacy.info1,Fix Model Button has been removed.,「モデルを修正」ボタンが削除されました。,모델 수정 버튼이 제거되었습니다.
-FixLegacy.info2,please see mmd options for alternatives.,代替案については mmd オプションを参照してください。,대안은 mmd 옵션을 참조하세요.
+FixLegacy.info1,Blender 4.1 Cats has issues due to MMD Tools Not being.,Blender 4.1 Cats は MMD Tools が原因で問題が発生します。,Blender 4.1 Cats는 MMD Tools의 이유로 문제가 발생합니다.
+FixLegacy.info2,updated most functions will work but you may see errors.,更新された大部分の機能は動作しますが、エラーが表示される可能性があります。,업데이트된 대부분의 기능은 작동하지만 오류가 표시될 수 있습니다.
 LegacyStuff.label,Legacy Features,レガシーなもの,레거시 물건
 LegacyStuff.info1,End of Life features,この領域はサポート終了機能に関するものです,이 영역은 단종 기능을 위한 것입니다.
 LegacyStuff.info2,Might be removed in the future,これらの機能は将来のアップデートで削除される可能性があります,이러한 기능은 향후 업데이트에서 제거될 수 있습니다.
