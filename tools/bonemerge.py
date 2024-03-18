@@ -105,6 +105,7 @@ class BoneMergeButton(bpy.types.Operator):
 
                 # Mix the weights
                 Common.set_default_stage()
+                Common.remove_rigidbodies_global()
                 Common.set_active(mesh)
 
                 vg = mesh.vertex_groups.get(bone_name)
@@ -113,6 +114,7 @@ class BoneMergeButton(bpy.types.Operator):
                     Common.mix_weights(mesh, bone_name, parent_name)
 
                 Common.set_default_stage()
+                Common.remove_rigidbodies_global()
 
                 # We are done, remove the bone
                 Common.remove_bone(bone_name)

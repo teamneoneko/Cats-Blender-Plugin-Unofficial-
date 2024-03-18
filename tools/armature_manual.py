@@ -157,6 +157,7 @@ def start_pose_mode(reset_pose=True):
         pass
 
     armature = Common.set_default_stage()
+    Common.remove_rigidbodies_global()
     Common.switch('POSE')
     armature.data.pose_position = 'POSE'
 
@@ -245,6 +246,7 @@ def stop_pose_mode(reset_pose=True):
         pb.select = False
 
     armature = Common.set_default_stage()
+    Common.remove_rigidbodies_global()
     # armature.data.pose_position = 'REST'
 
     for mesh in Common.get_meshes_objects():
@@ -295,6 +297,7 @@ def pose_to_shapekey(name):
         Common.apply_modifier(mod, as_shapekey=True)
 
     armature = Common.set_default_stage()
+    Common.remove_rigidbodies_global()
     Common.switch('POSE')
     armature.data.pose_position = 'POSE'
 
@@ -889,8 +892,10 @@ class RemoveZeroWeightBones(bpy.types.Operator):
         saved_data = Common.SavedData()
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
         count = Common.delete_zero_weight()
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         saved_data.load()
         self.report({'INFO'}, t('RemoveZeroWeightBones.success', number=str(count)))
@@ -912,6 +917,7 @@ class RemoveZeroWeightGroups(bpy.types.Operator):
         saved_data = Common.SavedData()
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
         count = Common.remove_unused_vertex_groups()
 
         saved_data.load()
@@ -953,8 +959,10 @@ class RemoveConstraints(bpy.types.Operator):
         saved_data = Common.SavedData()
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
         Common.delete_bone_constraints()
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         saved_data.load()
         self.report({'INFO'}, t('RemoveConstraints.success'))
@@ -1041,6 +1049,7 @@ class GenerateTwistBones(bpy.types.Operator):
                         mesh.vertex_groups[bone_name].add([vertex.index], untwist_weight, "REPLACE")
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         saved_data.load()
         self.report({'INFO'}, t('RemoveConstraints.success'))
@@ -1085,6 +1094,7 @@ class RecalculateNormals(bpy.types.Operator):
         bpy.ops.mesh.normals_make_consistent(inside=False)
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         saved_data.load()
         self.report({'INFO'}, t('RecalculateNormals.success'))
@@ -1130,6 +1140,7 @@ class FlipNormals(bpy.types.Operator):
         bpy.ops.mesh.flip_normals()
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         saved_data.load()
         self.report({'INFO'}, t('FlipNormals.success'))
@@ -1161,11 +1172,13 @@ class RemoveDoubles(bpy.types.Operator):
             meshes = [Common.get_meshes_objects()[0]]
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         for mesh in meshes:
             removed_tris += Common.remove_doubles(mesh, 0.00002, save_shapes=True)
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         saved_data.load()
 
@@ -1251,6 +1264,7 @@ class OptimizeStaticShapekeys(bpy.types.Operator):
                     bpy.ops.object.shape_key_remove(all=True)
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         saved_data.load()
         self.report({'INFO'}, "Separation complete.")
@@ -1327,6 +1341,7 @@ class RepairShapekeys(bpy.types.Operator):
 
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         saved_data.load()
         self.report({'INFO'}, "Repair complete.")
@@ -1358,11 +1373,13 @@ class RemoveDoublesNormal(bpy.types.Operator):
             meshes = [Common.get_meshes_objects()[0]]
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         for mesh in meshes:
             removed_tris += Common.remove_doubles(mesh, 0.00002, save_shapes=True)
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         saved_data.load()
 
@@ -1622,6 +1639,7 @@ class FixFBTButton(bpy.types.Operator):
         saved_data = Common.SavedData()
 
         armature = Common.set_default_stage()
+        Common.remove_rigidbodies_global()
         Common.switch('EDIT')
 
 
@@ -1724,6 +1742,7 @@ class RemoveFBTButton(bpy.types.Operator):
         saved_data = Common.SavedData()
 
         armature = Common.set_default_stage()
+        Common.remove_rigidbodies_global()
         Common.switch('EDIT')
 
 
@@ -2039,3 +2058,40 @@ class TestButton(bpy.types.Operator):
             i += 1
             # if i == 1000:
             #     break
+
+@register_wrap
+class RemoveRigidbodiesJointsOperator(bpy.types.Operator):
+    bl_idname = 'my_plugin.remove_rigidbodies_joints'
+    bl_label = t('RemoveRigidbodiesJointsOperator.label')
+    bl_description = t('RemoveRigidbodiesJointsOperator.description')
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        if not Common.get_armature():
+            return False
+
+        if len(Common.get_armature_objects()) == 0:
+            return False
+
+        return True
+
+    def execute(self, context):
+        Common.set_default_stage()
+        armature = context.active_object
+        to_delete = []
+        for child in Common.get_top_parent(armature).children:
+            if 'rigidbodies' in child.name or 'joints' in child.name and child.name not in to_delete:
+                to_delete.append(child.name)
+                continue
+            for child2 in child.children:
+                if 'rigidbodies' in child2.name or 'joints' in child2.name and child2.name not in to_delete:
+                    to_delete.append(child2.name)
+                    continue
+        for obj_name in to_delete:
+            Common.switch('EDIT')
+            Common.switch('OBJECT')
+            Common.delete_hierarchy(bpy.data.objects[obj_name])
+
+        self.report({'INFO'}, 'Removed rigidbodies and joints.')
+        return {'FINISHED'}

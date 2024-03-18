@@ -64,7 +64,17 @@ class MMDOptions(ToolPanel, bpy.types.Panel):
         row = split.row(align=True)
         row.scale_y = 1.5
         row.operator(Material.FixMaterialsButton.bl_idname, text=t('mmdoptions.FixMaterialsButton.label'), icon='NODE_MATERIAL')
-
+        col.separator()
+        split = col.row(align=True)
+        row = split.row(align=True)
+        row.scale_y = 1.5
+        sub.label(text=t("MMDOptions.RemoveRigidBodiesManaulInfo1"), icon='INFO')
+        sub.label(text=t("MMDOptions.RemoveRigidBodiesManaulInfo2"), icon='NONE')
+        col.separator()
+        split = col.row(align=True)
+        row = split.row(align=True)
+        row.scale_y = 1.5
+        row.operator(Armature_manual.RemoveRigidbodiesJointsOperator.bl_idname, icon='RIGID_BODY')
         col.separator()
         col.separator()
               

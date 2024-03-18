@@ -18,7 +18,12 @@ from bpy.props import BoolProperty, EnumProperty, FloatProperty, IntProperty, St
 documents_folder = pathlib.Path.home() / "Documents"
 default_exports_dir = os.path.join(documents_folder, "Cats")
 
-def register():  
+def register():
+    Scene.remove_rigidbodies_joints_global = BoolProperty(
+        name=t('Scene.removerigidbodiesjointsglobal.label'),
+        description=t('Scene.removerigidbodiesjointsglobal.desc'),
+        default=True  
+    )  
     Scene.custom_translate_csv_export_dir = StringProperty(
         name=t('Scene.customfoldershapekeycsv.label'),
         description=t('Scene.customfoldershapekeycsv.desc'),

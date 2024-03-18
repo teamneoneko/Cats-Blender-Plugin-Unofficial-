@@ -30,6 +30,8 @@ class UpdaterPanel(ToolPanel, bpy.types.Panel):
         row = col.row(align=True)
         row.prop(context.scene, 'embed_textures')
         row = col.row(align=True)
+        row.prop(context.scene, 'remove_rigidbodies_joints_global')
+        row = col.row(align=True)
         row.prop(context.scene, "export_translate_csv")
         row = col.row(align=True)
         path = context.scene.custom_translate_csv_export_dir

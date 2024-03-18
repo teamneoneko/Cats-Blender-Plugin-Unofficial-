@@ -165,6 +165,7 @@ class AutoDecimateButtonCats(bpy.types.Operator):
     def decimate(self, context):
         print('START DECIMATION')
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         custom_decimation = context.scene.decimation_mode == 'CUSTOM'
         full_decimation = context.scene.decimation_mode == 'FULL'
