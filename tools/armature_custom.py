@@ -26,7 +26,6 @@ class MergeArmature(bpy.types.Operator):
 
         # Set default stage
         Common.set_default_stage()
-        Common.remove_rigidbodies_global()
         Common.unselect_all()
 
         # Get both armatures
@@ -67,17 +66,21 @@ class MergeArmature(bpy.types.Operator):
                 saved_data.load()
                 Common.show_error(6.2, t('MergeArmature.error.pleaseFix'))
                 return {'CANCELLED'}
+            
+        #Remove Rigid Bodies and Joints as there won't merge.    
+        to_delete = []
+        for child in Common.get_top_parent(base_armature).children:
+            if 'rigidbodies' in child.name or 'joints' in child.name:
+                to_delete.append(child.name)
+            for child2 in child.children:
+                if 'rigidbodies' in child2.name or 'joints' in child2.name:
+                    to_delete.append(child2.name)
+        for obj_name in to_delete:
+            Common.switch('EDIT')
+            Common.switch('OBJECT')
+            Common.delete_hierarchy(bpy.data.objects[obj_name])
 
-        # if len(Common.get_meshes_objects(armature_name=merge_armature_name)) == 0:
-        #     saved_data.load()
-        #     Common.show_error(5.2, ['The armature "' + merge_armature_name + '" does not have any meshes.'])
-        #     return {'CANCELLED'}
-        # if len(Common.get_meshes_objects(armature_name=base_armature_name)) == 0:
-        #     saved_data.load()
-        #     Common.show_error(5.2, ['The armature "' + base_armature_name + '" does not have any meshes.'])
-        #     return {'CANCELLED'}
 
-        # Merge armatures
         merge_armatures(base_armature_name, merge_armature_name, False, merge_same_bones=context.scene.merge_same_bones)
 
         saved_data.load()
