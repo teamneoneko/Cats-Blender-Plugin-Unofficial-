@@ -23,6 +23,7 @@ class RootButton(bpy.types.Operator):
     def execute(self, context):
         saved_data = Common.SavedData()
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         Common.switch('EDIT')
 

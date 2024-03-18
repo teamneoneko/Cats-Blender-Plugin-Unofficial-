@@ -76,6 +76,8 @@ QuickAccess.ImportAnyModel.label,Import Model,モデルのインポート,모델
 QuickAccess.JoinMeshes.label,Join all meshes,すべてのメッシュを結合する,모든 메쉬에 합류
 QuickAccess.CombineMats.label,Combine Materials,材料を組み合わせる,재료 결합
 mmdoptions.FixMaterialsButton.label,Fix Materials,固定材料,재료 수정
+MMDOptions.RemoveRigidBodiesManaulInfo1,This will remove Rigid Bodies and Joint,この操作はリジッドボディとジョイントを削除します,이 작업은 리ジッドボディ와 관계를 제거합니다.
+MMDOptions.RemoveRigidBodiesManaulInfo2,Which are not needed for VRChat,VRChatで不要なものです,VRChat에서 필요하지 않은 것입니다.
 FixMaterialsButton.label,Fix Materials,固定材料,재료 수정
 FixMaterialsButton.desc,"This will apply some vrchat related fixes to materials
 
@@ -190,6 +192,14 @@ Scene.eye_left.label,Left Eye,左目,왼쪽 눈
 Scene.eye_left.desc,The models left eye bone,,
 Scene.eye_right.label,Right Eye,右目,오른쪽 눈
 Scene.eye_right.desc,The models right eye bone,,
+Scene.removerigidbodiesjointsglobal.label,Remove Rigidbodies and Joints Global,グローバルにリジッドボディとジョイントを削除,리ジッドボディ와 조인트를 전역적으로 제거
+Scene.removerigidbodiesjointsglobal.desc,"Removes all Rigidbodies and Joints from the scene whenever a button is used
+This is on by default as if rigidbodies collections are not removed it can cause issues.
+Only turn off if you need rigid bodies persevered for MMD reasons.","ボタンが使用されるたびに、シーンからすべてのリジッドボディとジョイントを削除します
+Rigidbody コレクションが削除されないと問題が発生する可能性があるため、これはデフォルトでオンになっています.
+MMD の理由でリジッド ボディを維持する必要がある場合にのみオフにします。","버튼을 사용할 때마다 장면에서 모든 강체 및 관절을 제거합니다.
+이는 Rigidbodies 컬렉션이 제거되지 않은 것처럼 기본적으로 켜져 있으며 문제가 발생할 수 있습니다.
+MMD 이유로 인해 강체를 유지해야 하는 경우에만 끄십시오."
 FixLegacy.info1,Fix Model Button has been removed.,「モデルを修正」ボタンが削除されました。,모델 수정 버튼이 제거되었습니다.
 FixLegacy.info2,please see mmd options for alternatives.,代替案については mmd オプションを参照してください。,대안은 mmd 옵션을 참조하세요.
 LegacyStuff.label,Legacy Features,レガシーなもの,레거시 물건
@@ -1105,12 +1115,10 @@ Scene.ui_lang.label,Cats Language,,
 Scene.ui_lang.desc,Lets you select which language the Cats interface should have,,
 Scene.use_custom_mmd_tools.label,Use Custom mmd_tools,カスタムmmd_toolsを使用する,커스텀 mmd_tools 사용
 Scene.use_custom_mmd_tools.desc,Enable this to use your own version of mmd_tools. This will disable the internal cats mmd_tools,,
-Scene.debug_translations.label,Debug Google Translations,Google翻訳をデバッグ,Google 번역 디버그
-Scene.debug_translations.desc,Tests the Google Translations and prints the Google response in case of error,,
-Scene.shapekeycsv.label,Export Shape Keys Translations CSV,シェイプキー翻訳CSVをエクスポート,쉐이프키 번역 CSV 내보내기
-Scene.shapekeycsv.desc,"When checked CATS will export shape keys translations to a CSV file located in Documents - cats - shapekeys.csv","チェックすると、CATS はシェイプ キーの翻訳をドキュメント - cats - Shapekeys.csv にある CSV ファイルにエクスポートします。","선택하면 CATS가 모양 키 번역을 문서 - cats - Shapekeys.csv에 있는 CSV 파일로 내보냅니다"
-Scene.customfoldershapekeycsv.label,Custom CSV Export Location,カスタムCSVエクスポートの場所,커스텀 CSV 내보내기 위치
+Scene.shapekeycsv.label,Export Translations To CSV,シェイプキー翻訳CSVをエクスポート,쉐이프키 번역 CSV 내보내기
+Scene.customfoldershapekeycsv.label,Custom CSV Export Location,シェイプキー翻訳CSVのエクスポート先をカスタマイズ,쉐이프키 번역
 Scene.customfoldershapekeycsv.desc,Choose your own location to export for the shape keys CSV to be.,シェイプ キーの CSV をエクスポートする独自の場所を選択します。,선택한 위치에 쉐이프 키 CSV를 내보냅니다.
+Scene.shapekeycsv.desc,"When checked CATS will export translations to a CSV file located in documents - CATS. Note you can set your own path","チェックすると、CATS はドキュメント内の CSV ファイル (CATS) に翻訳をエクスポートします。独自のパスを設定できることに注意してください","선택하면 CATS가 문서에 있는 CSV 파일(CATS)로 번역을 내보냅니다. 자신만의 경로를 설정할 수 있습니다."
 CheckForUpdateButton.label,Check now for Update,今すぐアップデートを確認,업데이트 체크
 CheckForUpdateButton.desc,Checks if a new update is available for CATS,,
 UpdateToLatestButton.label,Update Now,今すぐアップデート,지금 업데이트
@@ -1188,3 +1196,8 @@ select_this_to_keep_the_bones_after_merging_them_to_their_parents_or_to_the_acti
 select_this_to_only_merge_the_weights_of_the_visible_meshes,"Select this to only merge the weights of the visible meshes"
 keep_merged_bones,"Keep Merged Bones"
 merge_visible_meshes_only,"Merge Visible Meshes Only"
+RemoveRigidbodiesJointsOperator.label,"Remove Rigidbodies and Joints","剛体とジョイントを削除","리지드바디와 조인트 제거"
+RemoveRigidbodiesJointsOperator.description,"Rigidbodies and joints are used by MMD software to simulate physics. 
+They are completely useless for VRChat, so removing them is recommended for VRChat users!","剛体とジョイントはMMDソフトウェアによって物理シミュレーションを行います。
+VRChatでは彼らが役に立ちません。VRChatユーザーのためにこれらを削除することをお勧めします！","Rigidbodies와 joints는 MMD software에서 물리연산을 위해 사용되는 것들입니다.
+VRChat에 사용되지않으므로 VRChat 유저들에게는 이것들을 지우는 게 좋습니다!"

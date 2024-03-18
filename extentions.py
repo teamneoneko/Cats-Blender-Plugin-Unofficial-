@@ -19,14 +19,19 @@ documents_folder = pathlib.Path.home() / "Documents"
 default_exports_dir = os.path.join(documents_folder, "Cats")
 
 def register():
-    Scene.custom_shapekeys_export_dir = StringProperty(
+    Scene.remove_rigidbodies_joints_global = BoolProperty(
+        name=t('Scene.removerigidbodiesjointsglobal.label'),
+        description=t('Scene.removerigidbodiesjointsglobal.desc'),
+        default=True  
+    )  
+    Scene.custom_translate_csv_export_dir = StringProperty(
         name=t('Scene.customfoldershapekeycsv.label'),
         description=t('Scene.customfoldershapekeycsv.desc'),
         subtype = 'DIR_PATH',
         default = default_exports_dir
     )
 
-    Scene.export_shapekeys_csv = BoolProperty(
+    Scene.export_translate_csv = BoolProperty(
         name=t('Scene.shapekeycsv.label'),
         description=t('Scene.shapekeycsv.desc'),
         default = False

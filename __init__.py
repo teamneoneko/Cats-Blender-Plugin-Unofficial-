@@ -13,7 +13,7 @@ bl_info = {
     'warning': '',
 }
 
-dev_branch = False
+dev_branch = True
 
 import os
 import sys

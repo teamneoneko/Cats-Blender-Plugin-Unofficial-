@@ -9,7 +9,6 @@ from ..tools import settings as Settings
 from ..tools.register import register_wrap
 from ..tools.translations import t, DownloadTranslations
 
-
 @register_wrap
 class UpdaterPanel(ToolPanel, bpy.types.Panel):
     bl_idname = 'VIEW3D_PT_updater_v3'
@@ -31,14 +30,16 @@ class UpdaterPanel(ToolPanel, bpy.types.Panel):
         row = col.row(align=True)
         row.prop(context.scene, 'embed_textures')
         row = col.row(align=True)
-        row.prop(context.scene, "export_shapekeys_csv")
+        row.prop(context.scene, 'remove_rigidbodies_joints_global')
         row = col.row(align=True)
-        path = context.scene.custom_shapekeys_export_dir
+        row.prop(context.scene, "export_translate_csv")
+        row = col.row(align=True)
+        path = context.scene.custom_translate_csv_export_dir
         if path:
-            custom_shapekeys_export_dir = path
+            custom_translate_csv_export_dir = path
         else:
-            custom_shapekeys_export_dir = default_cats_dir
-        row.prop(context.scene, "custom_shapekeys_export_dir")
+            custom_translate_csv_export_dir = default_cats_dir
+        row.prop(context.scene, "custom_translate_csv_export_dir")
 
         col.separator()
 
