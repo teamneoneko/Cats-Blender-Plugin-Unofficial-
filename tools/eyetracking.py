@@ -333,6 +333,7 @@ class CreateEyesButton(bpy.types.Operator):
 
         # Remove empty objects
         Common.set_default_stage()  # Fixes an error apparently
+        Common.remove_rigidbodies_global()
         Common.remove_empty()
 
         # Fix armature name
@@ -481,6 +482,7 @@ def fix_eye_position(context, old_eye, new_eye, head, right_side):
 def repair_shapekeys(mesh_name, vertex_group):
     # This is done to fix a very weird bug where the mouth stays open sometimes
     Common.set_default_stage()
+    Common.remove_rigidbodies_global()
     mesh = Common.get_objects()[mesh_name]
     Common.unselect_all()
     Common.set_active(mesh)
@@ -551,6 +553,7 @@ def randBoolNumber():
 def repair_shapekeys_mouth(mesh_name):  # TODO Add vertex repairing!
     # This is done to fix a very weird bug where the mouth stays open sometimes
     Common.set_default_stage()
+    Common.remove_rigidbodies_global()
     mesh = Common.get_objects()[mesh_name]
     Common.unselect_all()
     Common.set_active(mesh)
@@ -666,6 +669,7 @@ class StopTestingButton(bpy.types.Operator):
 
         if not context.object or context.object.mode != 'POSE':
             Common.set_default_stage()
+            Common.remove_rigidbodies_global()
             Common.switch('POSE')
 
         for pb in Common.get_armature().data.bones:
