@@ -43,7 +43,7 @@ Please [Click Here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/
    - Though I have updated CATS to Blender 4.0, I do not currently recommend using 4.0 as there multiple issues with MDD Tools and Blender 4.0 which cats uses.
 - Anything older then 3.6 is not supported and no longer works.
 - If you have custom Python installed which Blender might use, you need to have Numpy installed
-- NOTE TO WINDOWS STORE USERS, STOP USING THE WINDOWS STORE VERSION YOU WILL HAVE ISSUES, PLEASE EITHER USE THE STEAM VERSION OR THE ONE FROM THE OFFICIAL BLENDER WEBSITE.
+- Note to Windows Store users: Though Cats seems to work on Windows Store these days no support will be given if there are any issues as the Unofficial cats does not support Windows store due to issues Windows Store versions of Blender have given in the past. 
 
 #### Additional Plugins Requirements.
 Some features of Cat's need additional plugins to work, you can find them here:
