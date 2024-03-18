@@ -33,6 +33,34 @@ class MergeArmature(bpy.types.Operator):
         merge_armature_name = bpy.context.scene.merge_armature
         base_armature = Common.get_objects()[base_armature_name]
         merge_armature = Common.get_objects()[merge_armature_name]
+        armature = Common.set_default_stage()
+
+        #Remove Rigid Bodies and Joints as there won't merge.    
+        to_delete = []
+        for child in Common.get_top_parent(base_armature).children:
+            if 'rigidbodies' in child.name or 'joints' in child.name:
+                to_delete.append(child.name)
+            for child2 in child.children:
+                if 'rigidbodies' in child2.name or 'joints' in child2.name:
+                    to_delete.append(child2.name)
+        for obj_name in to_delete:
+            Common.switch('EDIT')
+            Common.switch('OBJECT')
+            Common.delete_hierarchy(bpy.data.objects[obj_name])
+
+        if len(armature.children) > 1:
+            for child in armature.children:
+                for child2 in child.children:
+                    if child2.type != 'MESH':
+                        Common.delete(child2)
+
+                if child.type != 'MESH':
+                    Common.delete(child)
+
+        Common.set_default_stage()
+        Common.unselect_all()
+        Common.remove_empty()
+        Common.remove_unused_objects()
 
         if not merge_armature:
             saved_data.load()
@@ -66,20 +94,6 @@ class MergeArmature(bpy.types.Operator):
                 saved_data.load()
                 Common.show_error(6.2, t('MergeArmature.error.pleaseFix'))
                 return {'CANCELLED'}
-            
-        #Remove Rigid Bodies and Joints as there won't merge.    
-        to_delete = []
-        for child in Common.get_top_parent(base_armature).children:
-            if 'rigidbodies' in child.name or 'joints' in child.name:
-                to_delete.append(child.name)
-            for child2 in child.children:
-                if 'rigidbodies' in child2.name or 'joints' in child2.name:
-                    to_delete.append(child2.name)
-        for obj_name in to_delete:
-            Common.switch('EDIT')
-            Common.switch('OBJECT')
-            Common.delete_hierarchy(bpy.data.objects[obj_name])
-
 
         merge_armatures(base_armature_name, merge_armature_name, False, merge_same_bones=context.scene.merge_same_bones)
 
