@@ -51,7 +51,7 @@ class TranslateShapekeyButton(bpy.types.Operator):
     def execute(self, context):
         saved_data = Common.SavedData()
 
-        cats_dir = context.scene.custom_shapekeys_export_dir
+        cats_dir = context.scene.custom_translate_csv_export_dir
         if not cats_dir:
             # Fallback to default dir
             cats_dir = get_cats_dir(context)  
@@ -68,7 +68,7 @@ class TranslateShapekeyButton(bpy.types.Operator):
             self.report({'ERROR'}, "Unable to write to export folder. Please manually set the export directory")
             return {'CANCELLED'}
             
-        if context.scene.export_shapekeys_csv:
+        if context.scene.export_translate_csv:
             
             blend_path = bpy.context.blend_data.filepath
             if not blend_path:
@@ -147,28 +147,85 @@ class TranslateBonesButton(bpy.types.Operator):
     bl_description = t('TranslateBonesButton.desc')
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
-    @classmethod
-    def poll(cls, context):
-        if not Common.get_armature():
-            return False
-        return True
-
     def execute(self, context):
-        to_translate = []
-        for armature in Common.get_armature_objects():
-            for bone in armature.data.bones:
-                to_translate.append(bone.name)
+        saved_data = Common.SavedData()
 
-        update_dictionary(to_translate, self=self)
+        cats_dir = context.scene.custom_translate_csv_export_dir
+        if not cats_dir:
+            # Fallback to default dir
+            cats_dir = get_cats_dir(context)  
+            
+        # Check if dir exists or can be created
+        if not os.path.exists(cats_dir):
+            try:
+                os.makedirs(cats_dir) 
+            except OSError:
+                self.report({'ERROR'}, "Unable to create export folder. Please manually set the export directory")
+                return {'CANCELLED'}
+                
+        if not os.path.exists(cats_dir) or not os.access(cats_dir, os.W_OK):  
+            self.report({'ERROR'}, "Unable to write to export folder. Please manually set the export directory")
+            return {'CANCELLED'}
+            
+        if context.scene.export_translate_csv:
+            
+            blend_path = bpy.context.blend_data.filepath
+            if not blend_path:
+                self.report({'ERROR'}, "Please save blend first!")
+                return {'CANCELLED'}
+            
+            to_translate = []
+            for armature in Common.get_armature_objects():
+                for bone in armature.data.bones:
+                    to_translate.append(bone.name)
 
-        count = 0
-        for armature in Common.get_armature_objects():
-            for bone in armature.data.bones:
-                bone.name, translated = translate(bone.name)
-                if translated:
-                    count += 1
+            update_dictionary(to_translate, self=self)
+            
+            bones = []
+            i = 0
+            for armature in Common.get_armature_objects():
+                for bone in armature.data.bones:
+                    original_name = bone.name
+                    bone.name, translated = translate(bone.name)
+                    if translated:
+                        i += 1
+                        bones.append({
+                            'armature': armature.name,
+                            'original': original_name,
+                            'translated': bone.name
+                        })
 
-        self.report({'INFO'}, t('TranslateBonesButton.success', number=str(count)))
+            blend_name = os.path.splitext(os.path.basename(blend_path))[0] 
+            export_path = os.path.join(str(cats_dir), blend_name + "_bones.csv")
+            
+            with open(export_path, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(['armature', 'original', 'translated'])
+                for bone in bones:
+                    writer.writerow([bone['armature'], bone['original'], bone['translated']])
+
+        else:
+            to_translate = []
+            for armature in Common.get_armature_objects():
+                for bone in armature.data.bones:
+                    if bone.name not in to_translate:
+                        to_translate.append(bone.name)
+
+            update_dictionary(to_translate, self=self)
+
+            i = 0
+            for armature in Common.get_armature_objects():
+                for bone in armature.data.bones:
+                    original_name = bone.name
+                    bone.name, translated = translate(bone.name)
+                    if translated:
+                        i += 1
+
+        Common.ui_refresh()
+
+        saved_data.load()
+
+        self.report({'INFO'}, t('TranslateBonesButton.success', number=str(i)))
         return {'FINISHED'}
 
 
@@ -180,37 +237,77 @@ class TranslateObjectsButton(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
     def execute(self, context):
-        if bpy.app.version < (2, 79, 0):
-            self.report({'ERROR'}, t('TranslateX.error.wrongVersion'))
-            return {'FINISHED'}
-        to_translate = []
-        for obj in Common.get_objects():
-            if obj.name not in to_translate:
+        saved_data = Common.SavedData()
+
+        cats_dir = context.scene.custom_translate_csv_export_dir
+        if not cats_dir:
+            # Fallback to default dir
+            cats_dir = get_cats_dir(context)
+
+        # Check if dir exists or can be created
+        if not os.path.exists(cats_dir):
+            try:
+                os.makedirs(cats_dir)
+            except OSError:
+                self.report({'ERROR'}, "Unable to create export folder. Please manually set the export directory")
+                return {'CANCELLED'}
+
+        if not os.path.exists(cats_dir) or not os.access(cats_dir, os.W_OK):
+            self.report({'ERROR'}, "Unable to write to export folder. Please manually set the export directory")
+            return {'CANCELLED'}
+
+        if context.scene.export_translate_csv:
+            blend_path = bpy.context.blend_data.filepath
+            if not blend_path:
+                self.report({'ERROR'}, "Please save blend first!")
+                return {'CANCELLED'}
+
+            to_translate = []
+            for obj in Common.get_objects():
                 to_translate.append(obj.name)
-            if obj.type == 'ARMATURE':
-                if obj.data and obj.data.name not in to_translate:
-                    to_translate.append(obj.data.name)
-                if obj.animation_data and obj.animation_data.action:
-                    to_translate.append(obj.animation_data.action.name)
 
-        update_dictionary(to_translate, self=self)
+            update_dictionary(to_translate, self=self)
 
-        i = 0
-        for obj in Common.get_objects():
-            obj.name, translated = translate(obj.name)
-            if translated:
-                i += 1
+            objects_translations = []
+            i = 0
+            for obj in Common.get_objects():
+                original_name = obj.name
+                obj.name, translated = translate(obj.name)
+                if translated:
+                    i += 1
+                    objects_translations.append({
+                        'object': obj.name,
+                        'original': original_name,
+                        'translated': obj.name
+                    })
 
-            if obj.type == 'ARMATURE':
-                if obj.data:
-                    obj.data.name, translated = translate(obj.data.name)
-                    if translated:
-                        i += 1
+            blend_name = os.path.splitext(os.path.basename(blend_path))[0]
+            export_path = os.path.join(str(cats_dir), blend_name + "_objects.csv")
 
-                if obj.animation_data and obj.animation_data.action:
-                    obj.animation_data.action.name, translated = translate(obj.animation_data.action.name)
-                    if translated:
-                        i += 1
+            with open(export_path, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(['object', 'original', 'translated'])
+                for translation in objects_translations:
+                    writer.writerow([translation['object'], translation['original'], translation['translated']])
+
+        else:
+            to_translate = []
+            for obj in Common.get_objects():
+                if obj.name not in to_translate:
+                    to_translate.append(obj.name)
+
+            update_dictionary(to_translate, self=self)
+
+            i = 0
+            for obj in Common.get_objects():
+                original_name = obj.name
+                obj.name, translated = translate(obj.name)
+                if translated:
+                    i += 1
+
+        Common.ui_refresh()
+
+        saved_data.load()
 
         self.report({'INFO'}, t('TranslateObjectsButton.success', number=str(i)))
         return {'FINISHED'}
@@ -224,81 +321,84 @@ class TranslateMaterialsButton(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
     def execute(self, context):
-        if bpy.app.version < (2, 79, 0):
-            self.report({'ERROR'}, t('TranslateX.error.wrongVersion'))
-            return {'FINISHED'}
-
         saved_data = Common.SavedData()
 
-        to_translate = []
-        for mesh in Common.get_meshes_objects(mode=2):
-            for matslot in mesh.material_slots:
-                if matslot.name not in to_translate:
+        cats_dir = context.scene.custom_translate_csv_export_dir
+        if not cats_dir:
+            # Fallback to default dir
+            cats_dir = get_cats_dir(context)
+
+        # Check if dir exists or can be created
+        if not os.path.exists(cats_dir):
+            try:
+                os.makedirs(cats_dir)
+            except OSError:
+                self.report({'ERROR'}, "Unable to create export folder. Please manually set the export directory")
+                return {'CANCELLED'}
+
+        if not os.path.exists(cats_dir) or not os.access(cats_dir, os.W_OK):
+            self.report({'ERROR'}, "Unable to write to export folder. Please manually set the export directory")
+            return {'CANCELLED'}
+
+        if context.scene.export_translate_csv:
+            blend_path = bpy.context.blend_data.filepath
+            if not blend_path:
+                self.report({'ERROR'}, "Please save blend first!")
+                return {'CANCELLED'}
+
+            to_translate = []
+            for mesh in Common.get_meshes_objects(mode=2):
+                for matslot in mesh.material_slots:
                     to_translate.append(matslot.name)
 
-        update_dictionary(to_translate, self=self)
+            update_dictionary(to_translate, self=self)
 
-        i = 0
-        for mesh in Common.get_meshes_objects(mode=2):
-            Common.set_active(mesh)
-            for index, matslot in enumerate(mesh.material_slots):
-                mesh.active_material_index = index
-                if bpy.context.object.active_material:
-                    bpy.context.object.active_material.name, translated = translate(bpy.context.object.active_material.name)
+            materials_translations = []
+            i = 0
+            for mesh in Common.get_meshes_objects(mode=2):
+                for matslot in mesh.material_slots:
+                    original_name = matslot.name
+                    matslot.material.name, translated = translate(matslot.material.name)
+                    if translated:
+                        i += 1
+                        materials_translations.append({
+                            'mesh': mesh.name,
+                            'original': original_name,
+                            'translated': matslot.material.name
+                        })
+
+            blend_name = os.path.splitext(os.path.basename(blend_path))[0]
+            export_path = os.path.join(str(cats_dir), blend_name + "_materials.csv")
+
+            with open(export_path, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(['mesh', 'original', 'translated'])
+                for translation in materials_translations:
+                    writer.writerow([translation['mesh'], translation['original'], translation['translated']])
+
+        else:
+            to_translate = []
+            for mesh in Common.get_meshes_objects(mode=2):
+                for matslot in mesh.material_slots:
+                    if matslot.name not in to_translate:
+                        to_translate.append(matslot.name)
+
+            update_dictionary(to_translate, self=self)
+
+            i = 0
+            for mesh in Common.get_meshes_objects(mode=2):
+                for matslot in mesh.material_slots:
+                    original_name = matslot.name
+                    matslot.material.name, translated = translate(matslot.material.name)
                     if translated:
                         i += 1
 
+        Common.ui_refresh()
+
         saved_data.load()
+
         self.report({'INFO'}, t('TranslateMaterialsButton.success', number=str(i)))
         return {'FINISHED'}
-
-
-# @register_wrap
-# class TranslateTexturesButton(bpy.types.Operator):
-#     bl_idname = 'cats_translate.textures'
-#     bl_label = t('TranslateTexturesButton.label')
-#     bl_description = t('TranslateTexturesButton.desc')
-#     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
-#
-#     def execute(self, context):
-#         # It currently seems to do nothing. This should probably only added when the folder textures really get translated. Currently only the materials are important
-#         self.report({'INFO'}, t('TranslateTexturesButton.success_alt'))
-#         return {'FINISHED'}
-#
-#         translator = google_translator()
-#
-#         to_translate = []
-#         for ob in Common.get_objects():
-#             if ob.type == 'MESH':
-#                 for matslot in ob.material_slots:
-#                     for texslot in bpy.data.materials[matslot.name].texture_slots:
-#                         if texslot:
-#                             print(texslot.name)
-#                             to_translate.append(texslot.name)
-#
-#         translated = []
-#         try:
-#             translations = translator.translate(to_translate, lang_tgt='en')
-#         except SSLError:
-#             self.report({'ERROR'}, t('TranslateTexturesButton.error.noInternet'))
-#             return {'FINISHED'}
-#
-#         for translation in translations:
-#             translated.append(translation)
-#
-#         i = 0
-#         for ob in Common.get_objects():
-#             if ob.type == 'MESH':
-#                 for matslot in ob.material_slots:
-#                     for texslot in bpy.data.materials[matslot.name].texture_slots:
-#                         if texslot:
-#                             bpy.data.textures[texslot.name].name = translated[i]
-#                             i += 1
-#
-#         Common.unselect_all()
-#
-#         self.report({'INFO'}, t('TranslateTexturesButton.success', number=str(i)))
-#         return {'FINISHED'}
 
 
 @register_wrap
@@ -309,9 +409,13 @@ class TranslateAllButton(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
 
     def execute(self, context):
-        if bpy.app.version < (2, 79, 0):
-            self.report({'ERROR'}, t('TranslateX.error.wrongVersion'))
-            return {'FINISHED'}
+        
+        # Check if the export_translate_csv is checked and if the blend file is saved
+        if context.scene.export_translate_csv:
+            if not bpy.data.filepath:
+                # Prompt the user to save the blend file
+                self.report({'ERROR'}, "Please save the blend file before exporting translations.")
+                return {'CANCELLED'}
 
         error_shown = False
 
@@ -628,30 +732,3 @@ def reset_google_dict():
 def save_google_dict():
     with open(dictionary_google_file, 'w', encoding="utf8") as outfile:
         json.dump(dictionary_google, outfile, ensure_ascii=False, indent=4)
-
-# def cvs_to_json():
-#     temp_dict = OrderedDict()
-#
-#     # Load internal dictionary
-#     try:
-#         with open(dictionary_file, encoding="utf8") as file:
-#             data = csv.reader(file, delimiter=',')
-#             for row in data:
-#                 name = fix_jp_chars(str(row[0]))
-#                 translation = row[1]
-#
-#                 if translation.startswith(' "'):
-#                     translation = translation[2:-1]
-#                 if translation.startswith('"'):
-#                     translation = translation[1:-1]
-#
-#                 temp_dict[name] = translation
-#             print('DICTIONARY LOADED!')
-#     except FileNotFoundError:
-#         print('DICTIONARY NOT FOUND!')
-#         pass
-#
-#     # # Create json from cvs
-#     dictionary_file_new = os.path.join(resources_dir, "dictionary2.json")
-#     with open(dictionary_file_new, 'w', encoding="utf8") as outfile:
-#         json.dump(temp_dict, outfile, ensure_ascii=False, indent=4)

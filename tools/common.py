@@ -220,14 +220,9 @@ def switch(new_mode, check_mode=True):
         bpy.ops.object.mode_set(mode=new_mode, toggle=False)
 
 
-def set_default_stage():
-    """
-    Selects the armature, unhides everything and sets the modes of every object to object mode
-    :return: the armature
-    """
+def remove_rigidbodies_global():
 
-    # Remove rigidbody collections, as they cause issues if they are not in the view_layer
-    if bpy.context.scene.remove_rigidbodies_joints:
+    if bpy.context.scene.remove_rigidbodies_joints_global:
         print('Collections:')
         for collection in bpy.data.collections:
             print(' ' + collection.name, collection.name.lower())
@@ -236,6 +231,18 @@ def set_default_stage():
                 for obj in collection.objects:
                     delete(obj)
                 bpy.data.collections.remove(collection)
+
+    armature = get_armature()
+    if armature:
+        set_active(armature)
+
+    return armature
+
+def set_default_stage():
+    """
+    Selects the armature, unhides everything and sets the modes of every object to object mode
+    :return: the armature
+    """
 
     unhide_all()
     unselect_all()
@@ -252,10 +259,8 @@ def set_default_stage():
     armature = get_armature()
     if armature:
         set_active(armature)
-        armature.data.layers[0] = True
 
     return armature
-
 
 def apply_modifier(mod, as_shapekey=False):
     if bpy.app.version < (2, 90):

@@ -37,6 +37,7 @@ class AutoVisemeButton(bpy.types.Operator):
         saved_data = Common.SavedData()
 
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
         wm = bpy.context.window_manager
 
