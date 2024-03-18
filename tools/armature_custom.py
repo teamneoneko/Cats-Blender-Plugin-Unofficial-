@@ -26,6 +26,7 @@ class MergeArmature(bpy.types.Operator):
 
         # Set default stage
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
         Common.unselect_all()
 
         # Get both armatures
@@ -33,6 +34,34 @@ class MergeArmature(bpy.types.Operator):
         merge_armature_name = bpy.context.scene.merge_armature
         base_armature = Common.get_objects()[base_armature_name]
         merge_armature = Common.get_objects()[merge_armature_name]
+        armature = Common.set_default_stage()
+
+        #Remove Rigid Bodies and Joints as there won't merge.    
+        to_delete = []
+        for child in Common.get_top_parent(base_armature).children:
+            if 'rigidbodies' in child.name or 'joints' in child.name:
+                to_delete.append(child.name)
+            for child2 in child.children:
+                if 'rigidbodies' in child2.name or 'joints' in child2.name:
+                    to_delete.append(child2.name)
+        for obj_name in to_delete:
+            Common.switch('EDIT')
+            Common.switch('OBJECT')
+            Common.delete_hierarchy(bpy.data.objects[obj_name])
+
+        if len(armature.children) > 1:
+            for child in armature.children:
+                for child2 in child.children:
+                    if child2.type != 'MESH':
+                        Common.delete(child2)
+
+                if child.type != 'MESH':
+                    Common.delete(child)
+
+        Common.set_default_stage()
+        Common.unselect_all()
+        Common.remove_empty()
+        Common.remove_unused_objects()
 
         if not merge_armature:
             saved_data.load()
@@ -67,16 +96,6 @@ class MergeArmature(bpy.types.Operator):
                 Common.show_error(6.2, t('MergeArmature.error.pleaseFix'))
                 return {'CANCELLED'}
 
-        # if len(Common.get_meshes_objects(armature_name=merge_armature_name)) == 0:
-        #     saved_data.load()
-        #     Common.show_error(5.2, ['The armature "' + merge_armature_name + '" does not have any meshes.'])
-        #     return {'CANCELLED'}
-        # if len(Common.get_meshes_objects(armature_name=base_armature_name)) == 0:
-        #     saved_data.load()
-        #     Common.show_error(5.2, ['The armature "' + base_armature_name + '" does not have any meshes.'])
-        #     return {'CANCELLED'}
-
-        # Merge armatures
         merge_armatures(base_armature_name, merge_armature_name, False, merge_same_bones=context.scene.merge_same_bones)
 
         saved_data.load()
@@ -101,6 +120,7 @@ class AttachMesh(bpy.types.Operator):
 
         # Set default stage
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
         Common.unselect_all()
 
         # Get armature and mesh
@@ -290,6 +310,7 @@ def merge_armatures(base_armature_name, merge_armature_name, mesh_only, mesh_nam
 
     # Go back into object mode
     Common.set_default_stage()
+    Common.remove_rigidbodies_global()
     Common.unselect_all()
 
     # Select armature in correct way
@@ -357,6 +378,7 @@ def merge_armatures(base_armature_name, merge_armature_name, mesh_only, mesh_nam
 
     # Remove all unused bones, constraints and vertex groups
     Common.set_default_stage()
+    Common.remove_rigidbodies_global()
     if not mesh_only:
         Common.delete_bone_constraints(armature_name=base_armature_name)
         if bpy.context.scene.merge_armatures_remove_zero_weight_bones:
@@ -364,6 +386,7 @@ def merge_armatures(base_armature_name, merge_armature_name, mesh_only, mesh_nam
             if Common.get_meshes_objects(armature_name=base_armature_name):
                 Common.delete_zero_weight(armature_name=base_armature_name, ignore=root_name)
         Common.set_default_stage()
+        Common.remove_rigidbodies_global()
 
     # Merge bones into existing bones
     if not mesh_only:
@@ -432,12 +455,14 @@ def merge_armatures(base_armature_name, merge_armature_name, mesh_only, mesh_nam
 
     # Remove all unused bones, constraints and vertex groups
     Common.set_default_stage()
+    Common.remove_rigidbodies_global()
     if not mesh_only:
         if bpy.context.scene.merge_armatures_remove_zero_weight_bones:
             Common.remove_unused_vertex_groups()
             if Common.get_meshes_objects(armature_name=base_armature_name):
                 Common.delete_zero_weight(armature_name=base_armature_name, ignore=root_name)
             Common.set_default_stage()
+            Common.remove_rigidbodies_global()
 
     # Fix armature name
     Common.fix_armature_names(armature_name=base_armature_name)
