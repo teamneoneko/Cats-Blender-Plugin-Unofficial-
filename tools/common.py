@@ -481,31 +481,31 @@ def get_bones(names=None, armature_name=None, check_list=False):
 
 
 def get_shapekeys_mouth_ah(self, context):
-    return get_shapekeys(context, ['MTH A', 'Ah', 'A'], True, False, False, False)
+    return get_shapekeys(context, ['MTH A', 'Ah', 'A'], True, False, False)
 
 
 def get_shapekeys_mouth_oh(self, context):
-    return get_shapekeys(context, ['MTH U', 'Oh', 'O', 'Your'], True, False, False, False)
+    return get_shapekeys(context, ['MTH U', 'Oh', 'O', 'Your'], True, False, False)
 
 
 def get_shapekeys_mouth_ch(self, context):
-    return get_shapekeys(context, ['MTH I', 'Glue', 'Ch', 'I', 'There'], True, False, False, False)
+    return get_shapekeys(context, ['MTH I', 'Glue', 'Ch', 'I', 'There'], True, False, False)
 
 
 def get_shapekeys_eye_blink_l(self, context):
-    return get_shapekeys(context, ['EYE Close L', 'Wink 2', 'Wink', 'Wink left', 'Wink Left', 'Blink (Left)', 'Blink', 'Basis'], False, False, False, False)
+    return get_shapekeys(context, ['EYE Close L', 'Wink 2', 'Wink', 'Wink left', 'Wink Left', 'Blink (Left)', 'Blink', 'Basis'], False, False, False)
 
 
 def get_shapekeys_eye_blink_r(self, context):
-    return get_shapekeys(context, ['EYE Close R', 'Wink 2 right', 'Wink 2 Right', 'Wink right 2', 'Wink Right 2', 'Wink right', 'Wink Right', 'Blink (Right)', 'Basis'], False, False, False, False)
+    return get_shapekeys(context, ['EYE Close R', 'Wink 2 right', 'Wink 2 Right', 'Wink right 2', 'Wink Right 2', 'Wink right', 'Wink Right', 'Blink (Right)', 'Basis'], False, False, False)
 
 
 def get_shapekeys_eye_low_l(self, context):
-    return get_shapekeys(context, ['Basis'], False, False, False, False)
+    return get_shapekeys(context, ['Basis'], False, False, False)
 
 
 def get_shapekeys_eye_low_r(self, context):
-    return get_shapekeys(context, ['Basis'], False, False, False, False)
+    return get_shapekeys(context, ['Basis'], False, False, False)
 
 
 # names - The first object will be the first one in the list. So the first one has to be the one that exists in the most models
@@ -686,11 +686,7 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
         set_active(mesh)
         
         for mod in mesh.modifiers:
-            if has_shapekeys(mesh):
-                bpy.ops.object.shape_key_remove(all=True)
-
-                apply_modifier(mod)
-            elif mod.type == 'SUBSURF':
+            if mod.type == 'SUBSURF':
                 mesh.modifiers.remove(mod)
 
         if mesh.data.uv_layers:

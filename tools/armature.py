@@ -1156,7 +1156,7 @@ class FixArmature(bpy.types.Operator):
         if not source_engine:
             try:
                 bpy.ops.mmd_tools_local.set_shadeless_glsl_shading()
-                set_material_shading()
+                Common.set_material_shading()
             except RuntimeError:
                 pass
 
