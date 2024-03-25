@@ -1203,5 +1203,5 @@ RemoveRigidbodiesJointsOperator.description,"Rigidbodies and joints are used by 
 They are completely useless for VRChat, so removing them is recommended for VRChat users!","剛体とジョイントはMMDソフトウェアによって物理シミュレーションを行います。
 VRChatでは彼らが役に立ちません。VRChatユーザーのためにこれらを削除することをお勧めします！","Rigidbodies와 joints는 MMD software에서 물리연산을 위해 사용되는 것들입니다.
 VRChat에 사용되지않으므로 VRChat 유저들에게는 이것들을 지우는 게 좋습니다!"
-Importer.export_resonite.label,"Export to Resonite"
-Importer.export_resonite.desc,"Export to Resonite as a GLTF. Make sure your model is to scale in blender, and import as meters in Resonite."
+Importer.export_resonite.label,"Export to Resonite",,
+Importer.export_resonite.desc,"Export to Resonite as a GLTF. Make sure your model is to scale in blender, and import as meters in Resonite.",,
