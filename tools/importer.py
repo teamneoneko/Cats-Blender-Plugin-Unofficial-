@@ -2076,6 +2076,43 @@ class ExportModel(bpy.types.Operator):
         return {'FINISHED'}
 
 
+#donated to cats unofficial by @989onan - comment by @989onan
+@register_wrap
+class Cats_OT_ExportResonite(bpy.types.Operator):
+    bl_idname = 'cats_importer.export_resonite'
+    bl_label = t('Importer.export_resonite.label')
+    bl_description = t('Importer.export_resonite.desc')
+    bl_options = {'REGISTER', 'UNDO'}
+    filepath: bpy.props.StringProperty()
+
+
+    @classmethod
+    def poll(cls, context: bpy.types.Context):
+        if len(Common.get_armature_objects()) > 0:
+            return True
+        return False
+
+    def execute(self, context: bpy.types.Context):
+        if bpy.app.version[0] < 4:
+            bpy.ops.export_scene.gltf('INVOKE_AREA',
+                export_image_format = 'JPEG',
+                export_jpeg_quality = 75,
+                export_materials = 'EXPORT',
+                export_animations = True,
+                export_animation_mode = 'ACTIONS',
+                export_nla_strips_merged_animation_name = 'Animation',
+                export_nla_strips = True)            
+        else:
+            bpy.ops.export_scene.gltf('INVOKE_AREA',
+                export_image_format = 'WEBP',
+                export_image_quality = 75,
+                export_materials = 'EXPORT',
+                export_animations = True,
+                export_animation_mode = 'ACTIONS',
+                export_nla_strips_merged_animation_name = 'Animation',
+                export_nla_strips = True)
+        return {'FINISHED'}
+
 @register_wrap
 class ErrorDisplay(bpy.types.Operator):
     bl_idname = "cats_importer.display_error"
