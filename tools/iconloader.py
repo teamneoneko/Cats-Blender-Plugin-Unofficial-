@@ -40,7 +40,7 @@ def load_other_icons():
     pcoll.load('empty', os.path.join(icons_other_dir, 'empty.png'), 'IMAGE')
     pcoll.load('mesh', os.path.join(icons_other_dir, 'mesh.png'), 'IMAGE')
     pcoll.load('UP_ARROW', os.path.join(icons_other_dir, 'blender_up_arrow.png'), 'IMAGE')
-    pcoll.load('Resonite', os.path.join(icons_other_dir, 'RSN_Logomark_Color_1080.png'), 'IMAGE')
+    pcoll.load('Resonite', os.path.join(icons_other_dir, 'rsn_logo128.png'), 'IMAGE')
     # pcoll.load('TRANSLATE', os.path.join(icons_other_dir, 'translate.png'), 'IMAGE')
 
     preview_collections['custom_icons'] = pcoll

@@ -17,6 +17,7 @@ from .. import globs
 from . import armature_manual
 from . import common as Common
 from . import settings as Settings
+from ..tools import iconloader as Iconloader
 from .register import register_wrap
 from .translations import t
 
@@ -372,6 +373,32 @@ class ModelsPopup(bpy.types.Operator):
         row.scale_y = 1.3
         row.operator(ImportMMDAnimation.bl_idname)
 
+@register_wrap
+class ExporterModelsPopup(bpy.types.Operator):
+    bl_idname = "cats_exporter.model_popup"
+    bl_label = t('ExporterModelsPopup.label')
+    bl_description = t('ExporterModelsPopup.desc')
+    bl_options = {'INTERNAL'}
+
+    def execute(self, context):
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        dpi_value = Common.get_user_preferences().system.dpi
+        return context.window_manager.invoke_props_dialog(self, width=int(dpi_value * 3))
+
+    def check(self, context):
+        # Important for changing options
+        return True
+
+    def draw(self, context):
+        layout = self.layout
+        col = layout.column(align=True)
+
+        row = col.row(align=True)
+        row.scale_y = 1.3
+        row.operator(ExportModel.bl_idname, icon='ARMATURE_DATA').action = 'CHECK'
+        row.operator(Cats_OT_ExportResonite.bl_idname, icon_value=Iconloader.preview_collections["custom_icons"]["Resonite"].icon_id)
 
 @register_wrap
 class ImportMMD(bpy.types.Operator):
@@ -2112,6 +2139,7 @@ class Cats_OT_ExportResonite(bpy.types.Operator):
                 export_nla_strips_merged_animation_name = 'Animation',
                 export_nla_strips = True)
         return {'FINISHED'}
+
 
 @register_wrap
 class ErrorDisplay(bpy.types.Operator):
