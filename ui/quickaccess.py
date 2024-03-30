@@ -88,7 +88,7 @@ class QuickAccessPanel(ToolPanel, bpy.types.Panel):
             row = split.row(align=True)
             row.scale_y = 1.4
             row.operator(Importer.ImportAnyModel.bl_idname, text=t('QuickAccess.ImportAnyModel.label'), icon='ARMATURE_DATA')
-            row.operator(Importer.ExportModel.bl_idname, icon='ARMATURE_DATA').action = 'CHECK'
+            row.operator(Importer.ExporterModelsPopup.bl_idname, icon='ARMATURE_DATA')
             row = split.row(align=True)
             row.scale_y = 1.4
             row.operator(Importer.ModelsPopup.bl_idname, text="", icon='COLLAPSEMENU')
