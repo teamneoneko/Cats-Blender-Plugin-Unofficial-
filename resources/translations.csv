@@ -631,7 +631,7 @@ SourceToolsButton.success,Source Tools link opened,,
 VrmToolsButton.label,Download VRM Importer,VRMインポーターをダウンロード,VRM Importer 다운로드
 VrmToolsButton.URL_2.8,https://github.com/saturday06/VRM_IMPORTER_for_Blender2_8,,
 VrmToolsButton.success,VRM Importer link opened,,
-ExportModel.label,Export Model,モデルのエクスポート,모델 내보내기
+ExportModel.label,FBX for Unity,Unity用FBX,Unity용 FBX
 ExportModel.desc,"Export this model as .fbx for Unity.
 
 Automatically sets the optimal export settings",,
@@ -1203,3 +1203,7 @@ RemoveRigidbodiesJointsOperator.description,"Rigidbodies and joints are used by 
 They are completely useless for VRChat, so removing them is recommended for VRChat users!","剛体とジョイントはMMDソフトウェアによって物理シミュレーションを行います。
 VRChatでは彼らが役に立ちません。VRChatユーザーのためにこれらを削除することをお勧めします！","Rigidbodies와 joints는 MMD software에서 물리연산을 위해 사용되는 것들입니다.
 VRChat에 사용되지않으므로 VRChat 유저들에게는 이것들을 지우는 게 좋습니다!"
+Importer.export_resonite.label,"Resonite","Resoniteにエクスポート","Resonite에 내보내기"
+Importer.export_resonite.desc,"Export to Resonite as a GLTF. Make sure your model is to scale in blender, and import as meters in Resonite.","ResoniteにGLTFとしてエクスポートします。Blenderでモデルをスケールしてから、Resoniteでメートルでインポートしてください。","Resonite에 GLTF로 내보내기. Blender에서 모델을 스케일링 하고, Resonite에서 메터로 인포트하세요."
+ExporterModelsPopup.label,Export Models,モデルをエクスポート,모델 내보내기
+ExporterModelsPopup.desc,Export models to a selected format,選択したフォーマットにモデルをエクスポート,모델을 선택한 포맷으로 내보내기

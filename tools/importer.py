@@ -17,6 +17,7 @@ from .. import globs
 from . import armature_manual
 from . import common as Common
 from . import settings as Settings
+from ..tools import iconloader as Iconloader
 from .register import register_wrap
 from .translations import t
 
@@ -372,6 +373,32 @@ class ModelsPopup(bpy.types.Operator):
         row.scale_y = 1.3
         row.operator(ImportMMDAnimation.bl_idname)
 
+@register_wrap
+class ExporterModelsPopup(bpy.types.Operator):
+    bl_idname = "cats_exporter.model_popup"
+    bl_label = t('ExporterModelsPopup.label')
+    bl_description = t('ExporterModelsPopup.desc')
+    bl_options = {'INTERNAL'}
+
+    def execute(self, context):
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        dpi_value = Common.get_user_preferences().system.dpi
+        return context.window_manager.invoke_props_dialog(self, width=int(dpi_value * 3))
+
+    def check(self, context):
+        # Important for changing options
+        return True
+
+    def draw(self, context):
+        layout = self.layout
+        col = layout.column(align=True)
+
+        row = col.row(align=True)
+        row.scale_y = 1.3
+        row.operator(ExportModel.bl_idname, icon='ARMATURE_DATA').action = 'CHECK'
+        row.operator(Cats_OT_ExportResonite.bl_idname, icon_value=Iconloader.preview_collections["custom_icons"]["Resonite"].icon_id)
 
 @register_wrap
 class ImportMMD(bpy.types.Operator):
@@ -2073,6 +2100,44 @@ class ExportModel(bpy.types.Operator):
         except AttributeError:
             self.report({'ERROR'}, t('ExportModel.error.notEnabled'))
 
+        return {'FINISHED'}
+
+
+#donated to cats unofficial by @989onan - comment by @989onan
+@register_wrap
+class Cats_OT_ExportResonite(bpy.types.Operator):
+    bl_idname = 'cats_importer.export_resonite'
+    bl_label = t('Importer.export_resonite.label')
+    bl_description = t('Importer.export_resonite.desc')
+    bl_options = {'REGISTER', 'UNDO'}
+    filepath: bpy.props.StringProperty()
+
+
+    @classmethod
+    def poll(cls, context: bpy.types.Context):
+        if len(Common.get_armature_objects()) > 0:
+            return True
+        return False
+
+    def execute(self, context: bpy.types.Context):
+        if bpy.app.version[0] < 4:
+            bpy.ops.export_scene.gltf('INVOKE_AREA',
+                export_image_format = 'JPEG',
+                export_jpeg_quality = 75,
+                export_materials = 'EXPORT',
+                export_animations = True,
+                export_animation_mode = 'ACTIONS',
+                export_nla_strips_merged_animation_name = 'Animation',
+                export_nla_strips = True)            
+        else:
+            bpy.ops.export_scene.gltf('INVOKE_AREA',
+                export_image_format = 'WEBP',
+                export_image_quality = 75,
+                export_materials = 'EXPORT',
+                export_animations = True,
+                export_animation_mode = 'ACTIONS',
+                export_nla_strips_merged_animation_name = 'Animation',
+                export_nla_strips = True)
         return {'FINISHED'}
 
 
