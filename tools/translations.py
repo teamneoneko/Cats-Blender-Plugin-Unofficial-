@@ -10,6 +10,7 @@ import json
 import urllib
 import pathlib
 import addon_utils
+import requests
 from bpy.app.translations import locale
 
 from .register import register_wrap
@@ -17,13 +18,15 @@ from . import settings
 
 main_dir = pathlib.Path(os.path.dirname(__file__)).parent.resolve()
 resources_dir = os.path.join(str(main_dir), "resources")
+dictionary_file = os.path.join(resources_dir, "dictionary.json")
 translations_file = os.path.join(resources_dir, "translations.csv")
 settings_file = os.path.join(resources_dir, "settings.json")
 
 dictionary = {}
 languages = []
 verbose = True
-translation_download_link = "https://docs.google.com/spreadsheets/d/1ZAqNxaduDJJ31t9z3BXyBSDmq4mEGySaFafydRoglf4/export?gid=346601779&format=csv"
+translation_download_link = "https://raw.githubusercontent.com/Yusarina/Cats-Blender-Plugin-Unofficial-translations/4.1-translations/translations.csv"
+dictionary_download_link = "https://raw.githubusercontent.com/Yusarina/Cats-Blender-Plugin-Unofficial-translations/4.1-translations/dictionary.json"
 
 
 def load_translations():
@@ -126,25 +129,40 @@ def reload_scripts():
 @register_wrap
 class DownloadTranslations(bpy.types.Operator):
     bl_idname = 'cats_translations.download_latest'
-    bl_label = "Download UI Translations"
-    bl_description = "Downloads the latest UI translations from Google. This should only be used by translators"
+    bl_label = 'Download Latest Translations'
+    bl_description = 'Download the latest translations for cats UI and internal dictionary'   
     bl_options = {'INTERNAL'}
 
     def execute(self, context):
-        # Download csv
-        print('DOWNLOAD FILE')
+        # Download translations.csv from GitHub
+        print('DOWNLOAD TRANSLATIONS FILE')
         try:
-            ssl._create_default_https_context = ssl._create_unverified_context
-            urllib.request.urlretrieve(translation_download_link, translations_file)
-        except urllib.error.URLError:
+            response = requests.get(translation_download_link)
+            response.raise_for_status()  # Raise an exception if the request was unsuccessful
+            with open(translations_file, 'wb') as file:
+                file.write(response.content)
+        except requests.exceptions.RequestException as e:
             print("TRANSLATIONS FILE COULD NOT BE DOWNLOADED")
-            self.report({'ERROR'}, "TRANSLATIONS FILE COULD NOT BE DOWNLOADED, check your internet connection")
+            self.report({'ERROR'}, "TRANSLATIONS FILE COULD NOT BE DOWNLOADED: " + str(e))
             return {'CANCELLED'}
-        print('DOWNLOAD FINISHED')
+        print('TRANSLATIONS DOWNLOAD FINISHED')
+
+        # Download dictionary.json from GitHub
+        print('DOWNLOAD DICTIONARY FILE')
+        try:
+            response = requests.get(dictionary_download_link)
+            response.raise_for_status()  # Raise an exception if the request was unsuccessful
+            with open(dictionary_file, 'wb') as file:
+                file.write(response.content)
+        except requests.exceptions.RequestException as e:
+            print("DICTIONARY FILE COULD NOT BE DOWNLOADED")
+            self.report({'ERROR'}, "DICTIONARY FILE COULD NOT BE DOWNLOADED: " + str(e))
+            return {'CANCELLED'}
+        print('DICTIONARY DOWNLOAD FINISHED')
 
         reload_scripts()
 
-        self.report({'INFO'}, "Successfully downloaded the translations")
+        self.report({'INFO'}, "Successfully downloaded the translations and dictionary")
         return {'FINISHED'}
 
 
