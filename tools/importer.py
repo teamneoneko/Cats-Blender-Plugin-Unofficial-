@@ -20,13 +20,6 @@ from . import settings as Settings
 from .register import register_wrap
 from .translations import t
 
-mmd_tools_local_installed = False
-try:
-    import mmd_tools_local
-    mmd_tools_local_installed = True
-except:
-    pass
-
 current_blender_version = str(bpy.app.version[:2])[1:-1].replace(', ', '.')
 
 formats = '*.pmx;*.pmd;*.xps;*.mesh;*.ascii;*.smd;*.qc;*.qci;*.vta;*.dmx;*.fbx;*.dae;*.vrm;*.zip'
