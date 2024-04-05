@@ -24,7 +24,6 @@ translations_dir = os.path.join(resources_dir, "translations")
 dictionary: dict[str, str] = dict()
 languages = []
 verbose = True
-translation_download_link = "https://raw.githubusercontent.com/Yusarina/Cats-Blender-Plugin-Unofficial-translations/3.6-4.0-translations/translations.csv"
 dictionary_download_link = "https://raw.githubusercontent.com/Yusarina/Cats-Blender-Plugin-Unofficial-translations/3.6-4.0-translations/dictionary.json"
 
 def load_translations():
@@ -137,18 +136,49 @@ class DownloadTranslations(bpy.types.Operator):
     bl_options = {'INTERNAL'}
 
     def execute(self, context):
-        # Download translations.csv from GitHub
-        print('DOWNLOAD TRANSLATIONS FILE')
+        # GitHub repository and folder information
+        repo_owner = "Yusarina"
+        repo_name = "Cats-Blender-Plugin-Unofficial-translations"
+        branch = "3.6-4.0-translations"
+        folder_path = "UI%20Tanslations"
+
+        # Construct the API URL to get the list of files in the folder
+        api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{folder_path}?ref={branch}"
+
         try:
-            response = requests.get(translation_download_link)
+            # Send a GET request to the API URL
+            response = requests.get(api_url)
             response.raise_for_status()  # Raise an exception if the request was unsuccessful
-            with open(translations_file, 'wb') as file:
-                file.write(response.content)
+
+            # Parse the JSON response
+            files = response.json()
+
+            # Download each translation file
+            for file in files:
+                if file["type"] == "file" and file["name"].endswith(".json"):
+                    file_url = file["download_url"]
+                    file_name = file["name"]
+                    file_path = os.path.join(translations_dir, file_name)
+
+                    # Download the translation file
+                    file_response = requests.get(file_url)
+                    file_response.raise_for_status()
+
+                    # Save the translation file
+                    with open(file_path, 'wb') as file:
+                        file.write(file_response.content)
+
+                    print(f"Downloaded: {file_name}")
+
         except requests.exceptions.RequestException as e:
-            print("TRANSLATIONS FILE COULD NOT BE DOWNLOADED")
-            self.report({'ERROR'}, "TRANSLATIONS FILE COULD NOT BE DOWNLOADED: " + str(e))
+            print("TRANSLATIONS FILES COULD NOT BE DOWNLOADED")
+            self.report({'ERROR'}, "TRANSLATIONS FILES COULD NOT BE DOWNLOADED: " + str(e))
             return {'CANCELLED'}
+
         print('TRANSLATIONS DOWNLOAD FINISHED')
+
+        # Define the dictionary file path
+        dictionary_file = os.path.join(resources_dir, "dictionary.json")
 
         # Download dictionary.json from GitHub
         print('DOWNLOAD DICTIONARY FILE')
