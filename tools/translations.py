@@ -34,12 +34,30 @@ def load_translations():
 
     # Check the settings which translation to load
     language = get_language_from_settings()
-    # get all current languages
+    
+    # Set default language to "en_US" if language is None
+    if language is None:
+        language = "en_US"
+    
+    # Get all current languages
     for i in os.listdir(translations_dir):
         languages.append(i.split(".")[0])
-    with open(os.path.join(translations_dir, language+".json"), 'r') as file:
-        dictionary = json.load(fp=file)["messages"]
-        
+    
+    # Load the translation file
+    translation_file = os.path.join(translations_dir, language + ".json")
+    if os.path.exists(translation_file):
+        with open(translation_file, 'r') as file:
+            dictionary = json.load(fp=file)["messages"]
+    else:
+        print(f"Translation file not found for language: {language}")
+        # Load the default "en_US" translation file
+        default_file = os.path.join(translations_dir, "en_US.json")
+        if os.path.exists(default_file):
+            with open(default_file, 'r') as file:
+                dictionary = json.load(fp=file)["messages"]
+        else:
+            print("Default translation file 'en_US.json' not found.")
+    
     check_missing_translations()
 
 
