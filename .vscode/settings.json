@@ -1,0 +1,11 @@
+{
+    "python.analysis.extraPaths": [
+        "D:\\SteamLibrary\\steamapps\\common\\Blender\\4.0\\scripts\\addons",
+        "C:\\Users\\Onan\\AppData\\Roaming\\Blender Foundation\\Blender\\4.0\\scripts\\addons",//C:/Users/Onan/AppData/Roaming/Blender Foundation/Blender/4.0/scripts/addons
+        "D:\\blender stuff\\blendercodestuff\\4.0"
+    ],
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportInvalidTypeForm": "none"
+    },
+    "python.REPL.enableREPLSmartSend": false,
+}

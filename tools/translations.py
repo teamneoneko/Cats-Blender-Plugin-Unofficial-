@@ -18,43 +18,28 @@ from . import settings
 
 main_dir = pathlib.Path(os.path.dirname(__file__)).parent.resolve()
 resources_dir = os.path.join(str(main_dir), "resources")
-translations_file = os.path.join(resources_dir, "translations.csv")
-dictionary_file = os.path.join(resources_dir, "dictionary.json")
 settings_file = os.path.join(resources_dir, "settings.json")
+translations_dir = os.path.join(resources_dir, "translations")
 
-dictionary = {}
+dictionary: dict[str, str] = dict()
 languages = []
 verbose = True
 translation_download_link = "https://raw.githubusercontent.com/Yusarina/Cats-Blender-Plugin-Unofficial-translations/3.6-4.0-translations/translations.csv"
 dictionary_download_link = "https://raw.githubusercontent.com/Yusarina/Cats-Blender-Plugin-Unofficial-translations/3.6-4.0-translations/dictionary.json"
 
-
 def load_translations():
     global dictionary, languages
-    dictionary = {}
+    dictionary = dict()
     languages = ["auto"]
 
     # Check the settings which translation to load
     language = get_language_from_settings()
-
-    with open(translations_file, 'r', encoding="utf8") as csv_file:
-        csv_reader = csv.DictReader(csv_file, delimiter=',')
-        if not csv_reader:
-            return
-
-        for i, row in enumerate(csv_reader):
-            # print(row)
-            text = row.get(language)
-            if not text:
-                text = row.get('en_US')
-            dictionary[row['name']] = text
-
-            # get all current languages
-            if i == 0:
-                for key in row.keys():
-                    if '_' in key:
-                        languages.append(key)
-
+    # get all current languages
+    for i in os.listdir(translations_dir):
+        languages.append(i.split(".")[0])
+    with open(os.path.join(translations_dir, language+".json"), 'r') as file:
+        dictionary = json.load(fp=file)["messages"]
+        
     check_missing_translations()
 
 
