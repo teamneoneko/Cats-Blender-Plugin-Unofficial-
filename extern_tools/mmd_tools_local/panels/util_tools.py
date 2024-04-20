@@ -305,12 +305,12 @@ class MMDBoneOrder(_PanelBase, Panel):
     def draw(self, context):
         layout = self.layout
         active_obj = context.active_object
-        root = FnModel.find_root(active_obj)
+        root = FnModel.find_root_object(active_obj)
         if root is None:
             layout.label(text="Select a MMD Model")
             return
 
-        armature = FnModel.find_armature(root)
+        armature = FnModel.find_armature_object(root)
         if armature is None:
             layout.label(text="The armature object of active MMD model can't be found", icon="ERROR")
             return

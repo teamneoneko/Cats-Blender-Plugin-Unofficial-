@@ -116,7 +116,7 @@ class MMDBoneHandler(MMDDataHandlerABC):
 
     @classmethod
     def collect_data(cls, mmd_translation: "MMDTranslation"):
-        armature_object: bpy.types.Object = FnModel.find_armature(mmd_translation.id_data)
+        armature_object: bpy.types.Object = FnModel.find_armature_object(mmd_translation.id_data)
         pose_bone: bpy.types.PoseBone
         for index, pose_bone in enumerate(armature_object.pose.bones):
             if not any(c.is_visible for c in pose_bone.bone.collections):
@@ -279,7 +279,7 @@ class MMDMaterialHandler(MMDDataHandlerABC):
     def collect_data(cls, mmd_translation: "MMDTranslation"):
         checked_materials: Set[bpy.types.Material] = set()
         mesh_object: bpy.types.Object
-        for mesh_object in FnModel.child_meshes(FnModel.find_armature(mmd_translation.id_data)):
+        for mesh_object in FnModel.iterate_mesh_objects(mmd_translation.id_data):
             material: bpy.types.Material
             for index, material in enumerate(mesh_object.data.materials):
                 if material in checked_materials:
@@ -369,7 +369,7 @@ class MMDDisplayHandler(MMDDataHandlerABC):
 
     @classmethod
     def collect_data(cls, mmd_translation: "MMDTranslation"):
-        armature_object: bpy.types.Object = FnModel.find_armature(mmd_translation.id_data)
+        armature_object: bpy.types.Object = FnModel.find_armature_object(mmd_translation.id_data)
         bone_collection: bpy.types.BoneCollection
         for index, bone_collection in enumerate(armature_object.data.collections):
             mmd_translation_element: "MMDTranslationElement" = mmd_translation.translation_elements.add()
@@ -559,10 +559,12 @@ class MMDInfoHandler(MMDDataHandlerABC):
     @classmethod
     def collect_data(cls, mmd_translation: "MMDTranslation"):
         root_object: bpy.types.Object = mmd_translation.id_data
-        armature_object: bpy.types.Object = FnModel.find_armature(root_object)
+        info_objects = [root_object]
+        armature_object = FnModel.find_armature_object(root_object)
+        if armature_object is not None:
+            info_objects.append(armature_object)
 
-        info_object: bpy.types.Object
-        for info_object in itertools.chain([root_object, armature_object], FnModel.child_meshes(armature_object)):
+        for info_object in itertools.chain(info_objects, FnModel.iterate_mesh_objects(root_object)):
             mmd_translation_element: "MMDTranslationElement" = mmd_translation.translation_elements.add()
             mmd_translation_element.type = MMDTranslationElementType.INFO.name
             mmd_translation_element.object = info_object

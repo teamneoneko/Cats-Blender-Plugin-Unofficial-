@@ -9,11 +9,11 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, Iterator, List,
 
 import bpy
 import idprop
-import mathutils
 import rna_prop_ui
+from mathutils import Vector
 
 from mmd_tools_local import mmd_tools_local_VERSION, bpyutils
-from mmd_tools_local.bpyutils import Props, SceneOp
+from mmd_tools_local.bpyutils import FnContext, Props, SceneOp
 from mmd_tools_local.core import rigid_body
 from mmd_tools_local.core.morph import FnMorph
 from mmd_tools_local.core.rigid_body import MODE_DYNAMIC, MODE_DYNAMIC_BONE, MODE_STATIC
@@ -23,54 +23,92 @@ if TYPE_CHECKING:
     from properties.rigid_body import MMDRigidBody
 
 
-class InvalidRigidSettingException(ValueError):
-    pass
-
-
 class FnModel:
     @staticmethod
     def copy_mmd_root(destination_root_object: bpy.types.Object, source_root_object: bpy.types.Object, overwrite: bool = True, replace_name2values: Dict[str, Dict[Any, Any]] = None):
         FnModel.__copy_property(destination_root_object.mmd_root, source_root_object.mmd_root, overwrite=overwrite, replace_name2values=replace_name2values or {})
 
     @staticmethod
-    def find_root(obj: bpy.types.Object) -> Optional[bpy.types.Object]:
-        if not obj:
-            return None
-        if obj.mmd_type == "ROOT":
-            return obj
-        return FnModel.find_root(obj.parent)
+    def find_root_object(obj: Optional[bpy.types.Object]) -> Optional[bpy.types.Object]:
+        """Find the root object of the model.
+        Args:
+            obj (bpy.types.Object): The object to start searching from.
+        Returns:
+            Optional[bpy.types.Object]: The root object of the model. If the object is not a part of a model, None is returned.
+            Generally, the root object is a object with type == "EMPTY" and mmd_type == "ROOT".
+        """
+        while obj is not None and obj.mmd_type != "ROOT":
+            obj = obj.parent
+        return obj
 
     @staticmethod
-    def find_armature(root_object: bpy.types.Object) -> Optional[bpy.types.Object]:
+    def find_armature_object(root_object: bpy.types.Object) -> Optional[bpy.types.Object]:
+        """Find the armature object of the model.
+        Args:
+            root_object (bpy.types.Object): The root object of the model.
+        Returns:
+            Optional[bpy.types.Object]: The armature object of the model. If the model does not have an armature, None is returned.
+        """
         for o in root_object.children:
             if o.type == "ARMATURE":
                 return o
         return None
 
     @staticmethod
-    def find_rigid_group(root_object: bpy.types.Object) -> Optional[bpy.types.Object]:
+    def find_rigid_group_object(root_object: bpy.types.Object) -> Optional[bpy.types.Object]:
         for o in root_object.children:
             if o.type == "EMPTY" and o.mmd_type == "RIGID_GRP_OBJ":
                 return o
         return None
 
     @staticmethod
-    def find_joint_group(root_object: bpy.types.Object) -> Optional[bpy.types.Object]:
+    def __new_group_object(context: bpy.types.Context, name: str, mmd_type: str, parent: bpy.types.Object) -> bpy.types.Object:
+        group_object = FnContext.new_and_link_object(context, name=name, object_data=None)
+        group_object.mmd_type = mmd_type
+        group_object.parent = parent
+        group_object.hide_set(True)
+        group_object.hide_select = True
+        group_object.lock_rotation = group_object.lock_location = group_object.lock_scale = [True, True, True]
+        return group_object
+
+    @staticmethod
+    def ensure_rigid_group_object(context: bpy.types.Context, root_object: bpy.types.Object) -> bpy.types.Object:
+        rigid_group_object = FnModel.find_rigid_group_object(root_object)
+        if rigid_group_object is not None:
+            return rigid_group_object
+        return FnModel.__new_group_object(context, name="rigidbodies", mmd_type="RIGID_GRP_OBJ", parent=root_object)
+
+    @staticmethod
+    def find_joint_group_object(root_object: bpy.types.Object) -> Optional[bpy.types.Object]:
         for o in root_object.children:
             if o.type == "EMPTY" and o.mmd_type == "JOINT_GRP_OBJ":
                 return o
         return None
 
     @staticmethod
-    def find_temporary_group(root_object: bpy.types.Object) -> Optional[bpy.types.Object]:
+    def ensure_joint_group_object(context: bpy.types.Context, root_object: bpy.types.Object) -> bpy.types.Object:
+        joint_group_object = FnModel.find_joint_group_object(root_object)
+        if joint_group_object is not None:
+            return joint_group_object
+        return FnModel.__new_group_object(context, name="joints", mmd_type="JOINT_GRP_OBJ", parent=root_object)
+
+    @staticmethod
+    def find_temporary_group_object(root_object: bpy.types.Object) -> Optional[bpy.types.Object]:
         for o in root_object.children:
             if o.type == "EMPTY" and o.mmd_type == "TEMPORARY_GRP_OBJ":
                 return o
         return None
 
     @staticmethod
+    def ensure_temporary_group_object(context: bpy.types.Context, root_object: bpy.types.Object) -> bpy.types.Object:
+        temporary_group_object = FnModel.find_temporary_group_object(root_object)
+        if temporary_group_object is not None:
+            return temporary_group_object
+        return FnModel.__new_group_object(context, name="temporary", mmd_type="TEMPORARY_GRP_OBJ", parent=root_object)
+
+    @staticmethod
     def find_bone_order_mesh_object(root_object: bpy.types.Object) -> Optional[bpy.types.Object]:
-        armature_object = FnModel.find_armature(root_object)
+        armature_object = FnModel.find_armature_object(root_object)
         if armature_object is None:
             return None
 
@@ -78,75 +116,74 @@ class FnModel:
         return next(filter(lambda o: o.type == "MESH" and "mmd_bone_order_override" in o.modifiers, armature_object.children), None)
 
     @staticmethod
-    def find_mesh_by_name(root_object: bpy.types.Object, name: str) -> Optional[bpy.types.Object]:
-        armature_object = FnModel.find_armature(root_object)
-        if armature_object is None:
-            return None
-        for o in FnModel.child_meshes(armature_object):
+    def find_mesh_object_by_name(root_object: bpy.types.Object, name: str) -> Optional[bpy.types.Object]:
+        for o in FnModel.iterate_mesh_objects(root_object):
             if o.name != name:
                 continue
             return o
         return None
 
     @staticmethod
-    def all_children(obj: bpy.types.Object) -> Iterator[bpy.types.Object]:
-        child: bpy.types.Object
+    def iterate_child_objects(obj: bpy.types.Object) -> Iterator[bpy.types.Object]:
         for child in obj.children:
             yield child
-            yield from FnModel.all_children(child)
+            yield from FnModel.iterate_child_objects(child)
 
     @staticmethod
-    def filtered_children(condition_function: Callable[[bpy.types.Object], bool], obj: Optional[bpy.types.Object]) -> Iterator[bpy.types.Object]:
+    def iterate_filtered_child_objects(condition_function: Callable[[bpy.types.Object], bool], obj: Optional[bpy.types.Object]) -> Iterator[bpy.types.Object]:
         if obj is None:
-            return
-        child: bpy.types.Object
+            return iter(())
+        return FnModel.__iterate_filtered_child_objects_internal(condition_function, obj)
+
+    @staticmethod
+    def __iterate_filtered_child_objects_internal(condition_function: Callable[[bpy.types.Object], bool], obj: bpy.types.Object) -> Iterator[bpy.types.Object]:
         for child in obj.children:
             if condition_function(child):
                 yield child
-            else:
-                yield from FnModel.filtered_children(condition_function, child)
+            yield from FnModel.__iterate_filtered_child_objects_internal(condition_function, child)
 
     @staticmethod
-    def child_meshes(obj: bpy.types.Object) -> Iterator[bpy.types.Object]:
-        return FnModel.filtered_children(FnModel.is_mesh_object, obj)
+    def __iterate_child_mesh_objects(obj: Optional[bpy.types.Object]) -> Iterator[bpy.types.Object]:
+        return FnModel.iterate_filtered_child_objects(FnModel.is_mesh_object, obj)
+
+    @staticmethod
+    def iterate_mesh_objects(root_object: bpy.types.Object) -> Iterator[bpy.types.Object]:
+        return FnModel.__iterate_child_mesh_objects(FnModel.find_armature_object(root_object))
 
     @staticmethod
     def iterate_rigid_body_objects(root_object: bpy.types.Object) -> Iterator[bpy.types.Object]:
         if root_object.mmd_root.is_built:
             return itertools.chain(
-                FnModel.filtered_children(FnModel.is_rigid_body_object, FnModel.find_armature(root_object)),
-                FnModel.filtered_children(FnModel.is_rigid_body_object, FnModel.find_rigid_group(root_object)),
+                FnModel.iterate_filtered_child_objects(FnModel.is_rigid_body_object, FnModel.find_armature_object(root_object)),
+                FnModel.iterate_filtered_child_objects(FnModel.is_rigid_body_object, FnModel.find_rigid_group_object(root_object)),
             )
-        return FnModel.filtered_children(FnModel.is_rigid_body_object, FnModel.find_rigid_group(root_object))
+        return FnModel.iterate_filtered_child_objects(FnModel.is_rigid_body_object, FnModel.find_rigid_group_object(root_object))
 
     @staticmethod
     def iterate_joint_objects(root_object: bpy.types.Object) -> Iterator[bpy.types.Object]:
-        return FnModel.filtered_children(FnModel.is_joint_object, FnModel.find_joint_group(root_object))
+        return FnModel.iterate_filtered_child_objects(FnModel.is_joint_object, FnModel.find_joint_group_object(root_object))
 
     @staticmethod
     def iterate_temporary_objects(root_object: bpy.types.Object, rigid_track_only: bool = False) -> Iterator[bpy.types.Object]:
-        rigid_body_objects = FnModel.filtered_children(FnModel.is_temporary_object, FnModel.find_rigid_group(root_object))
+        rigid_body_objects = FnModel.iterate_filtered_child_objects(FnModel.is_temporary_object, FnModel.find_rigid_group_object(root_object))
 
         if rigid_track_only:
             return rigid_body_objects
 
-        temporary_group_object = FnModel.find_temporary_group(root_object)
+        temporary_group_object = FnModel.find_temporary_group_object(root_object)
         if temporary_group_object is None:
             return rigid_body_objects
-        return itertools.chain(rigid_body_objects, FnModel.filtered_children(FnModel.is_temporary_object, temporary_group_object))
+        return itertools.chain(rigid_body_objects, FnModel.__iterate_filtered_child_objects_internal(FnModel.is_temporary_object, temporary_group_object))
 
     @staticmethod
-    def iterate_materials(root_object: bpy.types.Object) -> Iterable[bpy.types.Material]:
-        armature_object = FnModel.find_armature(root_object)
-        if armature_object is None:
-            return []
-        return (material for mesh_object in FnModel.child_meshes(armature_object) for material in cast(bpy.types.Mesh, mesh_object.data).materials if material is not None)
+    def iterate_materials(root_object: bpy.types.Object) -> Iterator[bpy.types.Material]:
+        return (material for mesh_object in FnModel.iterate_mesh_objects(root_object) for material in cast(bpy.types.Mesh, mesh_object.data).materials if material is not None)
 
     @staticmethod
-    def iterate_unique_materials(root_object: bpy.types.Object) -> Iterable[bpy.types.Material]:
+    def iterate_unique_materials(root_object: bpy.types.Object) -> Iterator[bpy.types.Material]:
         materials: Dict[bpy.types.Material, None] = {}  # use dict because set does not guarantee the order
         materials.update((material, None) for material in FnModel.iterate_materials(root_object))
-        return materials.keys()
+        return iter(materials.keys())
 
     @staticmethod
     def is_root_object(obj: Optional[bpy.types.Object]) -> TypeGuard[bpy.types.Object]:
@@ -169,31 +206,8 @@ class FnModel:
         return obj is not None and obj.type == "MESH" and obj.mmd_type == "NONE"
 
     @staticmethod
-    def get_rigid_body_size(obj: bpy.types.Object):
-        assert obj.mmd_type == "RIGID_BODY"
-
-        x0, y0, z0 = obj.bound_box[0]
-        x1, y1, z1 = obj.bound_box[6]
-        assert x1 >= x0 and y1 >= y0 and z1 >= z0
-
-        shape = obj.mmd_rigid.shape
-        if shape == "SPHERE":
-            radius = (z1 - z0) / 2
-            return (radius, 0.0, 0.0)
-        elif shape == "BOX":
-            x, y, z = (x1 - x0) / 2, (y1 - y0) / 2, (z1 - z0) / 2
-            return (x, y, z)
-        elif shape == "CAPSULE":
-            diameter = x1 - x0
-            radius = diameter / 2
-            height = abs((z1 - z0) - diameter)
-            return (radius, height, 0.0)
-        else:
-            raise ValueError(f"Invalid shape type: {shape}")
-
-    @staticmethod
     def join_models(parent_root_object: bpy.types.Object, child_root_objects: List[bpy.types.Object]):
-        parent_armature_object = FnModel.find_armature(parent_root_object)
+        parent_armature_object = FnModel.find_armature_object(parent_root_object)
         with bpy.context.temp_override(
             active_object=parent_armature_object,
             selected_editable_objects=[parent_armature_object],
@@ -228,7 +242,7 @@ class FnModel:
 
         child_root_object: bpy.types.Object
         for child_root_object in child_root_objects:
-            child_armature_object = FnModel.find_armature(child_root_object)
+            child_armature_object = FnModel.find_armature_object(child_root_object)
             child_pose_bones = child_armature_object.pose.bones
             child_bone_morphs = child_root_object.mmd_root.bone_morphs
 
@@ -257,7 +271,7 @@ class FnModel:
             try:
                 # replace mesh armature modifier.object
                 mesh: bpy.types.Object
-                for mesh in FnModel.child_meshes(child_armature_object):
+                for mesh in FnModel.__iterate_child_mesh_objects(child_armature_object):
                     with bpy.context.temp_override(
                         active_object=mesh,
                         selected_editable_objects=[mesh],
@@ -276,15 +290,15 @@ class FnModel:
             ):
                 bpy.ops.object.join()
 
-            for mesh in FnModel.child_meshes(parent_armature_object):
+            for mesh in FnModel.__iterate_child_mesh_objects(parent_armature_object):
                 armature_modifier: bpy.types.ArmatureModifier = mesh.modifiers["mmd_bone_order_override"] if "mmd_bone_order_override" in mesh.modifiers else mesh.modifiers.new("mmd_bone_order_override", "ARMATURE")
                 if armature_modifier.object is None:
                     armature_modifier.object = parent_armature_object
                     mesh.matrix_parent_inverse = child_armature_matrix
 
-            child_rigid_group_object = FnModel.find_rigid_group(child_root_object)
+            child_rigid_group_object = FnModel.find_rigid_group_object(child_root_object)
             if child_rigid_group_object is not None:
-                parent_rigid_group_object = FnModel.find_rigid_group(parent_root_object)
+                parent_rigid_group_object = FnModel.find_rigid_group_object(parent_root_object)
 
                 with bpy.context.temp_override(
                     object=parent_rigid_group_object,
@@ -293,9 +307,9 @@ class FnModel:
                     bpy.ops.object.parent_set(type="OBJECT", keep_transform=True)
                 bpy.data.objects.remove(child_rigid_group_object)
 
-            child_joint_group_object = FnModel.find_joint_group(child_root_object)
+            child_joint_group_object = FnModel.find_joint_group_object(child_root_object)
             if child_joint_group_object is not None:
-                parent_joint_group_object = FnModel.find_joint_group(parent_root_object)
+                parent_joint_group_object = FnModel.find_joint_group_object(parent_root_object)
                 with bpy.context.temp_override(
                     object=parent_joint_group_object,
                     selected_editable_objects=[parent_joint_group_object, *FnModel.iterate_joint_objects(child_root_object)],
@@ -303,16 +317,16 @@ class FnModel:
                     bpy.ops.object.parent_set(type="OBJECT", keep_transform=True)
                 bpy.data.objects.remove(child_joint_group_object)
 
-            child_temporary_group_object = FnModel.find_temporary_group(child_root_object)
+            child_temporary_group_object = FnModel.find_temporary_group_object(child_root_object)
             if child_temporary_group_object is not None:
-                parent_temporary_group_object = FnModel.find_temporary_group(parent_root_object)
+                parent_temporary_group_object = FnModel.find_temporary_group_object(parent_root_object)
                 with bpy.context.temp_override(
                     object=parent_temporary_group_object,
                     selected_editable_objects=[parent_temporary_group_object, *FnModel.iterate_temporary_objects(child_root_object)],
                 ):
                     bpy.ops.object.parent_set(type="OBJECT", keep_transform=True)
 
-                for obj in list(FnModel.all_children(child_temporary_group_object)):
+                for obj in list(FnModel.iterate_child_objects(child_temporary_group_object)):
                     bpy.data.objects.remove(obj)
                 bpy.data.objects.remove(child_temporary_group_object)
 
@@ -324,11 +338,13 @@ class FnModel:
 
     @staticmethod
     def _add_armature_modifier(mesh_object: bpy.types.Object, armature_object: bpy.types.Object) -> bpy.types.ArmatureModifier:
-        if any(m.type == "ARMATURE" for m in mesh_object.modifiers):
+        for m in mesh_object.modifiers:
+            if m.type != "ARMATURE":
+                continue
             # already has armature modifier.
-            return
+            return cast(bpy.types.ArmatureModifier, m)
 
-        modifier: bpy.types.ArmatureModifier = mesh_object.modifiers.new(name="Armature", type="ARMATURE")
+        modifier = cast(bpy.types.ArmatureModifier, mesh_object.modifiers.new(name="Armature", type="ARMATURE"))
         modifier.object = armature_object
         modifier.use_vertex_groups = True
         modifier.name = "mmd_bone_order_override"
@@ -336,8 +352,10 @@ class FnModel:
         return modifier
 
     @staticmethod
-    def attach_meshes(parent_root_object: bpy.types.Object, mesh_objects: Iterable[bpy.types.Object], add_armature_modifier: bool):
-        armature_object: bpy.types.Object = FnModel.find_armature(parent_root_object)
+    def attach_mesh_objects(parent_root_object: bpy.types.Object, mesh_objects: Iterable[bpy.types.Object], add_armature_modifier: bool):
+        armature_object = FnModel.find_armature_object(parent_root_object)
+        if armature_object is None:
+            raise ValueError(f"Armature object not found in {parent_root_object}")
 
         def __get_root_object(obj: bpy.types.Object) -> bpy.types.Object:
             if obj.parent is None:
@@ -345,11 +363,10 @@ class FnModel:
             return __get_root_object(obj.parent)
 
         for mesh_object in mesh_objects:
-            if mesh_object.type != "MESH":
+            if not FnModel.is_mesh_object(mesh_object):
                 continue
-            if mesh_object.mmd_type != "NONE":
-                continue
-            if FnModel.find_root(mesh_object) is not None:
+
+            if FnModel.find_root_object(mesh_object) is not None:
                 continue
 
             mesh_root_object = __get_root_object(mesh_object)
@@ -363,14 +380,16 @@ class FnModel:
 
     @staticmethod
     def add_missing_vertex_groups_from_bones(root_object: bpy.types.Object, mesh_object: bpy.types.Object, search_in_all_meshes: bool):
+        armature_object = FnModel.find_armature_object(root_object)
+        if armature_object is None:
+            raise ValueError(f"Armature object not found in {root_object}")
+
         vertex_group_names: Set[str] = set()
 
-        search_meshes = FnModel.child_meshes(root_object) if search_in_all_meshes else [mesh_object]
+        search_meshes = FnModel.iterate_mesh_objects(root_object) if search_in_all_meshes else [mesh_object]
 
         for search_mesh in search_meshes:
             vertex_group_names.update(search_mesh.vertex_groups.keys())
-
-        armature_object = FnModel.find_armature(root_object)
 
         pose_bone: bpy.types.PoseBone
         for pose_bone in armature_object.pose.bones:
@@ -392,10 +411,9 @@ class FnModel:
         if new_ik_loop_factor == old_ik_loop_factor:
             return
 
-        armature_object = FnModel.find_armature(root_object)
+        armature_object = FnModel.find_armature_object(root_object)
         for pose_bone in armature_object.pose.bones:
-            constraint: bpy.types.KinematicConstraint
-            for constraint in (c for c in pose_bone.constraints if c.type == "IK"):
+            for constraint in (cast(bpy.types.KinematicConstraint, c) for c in pose_bone.constraints if c.type == "IK"):
                 iterations = int(constraint.iterations * new_ik_loop_factor / old_ik_loop_factor)
                 logging.info("Update %s of %s: %d -> %d", constraint.name, pose_bone.name, constraint.iterations, iterations)
                 constraint.iterations = iterations
@@ -472,6 +490,35 @@ class FnModel:
         else:
             raise ValueError(f"Unsupported destination: {destination}")
 
+    @staticmethod
+    def initalize_display_item_frames(root_object: bpy.types.Object, reset: bool = True):
+        frames = root_object.mmd_root.display_item_frames
+        if reset and len(frames) > 0:
+            root_object.mmd_root.active_display_item_frame = 0
+            frames.clear()
+
+        frame_names = {"Root": "Root", "表情": "Facial"}
+
+        for frame_name, frame_name_e in frame_names.items():
+            frame = frames.get(frame_name, None) or frames.add()
+            frame.name = frame_name
+            frame.name_e = frame_name_e
+            frame.is_special = True
+
+        arm = FnModel.find_armature_object(root_object)
+        if arm is not None and len(arm.data.bones) > 0 and len(frames[0].data) < 1:
+            item = frames[0].data.add()
+            item.type = "BONE"
+            item.name = arm.data.bones[0].name
+
+        if not reset:
+            frames.move(frames.find("Root"), 0)
+            frames.move(frames.find("表情"), 1)
+
+    @staticmethod
+    def get_empty_display_size(root_object: bpy.types.Object) -> float:
+        return getattr(root_object, Props.empty_display_size)
+
 
 class MigrationFnModel:
     """Migration Functions for old MMD models broken by bugs or issues"""
@@ -485,7 +532,7 @@ class MigrationFnModel:
             if "mmd_ik_loop_factor" not in armature_object:
                 return
 
-            FnModel.find_root(armature_object).mmd_root.ik_loop_factor = max(armature_object["mmd_ik_loop_factor"], 1)
+            FnModel.find_root_object(armature_object).mmd_root.ik_loop_factor = max(armature_object["mmd_ik_loop_factor"], 1)
             del armature_object["mmd_ik_loop_factor"]
 
     @staticmethod
@@ -560,35 +607,12 @@ class Model:
         bpyutils.select_object(root)
         return Model(root)
 
-    @classmethod
-    def findRoot(cls, obj):
-        return FnModel.find_root(obj)
+    @staticmethod
+    def findRoot(obj: bpy.types.Object) -> Optional[bpy.types.Object]:
+        return FnModel.find_root_object(obj)
 
     def initialDisplayFrames(self, reset=True):
-        frames = self.__root.mmd_root.display_item_frames
-        if reset and len(frames):
-            self.__root.mmd_root.active_display_item_frame = 0
-            frames.clear()
-
-        frame_root = frames.get("Root", None) or frames.add()
-        frame_root.name = "Root"
-        frame_root.name_e = "Root"
-        frame_root.is_special = True
-
-        frame_facial = frames.get("表情", None) or frames.add()
-        frame_facial.name = "表情"
-        frame_facial.name_e = "Facial"
-        frame_facial.is_special = True
-
-        arm = self.armature()
-        if arm and len(arm.data.bones) and len(frame_root.data) < 1:
-            item = frame_root.data.add()
-            item.type = "BONE"
-            item.name = arm.data.bones[0].name
-
-        if not reset:
-            frames.move(frames.find("Root"), 0)
-            frames.move(frames.find("表情"), 1)
+        FnModel.initalize_display_item_frames(self.__root, reset=reset)
 
     @property
     def morph_slider(self):
@@ -596,201 +620,6 @@ class Model:
 
     def loadMorphs(self):
         FnMorph.load_morphs(self)
-
-    def createRigidBodyPool(self, counts: int) -> List[bpy.types.Object]:
-        if counts < 1:
-            return []
-        obj = bpyutils.createObject(name="Rigidbody", object_data=bpy.data.meshes.new(name="Rigidbody"))
-        obj.parent = self.rigidGroupObject()
-        obj.mmd_type = "RIGID_BODY"
-        obj.rotation_mode = "YXZ"
-        setattr(obj, Props.display_type, "SOLID")
-        obj.show_transparent = True
-        obj.hide_render = True
-        if hasattr(obj, "display"):
-            obj.display.show_shadows = False
-        if hasattr(obj, "cycles_visibility"):
-            for attr_name in ("camera", "diffuse", "glossy", "scatter", "shadow", "transmission"):
-                if hasattr(obj.cycles_visibility, attr_name):
-                    setattr(obj.cycles_visibility, attr_name, False)
-
-        bpy.ops.rigidbody.object_add(type="ACTIVE")
-        if counts == 1:
-            return [obj]
-        return bpyutils.duplicateObject(obj, counts)
-
-    def createRigidBody(self, **kwargs):
-        """Create a object for MMD rigid body dynamics.
-        ### Parameters ###
-         @param shape_type the shape type.
-         @param location location of the rigid body object.
-         @param rotation rotation of the rigid body object.
-         @param size
-         @param dynamics_type the type of dynamics mode. (STATIC / DYNAMIC / DYNAMIC2)
-         @param collision_group_number
-         @param collision_group_mask list of boolean values. (length:16)
-         @param name Object name (Optional)
-         @param name_e English object name (Optional)
-         @param bone
-        """
-
-        shape_type = kwargs["shape_type"]
-        location = kwargs["location"]
-        rotation = kwargs["rotation"]
-        size = kwargs["size"]
-        dynamics_type = kwargs["dynamics_type"]
-        collision_group_number = kwargs.get("collision_group_number")
-        collision_group_mask = kwargs.get("collision_group_mask")
-        name = kwargs.get("name")
-        name_e = kwargs.get("name_e")
-        bone = kwargs.get("bone")
-
-        friction = kwargs.get("friction")
-        mass = kwargs.get("mass")
-        angular_damping = kwargs.get("angular_damping")
-        linear_damping = kwargs.get("linear_damping")
-        bounce = kwargs.get("bounce")
-
-        obj: Optional[bpy.types.Object] = kwargs.get("obj", None)
-        if obj is None:
-            obj = self.createRigidBodyPool(1)[0]
-
-        obj.location = location
-        obj.rotation_euler = rotation
-
-        obj.mmd_rigid.shape = rigid_body.collisionShape(shape_type)
-        obj.mmd_rigid.size = size
-        obj.mmd_rigid.type = str(dynamics_type) if dynamics_type in range(3) else "1"
-
-        if collision_group_number is not None:
-            obj.mmd_rigid.collision_group_number = collision_group_number
-        if collision_group_mask is not None:
-            obj.mmd_rigid.collision_group_mask = collision_group_mask
-        if name is not None:
-            obj.name = name
-            obj.mmd_rigid.name_j = name
-        if name_e is not None:
-            obj.mmd_rigid.name_e = name_e
-
-        obj.mmd_rigid.bone = bone if bone else ""
-
-        rb = obj.rigid_body
-        if friction is not None:
-            rb.friction = friction
-        if mass is not None:
-            rb.mass = mass
-        if angular_damping is not None:
-            rb.angular_damping = angular_damping
-        if linear_damping is not None:
-            rb.linear_damping = linear_damping
-        if bounce:
-            rb.restitution = bounce
-
-        obj.select_set(False)
-        return obj
-
-    def createJointPool(self, counts):
-        if counts < 1:
-            return []
-        obj = bpyutils.createObject(name="Joint", object_data=None)
-        obj.parent = self.jointGroupObject()
-        obj.mmd_type = "JOINT"
-        obj.rotation_mode = "YXZ"
-        setattr(obj, Props.empty_display_type, "ARROWS")
-        setattr(obj, Props.empty_display_size, 0.1 * getattr(self.__root, Props.empty_display_size))
-        obj.hide_render = True
-
-        if bpy.ops.rigidbody.world_add.poll():
-            bpy.ops.rigidbody.world_add()
-        bpy.ops.rigidbody.constraint_add(type="GENERIC_SPRING")
-        rbc = obj.rigid_body_constraint
-        rbc.disable_collisions = False
-        rbc.use_limit_ang_x = True
-        rbc.use_limit_ang_y = True
-        rbc.use_limit_ang_z = True
-        rbc.use_limit_lin_x = True
-        rbc.use_limit_lin_y = True
-        rbc.use_limit_lin_z = True
-        rbc.use_spring_x = True
-        rbc.use_spring_y = True
-        rbc.use_spring_z = True
-        if hasattr(rbc, "use_spring_ang_x"):
-            rbc.use_spring_ang_x = True
-            rbc.use_spring_ang_y = True
-            rbc.use_spring_ang_z = True
-        if counts == 1:
-            return [obj]
-        return bpyutils.duplicateObject(obj, counts)
-
-    def createJoint(self, **kwargs):
-        """Create a joint object for MMD rigid body dynamics.
-        ### Parameters ###
-         @param shape_type the shape type.
-         @param location location of the rigid body object.
-         @param rotation rotation of the rigid body object.
-         @param size
-         @param dynamics_type the type of dynamics mode. (STATIC / DYNAMIC / DYNAMIC2)
-         @param collision_group_number
-         @param collision_group_mask list of boolean values. (length:16)
-         @param name Object name
-         @param name_e English object name (Optional)
-         @param bone
-        """
-
-        location = kwargs["location"]
-        rotation = kwargs["rotation"]
-
-        rigid_a = kwargs["rigid_a"]
-        rigid_b = kwargs["rigid_b"]
-
-        max_loc = kwargs["maximum_location"]
-        min_loc = kwargs["minimum_location"]
-        max_rot = kwargs["maximum_rotation"]
-        min_rot = kwargs["minimum_rotation"]
-        spring_angular = kwargs["spring_angular"]
-        spring_linear = kwargs["spring_linear"]
-
-        name = kwargs["name"]
-        name_e = kwargs.get("name_e")
-
-        obj = kwargs.get("obj", None)
-        if obj is None:
-            obj = self.createJointPool(1)[0]
-
-        obj.name = "J." + name
-        obj.mmd_joint.name_j = name
-        if name_e is not None:
-            obj.mmd_joint.name_e = name_e
-
-        obj.location = location
-        obj.rotation_euler = rotation
-
-        rbc = obj.rigid_body_constraint
-
-        rbc.object1 = rigid_a
-        rbc.object2 = rigid_b
-
-        rbc.limit_lin_x_upper = max_loc[0]
-        rbc.limit_lin_y_upper = max_loc[1]
-        rbc.limit_lin_z_upper = max_loc[2]
-
-        rbc.limit_lin_x_lower = min_loc[0]
-        rbc.limit_lin_y_lower = min_loc[1]
-        rbc.limit_lin_z_lower = min_loc[2]
-
-        rbc.limit_ang_x_upper = max_rot[0]
-        rbc.limit_ang_y_upper = max_rot[1]
-        rbc.limit_ang_z_upper = max_rot[2]
-
-        rbc.limit_ang_x_lower = min_rot[0]
-        rbc.limit_ang_y_lower = min_rot[1]
-        rbc.limit_ang_z_lower = min_rot[2]
-
-        obj.mmd_joint.spring_linear = spring_linear
-        obj.mmd_joint.spring_angular = spring_angular
-
-        obj.select_set(False)
-        return obj
 
     def create_ik_constraint(self, bone, ik_target):
         """create IK constraint
@@ -814,22 +643,22 @@ class Model:
         if obj is None:
             obj: bpy.types.Object = self.__root
         yield obj
-        yield from FnModel.all_children(obj)
+        yield from FnModel.iterate_child_objects(obj)
 
     def rootObject(self):
         return self.__root
 
     def armature(self):
         if self.__arm is None:
-            self.__arm = FnModel.find_armature(self.__root)
+            self.__arm = FnModel.find_armature_object(self.__root)
         return self.__arm
 
     def hasRigidGroupObject(self):
-        return FnModel.find_rigid_group(self.__root) is not None
+        return FnModel.find_rigid_group_object(self.__root) is not None
 
     def rigidGroupObject(self):
         if self.__rigid_grp is None:
-            self.__rigid_grp = FnModel.find_rigid_group(self.__root)
+            self.__rigid_grp = FnModel.find_rigid_group_object(self.__root)
             if self.__rigid_grp is None:
                 rigids = bpy.data.objects.new(name="rigidbodies", object_data=None)
                 SceneOp(bpy.context).link_object(rigids)
@@ -842,11 +671,11 @@ class Model:
         return self.__rigid_grp
 
     def hasJointGroupObject(self):
-        return FnModel.find_joint_group(self.__root) is not None
+        return FnModel.find_joint_group_object(self.__root) is not None
 
     def jointGroupObject(self):
         if self.__joint_grp is None:
-            self.__joint_grp = FnModel.find_joint_group(self.__root)
+            self.__joint_grp = FnModel.find_joint_group_object(self.__root)
             if self.__joint_grp is None:
                 joints = bpy.data.objects.new(name="joints", object_data=None)
                 SceneOp(bpy.context).link_object(joints)
@@ -859,11 +688,11 @@ class Model:
         return self.__joint_grp
 
     def hasTemporaryGroupObject(self):
-        return FnModel.find_temporary_group(self.__root) is not None
+        return FnModel.find_temporary_group_object(self.__root) is not None
 
     def temporaryGroupObject(self):
         if self.__temporary_grp is None:
-            self.__temporary_grp = FnModel.find_temporary_group(self.__root)
+            self.__temporary_grp = FnModel.find_temporary_group_object(self.__root)
             if self.__temporary_grp is None:
                 temporarys = bpy.data.objects.new(name="temporary", object_data=None)
                 SceneOp(bpy.context).link_object(temporarys)
@@ -876,13 +705,10 @@ class Model:
         return self.__temporary_grp
 
     def meshes(self):
-        arm = self.armature()
-        if arm is None:
-            return []
-        return FnModel.child_meshes(arm)
+        return FnModel.iterate_mesh_objects(self.__root)
 
     def attachMeshes(self, meshes: Iterator[bpy.types.Object], add_armature_modifier: bool = True):
-        FnModel.attach_meshes(self.rootObject(), meshes, add_armature_modifier)
+        FnModel.attach_mesh_objects(self.rootObject(), meshes, add_armature_modifier)
 
     def firstMesh(self):
         for i in self.meshes():
@@ -1032,31 +858,6 @@ class Model:
     def __removeTemporaryObjects(self):
         with bpy.context.temp_override(selected_objects=tuple(self.temporaryObjects()), active_object=self.rootObject()):
             bpy.ops.object.delete()
-
-    def __removeChildrenOfTemporaryGroupObject(self):
-        tmp_grp_obj = self.temporaryGroupObject()
-        tmp_cnt = len(tmp_grp_obj.children)
-        if tmp_cnt == 0:
-            return
-        logging.debug(" Removing %d children of temporary group object", tmp_cnt)
-        start_time = time.time()
-        total_cnt = len(bpy.data.objects)
-        layer_index = bpy.context.scene.active_layer
-        try:
-            bpy.ops.object.mode_set(mode="OBJECT")
-        except Exception:
-            pass
-        for i in bpy.context.selected_objects:
-            i.select_set(False)
-        for i in tmp_grp_obj.children:
-            i.hide_select = False
-            i.hide_set(False)
-            i.select_set(True)
-            i.layers[layer_index] = True
-        assert len(bpy.context.selected_objects) == tmp_cnt
-        bpy.ops.object.delete()
-        assert len(bpy.data.objects) == total_cnt - tmp_cnt
-        logging.debug("   - Done in %f seconds.", time.time() - start_time)
 
     def __restoreTransforms(self, obj):
         for attr in ("location", "rotation_euler"):
@@ -1241,7 +1042,7 @@ class Model:
         rb.collision_shape = rigid.shape
 
     def __getRigidRange(self, obj):
-        return (mathutils.Vector(obj.bound_box[0]) - mathutils.Vector(obj.bound_box[6])).length
+        return (Vector(obj.bound_box[0]) - Vector(obj.bound_box[6])).length
 
     def __createNonCollisionConstraint(self, nonCollisionJointTable):
         total_len = len(nonCollisionJointTable)

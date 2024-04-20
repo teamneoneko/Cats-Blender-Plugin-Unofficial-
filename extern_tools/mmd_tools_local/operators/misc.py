@@ -240,17 +240,17 @@ class AttachMeshesToMMD(Operator):
     add_armature_modifier: bpy.props.BoolProperty(default=True)
 
     def execute(self, context: bpy.types.Context):
-        root = mmd_model.FnModel.find_root(context.active_object)
+        root = mmd_model.FnModel.find_root_object(context.active_object)
         if root is None:
             self.report({"ERROR"}, "Select a MMD model")
             return {"CANCELLED"}
 
-        armObj = mmd_model.FnModel.find_armature(root)
+        armObj = mmd_model.FnModel.find_armature_object(root)
         if armObj is None:
             self.report({"ERROR"}, "Model Armature not found")
             return {"CANCELLED"}
 
-        mmd_model.FnModel.attach_meshes(root, context.visible_objects, self.add_armature_modifier)
+        mmd_model.FnModel.attach_mesh_objects(root, context.visible_objects, self.add_armature_modifier)
         return {"FINISHED"}
 
 
@@ -270,16 +270,16 @@ class ChangeMMDIKLoopFactor(Operator):
 
     @classmethod
     def poll(cls, context):
-        return mmd_model.FnModel.find_root(context.active_object) is not None
+        return mmd_model.FnModel.find_root_object(context.active_object) is not None
 
     def invoke(self, context, event):
-        root_object = mmd_model.FnModel.find_root(context.active_object)
+        root_object = mmd_model.FnModel.find_root_object(context.active_object)
         self.mmd_ik_loop_factor = root_object.mmd_root.ik_loop_factor
         vm = context.window_manager
         return vm.invoke_props_dialog(self)
 
     def execute(self, context):
-        root_object = mmd_model.FnModel.find_root(context.active_object)
+        root_object = mmd_model.FnModel.find_root_object(context.active_object)
         mmd_model.FnModel.change_mmd_ik_loop_factor(root_object, self.mmd_ik_loop_factor)
         return {"FINISHED"}
 

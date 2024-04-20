@@ -57,9 +57,10 @@ class VPDExporter:
             vpd_bones.append(vpd.VpdBone(bone_name, location, [x, y, z, w]))
         return vpd_bones
 
-    def __exportPoseLib(self, armObj, pose_type, filepath, use_pose_mode=False):
+    def __exportPoseLib(self, armObj: bpy.types.Object, pose_type, filepath, use_pose_mode=False):
         if armObj is None:
             return None
+        # FIXME: armObj.pose_library is None when the armature is not in pose mode
         if armObj.pose_library is None:
             return None
 

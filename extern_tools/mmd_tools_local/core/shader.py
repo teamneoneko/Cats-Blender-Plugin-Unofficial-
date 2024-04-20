@@ -6,7 +6,7 @@ import bpy
 
 
 class _NodeTreeUtils:
-    def __init__(self, shader):
+    def __init__(self, shader: bpy.types.NodeTree):
         self.shader, self.nodes, self.links = shader, shader.nodes, shader.links
 
     def _find_node(self, node_type):
@@ -53,7 +53,7 @@ SOCKET_SUBTYPE_MAPPING = {"NodeSocketFloatFactor": "FACTOR"}
 
 
 class _NodeGroupUtils(_NodeTreeUtils):
-    def __init__(self, shader):
+    def __init__(self, shader: bpy.types.NodeTree):
         super().__init__(shader)
         self.__node_input = self.__node_output = None
 

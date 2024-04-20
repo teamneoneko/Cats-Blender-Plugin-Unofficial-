@@ -115,8 +115,8 @@ class FnMorph:
 
         for vg_name in tuple(i[0].name for i in FnMorph.get_uv_morph_vertex_groups(obj, src_name)):
             obj.vertex_groups.active = obj.vertex_groups[vg_name]
-            override = {"object": obj, "window": bpy.context.window, "region": bpy.context.region}
-            bpy.ops.object.vertex_group_copy(override)
+            with bpy.context.temp_override(object=obj, window=bpy.context.window, region=bpy.context.region):
+                bpy.ops.object.vertex_group_copy()
             obj.vertex_groups.active.name = vg_name.replace(src_name, dest_name)
 
     @staticmethod

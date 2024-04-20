@@ -91,7 +91,7 @@ class MMDSDEFPanel(_PanelBase):
 
     def draw(self, context):
         c = self.layout.column(align=True)
-        c.operator('mmd_tools_local.sdef_bind', text='Bind')
+        c.operator('mmmd_tools_local.sdef_bind', text='Bind')
         c.operator('mmd_tools_local.sdef_unbind', text='Unbind')
         row = c.row()
         row.label(text='Cache Info: %d data'%(len(FnSDEF.g_verts)), icon='INFO')

@@ -34,7 +34,7 @@ class VPDImporter:
             for bone, matrix_basis in pose_orig.items():
                 bone.matrix_basis = matrix_basis
 
-    def __assignToArmatureSimple(self, armObj, reset_transform=True):
+    def __assignToArmatureSimple(self, armObj: bpy.types.Object, reset_transform=True):
         logging.info('  - assigning to armature "%s"', armObj.name)
 
         pose_bones = armObj.pose.bones
@@ -61,6 +61,7 @@ class VPDImporter:
             elif reset_transform:
                 bone.matrix_basis.identity()
 
+        # FIXME: armObj.pose_library is None when the armature is not in pose mode
         if armObj.pose_library is None:
             armObj.pose_library = bpy.data.actions.new(name="PoseLib")
 

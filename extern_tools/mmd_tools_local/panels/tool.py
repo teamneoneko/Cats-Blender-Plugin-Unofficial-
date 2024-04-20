@@ -2,6 +2,7 @@
 # Copyright 2015 MMD Tools authors
 # This file is part of MMD Tools.
 
+from typing import Optional
 import bpy
 from bpy.types import Menu, Panel, UIList
 
@@ -127,11 +128,11 @@ class MMD_ROOT_UL_display_items(UIList):
     )
 
     @staticmethod
-    def draw_bone_special(layout, armature, bone_name, mmd_name=None):
+    def draw_bone_special(layout: bpy.types.UILayout, armature: bpy.types.Object, bone_name: str, mmd_name: Optional[str] = None):
         if armature is None:
             return
         row = layout.row(align=True)
-        p_bone = armature.pose.bones.get(bone_name, None)
+        p_bone: bpy.types.PoseBone = armature.pose.bones.get(bone_name, None)
         if p_bone:
             bone = p_bone.bone
             if mmd_name:

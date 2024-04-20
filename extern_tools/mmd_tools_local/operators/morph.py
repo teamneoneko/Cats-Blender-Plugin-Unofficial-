@@ -2,6 +2,7 @@
 # Copyright 2015 MMD Tools authors
 # This file is part of MMD Tools.
 
+from typing import Optional, cast
 import bpy
 from bpy.types import Operator
 from mathutils import Quaternion, Vector
@@ -169,7 +170,7 @@ class OverwriteBoneMorphsFromPoseLibrary(Operator):
 
     def execute(self, context):
         root = mmd_model.Model.findRoot(context.active_object)
-        FnMorph.overwrite_bone_morphs_from_pose_library(mmd_model.FnModel.find_armature(root))
+        FnMorph.overwrite_bone_morphs_from_pose_library(mmd_model.FnModel.find_armature_object(root))
 
         return {"FINISHED"}
 
@@ -448,7 +449,7 @@ class ViewBoneMorph(Operator):
         utils.selectSingleBone(context, armature, None, True)
         morph = mmd_root.bone_morphs[mmd_root.active_morph]
         for morph_data in morph.data:
-            p_bone = armature.pose.bones.get(morph_data.bone, None)
+            p_bone: Optional[bpy.types.PoseBone] = armature.pose.bones.get(morph_data.bone, None)
             if p_bone:
                 p_bone.bone.select = True
                 mtx = (p_bone.matrix_basis.to_3x3() @ Quaternion(*morph_data.rotation.to_axis_angle()).to_matrix()).to_4x4()
@@ -583,10 +584,10 @@ class ViewUVMorph(Operator):
         bpy.ops.mmd_tools_local.clear_uv_morph_view()
 
         selected = meshObj.select_get()
-        with bpyutils.select_object(meshObj) as data:
+        with bpyutils.select_object(meshObj):
+            mesh = cast(bpy.types.Mesh, meshObj.data)
             morph = mmd_root.uv_morphs[mmd_root.active_morph]
-            mesh = meshObj.data
-            uv_textures = getattr(mesh, "uv_textures", mesh.uv_layers)
+            uv_textures = mesh.uv_layers
 
             base_uv_layers = [l for l in mesh.uv_layers if not l.name.startswith("_")]
             if morph.uv_index >= len(base_uv_layers):
@@ -678,22 +679,22 @@ class EditUVMorph(Operator):
         mmd_root = root.mmd_root
         meshObj = obj
 
-        selected = meshObj.select
-        with bpyutils.select_object(meshObj) as data:
+        selected = meshObj.select_get()
+        with bpyutils.select_object(meshObj):
+            mesh = cast(bpy.types.Mesh, meshObj.data)
             bpy.ops.object.mode_set(mode="EDIT")
             bpy.ops.mesh.select_mode(type="VERT", action="ENABLE")
             bpy.ops.mesh.reveal()  # unhide all vertices
             bpy.ops.mesh.select_all(action="DESELECT")
             bpy.ops.object.mode_set(mode="OBJECT")
 
-            vertices = meshObj.data.vertices
-            for l, d in zip(meshObj.data.loops, meshObj.data.uv_layers.active.data):
+            vertices = mesh.vertices
+            for l, d in zip(mesh.loops, mesh.uv_layers.active.data):
                 if d.select:
                     vertices[l.vertex_index].select = True
 
-            if not hasattr(meshObj.data, "uv_textures"):
-                polygons = meshObj.data.polygons
-                polygons.active = getattr(next((p for p in polygons if all(vertices[i].select for i in p.vertices)), None), "index", polygons.active)
+            polygons = mesh.polygons
+            polygons.active = getattr(next((p for p in polygons if all(vertices[i].select for i in p.vertices)), None), "index", polygons.active)
 
             bpy.ops.object.mode_set(mode="EDIT")
         meshObj.select_set(selected)
@@ -721,10 +722,10 @@ class ApplyUVMorph(Operator):
         mmd_root = root.mmd_root
         meshObj = obj
 
-        selected = meshObj.select
-        with bpyutils.select_object(meshObj) as data:
+        selected = meshObj.select_get()
+        with bpyutils.select_object(meshObj):
+            mesh = cast(bpy.types.Mesh, meshObj.data)
             morph = mmd_root.uv_morphs[mmd_root.active_morph]
-            mesh = meshObj.data
 
             base_uv_name = mesh.uv_layers.active.name[5:]
             if base_uv_name not in mesh.uv_layers:
@@ -764,7 +765,7 @@ class CleanDuplicatedMaterialMorphs(bpy.types.Operator):
         return mmd_model.Model.findRoot(context.active_object) is not None
 
     def execute(self, context: bpy.types.Context):
-        mmd_root_object = mmd_model.FnModel.find_root(context.active_object)
+        mmd_root_object = mmd_model.FnModel.find_root_object(context.active_object)
         FnMorph.clean_duplicated_material_morphs(mmd_root_object)
 
         return {"FINISHED"}

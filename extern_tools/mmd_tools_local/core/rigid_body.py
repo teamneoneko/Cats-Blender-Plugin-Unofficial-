@@ -2,7 +2,12 @@
 # Copyright 2014 MMD Tools authors
 # This file is part of MMD Tools.
 
+from typing import List, Optional
+
 import bpy
+from mathutils import Euler, Vector
+
+from mmd_tools_local.bpyutils import FnContext, Props
 
 SHAPE_SPHERE = 0
 SHAPE_BOX = 1
@@ -75,3 +80,207 @@ class RigidBodyMaterial:
         else:
             mat = bpy.data.materials[material_name]
         return mat
+
+
+class FnRigidBody:
+    @staticmethod
+    def new_rigid_body_objects(context: bpy.types.Context, parent_object: bpy.types.Object, count: int) -> List[bpy.types.Object]:
+        if count < 1:
+            return []
+
+        obj = FnRigidBody.new_rigid_body_object(context, parent_object)
+
+        if count == 1:
+            return [obj]
+
+        return FnContext.duplicate_object(context, obj, count)
+
+    @staticmethod
+    def new_rigid_body_object(context: bpy.types.Context, parent_object: bpy.types.Object) -> bpy.types.Object:
+        obj = FnContext.new_and_link_object(context, name="Rigidbody", object_data=bpy.data.meshes.new(name="Rigidbody"))
+        obj.parent = parent_object
+        obj.mmd_type = "RIGID_BODY"
+        obj.rotation_mode = "YXZ"
+        setattr(obj, Props.display_type, "SOLID")
+        obj.show_transparent = True
+        obj.hide_render = True
+        obj.display.show_shadows = False
+
+        with context.temp_override(object=obj):
+            bpy.ops.rigidbody.object_add(type="ACTIVE")
+
+        return obj
+
+    @staticmethod
+    def setup_rigid_body_object(
+        obj: bpy.types.Object,
+        shape_type: str,
+        location: Vector,
+        rotation: Euler,
+        size: Vector,
+        dynamics_type: str,
+        collision_group_number: Optional[int] = None,
+        collision_group_mask: Optional[List[bool]] = None,
+        name: Optional[str] = None,
+        name_e: Optional[str] = None,
+        bone: Optional[str] = None,
+        friction: Optional[float] = None,
+        mass: Optional[float] = None,
+        angular_damping: Optional[float] = None,
+        linear_damping: Optional[float] = None,
+        bounce: Optional[float] = None,
+    ) -> bpy.types.Object:
+        obj.location = location
+        obj.rotation_euler = rotation
+
+        obj.mmd_rigid.shape = collisionShape(shape_type)
+        obj.mmd_rigid.size = size
+        obj.mmd_rigid.type = str(dynamics_type) if dynamics_type in range(3) else "1"
+
+        if collision_group_number is not None:
+            obj.mmd_rigid.collision_group_number = collision_group_number
+
+        if collision_group_mask is not None:
+            obj.mmd_rigid.collision_group_mask = collision_group_mask
+
+        if name is not None:
+            obj.name = name
+            obj.mmd_rigid.name_j = name
+            obj.data.name = name
+
+        if name_e is not None:
+            obj.mmd_rigid.name_e = name_e
+
+        if bone is not None:
+            obj.mmd_rigid.bone = bone
+        else:
+            obj.mmd_rigid.bone = ""
+
+        rb = obj.rigid_body
+        if friction is not None:
+            rb.friction = friction
+        if mass is not None:
+            rb.mass = mass
+        if angular_damping is not None:
+            rb.angular_damping = angular_damping
+        if linear_damping is not None:
+            rb.linear_damping = linear_damping
+        if bounce is not None:
+            rb.restitution = bounce
+
+        return obj
+
+    @staticmethod
+    def get_rigid_body_size(obj: bpy.types.Object):
+        assert obj.mmd_type == "RIGID_BODY"
+
+        x0, y0, z0 = obj.bound_box[0]
+        x1, y1, z1 = obj.bound_box[6]
+        assert x1 >= x0 and y1 >= y0 and z1 >= z0
+
+        shape = obj.mmd_rigid.shape
+        if shape == "SPHERE":
+            radius = (z1 - z0) / 2
+            return (radius, 0.0, 0.0)
+        elif shape == "BOX":
+            x, y, z = (x1 - x0) / 2, (y1 - y0) / 2, (z1 - z0) / 2
+            return (x, y, z)
+        elif shape == "CAPSULE":
+            diameter = x1 - x0
+            radius = diameter / 2
+            height = abs((z1 - z0) - diameter)
+            return (radius, height, 0.0)
+        else:
+            raise ValueError(f"Invalid shape type: {shape}")
+
+    @staticmethod
+    def new_joint_object(context: bpy.types.Context, parent_object: bpy.types.Object, empty_display_size: float) -> bpy.types.Object:
+        obj = FnContext.new_and_link_object(context, name="Joint", object_data=None)
+        obj.parent = parent_object
+        obj.mmd_type = "JOINT"
+        obj.rotation_mode = "YXZ"
+        setattr(obj, Props.empty_display_type, "ARROWS")
+        setattr(obj, Props.empty_display_size, 0.1 * empty_display_size)
+        obj.hide_render = True
+
+        with context.temp_override():
+            context.view_layer.objects.active = obj
+            bpy.ops.rigidbody.constraint_add(type="GENERIC_SPRING")
+
+        rigid_body_constraint = obj.rigid_body_constraint
+        rigid_body_constraint.disable_collisions = False
+        rigid_body_constraint.use_limit_ang_x = True
+        rigid_body_constraint.use_limit_ang_y = True
+        rigid_body_constraint.use_limit_ang_z = True
+        rigid_body_constraint.use_limit_lin_x = True
+        rigid_body_constraint.use_limit_lin_y = True
+        rigid_body_constraint.use_limit_lin_z = True
+        rigid_body_constraint.use_spring_x = True
+        rigid_body_constraint.use_spring_y = True
+        rigid_body_constraint.use_spring_z = True
+        rigid_body_constraint.use_spring_ang_x = True
+        rigid_body_constraint.use_spring_ang_y = True
+        rigid_body_constraint.use_spring_ang_z = True
+
+        return obj
+
+    @staticmethod
+    def new_joint_objects(context: bpy.types.Context, parent_object: bpy.types.Object, count: int, empty_display_size: float) -> List[bpy.types.Object]:
+        if count < 1:
+            return []
+
+        obj = FnRigidBody.new_joint_object(context, parent_object, empty_display_size)
+
+        if count == 1:
+            return [obj]
+
+        return FnContext.duplicate_object(context, obj, count)
+
+    @staticmethod
+    def setup_joint_object(
+        obj: bpy.types.Object,
+        location: Vector,
+        rotation: Euler,
+        rigid_a: bpy.types.Object,
+        rigid_b: bpy.types.Object,
+        maximum_location: Vector,
+        minimum_location: Vector,
+        maximum_rotation: Euler,
+        minimum_rotation: Euler,
+        spring_angular: Vector,
+        spring_linear: Vector,
+        name: str,
+        name_e: Optional[str] = None,
+    ) -> bpy.types.Object:
+        obj.name = f"J.{name}"
+
+        obj.location = location
+        obj.rotation_euler = rotation
+
+        rigid_body_constraint = obj.rigid_body_constraint
+        rigid_body_constraint.object1 = rigid_a
+        rigid_body_constraint.object2 = rigid_b
+        rigid_body_constraint.limit_lin_x_upper = maximum_location.x
+        rigid_body_constraint.limit_lin_y_upper = maximum_location.y
+        rigid_body_constraint.limit_lin_z_upper = maximum_location.z
+
+        rigid_body_constraint.limit_lin_x_lower = minimum_location.x
+        rigid_body_constraint.limit_lin_y_lower = minimum_location.y
+        rigid_body_constraint.limit_lin_z_lower = minimum_location.z
+
+        rigid_body_constraint.limit_ang_x_upper = maximum_rotation.x
+        rigid_body_constraint.limit_ang_y_upper = maximum_rotation.y
+        rigid_body_constraint.limit_ang_z_upper = maximum_rotation.z
+
+        rigid_body_constraint.limit_ang_x_lower = minimum_rotation.x
+        rigid_body_constraint.limit_ang_y_lower = minimum_rotation.y
+        rigid_body_constraint.limit_ang_z_lower = minimum_rotation.z
+
+        obj.mmd_joint.name_j = name
+        if name_e is not None:
+            obj.mmd_joint.name_e = name_e
+
+        obj.mmd_joint.spring_linear = spring_linear
+        obj.mmd_joint.spring_angular = spring_angular
+
+        return obj

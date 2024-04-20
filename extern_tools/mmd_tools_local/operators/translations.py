@@ -83,7 +83,7 @@ class TranslateMMDModel(bpy.types.Operator):
             return {"CANCELLED"}
 
         obj = context.active_object
-        root = FnModel.find_root(obj)
+        root = FnModel.find_root_object(obj)
         rig = Model(root)
 
         if "MMD" in self.modes:
@@ -207,7 +207,7 @@ class RestoreMMDDataReferenceOperator(bpy.types.Operator):
     restore_value: bpy.props.StringProperty()
 
     def execute(self, context: bpy.types.Context):
-        root_object = FnModel.find_root(context.object)
+        root_object = FnModel.find_root_object(context.object)
         mmd_translation_element_index = root_object.mmd_root.translation.filtered_translation_element_indices[self.index].value
         mmd_translation_element = root_object.mmd_root.translation.translation_elements[mmd_translation_element_index]
         setattr(mmd_translation_element, self.prop_name, self.restore_value)
@@ -222,7 +222,7 @@ class GlobalTranslationPopup(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return FnModel.find_root(context.object) is not None
+        return FnModel.find_root_object(context.object) is not None
 
     def draw(self, _context):
         layout = self.layout
@@ -287,7 +287,7 @@ class GlobalTranslationPopup(bpy.types.Operator):
         row.prop(mmd_translation, "dictionary", text="replace")
 
     def invoke(self, context: bpy.types.Context, _event):
-        root_object = FnModel.find_root(context.object)
+        root_object = FnModel.find_root_object(context.object)
         if root_object is None:
             return {"CANCELLED"}
 
@@ -300,7 +300,7 @@ class GlobalTranslationPopup(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self, width=800)
 
     def execute(self, context):
-        root_object = FnModel.find_root(context.object)
+        root_object = FnModel.find_root_object(context.object)
         if root_object is None:
             return {"CANCELLED"}
 
@@ -316,7 +316,7 @@ class ExecuteTranslationBatchOperator(bpy.types.Operator):
     bl_options = {"INTERNAL"}
 
     def execute(self, context: bpy.types.Context):
-        root = FnModel.find_root(context.object)
+        root = FnModel.find_root_object(context.object)
         if root is None:
             return {"CANCELLED"}
 
