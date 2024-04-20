@@ -149,7 +149,7 @@ class FnBone:
 
         from mmd_tools_local.core.model import FnModel
 
-        root_object: bpy.types.Object = FnModel.find_root(armature_object)
+        root_object: bpy.types.Object = FnModel.find_root_object(armature_object)
         mmd_root = root_object.mmd_root
 
         bones = armature.bones
@@ -198,6 +198,7 @@ class FnBone:
 
         force_align = True
         with bpyutils.edit_object(armature_object) as data:
+            bone: bpy.types.EditBone
             for bone in data.edit_bones:
                 if bone.name not in bone_map:
                     bone.select = False
@@ -254,6 +255,7 @@ class FnBone:
             bone_map[b.name] = (mmd_bone.local_axis_x, mmd_bone.local_axis_z)
 
         with bpyutils.edit_object(armature_object) as data:
+            bone: bpy.types.EditBone
             for bone in data.edit_bones:
                 if bone.name not in bone_map:
                     bone.select = False
@@ -283,6 +285,7 @@ class FnBone:
             if not b.is_mmd_shadow_bone and not b.mmd_bone.enabled_local_axes and FnBone.has_auto_local_axis(b.mmd_bone.name_j):
                 bone_names.append(b.name)
         with bpyutils.edit_object(armature) as data:
+            bone: bpy.types.EditBone
             for bone in data.edit_bones:
                 if bone.name not in bone_names:
                     continue

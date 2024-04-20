@@ -64,8 +64,8 @@ class ModelJoinByBonesOperator(bpy.types.Operator):
     def join(self, context: bpy.types.Context):
         bpy.ops.object.mode_set(mode="OBJECT")
 
-        parent_root_object = FnModel.find_root(context.active_object)
-        child_root_objects = {FnModel.find_root(o) for o in context.selected_objects}
+        parent_root_object = FnModel.find_root_object(context.active_object)
+        child_root_objects = {FnModel.find_root_object(o) for o in context.selected_objects}
         child_root_objects.remove(parent_root_object)
 
         if parent_root_object is None or len(child_root_objects) == 0:
@@ -120,7 +120,7 @@ class ModelSeparateByBonesOperator(bpy.types.Operator):
         if active_object.type != "ARMATURE":
             return False
 
-        if FnModel.find_root(active_object) is None:
+        if FnModel.find_root_object(active_object) is None:
             return False
 
         return len(context.selected_pose_bones) > 0
@@ -154,7 +154,7 @@ class ModelSeparateByBonesOperator(bpy.types.Operator):
         separate_bones: Dict[str, bpy.types.EditBone] = {b.name: b for b in context.selected_bones}
         deform_bones: Dict[str, bpy.types.EditBone] = {b.name: b for b in target_armature_object.data.edit_bones if b.use_deform}
 
-        mmd_root_object: bpy.types.Object = FnModel.find_root(context.active_object)
+        mmd_root_object: bpy.types.Object = FnModel.find_root_object(context.active_object)
         mmd_model = Model(mmd_root_object)
         mmd_model_mesh_objects: List[bpy.types.Object] = list(mmd_model.meshes())
 

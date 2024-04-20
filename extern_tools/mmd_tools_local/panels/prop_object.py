@@ -16,13 +16,13 @@ class MMDModelObjectPanel(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return FnModel.find_root(context.active_object)
+        return FnModel.find_root_object(context.active_object)
 
     def draw(self, context):
         layout = self.layout
         obj = context.active_object
 
-        root = FnModel.find_root(obj)
+        root = FnModel.find_root_object(obj)
 
         c = layout.column()
         c.prop(root.mmd_root, "name")

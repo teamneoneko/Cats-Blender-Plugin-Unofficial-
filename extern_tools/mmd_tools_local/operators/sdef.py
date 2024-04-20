@@ -19,17 +19,15 @@ def _get_target_objects(context):
             selected_objects.add(i)
             continue
 
-        root = FnModel.find_root(i)
-        if root not in {i, i.parent}:
+        root_object = FnModel.find_root_object(i)
+        if root_object is None:
+            continue
+        if root_object in root_objects:
             continue
 
-        root_objects.add(root)
+        root_objects.add(root_object)
 
-        arm = FnModel.find_armature(root)
-        if arm is None:
-            continue
-
-        selected_objects |= set(FnModel.child_meshes(arm))
+        selected_objects |= set(FnModel.iterate_mesh_objects(root_object))
     return selected_objects, root_objects
 
 

@@ -6,6 +6,7 @@ import collections
 import logging
 import os
 import time
+from typing import List, TYPE_CHECKING
 
 import bpy
 from mathutils import Matrix, Vector
@@ -16,9 +17,13 @@ from mmd_tools_local.core.bone import FnBone
 from mmd_tools_local.core.material import FnMaterial
 from mmd_tools_local.core.model import FnModel, Model
 from mmd_tools_local.core.morph import FnMorph
+from mmd_tools_local.core.rigid_body import FnRigidBody
 from mmd_tools_local.core.vmd.importer import BoneConverter
 from mmd_tools_local.operators.display_item import DisplayItemQuickSetup
 from mmd_tools_local.operators.misc import MoveObject
+
+if TYPE_CHECKING:
+    from mmd_tools_local.properties.pose_bone import MMDBone
 
 
 class PMXImporter:
@@ -282,8 +287,8 @@ class PMXImporter:
 
         return nameTable, specialTipBones
 
-    def __sortPoseBonesByBoneIndex(self, pose_bones, bone_names):
-        r = []
+    def __sortPoseBonesByBoneIndex(self, pose_bones: List[bpy.types.PoseBone], bone_names):
+        r: List[bpy.types.PoseBone] = []
         for i in bone_names:
             r.append(pose_bones[i])
         return r
@@ -418,7 +423,7 @@ class PMXImporter:
         self.__boneTable = pose_bones
         for i, pmx_bone in sorted(enumerate(pmxModel.bones), key=lambda x: x[1].transform_order):
             b_bone = pose_bones[i]
-            mmd_bone = b_bone.mmd_bone
+            mmd_bone: MMDBone = b_bone.mmd_bone
             mmd_bone.name_j = b_bone.name  # pmx_bone.name
             mmd_bone.name_e = pmx_bone.name_e
             mmd_bone.is_controllable = pmx_bone.isControllable
@@ -467,24 +472,24 @@ class PMXImporter:
     def __importRigids(self):
         start_time = time.time()
         self.__rigidTable = {}
-        rigid_pool = self.__rig.createRigidBodyPool(len(self.__model.rigids))
+        context = bpyutils.FnContext.ensure_context()
+        rigid_pool = FnRigidBody.new_rigid_body_objects(context, FnModel.ensure_rigid_group_object(context, self.__rig.rootObject()), len(self.__model.rigids))
         for i, (rigid, rigid_obj) in enumerate(zip(self.__model.rigids, rigid_pool)):
             loc = Vector(rigid.location).xzy * self.__scale
             rot = Vector(rigid.rotation).xzy * -1
             size = Vector(rigid.size).xzy if rigid.type == pmx.Rigid.TYPE_BOX else Vector(rigid.size)
 
-            obj = self.__rig.createRigidBody(
+            obj = FnRigidBody.setup_rigid_body_object(
                 obj=rigid_obj,
-                name=rigid.name,
-                name_e=rigid.name_e,
                 shape_type=rigid.type,
-                dynamics_type=rigid.mode,
                 location=loc,
                 rotation=rot,
                 size=size * self.__scale,
+                dynamics_type=rigid.mode,
+                name=rigid.name,
+                name_e=rigid.name_e,
                 collision_group_number=rigid.collision_group_number,
                 collision_group_mask=[rigid.collision_group_mask & (1 << i) == 0 for i in range(16)],
-                arm_obj=self.__armObj,
                 mass=rigid.mass,
                 friction=rigid.friction,
                 angular_damping=rigid.rotation_attenuation,
@@ -500,12 +505,13 @@ class PMXImporter:
 
     def __importJoints(self):
         start_time = time.time()
-        joint_pool = self.__rig.createJointPool(len(self.__model.joints))
+        context = bpyutils.FnContext.ensure_context()
+        joint_pool = FnRigidBody.new_joint_objects(context, FnModel.ensure_joint_group_object(context, self.__rig.rootObject()), len(self.__model.joints), FnModel.get_empty_display_size(self.__rig.rootObject()))
         for i, (joint, joint_obj) in enumerate(zip(self.__model.joints, joint_pool)):
             loc = Vector(joint.location).xzy * self.__scale
             rot = Vector(joint.rotation).xzy * -1
 
-            obj = self.__rig.createJoint(
+            obj = FnRigidBody.setup_joint_object(
                 obj=joint_obj,
                 name=joint.name,
                 name_e=joint.name_e,
@@ -783,10 +789,7 @@ class PMXImporter:
         armModifier.show_render = armModifier.show_viewport = len(meshObj.data.vertices) > 0
 
     def __assignCustomNormals(self):
-        mesh = self.__meshObj.data
-        if not hasattr(mesh, "has_custom_normals"):
-            logging.info(" * No support for custom normals!!")
-            return
+        mesh: bpy.types.Mesh = self.__meshObj.data
         logging.info("Setting custom normals...")
         if self.__vertex_map:
             verts, faces = self.__model.vertices, self.__model.faces

@@ -2,7 +2,7 @@
 # Copyright 2013 MMD Tools authors
 # This file is part of MMD Tools.
 
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import bpy
 
@@ -107,10 +107,7 @@ class __ActivateLayerCollection:
 
 
 def addon_preferences(attrname, default=None):
-    if hasattr(bpy.context, "preferences"):
-        addon = bpy.context.preferences.addons.get(__package__, None)
-    else:
-        addon = bpy.context.user_preferences.addons.get(__package__, None)
+    addon = bpy.context.preferences.addons.get(__package__, None)
     return getattr(addon.preferences, attrname, default) if addon else default
 
 
@@ -164,26 +161,7 @@ def activate_layer_collection(target: Union[bpy.types.Object, bpy.types.LayerCol
 
 
 def duplicateObject(obj, total_len):
-    for i in bpy.context.selected_objects:
-        i.select_set(False)
-    obj.select_set(True)
-    assert len(bpy.context.selected_objects) == 1
-    assert bpy.context.selected_objects[0] == obj
-    last_selected = objs = [obj]
-    while len(objs) < total_len:
-        bpy.ops.object.duplicate()
-        objs.extend(bpy.context.selected_objects)
-        remain = total_len - len(objs) - len(bpy.context.selected_objects)
-        if remain < 0:
-            last_selected = bpy.context.selected_objects
-            for i in range(-remain):
-                last_selected[i].select_set(False)
-        else:
-            for i in range(min(remain, len(last_selected))):
-                last_selected[i].select_set(True)
-        last_selected = bpy.context.selected_objects
-    assert len(objs) == total_len
-    return objs
+    return FnContext.duplicate_object(bpy.context, obj, total_len)
 
 
 def makeCapsuleBak(segment=16, ring_count=8, radius=1.0, height=1.0, target_scene=None):
@@ -240,11 +218,8 @@ def makeCapsuleBak(segment=16, ring_count=8, radius=1.0, height=1.0, target_scen
 
 
 def createObject(name="Object", object_data=None, target_scene=None):
-    target_scene = SceneOp(target_scene)
-    obj = bpy.data.objects.new(name=name, object_data=object_data)
-    target_scene.link_object(obj)
-    target_scene.active_object = obj
-    return obj
+    context = FnContext.ensure_context(target_scene)
+    return FnContext.set_active_object(context, FnContext.new_and_link_object(context, name, object_data))
 
 
 def makeSphere(segment=8, ring_count=5, radius=1.0, target_object=None):
@@ -484,13 +459,21 @@ class SceneOp:
 
 
 class FnContext:
+    def __init__(self):
+        raise NotImplementedError("This class is not expected to be instantiated.")
+
+    @staticmethod
+    def ensure_context(context: Optional[bpy.types.Context] = None) -> bpy.types.Context:
+        return context or bpy.context
+
     @staticmethod
     def get_active_object(context: bpy.types.Context) -> Optional[bpy.types.Object]:
         return context.active_object
 
     @staticmethod
-    def set_active_object(context: bpy.types.Context, obj: bpy.types.Object) -> None:
+    def set_active_object(context: bpy.types.Context, obj: bpy.types.Object) -> bpy.types.Object:
         context.view_layer.objects.active = obj
+        return obj
 
     @staticmethod
     def get_scene_objects(context: bpy.types.Context) -> bpy.types.SceneObjects:
@@ -504,7 +487,7 @@ class FnContext:
 
         if obj not in context.selectable_objects:
 
-            def __layer_check(layer_collection: bpy.types.LayerCollection):
+            def __layer_check(layer_collection: bpy.types.LayerCollection) -> bool:
                 for lc in layer_collection.children:
                     if __layer_check(lc):
                         lc.hide_viewport = False
@@ -523,13 +506,11 @@ class FnContext:
                 for i in context.selected_objects:
                     if i not in selected_objects:
                         i.select_set(False)
-
         return obj
 
     @staticmethod
     def select_object(context: bpy.types.Context, obj: bpy.types.Object) -> bpy.types.Object:
-        FnContext.ensure_selectable(context, obj)
-        obj.select_set(True)
+        FnContext.ensure_selectable(context, obj).select_set(True)
         return obj
 
     @staticmethod
@@ -537,3 +518,43 @@ class FnContext:
         for i in context.selected_objects:
             i.select_set(False)
         return FnContext.select_object(context, obj)
+
+    @staticmethod
+    def link_object(context: bpy.types.Context, obj: bpy.types.Object) -> bpy.types.Object:
+        context.collection.objects.link(obj)
+        return obj
+
+    @staticmethod
+    def new_and_link_object(context: bpy.types.Context, name: str, object_data: Optional[bpy.types.ID]) -> bpy.types.Object:
+        return FnContext.link_object(context, bpy.data.objects.new(name=name, object_data=object_data))
+
+    @staticmethod
+    def duplicate_object(context: bpy.types.Context, object_to_duplicate: bpy.types.Object, target_count: int) -> List[bpy.types.Object]:
+        """Duplicate object
+        Args:
+            context (bpy.types.Context): context
+            obj (bpy.types.Object): object to duplicate
+            target_count (int): target count of duplicated objects
+        Returns:
+            List[bpy.types.Object]: duplicated objects
+        """
+        for o in context.selected_objects:
+            o.select_set(False)
+        object_to_duplicate.select_set(True)
+        assert len(context.selected_objects) == 1
+        assert context.selected_objects[0] == object_to_duplicate
+        last_selected_objects = result_objects = [object_to_duplicate]
+        while len(result_objects) < target_count:
+            bpy.ops.object.duplicate()
+            result_objects.extend(context.selected_objects)
+            remain = target_count - len(result_objects) - len(context.selected_objects)
+            if remain < 0:
+                last_selected_objects = context.selected_objects
+                for i in range(-remain):
+                    last_selected_objects[i].select_set(False)
+            else:
+                for i in range(min(remain, len(last_selected_objects))):
+                    last_selected_objects[i].select_set(True)
+                last_selected_objects = context.selected_objects
+        assert len(result_objects) == target_count
+        return result_objects

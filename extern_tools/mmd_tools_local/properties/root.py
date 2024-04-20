@@ -37,7 +37,7 @@ def __add_single_prop(variables, id_obj, data_path, prefix):
 
 def _toggleUsePropertyDriver(self: "MMDRoot", _context):
     root_object: bpy.types.Object = self.id_data
-    armature_object = FnModel.find_armature(root_object)
+    armature_object = FnModel.find_armature_object(root_object)
 
     if armature_object is None:
         ik_map = {}
@@ -55,7 +55,7 @@ def _toggleUsePropertyDriver(self: "MMDRoot", _context):
                 if c:
                     driver, variables = __driver_variables(c, "influence")
                     driver.expression = "%s" % __add_single_prop(variables, ik.id_data, ik.path_from_id("mmd_ik_toggle"), "use_ik").name
-        for i in FnModel.child_meshes(root_object):
+        for i in FnModel.iterate_mesh_objects(root_object):
             for prop_hide in ("hide_viewport", "hide_render"):
                 driver, variables = __driver_variables(i, prop_hide)
                 driver.expression = "not %s" % __add_single_prop(variables, root_object, "mmd_root.show_meshes", "show").name
@@ -67,7 +67,7 @@ def _toggleUsePropertyDriver(self: "MMDRoot", _context):
                 c = next((c for c in b.constraints if c.type == "LIMIT_ROTATION" and not c.mute), None)
                 if c:
                     c.driver_remove("influence")
-        for i in FnModel.child_meshes(root_object):
+        for i in FnModel.iterate_mesh_objects(root_object):
             for prop_hide in ("hide_viewport", "hide_render"):
                 i.driver_remove(prop_hide)
 
@@ -79,7 +79,7 @@ def _toggleUsePropertyDriver(self: "MMDRoot", _context):
 
 def _toggleUseToonTexture(self: "MMDRoot", _context):
     use_toon = self.use_toon_texture
-    for i in FnModel.child_meshes(self.id_data):
+    for i in FnModel.iterate_mesh_objects(self.id_data):
         for m in i.data.materials:
             if m:
                 FnMaterial(m).use_toon_texture(use_toon)
@@ -87,7 +87,7 @@ def _toggleUseToonTexture(self: "MMDRoot", _context):
 
 def _toggleUseSphereTexture(self: "MMDRoot", _context):
     use_sphere = self.use_sphere_texture
-    for i in FnModel.child_meshes(self.id_data):
+    for i in FnModel.iterate_mesh_objects(self.id_data):
         for m in i.data.materials:
             if m:
                 FnMaterial(m).use_sphere_texture(use_sphere, i)
@@ -95,14 +95,14 @@ def _toggleUseSphereTexture(self: "MMDRoot", _context):
 
 def _toggleUseSDEF(self: "MMDRoot", _context):
     mute_sdef = not self.use_sdef
-    for i in FnModel.child_meshes(self.id_data):
+    for i in FnModel.iterate_mesh_objects(self.id_data):
         FnSDEF.mute_sdef_set(i, mute_sdef)
 
 
 def _toggleVisibilityOfMeshes(self: "MMDRoot", context: bpy.types.Context):
     root = self.id_data
     hide = not self.show_meshes
-    for i in FnModel.child_meshes(self.id_data):
+    for i in FnModel.iterate_mesh_objects(self.id_data):
         i.hide_set(hide)
         i.hide_render = hide
     if hide and context.active_object is None:
@@ -153,7 +153,7 @@ def _toggleShowNamesOfJoints(self: "MMDRoot", _context):
 
 def _setVisibilityOfMMDRigArmature(prop: "MMDRoot", v: bool):
     root = prop.id_data
-    arm = FnModel.find_armature(root)
+    arm = FnModel.find_armature_object(root)
     if arm is None:
         return
     if not v and bpy.context.active_object == arm:
@@ -164,7 +164,7 @@ def _setVisibilityOfMMDRigArmature(prop: "MMDRoot", v: bool):
 def _getVisibilityOfMMDRigArmature(prop: "MMDRoot"):
     if prop.id_data.mmd_type != "ROOT":
         return False
-    arm = FnModel.find_armature(prop.id_data)
+    arm = FnModel.find_armature_object(prop.id_data)
     return arm and not arm.hide_get()
 
 

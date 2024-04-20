@@ -200,11 +200,11 @@ class AddMissingVertexGroupsFromBones(Operator):
 
     @classmethod
     def poll(cls, context: bpy.types.Context):
-        return mmd_model.FnModel.find_root(context.active_object) is not None
+        return mmd_model.FnModel.find_root_object(context.active_object) is not None
 
     def execute(self, context: bpy.types.Context):
         active_object: bpy.types.Object = context.active_object
-        root_object = mmd_model.FnModel.find_root(active_object)
+        root_object = mmd_model.FnModel.find_root_object(active_object)
 
         bone_order_mesh_object = mmd_model.FnModel.find_bone_order_mesh_object(root_object)
         if bone_order_mesh_object is None:
@@ -402,15 +402,15 @@ class ResetObjectVisibility(bpy.types.Operator):
 
         mmd_root_object.hide_set(False)
 
-        rigid_group_object = mmd_model.FnModel.find_rigid_group(mmd_root_object)
+        rigid_group_object = mmd_model.FnModel.find_rigid_group_object(mmd_root_object)
         if rigid_group_object:
             rigid_group_object.hide_set(True)
 
-        joint_group_object = mmd_model.FnModel.find_joint_group(mmd_root_object)
+        joint_group_object = mmd_model.FnModel.find_joint_group_object(mmd_root_object)
         if joint_group_object:
             joint_group_object.hide_set(True)
 
-        temporary_group_object = mmd_model.FnModel.find_temporary_group(mmd_root_object)
+        temporary_group_object = mmd_model.FnModel.find_temporary_group_object(mmd_root_object)
         if temporary_group_object:
             temporary_group_object.hide_set(True)
 

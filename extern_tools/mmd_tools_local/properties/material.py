@@ -74,7 +74,7 @@ def _mmd_material_get_name_j(prop: "MMDMaterial"):
 def _mmd_material_set_name_j(prop: "MMDMaterial", value: str):
     prop_value = value
     if prop_value and prop_value != prop.get("name_j"):
-        root = FnModel.find_root(bpy.context.active_object)
+        root = FnModel.find_root_object(bpy.context.active_object)
         if root is None:
             prop_value = utils.unique_name(value, {mat.mmd_material.name_j for mat in bpy.data.materials})
         else:

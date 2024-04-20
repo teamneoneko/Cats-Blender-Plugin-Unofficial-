@@ -8,6 +8,7 @@ import bpy
 
 from mmd_tools_local import bpyutils
 from mmd_tools_local.core import rigid_body
+from mmd_tools_local.core.rigid_body import RigidBodyMaterial, FnRigidBody
 from mmd_tools_local.core.model import FnModel
 from mmd_tools_local.properties import patch_library_overridable
 
@@ -16,9 +17,9 @@ def _updateCollisionGroup(prop, context):
     obj = prop.id_data
     materials = obj.data.materials
     if len(materials) == 0:
-        materials.append(rigid_body.RigidBodyMaterial.getMaterial(prop.collision_group_number))
+        materials.append(RigidBodyMaterial.getMaterial(prop.collision_group_number))
     else:
-        obj.material_slots[0].material = rigid_body.RigidBodyMaterial.getMaterial(prop.collision_group_number)
+        obj.material_slots[0].material = RigidBodyMaterial.getMaterial(prop.collision_group_number)
 
 
 def _updateType(prop, context):
@@ -62,9 +63,9 @@ def _set_bone(prop, value):
 
     arm = relation.target
     if arm is None:
-        root = FnModel.find_root(obj)
+        root = FnModel.find_root_object(obj)
         if root:
-            arm = relation.target = FnModel.find_armature(root)
+            arm = relation.target = FnModel.find_armature_object(root)
 
     if arm is not None and bone_name in arm.data.bones:
         relation.subtarget = bone_name
@@ -77,7 +78,7 @@ def _set_bone(prop, value):
 def _get_size(prop):
     if prop.id_data.mmd_type != "RIGID_BODY":
         return (0, 0, 0)
-    return FnModel.get_rigid_body_size(prop.id_data)
+    return FnRigidBody.get_rigid_body_size(prop.id_data)
 
 
 def _set_size(prop, value):
@@ -125,7 +126,7 @@ def _set_size(prop, value):
                 z0 = -z if z0 < 0 else z
                 v.co = [x0, y0, z0]
         elif shape == "CAPSULE":
-            r0, h0, xx = FnModel.get_rigid_body_size(prop.id_data)
+            r0, h0, xx = FnRigidBody.get_rigid_body_size(prop.id_data)
             h0 *= 0.5
             radius = max(value[0], 1e-3)
             height = max(value[1], 1e-3) * 0.5

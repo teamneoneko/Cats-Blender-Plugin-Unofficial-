@@ -3,13 +3,15 @@
 # This file is part of MMD Tools.
 
 import math
-from typing import Dict
+from typing import Dict, Optional, Tuple, cast
 
 import bpy
+from mathutils import Euler, Vector
 
 from mmd_tools_local import utils
-from mmd_tools_local.bpyutils import Props, activate_layer_collection
+from mmd_tools_local.bpyutils import FnContext, Props, activate_layer_collection
 from mmd_tools_local.core import rigid_body
+from mmd_tools_local.core.rigid_body import FnRigidBody
 from mmd_tools_local.core.model import FnModel, Model
 
 
@@ -48,7 +50,7 @@ class SelectRigidBody(bpy.types.Operator):
 
     def execute(self, context):
         obj = context.active_object
-        root = FnModel.find_root(obj)
+        root = FnModel.find_root_object(obj)
         if root is None:
             self.report({"ERROR"}, "The model root can't be found")
             return {"CANCELLED"}
@@ -168,15 +170,17 @@ class AddRigidBody(bpy.types.Operator):
         default=0.1,
     )
 
-    def __add_rigid_body(self, rig, arm_obj=None, pose_bone=None):
-        name_j = self.name_j
-        name_e = self.name_e
+    def __add_rigid_body(self, context: bpy.types.Context, root_object: bpy.types.Object, pose_bone: Optional[bpy.types.PoseBone] = None):
+        name_j: str = self.name_j
+        name_e: str = self.name_e
         size = self.size.copy()
-        loc = (0.0, 0.0, 0.0)
-        rot = (0.0, 0.0, 0.0)
-        bone_name = None
+        loc = Vector((0.0, 0.0, 0.0))
+        rot = Euler((0.0, 0.0, 0.0))
+        bone_name: Optional[str] = None
 
-        if pose_bone:
+        if pose_bone is None:
+            size *= getattr(root_object, Props.empty_display_size)
+        else:
             bone_name = pose_bone.name
             mmd_bone = pose_bone.mmd_bone
             name_j = name_j.replace("$name_j", mmd_bone.name_j or bone_name)
@@ -198,17 +202,16 @@ class AddRigidBody(bpy.types.Operator):
                 size.z *= 0.8
             elif self.rigid_shape == "CAPSULE":
                 size.x /= 3
-        else:
-            size *= getattr(rig.rootObject(), Props.empty_display_size)
 
-        return rig.createRigidBody(
-            name=name_j,
-            name_e=name_e,
+        return FnRigidBody.setup_rigid_body_object(
+            obj=FnRigidBody.new_rigid_body_object(context, FnModel.ensure_rigid_group_object(context, root_object)),
+            shape_type=rigid_body.shapeType(self.rigid_shape),
             location=loc,
             rotation=rot,
             size=size,
-            shape_type=rigid_body.shapeType(self.rigid_shape),
             dynamics_type=int(self.rigid_type),
+            name=name_j,
+            name_e=name_e,
             collision_group_number=self.collision_group_number,
             collision_group_mask=self.collision_group_mask,
             mass=self.mass,
@@ -219,28 +222,40 @@ class AddRigidBody(bpy.types.Operator):
             bone=bone_name,
         )
 
+    @classmethod
+    def poll(cls, context):
+        root_object = FnModel.find_root_object(context.active_object)
+        if root_object is None:
+            return False
+
+        armature_object = FnModel.find_armature_object(root_object)
+        if armature_object is None:
+            return False
+
+        return True
+
     def execute(self, context):
-        obj = context.active_object
-        root = FnModel.find_root(obj)
-        rig = Model(root)
-        arm = rig.armature()
-        if obj != arm:
-            utils.selectAObject(root)
-            root.select_set(False)
-        elif arm.mode != "POSE":
+        active_object = context.active_object
+
+        root_object = cast(bpy.types.Object, FnModel.find_root_object(active_object))
+        armature_object = cast(bpy.types.Object, FnModel.find_armature_object(root_object))
+
+        if active_object != armature_object:
+            FnContext.select_single_object(context, root_object).select_set(False)
+        elif armature_object.mode != "POSE":
             bpy.ops.object.mode_set(mode="POSE")
 
         selected_pose_bones = []
         if context.selected_pose_bones:
             selected_pose_bones = context.selected_pose_bones
 
-        arm.select_set(False)
+        armature_object.select_set(False)
         if len(selected_pose_bones) > 0:
             for pose_bone in selected_pose_bones:
-                rigid = self.__add_rigid_body(rig, arm, pose_bone)
+                rigid = self.__add_rigid_body(context, root_object, pose_bone)
                 rigid.select_set(True)
         else:
-            rigid = self.__add_rigid_body(rig)
+            rigid = self.__add_rigid_body(context, root_object)
             rigid.select_set(True)
         return {"FINISHED"}
 
@@ -275,7 +290,7 @@ class RemoveRigidBody(bpy.types.Operator):
 
     def execute(self, context):
         obj = context.active_object
-        root = FnModel.find_root(obj)
+        root = FnModel.find_root_object(obj)
         utils.selectAObject(obj)  # ensure this is the only one object select
         bpy.ops.object.delete(use_global=True)
         if root:
@@ -289,9 +304,8 @@ class RigidBodyBake(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
     def execute(self, context: bpy.types.Context):
-        override: Dict = context.copy()
-        override.update({"scene": context.scene, "point_cache": context.scene.rigidbody_world.point_cache})
-        bpy.ops.ptcache.bake(override, "INVOKE_DEFAULT", bake=True)
+        with bpy.context.temp_override(scene=context.scene, point_cache=context.scene.rigidbody_world.point_cache):
+            bpy.ops.ptcache.bake("INVOKE_DEFAULT", bake=True)
 
         return {"FINISHED"}
 
@@ -302,9 +316,8 @@ class RigidBodyDeleteBake(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
     def execute(self, context: bpy.types.Context):
-        override: Dict = context.copy()
-        override.update({"scene": context.scene, "point_cache": context.scene.rigidbody_world.point_cache})
-        bpy.ops.ptcache.free_bake(override, "INVOKE_DEFAULT")
+        with bpy.context.temp_override(scene=context.scene, point_cache=context.scene.rigidbody_world.point_cache):
+            bpy.ops.ptcache.free_bake("INVOKE_DEFAULT")
 
         return {"FINISHED"}
 
@@ -365,7 +378,7 @@ class AddJoint(bpy.types.Operator):
         min=0,
     )
 
-    def __enumerate_rigid_pair(self, bone_map):
+    def __enumerate_rigid_pair(self, bone_map: Dict[bpy.types.Object, Optional[bpy.types.Bone]]):
         obj_seq = tuple(bone_map.keys())
         for rigid_a, bone_a in bone_map.items():
             for rigid_b, bone_b in bone_map.items():
@@ -378,8 +391,9 @@ class AddJoint(bpy.types.Operator):
             else:
                 yield obj_seq
 
-    def __add_joint(self, rig, rigid_pair, bone_map):
-        loc, rot = None, [0, 0, 0]
+    def __add_joint(self, context: bpy.types.Context, root_object: bpy.types.Object, rigid_pair: Tuple[bpy.types.Object, bpy.types.Object], bone_map):
+        loc: Optional[Vector] = None
+        rot = Euler((0.0, 0.0, 0.0))
         rigid_a, rigid_b = rigid_pair
         bone_a = bone_map[rigid_a]
         bone_b = bone_map[rigid_b]
@@ -397,7 +411,9 @@ class AddJoint(bpy.types.Operator):
 
         name_j = rigid_b.mmd_rigid.name_j or rigid_b.name
         name_e = rigid_b.mmd_rigid.name_e or rigid_b.name
-        return rig.createJoint(
+
+        return FnRigidBody.setup_joint_object(
+            obj=FnRigidBody.new_joint_object(context, FnModel.ensure_joint_group_object(context, root_object), FnModel.get_empty_display_size(root_object)),
             name=name_j,
             name_e=name_e,
             location=loc,
@@ -412,28 +428,35 @@ class AddJoint(bpy.types.Operator):
             spring_angular=self.spring_angular,
         )
 
-    def execute(self, context):
-        obj = context.active_object
-        root = FnModel.find_root(obj)
-        rig = Model(root)
+    @classmethod
+    def poll(cls, context):
+        root_object = FnModel.find_root_object(context.active_object)
+        if root_object is None:
+            return False
 
-        arm = rig.armature()
-        bone_map = {}
-        for i in context.selected_objects:
-            if FnModel.is_rigid_body_object(i):
-                bone_map[i] = arm.data.bones.get(i.mmd_rigid.bone, None)
+        armature_object = FnModel.find_armature_object(root_object)
+        if armature_object is None:
+            return False
+
+        return True
+
+    def execute(self, context):
+        active_object = context.active_object
+        root_object = cast(bpy.types.Object, FnModel.find_root_object(active_object))
+        armature_object = cast(bpy.types.Object, FnModel.find_armature_object(root_object))
+        bones = cast(bpy.types.Armature, armature_object.data).bones
+        bone_map: Dict[bpy.types.Object, Optional[bpy.types.Bone]] = {r: bones.get(r.mmd_rigid.bone, None) for r in FnModel.iterate_rigid_body_objects(root_object) if r.select_get()}
 
         if len(bone_map) < 2:
             self.report({"ERROR"}, "Please select two or more mmd rigid objects")
             return {"CANCELLED"}
 
-        utils.selectAObject(root)
-        root.select_set(False)
+        FnContext.select_single_object(context, root_object).select_set(False)
         if context.scene.rigidbody_world is None:
             bpy.ops.rigidbody.world_add()
 
         for pair in self.__enumerate_rigid_pair(bone_map):
-            joint = self.__add_joint(rig, pair, bone_map)
+            joint = self.__add_joint(context, root_object, pair, bone_map)
             joint.select_set(True)
 
         return {"FINISHED"}
@@ -455,7 +478,7 @@ class RemoveJoint(bpy.types.Operator):
 
     def execute(self, context):
         obj = context.active_object
-        root = FnModel.find_root(obj)
+        root = FnModel.find_root_object(obj)
         utils.selectAObject(obj)  # ensure this is the only one object select
         bpy.ops.object.delete(use_global=True)
         if root:
@@ -521,7 +544,7 @@ class UpdateRigidBodyWorld(bpy.types.Operator):
             if not _update_group(i, rb_objs):
                 continue
 
-            rb_map = table.setdefault(FnModel.find_root(i), {})
+            rb_map = table.setdefault(FnModel.find_root_object(i), {})
             if i in rb_map:  # means rb_map[i] will replace i
                 rb_objs.unlink(i)
                 continue
@@ -535,7 +558,7 @@ class UpdateRigidBodyWorld(bpy.types.Operator):
             if not _update_group(i, rbc_objs):
                 continue
 
-            rbc, root = i.rigid_body_constraint, FnModel.find_root(i)
+            rbc, root = i.rigid_body_constraint, FnModel.find_root_object(i)
             rb_map = table.get(root, {})
             rbc.object1 = rb_map.get(rbc.object1, rbc.object1)
             rbc.object2 = rb_map.get(rbc.object2, rbc.object2)
