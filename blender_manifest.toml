@@ -1,0 +1,16 @@
+schema_version = "1.0.0"
+
+# Unoffical Cats Blender Plugin Extenstion
+id = "cats_blender_plugin"
+version = "4.2.1.0"
+name = "Unoffical Cats Blender Plugin"
+tagline = "A tool designed to shorten steps needed to import and optimize models into VRChat"
+maintainer = "Yusarina <hello@yusarina.xyz>"
+type = "add-on"
+permissions = ["files", "network"]
+website = "https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-"
+tags = ["3D View", "Modeling", "Mesh", "Object"]
+blender_version_min = "4.2.0"
+license = [
+  "SPDX:MIT",
+]
