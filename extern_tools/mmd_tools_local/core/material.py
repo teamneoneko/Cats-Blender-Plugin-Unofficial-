@@ -4,13 +4,17 @@
 
 import logging
 import os
-from typing import Optional, Tuple, cast
+from typing import TYPE_CHECKING, Callable, Iterable, Optional, Tuple, cast
 
 import bpy
+from mathutils import Vector
 
 from mmd_tools_local.bpyutils import addon_preferences
 from mmd_tools_local.core.exceptions import MaterialNotFoundError
 from mmd_tools_local.core.shader import _NodeGroupUtils
+
+if TYPE_CHECKING:
+    from mmd_tools_local.properties.material import MMDMaterial
 
 SPHERE_MODE_OFF = 0
 SPHERE_MODE_MULT = 1
@@ -33,25 +37,25 @@ class _DummyTextureSlot:
 
 
 class FnMaterial:
-    __NODES_ARE_READONLY = False
+    __NODES_ARE_READONLY: bool = False
 
-    def __init__(self, material=None):
+    def __init__(self, material: bpy.types.Material):
         self.__material = material
         self._nodes_are_readonly = FnMaterial.__NODES_ARE_READONLY
 
     @staticmethod
-    def set_nodes_are_readonly(nodes_are_readonly):
+    def set_nodes_are_readonly(nodes_are_readonly: bool):
         FnMaterial.__NODES_ARE_READONLY = nodes_are_readonly
 
     @classmethod
-    def from_material_id(cls, material_id):
+    def from_material_id(cls, material_id: str):
         for material in bpy.data.materials:
             if material.mmd_material.material_id == material_id:
                 return cls(material)
         return None
 
     @staticmethod
-    def clean_materials(obj, can_remove):
+    def clean_materials(obj, can_remove: Callable[[bpy.types.Material], bool]):
         materials = obj.data.materials
         materials_pop = materials.pop
         for i in sorted((x for x, m in enumerate(materials) if can_remove(m)), reverse=True):
@@ -105,20 +109,21 @@ class FnMaterial:
         return mat1, mat2
 
     @staticmethod
-    def fixMaterialOrder(meshObj, material_names):
+    def fixMaterialOrder(meshObj: bpy.types.Object, material_names: Iterable[str]):
         """
         This method will fix the material order. Which is lost after joining meshes.
         """
+        materials = cast(bpy.types.Mesh, meshObj.data).materials
         for new_idx, mat in enumerate(material_names):
             # Get the material that is currently on this index
-            other_mat = meshObj.data.materials[new_idx]
+            other_mat = materials[new_idx]
             if other_mat.name == mat:
                 continue  # This is already in place
             FnMaterial.swap_materials(meshObj, mat, new_idx, reverse=True, swap_slots=True)
 
     @property
     def material_id(self):
-        mmd_mat = self.__material.mmd_material
+        mmd_mat: MMDMaterial = self.__material.mmd_material
         if mmd_mat.material_id < 0:
             max_id = -1
             for mat in bpy.data.materials:
@@ -164,7 +169,7 @@ class FnMaterial:
     def update_toon_texture(self):
         if self._nodes_are_readonly:
             return
-        mmd_mat = self.__material.mmd_material
+        mmd_mat: MMDMaterial = self.__material.mmd_material
         if mmd_mat.is_shared_toon_texture:
             shared_toon_folder = addon_preferences("shared_toon_folder", "")
             toon_path = os.path.join(shared_toon_folder, "toon%02d.bmp" % (mmd_mat.shared_toon_texture + 1))
@@ -174,7 +179,7 @@ class FnMaterial:
         else:
             self.remove_toon_texture()
 
-    def _mixDiffuseAndAmbient(self, mmd_mat):
+    def _mix_diffuse_and_ambient(self, mmd_mat):
         r, g, b = mmd_mat.diffuse_color
         ar, ag, ab = mmd_mat.ambient_color
         return [min(1.0, 0.5 * r + ar), min(1.0, 0.5 * g + ag), min(1.0, 0.5 * b + ab)]
@@ -191,13 +196,13 @@ class FnMaterial:
         if self._nodes_are_readonly:
             return
         mat = self.__material
-        mmd_mat = mat.mmd_material
+        mmd_mat: MMDMaterial = mat.mmd_material
         color, alpha = mmd_mat.edge_color[:3], mmd_mat.edge_color[3]
         line_color = color + (min(alpha, int(mmd_mat.enabled_toon_edge)),)
         if hasattr(mat, "line_color"):  # freestyle line color
             mat.line_color = line_color
 
-        mat_edge = bpy.data.materials.get("mmd_edge." + mat.name, None)
+        mat_edge: bpy.types.Material = bpy.data.materials.get("mmd_edge." + mat.name, None)
         if mat_edge:
             mat_edge.mmd_material.edge_color = line_color
 
@@ -330,7 +335,7 @@ class FnMaterial:
             return
         mat = self.material
         mmd_mat = mat.mmd_material
-        mat.diffuse_color[:3] = self._mixDiffuseAndAmbient(mmd_mat)
+        mat.diffuse_color[:3] = self._mix_diffuse_and_ambient(mmd_mat)
         self.__update_shader_input("Ambient Color", mmd_mat.ambient_color[:] + (1,))
 
     def update_diffuse_color(self):
@@ -338,7 +343,7 @@ class FnMaterial:
             return
         mat = self.material
         mmd_mat = mat.mmd_material
-        mat.diffuse_color[:3] = self._mixDiffuseAndAmbient(mmd_mat)
+        mat.diffuse_color[:3] = self._mix_diffuse_and_ambient(mmd_mat)
         self.__update_shader_input("Diffuse Color", mmd_mat.diffuse_color[:] + (1,))
 
     def update_alpha(self):
@@ -488,8 +493,6 @@ class FnMaterial:
             mat.use_nodes = True
             mat.node_tree.nodes.clear()
 
-        from mathutils import Vector
-
         nodes, links = mat.node_tree.nodes, mat.node_tree.links
 
         class _Dummy:
@@ -497,13 +500,13 @@ class FnMaterial:
 
         node_shader = nodes.get("mmd_shader", None)
         if node_shader is None:
-            node_shader = nodes.new("ShaderNodeGroup")
+            node_shader: bpy.types.ShaderNodeGroup = nodes.new("ShaderNodeGroup")
             node_shader.name = "mmd_shader"
             node_shader.location = (0, 1500)
             node_shader.width = 200
             node_shader.node_tree = self.__get_shader()
 
-            mmd_mat = mat.mmd_material
+            mmd_mat: MMDMaterial = mat.mmd_material
             node_shader.inputs.get("Ambient Color", _Dummy).default_value = mmd_mat.ambient_color[:] + (1,)
             node_shader.inputs.get("Diffuse Color", _Dummy).default_value = mmd_mat.diffuse_color[:] + (1,)
             node_shader.inputs.get("Specular Color", _Dummy).default_value = mmd_mat.specular_color[:] + (1,)
@@ -515,7 +518,7 @@ class FnMaterial:
 
         node_uv = nodes.get("mmd_tex_uv", None)
         if node_uv is None:
-            node_uv = nodes.new("ShaderNodeGroup")
+            node_uv: bpy.types.ShaderNodeGroup = nodes.new("ShaderNodeGroup")
             node_uv.name = "mmd_tex_uv"
             node_uv.location = node_shader.location + Vector((-5 * 210, -2.5 * 220))
             node_uv.node_tree = self.__get_shader_uv()
@@ -523,7 +526,7 @@ class FnMaterial:
         if not (node_shader.outputs["Shader"].is_linked or node_shader.outputs["Color"].is_linked or node_shader.outputs["Alpha"].is_linked):
             node_output = next((n for n in nodes if isinstance(n, bpy.types.ShaderNodeOutputMaterial) and n.is_active_output), None)
             if node_output is None:
-                node_output = nodes.new("ShaderNodeOutputMaterial")
+                node_output: bpy.types.ShaderNodeOutputMaterial = nodes.new("ShaderNodeOutputMaterial")
                 node_output.is_active_output = True
             node_output.location = node_shader.location + Vector((400, 0))
             links.new(node_shader.outputs["Shader"], node_output.inputs["Surface"])
@@ -541,30 +544,26 @@ class FnMaterial:
 
     def __get_shader_uv(self):
         group_name = "MMDTexUV"
-        shader = bpy.data.node_groups.get(group_name, None) or bpy.data.node_groups.new(name=group_name, type="ShaderNodeTree")
+        shader: bpy.types.ShaderNodeTree = bpy.data.node_groups.get(group_name, None) or bpy.data.node_groups.new(name=group_name, type="ShaderNodeTree")
         if len(shader.nodes):
             return shader
 
         ng = _NodeGroupUtils(shader)
 
         ############################################################################
-        _node_output = ng.new_node("NodeGroupOutput", (6, 0))
+        _node_output: bpy.types.NodeGroupOutput = ng.new_node("NodeGroupOutput", (6, 0))
 
-        tex_coord = ng.new_node("ShaderNodeTexCoord", (0, 0))
+        tex_coord: bpy.types.ShaderNodeTexCoord = ng.new_node("ShaderNodeTexCoord", (0, 0))
 
-        if hasattr(bpy.types, "ShaderNodeUVMap"):
-            tex_coord1 = ng.new_node("ShaderNodeUVMap", (4, -2))
-            tex_coord1.uv_map, socketUV1 = "UV1", "UV"
-        else:
-            tex_coord1 = ng.new_node("ShaderNodeAttribute", (4, -2))
-            tex_coord1.attribute_name, socketUV1 = "UV1", "Vector"
+        tex_coord1: bpy.types.ShaderNodeUVMap = ng.new_node("ShaderNodeUVMap", (4, -2))
+        tex_coord1.uv_map = "UV1"
 
-        vec_trans = ng.new_node("ShaderNodeVectorTransform", (1, -1))
+        vec_trans: bpy.types.ShaderNodeVectorTransform = ng.new_node("ShaderNodeVectorTransform", (1, -1))
         vec_trans.vector_type = "NORMAL"
         vec_trans.convert_from = "OBJECT"
         vec_trans.convert_to = "CAMERA"
 
-        node_vector = ng.new_node("ShaderNodeMapping", (2, -1))
+        node_vector: bpy.types.ShaderNodeMapping = ng.new_node("ShaderNodeMapping", (2, -1))
         node_vector.vector_type = "POINT"
         node_vector.inputs["Location"].default_value = (0.5, 0.5, 0.0)
         node_vector.inputs["Scale"].default_value = (0.5, 0.5, 1.0)
@@ -576,49 +575,49 @@ class FnMaterial:
         ng.new_output_socket("Base UV", tex_coord.outputs["UV"])
         ng.new_output_socket("Toon UV", node_vector.outputs["Vector"])
         ng.new_output_socket("Sphere UV", node_vector.outputs["Vector"])
-        ng.new_output_socket("SubTex UV", tex_coord1.outputs[socketUV1])
+        ng.new_output_socket("SubTex UV", tex_coord1.outputs["UV"])
 
         return shader
 
     def __get_shader(self):
         group_name = "MMDShaderDev"
-        shader = bpy.data.node_groups.get(group_name, None) or bpy.data.node_groups.new(name=group_name, type="ShaderNodeTree")
+        shader: bpy.types.ShaderNodeTree = bpy.data.node_groups.get(group_name, None) or bpy.data.node_groups.new(name=group_name, type="ShaderNodeTree")
         if len(shader.nodes):
             return shader
 
         ng = _NodeGroupUtils(shader)
 
         ############################################################################
-        node_input = ng.new_node("NodeGroupInput", (-5, -1))
-        _node_output = ng.new_node("NodeGroupOutput", (11, 1))
+        node_input: bpy.types.NodeGroupInput = ng.new_node("NodeGroupInput", (-5, -1))
+        _node_output: bpy.types.NodeGroupOutput = ng.new_node("NodeGroupOutput", (11, 1))
 
-        node_diffuse = ng.new_mix_node("ADD", (-3, 4), fac=0.6)
+        node_diffuse: bpy.types.ShaderNodeMath = ng.new_mix_node("ADD", (-3, 4), fac=0.6)
         node_diffuse.use_clamp = True
 
-        node_tex = ng.new_mix_node("MULTIPLY", (-2, 3.5))
-        node_toon = ng.new_mix_node("MULTIPLY", (-1, 3))
-        node_sph = ng.new_mix_node("MULTIPLY", (0, 2.5))
-        node_spa = ng.new_mix_node("ADD", (0, 1.5))
-        node_sphere = ng.new_mix_node("MIX", (1, 1))
+        node_tex: bpy.types.ShaderNodeMath = ng.new_mix_node("MULTIPLY", (-2, 3.5))
+        node_toon: bpy.types.ShaderNodeMath = ng.new_mix_node("MULTIPLY", (-1, 3))
+        node_sph: bpy.types.ShaderNodeMath = ng.new_mix_node("MULTIPLY", (0, 2.5))
+        node_spa: bpy.types.ShaderNodeMath = ng.new_mix_node("ADD", (0, 1.5))
+        node_sphere: bpy.types.ShaderNodeMath = ng.new_mix_node("MIX", (1, 1))
 
-        node_geo = ng.new_node("ShaderNodeNewGeometry", (6, 3.5))
-        node_invert = ng.new_math_node("LESS_THAN", (7, 3))
-        node_cull = ng.new_math_node("MAXIMUM", (8, 2.5))
-        node_alpha = ng.new_math_node("MINIMUM", (9, 2))
+        node_geo: bpy.types.ShaderNodeNewGeometry = ng.new_node("ShaderNodeNewGeometry", (6, 3.5))
+        node_invert: bpy.types.ShaderNodeMath = ng.new_math_node("LESS_THAN", (7, 3))
+        node_cull: bpy.types.ShaderNodeMath = ng.new_math_node("MAXIMUM", (8, 2.5))
+        node_alpha: bpy.types.ShaderNodeMath = ng.new_math_node("MINIMUM", (9, 2))
         node_alpha.use_clamp = True
-        node_alpha_tex = ng.new_math_node("MULTIPLY", (-1, -2))
-        node_alpha_toon = ng.new_math_node("MULTIPLY", (0, -2.5))
-        node_alpha_sph = ng.new_math_node("MULTIPLY", (1, -3))
+        node_alpha_tex: bpy.types.ShaderNodeMath = ng.new_math_node("MULTIPLY", (-1, -2))
+        node_alpha_toon: bpy.types.ShaderNodeMath = ng.new_math_node("MULTIPLY", (0, -2.5))
+        node_alpha_sph: bpy.types.ShaderNodeMath = ng.new_math_node("MULTIPLY", (1, -3))
 
-        node_reflect = ng.new_math_node("DIVIDE", (7, -1.5), value1=1)
+        node_reflect: bpy.types.ShaderNodeMath = ng.new_math_node("DIVIDE", (7, -1.5), value1=1)
         node_reflect.use_clamp = True
 
-        shader_diffuse = ng.new_node("ShaderNodeBsdfDiffuse", (8, 0))
-        shader_glossy = ng.new_node("ShaderNodeBsdfGlossy", (8, -1))
-        shader_base_mix = ng.new_node("ShaderNodeMixShader", (9, 0))
+        shader_diffuse: bpy.types.ShaderNodeBsdfDiffuse = ng.new_node("ShaderNodeBsdfDiffuse", (8, 0))
+        shader_glossy: bpy.types.ShaderNodeBsdfAnisotropic = ng.new_node("ShaderNodeBsdfAnisotropic", (8, -1))
+        shader_base_mix: bpy.types.ShaderNodeMixShader = ng.new_node("ShaderNodeMixShader", (9, 0))
         shader_base_mix.inputs["Fac"].default_value = 0.02
-        shader_trans = ng.new_node("ShaderNodeBsdfTransparent", (9, 1))
-        shader_alpha_mix = ng.new_node("ShaderNodeMixShader", (10, 1))
+        shader_trans: bpy.types.ShaderNodeBsdfTransparent = ng.new_node("ShaderNodeBsdfTransparent", (9, 1))
+        shader_alpha_mix: bpy.types.ShaderNodeMixShader = ng.new_node("ShaderNodeMixShader", (10, 1))
 
         links = ng.links
         links.new(node_reflect.outputs["Value"], shader_glossy.inputs["Roughness"])
@@ -679,10 +678,10 @@ class MigrationFnMaterial:
         if mmd_shader_node_tree is None:
             return
 
-        if "Color" in mmd_shader_node_tree.outputs:
+        ng = _NodeGroupUtils(mmd_shader_node_tree)
+        if "Color" in ng.node_output.inputs:
             return
 
-        ng = _NodeGroupUtils(mmd_shader_node_tree)
         shader_diffuse: bpy.types.ShaderNodeBsdfDiffuse = [n for n in mmd_shader_node_tree.nodes if n.type == "BSDF_DIFFUSE"][0]
         node_sphere: bpy.types.ShaderNodeMixRGB = shader_diffuse.inputs["Color"].links[0].from_node
         node_output: bpy.types.NodeGroupOutput = ng.node_output

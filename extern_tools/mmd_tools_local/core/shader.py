@@ -2,18 +2,21 @@
 # Copyright 2019 MMD Tools authors
 # This file is part of MMD Tools.
 
+from typing import Optional, Tuple, cast
 import bpy
 
 
 class _NodeTreeUtils:
-    def __init__(self, shader: bpy.types.NodeTree):
-        self.shader, self.nodes, self.links = shader, shader.nodes, shader.links
+    def __init__(self, shader: bpy.types.ShaderNodeTree):
+        self.shader = shader
+        self.nodes: bpy.types.bpy_prop_collection[bpy.types.ShaderNode] = shader.nodes  # type: ignore
+        self.links = shader.links
 
-    def _find_node(self, node_type):
+    def _find_node(self, node_type: str) -> Optional[bpy.types.ShaderNode]:
         return next((n for n in self.nodes if n.bl_idname == node_type), None)
 
-    def new_node(self, idname, pos):
-        node = self.nodes.new(idname)
+    def new_node(self, idname: str, pos: Tuple[int, int]) -> bpy.types.ShaderNode:
+        node: bpy.types.ShaderNode = self.nodes.new(idname)
         node.location = (pos[0] * 210, pos[1] * 220)
         return node
 
@@ -53,31 +56,33 @@ SOCKET_SUBTYPE_MAPPING = {"NodeSocketFloatFactor": "FACTOR"}
 
 
 class _NodeGroupUtils(_NodeTreeUtils):
-    def __init__(self, shader: bpy.types.NodeTree):
+    def __init__(self, shader: bpy.types.ShaderNodeTree):
         super().__init__(shader)
-        self.__node_input = self.__node_output = None
+        self.__node_input: Optional[bpy.types.NodeGroupInput] = None
+        self.__node_output: Optional[bpy.types.NodeGroupOutput] = None
 
     @property
-    def node_input(self):
+    def node_input(self) -> bpy.types.NodeGroupInput:
         if not self.__node_input:
-            self.__node_input = self._find_node("NodeGroupInput") or self.new_node("NodeGroupInput", (-2, 0))
+            self.__node_input = cast(bpy.types.NodeGroupInput, self._find_node("NodeGroupInput") or self.new_node("NodeGroupInput", (-2, 0)))
         return self.__node_input
 
     @property
-    def node_output(self):
+    def node_output(self) -> bpy.types.NodeGroupOutput:
         if not self.__node_output:
-            self.__node_output = self._find_node("NodeGroupOutput") or self.new_node("NodeGroupOutput", (2, 0))
+            self.__node_output = cast(bpy.types.NodeGroupOutput, self._find_node("NodeGroupOutput") or self.new_node("NodeGroupOutput", (2, 0)))
         return self.__node_output
 
     def hide_nodes(self, hide_sockets=True):
         skip_nodes = {self.__node_input, self.__node_output}
         for n in (x for x in self.nodes if x not in skip_nodes):
             n.hide = True
-            if hide_sockets:
-                for s in n.inputs:
-                    s.hide = not s.is_linked
-                for s in n.outputs:
-                    s.hide = not s.is_linked
+            if not hide_sockets:
+                continue
+            for s in n.inputs:
+                s.hide = not s.is_linked
+            for s in n.outputs:
+                s.hide = not s.is_linked
 
     def new_input_socket(self, io_name, socket, default_val=None, min_max=None, socket_type=None):
         self.__new_io("INPUT", self.node_input.outputs, io_name, socket, default_val, min_max, socket_type)

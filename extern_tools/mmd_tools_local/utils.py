@@ -107,7 +107,7 @@ def mergeVertexGroup(meshObj, src_vertex_group_name, dest_vertex_group_name):
             pass
 
 
-def separateByMaterials(meshObj):
+def separateByMaterials(meshObj: bpy.types.Object):
     if len(meshObj.data.materials) < 2:
         selectAObject(meshObj)
         return
@@ -122,14 +122,12 @@ def separateByMaterials(meshObj):
         bpy.ops.mesh.separate(type="MATERIAL")
     finally:
         bpy.ops.object.mode_set(mode="OBJECT")
-        for i in dummy_parent.children:
-            if custom_normal_keeper:
-                custom_normal_keeper.restore_custom_normals(i.data)
-            materials = i.data.materials
-            i.name = getattr(materials[0], "name", "None") if len(materials) else "None"
-            i.parent = prev_parent
-            i.matrix_parent_inverse = matrix_parent_inverse
-        bpy.data.objects.remove(dummy_parent)
+    for i in dummy_parent.children:
+        materials = i.data.materials
+        i.name = getattr(materials[0], "name", "None") if len(materials) else "None"
+        i.parent = prev_parent
+        i.matrix_parent_inverse = matrix_parent_inverse
+    bpy.data.objects.remove(dummy_parent)
 
 
 def clearUnusedMeshes():
@@ -233,7 +231,7 @@ class ItemOp:
         return None
 
     @staticmethod
-    def resize(items, length):
+    def resize(items: bpy.types.bpy_prop_collection, length: int):
         count = length - len(items)
         if count > 0:
             for i in range(count):

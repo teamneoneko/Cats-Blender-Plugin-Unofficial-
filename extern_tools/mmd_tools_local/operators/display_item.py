@@ -258,8 +258,8 @@ class DisplayItemQuickSetup(Operator):
         items=[
             ("RESET", "Reset", "Clear all items and frames, reset to default", "X", 0),
             ("FACIAL", "Load Facial Items", "Load all morphs to faical frame", "SHAPEKEY_DATA", 1),
-            ("GROUP_LOAD", "Load Bone Groups", "Load armature's bone groups to display item frames", "GROUP_BONE", 2),
-            ("GROUP_APPLY", "Apply Bone Groups", "Apply display item frames to armature's bone groups", "GROUP_BONE", 3),
+            ("GROUP_LOAD", "Sync from Bone Collections", "Sync armature's bone collections to display item frames", "GROUP_BONE", 2),
+            ("GROUP_APPLY", "Sync to Bone Collections", "Sync display item frames to armature's bone collections", "GROUP_BONE", 3),
         ],
         default="FACIAL",
     )
@@ -274,10 +274,10 @@ class DisplayItemQuickSetup(Operator):
             rig.initialDisplayFrames(reset=False)  # ensure default frames
             self.load_facial_items(root.mmd_root)
         elif self.type == "GROUP_LOAD":
-            self.load_bone_groups(root.mmd_root, rig.armature())
+            FnBone.sync_display_item_frames_from_bone_collections(rig.armature())
             rig.initialDisplayFrames(reset=False)  # ensure default frames
         elif self.type == "GROUP_APPLY":
-            self.apply_bone_groups(root.mmd_root, rig.armature())
+            FnBone.sync_bone_collections_from_display_item_frames(rig.armature())
         return {"FINISHED"}
 
     @staticmethod
@@ -303,45 +303,3 @@ class DisplayItemQuickSetup(Operator):
             item.type = "MORPH"
             item.morph_type, item.name = data
         frame.active_item = 0
-
-    @staticmethod
-    def load_bone_groups(mmd_root, armature):
-        bone_groups = OrderedDict((i.name, []) for i in armature.pose.bone_groups)
-        for b in armature.pose.bones:
-            if b.bone_group:
-                bone_groups[b.bone_group.name].append(b.name)
-
-        frames = mmd_root.display_item_frames
-        used_index = set()
-        for group_name, bone_names in bone_groups.items():
-            if len(bone_names) < 1:  # skip empty group
-                continue
-
-            frame = frames.get(group_name)
-            if frame is None:
-                frame = frames.add()
-                frame.name = group_name
-                frame.name_e = group_name
-            used_index.add(frames.find(group_name))
-
-            items = frame.data
-            ItemOp.resize(items, len(bone_names))
-            for item, name in zip(items, bone_names):
-                item.type = "BONE"
-                item.name = name
-            frame.active_item = 0
-
-        # remove unused frames
-        for i in reversed(range(len(frames))):
-            if i not in used_index:
-                frame = frames[i]
-                if frame.is_special:
-                    if frame.name != "表情":
-                        frame.data.clear()
-                else:
-                    frames.remove(i)
-        mmd_root.active_display_item_frame = 0
-
-    @staticmethod
-    def apply_bone_groups(mmd_root, armature):
-        FnBone.sync_bone_collections_from_armature(armature)

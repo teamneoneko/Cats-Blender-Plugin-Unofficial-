@@ -95,12 +95,12 @@ v0.3.1
 * To cycles時にAlphaを考慮したシェーダを生成するよう変更
 
 ### バグ修正 ###
-* mmd_tools_local v0.3.0未満で読み込んだモデルへモーションをアサインできるよう修正
+* mmd_tools_local_local v0.3.0未満で読み込んだモデルへモーションをアサインできるよう修正
 
 v0.3.0
 -------
 ### 変更 ###
-* Blender addon名を"mmd_tools_local"に変更
+* Blender addon名を"mmd_tools_local_local"に変更
 * pmxインポート時の"delete tip bones"機能を廃止
     * 別機能として実装予定
 * pmxインポート時に自動設定されるgravity値の基準を変更
