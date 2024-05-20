@@ -2,7 +2,7 @@
 # Copyright 2021 MMD Tools authors
 # This file is part of MMD Tools.
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import bpy
 
@@ -106,7 +106,7 @@ class TranslateMMDModel(bpy.types.Operator):
             name_e = None
         return self.__translator.translate(name_j, name_e)
 
-    def translate_blender_names(self, rig):
+    def translate_blender_names(self, rig: Model):
         if "BONE" in self.types:
             for b in rig.armature().pose.bones:
                 rig.renameBone(b.name, self.translate(b.name, b.name))
@@ -121,7 +121,8 @@ class TranslateMMDModel(bpy.types.Operator):
                 m.name = self.translate(m.name, m.name)
 
         if "DISPLAY" in self.types:
-            for g in rig.armature().pose.bone_groups:
+            g: bpy.types.BoneCollection
+            for g in cast(bpy.types.Armature, rig.armature().data).collections:
                 g.name = self.translate(g.name, g.name)
 
         if "PHYSICS" in self.types:

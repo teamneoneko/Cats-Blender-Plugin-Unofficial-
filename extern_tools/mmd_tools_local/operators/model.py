@@ -2,12 +2,17 @@
 # Copyright 2014 MMD Tools authors
 # This file is part of MMD Tools.
 
+from typing import TYPE_CHECKING, cast
+
 import bpy
 from bpy.types import Operator
 
-import mmd_tools_local.core.model as mmd_model
 from mmd_tools_local.bpyutils import SceneOp, activate_layer_collection
 from mmd_tools_local.core.bone import FnBone, MigrationFnBone
+from mmd_tools_local.core.model import FnModel, Model
+
+if TYPE_CHECKING:
+    from mmd_tools_local.properties.root import MMDRoot
 
 
 class MorphSliderSetup(Operator):
@@ -29,10 +34,10 @@ class MorphSliderSetup(Operator):
 
     def execute(self, context):
         obj = context.active_object
-        root = mmd_model.Model.findRoot(context.active_object)
+        root = FnModel.find_root_object(context.active_object)
 
         with activate_layer_collection(root):
-            rig = mmd_model.Model(root)
+            rig = Model(root)
             if self.type == "BIND":
                 rig.morph_slider.bind()
             elif self.type == "UNBIND":
@@ -51,8 +56,8 @@ class CleanRiggingObjects(Operator):
     bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
     def execute(self, context):
-        root = mmd_model.Model.findRoot(context.active_object)
-        rig = mmd_model.Model(root)
+        root = FnModel.find_root_object(context.active_object)
+        rig = Model(root)
         rig.clean()
         SceneOp(context).active_object = root
         return {"FINISHED"}
@@ -82,10 +87,10 @@ class BuildRig(Operator):
     )
 
     def execute(self, context):
-        root = mmd_model.Model.findRoot(context.active_object)
+        root = FnModel.find_root_object(context.active_object)
 
         with activate_layer_collection(root):
-            rig = mmd_model.Model(root)
+            rig = Model(root)
             rig.build(self.non_collision_distance_scale, self.collision_margin)
             SceneOp(context).active_object = root
 
@@ -100,8 +105,8 @@ class CleanAdditionalTransformConstraints(Operator):
 
     def execute(self, context):
         obj = context.active_object
-        root = mmd_model.Model.findRoot(obj)
-        rig = mmd_model.Model(root)
+        root = FnModel.find_root_object(obj)
+        rig = Model(root)
         FnBone.clean_additional_transformation(rig.armature())
         SceneOp(context).active_object = obj
         return {"FINISHED"}
@@ -115,8 +120,8 @@ class ApplyAdditionalTransformConstraints(Operator):
 
     def execute(self, context):
         obj = context.active_object
-        root = mmd_model.Model.findRoot(obj)
-        rig = mmd_model.Model(root)
+        root = FnModel.find_root_object(obj)
+        rig = Model(root)
         MigrationFnBone.fix_mmd_ik_limit_override(rig.armature())
         FnBone.apply_additional_transformation(rig.armature())
 
@@ -200,17 +205,18 @@ class AddMissingVertexGroupsFromBones(Operator):
 
     @classmethod
     def poll(cls, context: bpy.types.Context):
-        return mmd_model.FnModel.find_root_object(context.active_object) is not None
+        return FnModel.find_root_object(context.active_object) is not None
 
     def execute(self, context: bpy.types.Context):
         active_object: bpy.types.Object = context.active_object
-        root_object = mmd_model.FnModel.find_root_object(active_object)
+        root_object = FnModel.find_root_object(active_object)
+        assert root_object is not None
 
-        bone_order_mesh_object = mmd_model.FnModel.find_bone_order_mesh_object(root_object)
+        bone_order_mesh_object = FnModel.find_bone_order_mesh_object(root_object)
         if bone_order_mesh_object is None:
             return {"CANCELLED"}
 
-        mmd_model.FnModel.add_missing_vertex_groups_from_bones(root_object, bone_order_mesh_object, self.search_in_all_meshes)
+        FnModel.add_missing_vertex_groups_from_bones(root_object, bone_order_mesh_object, self.search_in_all_meshes)
 
         return {"FINISHED"}
 
@@ -238,7 +244,7 @@ class CreateMMDModelRoot(Operator):
     )
 
     def execute(self, context):
-        rig = mmd_model.Model.create(self.name_j, self.name_e, self.scale, add_root_bone=True)
+        rig = Model.create(self.name_j, self.name_e, self.scale, add_root_bone=True)
         rig.initialDisplayFrames()
         return {"FINISHED"}
 
@@ -310,12 +316,12 @@ class ConvertToMMDModel(Operator):
         scale = self.scale
         model_name = "New MMD Model"
 
-        root = mmd_model.Model.findRoot(armature)
+        root = FnModel.find_root_object(armature)
         if root is None or root != armature.parent:
-            rig = mmd_model.Model.create(model_name, model_name, scale, armature=armature)
+            Model.create(model_name, model_name, scale, armature=armature)
 
         self.__attach_meshes_to(armature, SceneOp(context).id_objects)
-        self.__configure_rig(context, mmd_model.Model(armature.parent))
+        self.__configure_rig(context, Model(armature.parent))
         return {"FINISHED"}
 
     def __attach_meshes_to(self, armature, objects):
@@ -379,7 +385,7 @@ class ConvertToMMDModel(Operator):
             FnMaterial.set_nodes_are_readonly(False)
         from mmd_tools_local.operators.display_item import DisplayItemQuickSetup
 
-        DisplayItemQuickSetup.load_bone_groups(root.mmd_root, armature)
+        FnBone.sync_display_item_frames_from_bone_collections(armature)
         rig.initialDisplayFrames(reset=False)  # ensure default frames
         DisplayItemQuickSetup.load_facial_items(root.mmd_root)
         root.mmd_root.active_display_item_frame = 0
@@ -393,24 +399,25 @@ class ResetObjectVisibility(bpy.types.Operator):
     @classmethod
     def poll(cls, context: bpy.types.Context):
         active_object: bpy.types.Object = context.active_object
-        return mmd_model.Model.findRoot(active_object) is not None
+        return FnModel.find_root_object(active_object) is not None
 
     def execute(self, context: bpy.types.Context):
         active_object: bpy.types.Object = context.active_object
-        mmd_root_object = mmd_model.Model.findRoot(active_object)
-        mmd_root = mmd_root_object.mmd_root
+        mmd_root_object = FnModel.find_root_object(active_object)
+        assert mmd_root_object is not None
+        mmd_root = cast(MMDRoot, mmd_root_object.mmd_root)
 
         mmd_root_object.hide_set(False)
 
-        rigid_group_object = mmd_model.FnModel.find_rigid_group_object(mmd_root_object)
+        rigid_group_object = FnModel.find_rigid_group_object(mmd_root_object)
         if rigid_group_object:
             rigid_group_object.hide_set(True)
 
-        joint_group_object = mmd_model.FnModel.find_joint_group_object(mmd_root_object)
+        joint_group_object = FnModel.find_joint_group_object(mmd_root_object)
         if joint_group_object:
             joint_group_object.hide_set(True)
 
-        temporary_group_object = mmd_model.FnModel.find_temporary_group_object(mmd_root_object)
+        temporary_group_object = FnModel.find_temporary_group_object(mmd_root_object)
         if temporary_group_object:
             temporary_group_object.hide_set(True)
 
@@ -432,10 +439,10 @@ class AssembleAll(Operator):
 
     def execute(self, context):
         active_object = context.active_object
-        root_object = mmd_model.Model.findRoot(active_object)
+        root_object = FnModel.find_root_object(active_object)
 
         with activate_layer_collection(root_object):
-            rig = mmd_model.Model(root_object)
+            rig = Model(root_object)
 
             MigrationFnBone.fix_mmd_ik_limit_override(rig.armature())
             FnBone.apply_additional_transformation(rig.armature())
@@ -458,10 +465,10 @@ class DisassembleAll(Operator):
 
     def execute(self, context):
         active_object = context.active_object
-        root_object = mmd_model.Model.findRoot(active_object)
+        root_object = FnModel.find_root_object(active_object)
 
         with activate_layer_collection(root_object):
-            rig = mmd_model.Model(root_object)
+            rig = Model(root_object)
 
             root_object.mmd_root.use_property_driver = False
             with bpy.context.temp_override(selected_objects=[active_object]):

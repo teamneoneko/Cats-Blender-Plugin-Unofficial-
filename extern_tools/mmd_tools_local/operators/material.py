@@ -38,8 +38,7 @@ class ConvertMaterialsForCycles(Operator):
 
     def draw(self, context):
         layout = self.layout
-        if cycles_converter.is_principled_bsdf_supported():
-            layout.prop(self, "use_principled")
+        layout.prop(self, "use_principled")
         layout.prop(self, "clean_nodes")
 
     def execute(self, context):
