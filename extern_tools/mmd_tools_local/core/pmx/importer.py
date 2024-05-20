@@ -778,7 +778,7 @@ class PMXImporter:
                 else:
                     raise Exception("Unknown display item type.")
 
-        DisplayItemQuickSetup.apply_bone_groups(root.mmd_root, self.__armObj)
+        FnBone.sync_bone_collections_from_display_item_frames(self.__armObj)
 
     def __addArmatureModifier(self, meshObj, armObj):
         # TODO: move to model.py

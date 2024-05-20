@@ -3,13 +3,18 @@
 # This file is part of MMD Tools.
 
 import math
-from typing import Iterable, Optional
+from typing import TYPE_CHECKING, Iterable, Optional, Set
 
 import bpy
 from mathutils import Vector
 
 from mmd_tools_local import bpyutils
 from mmd_tools_local.bpyutils import TransformConstraintOp
+import mmd_tools_local.utils
+
+if TYPE_CHECKING:
+    from mmd_tools_local.properties.root import MMDRoot, MMDDisplayItemFrame
+    from mmd_tools_local.properties.pose_bone import MMDBone
 
 
 def remove_constraint(constraints, name):
@@ -74,7 +79,7 @@ class FnBone:
     @staticmethod
     def load_bone_fixed_axis(armature_object: bpy.types.Object, enable=True):
         for b in FnBone.__get_selected_pose_bones(armature_object):
-            mmd_bone = b.mmd_bone
+            mmd_bone: MMDBone = b.mmd_bone
             mmd_bone.enabled_fixed_axis = enable
             lock_rotation = b.lock_rotation[:]
             if enable:
@@ -143,14 +148,14 @@ class FnBone:
         return edit_bone
 
     @staticmethod
-    def sync_bone_collections_from_armature(armature_object: bpy.types.Object):
+    def sync_bone_collections_from_display_item_frames(armature_object: bpy.types.Object):
         armature: bpy.types.Armature = armature_object.data
         bone_collections = armature.collections
 
         from mmd_tools_local.core.model import FnModel
 
         root_object: bpy.types.Object = FnModel.find_root_object(armature_object)
-        mmd_root = root_object.mmd_root
+        mmd_root: MMDRoot = root_object.mmd_root
 
         bones = armature.bones
         used_groups = set()
@@ -187,12 +192,54 @@ class FnBone:
             bone_collections.remove(bone_collection)
 
     @staticmethod
+    def sync_display_item_frames_from_bone_collections(armature_object: bpy.types.Object):
+        armature: bpy.types.Armature = armature_object.data
+        bone_collections: bpy.types.BoneCollections = armature.collections
+
+        from mmd_tools_local.core.model import FnModel
+
+        root_object: bpy.types.Object = FnModel.find_root_object(armature_object)
+        mmd_root: MMDRoot = root_object.mmd_root
+        display_item_frames = mmd_root.display_item_frames
+
+        used_frame_index: Set[int] = set()
+
+        bone_collection: bpy.types.BoneCollection
+        for bone_collection in bone_collections:
+            if len(bone_collection.bones) == 0 or FnBone.__is_special_bone_collection(bone_collection):
+                continue
+
+            bone_collection_name = bone_collection.name
+            display_item_frame: Optional[MMDDisplayItemFrame] = display_item_frames.get(bone_collection_name)
+            if display_item_frame is None:
+                display_item_frame = display_item_frames.add()
+                display_item_frame.name = bone_collection_name
+                display_item_frame.name_e = bone_collection_name
+            used_frame_index.add(display_item_frames.find(bone_collection_name))
+
+            mmd_tools_local.utils.ItemOp.resize(display_item_frame.data, len(bone_collection.bones))
+            for display_item, bone in zip(display_item_frame.data, bone_collection.bones):
+                display_item.type = "BONE"
+                display_item.name = bone.name
+
+        for i in reversed(range(len(display_item_frames))):
+            if i in used_frame_index:
+                continue
+            display_item_frame = display_item_frames[i]
+            if display_item_frame.is_special:
+                if display_item_frame.name != "表情":
+                    display_item_frame.data.clear()
+            else:
+                display_item_frames.remove(i)
+        mmd_root.active_display_item_frame = 0
+
+    @staticmethod
     def apply_bone_fixed_axis(armature_object: bpy.types.Object):
         bone_map = {}
         for b in armature_object.pose.bones:
             if b.is_mmd_shadow_bone or not b.mmd_bone.enabled_fixed_axis:
                 continue
-            mmd_bone = b.mmd_bone
+            mmd_bone: MMDBone = b.mmd_bone
             parent_tip = b.parent and not b.parent.is_mmd_shadow_bone and b.parent.mmd_bone.is_tip
             bone_map[b.name] = (mmd_bone.fixed_axis.normalized(), mmd_bone.is_tip, parent_tip)
 
@@ -238,7 +285,7 @@ class FnBone:
     @staticmethod
     def load_bone_local_axes(armature_object: bpy.types.Object, enable=True):
         for b in FnBone.__get_selected_pose_bones(armature_object):
-            mmd_bone = b.mmd_bone
+            mmd_bone: MMDBone = b.mmd_bone
             mmd_bone.enabled_local_axes = enable
             if enable:
                 axes = b.bone.matrix_local.to_3x3().transposed()
@@ -251,7 +298,7 @@ class FnBone:
         for b in armature_object.pose.bones:
             if b.is_mmd_shadow_bone or not b.mmd_bone.enabled_local_axes:
                 continue
-            mmd_bone = b.mmd_bone
+            mmd_bone: MMDBone = b.mmd_bone
             bone_map[b.name] = (mmd_bone.local_axis_x, mmd_bone.local_axis_z)
 
         with bpyutils.edit_object(armature_object) as data:
