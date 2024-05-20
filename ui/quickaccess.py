@@ -28,7 +28,19 @@ class QuickAccessPanel(ToolPanel, bpy.types.Panel):
         updater.check_for_update_background(check_on_startup=True)
         updater.draw_update_notification_panel(box)
 
-        col = box.column(align=True)
+        col = box.column(align=True)        
+        col.separator()
+        row = col.row(align=True)
+        row.scale_y = 0.75
+        row.label(text=t('QuickAccess.warn.outdated401'), icon='ERROR')
+        row = col.row(align=True)
+        row.scale_y = 0.75
+        row.label(text=t('QuickAccess.warn.outdated402'), icon='BLANK1')
+        row = col.row(align=True)
+        row.scale_y = 0.75
+        row.label(text=t('QuickAccess.warn.outdated403'), icon='BLANK1')
+        col.separator()
+        col.separator()
 
         if bpy.app.version < (3, 6, 0):
             col.separator()

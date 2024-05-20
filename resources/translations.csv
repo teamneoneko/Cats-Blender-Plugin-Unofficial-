@@ -63,6 +63,9 @@ Blender를 다시 시작하고 Cats Plugin를 다시 활성화하세요!
 ToolPanel.label,Cats Blender Plugin,Cats ブレンダープラグイン,
 ToolPanel.category,CATS,,
 QuickAccess.label,Quick Access,迅速なアクセス,빠른 접근
+QuickAccess.warn.outdated401,"Blender 4.0 is no longer supported"
+QuickAccess.warn.outdated402,"Please update to Blender 4.1 or above"
+QuickAccess.warn.outdated403,"This version of cats will no longer be updated."
 QuickAccess.warn.newBlender1,Potentially unsupported Blender version detected!
 QuickAccess.warn.newBlender2,Some features might not work, CATS currently 
 QuickAccess.warn.newBlender3,supports up to Blender 4.0 see github for the 4.0 one.
