@@ -650,7 +650,7 @@ class FnMaterial:
         ng.new_input_socket("Reflect", node_reflect.inputs[1], 50, min_max=(1, 512))
         ng.new_input_socket("Base Tex Fac", node_tex.inputs["Fac"], 1)
         ng.new_input_socket("Base Tex", node_tex.inputs["Color2"], (1, 1, 1, 1))
-        ng.new_input_socket("Toon Tex Fac", node_toon.inputs["Fac"], 1)
+        ng.new_input_socket("Toon Tex Fac", node_toon.inputs["Fac"], 0)
         ng.new_input_socket("Toon Tex", node_toon.inputs["Color2"], (1, 1, 1, 1))
         ng.new_input_socket("Sphere Tex Fac", node_sph.inputs["Fac"], 1)
         ng.new_input_socket("Sphere Tex", node_sph.inputs["Color2"], (1, 1, 1, 1))
