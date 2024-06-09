@@ -18,43 +18,45 @@ from . import settings
 
 main_dir = pathlib.Path(os.path.dirname(__file__)).parent.resolve()
 resources_dir = os.path.join(str(main_dir), "resources")
-translations_file = os.path.join(resources_dir, "translations.csv")
-dictionary_file = os.path.join(resources_dir, "dictionary.json")
 settings_file = os.path.join(resources_dir, "settings.json")
+translations_dir = os.path.join(resources_dir, "translations")
 
-dictionary = {}
+dictionary: dict[str, str] = dict()
 languages = []
 verbose = True
-translation_download_link = "https://raw.githubusercontent.com/Yusarina/Cats-Blender-Plugin-Unofficial-translations/3.6-4.0-translations/translations.csv"
 dictionary_download_link = "https://raw.githubusercontent.com/Yusarina/Cats-Blender-Plugin-Unofficial-translations/3.6-4.0-translations/dictionary.json"
-
 
 def load_translations():
     global dictionary, languages
-    dictionary = {}
+    dictionary = dict()
     languages = ["auto"]
 
     # Check the settings which translation to load
     language = get_language_from_settings()
-
-    with open(translations_file, 'r', encoding="utf8") as csv_file:
-        csv_reader = csv.DictReader(csv_file, delimiter=',')
-        if not csv_reader:
-            return
-
-        for i, row in enumerate(csv_reader):
-            # print(row)
-            text = row.get(language)
-            if not text:
-                text = row.get('en_US')
-            dictionary[row['name']] = text
-
-            # get all current languages
-            if i == 0:
-                for key in row.keys():
-                    if '_' in key:
-                        languages.append(key)
-
+    
+    # Set default language to "en_US" if language is None
+    if language is None:
+        language = "en_US"
+    
+    # Get all current languages
+    for i in os.listdir(translations_dir):
+        languages.append(i.split(".")[0])
+    
+    # Load the translation file
+    translation_file = os.path.join(translations_dir, language + ".json")
+    if os.path.exists(translation_file):
+        with open(translation_file, 'r') as file:
+            dictionary = json.load(fp=file)["messages"]
+    else:
+        print(f"Translation file not found for language: {language}")
+        # Load the default "en_US" translation file
+        default_file = os.path.join(translations_dir, "en_US.json")
+        if os.path.exists(default_file):
+            with open(default_file, 'r') as file:
+                dictionary = json.load(fp=file)["messages"]
+        else:
+            print("Default translation file 'en_US.json' not found.")
+    
     check_missing_translations()
 
 
@@ -134,18 +136,49 @@ class DownloadTranslations(bpy.types.Operator):
     bl_options = {'INTERNAL'}
 
     def execute(self, context):
-        # Download translations.csv from GitHub
-        print('DOWNLOAD TRANSLATIONS FILE')
+        # GitHub repository and folder information
+        repo_owner = "Yusarina"
+        repo_name = "Cats-Blender-Plugin-Unofficial-translations"
+        branch = "3.6-4.0-translations"
+        folder_path = "UI%20Tanslations"
+
+        # Construct the API URL to get the list of files in the folder
+        api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{folder_path}?ref={branch}"
+
         try:
-            response = requests.get(translation_download_link)
+            # Send a GET request to the API URL
+            response = requests.get(api_url)
             response.raise_for_status()  # Raise an exception if the request was unsuccessful
-            with open(translations_file, 'wb') as file:
-                file.write(response.content)
+
+            # Parse the JSON response
+            files = response.json()
+
+            # Download each translation file
+            for file in files:
+                if file["type"] == "file" and file["name"].endswith(".json"):
+                    file_url = file["download_url"]
+                    file_name = file["name"]
+                    file_path = os.path.join(translations_dir, file_name)
+
+                    # Download the translation file
+                    file_response = requests.get(file_url)
+                    file_response.raise_for_status()
+
+                    # Save the translation file
+                    with open(file_path, 'wb') as file:
+                        file.write(file_response.content)
+
+                    print(f"Downloaded: {file_name}")
+
         except requests.exceptions.RequestException as e:
-            print("TRANSLATIONS FILE COULD NOT BE DOWNLOADED")
-            self.report({'ERROR'}, "TRANSLATIONS FILE COULD NOT BE DOWNLOADED: " + str(e))
+            print("TRANSLATIONS FILES COULD NOT BE DOWNLOADED")
+            self.report({'ERROR'}, "TRANSLATIONS FILES COULD NOT BE DOWNLOADED: " + str(e))
             return {'CANCELLED'}
+
         print('TRANSLATIONS DOWNLOAD FINISHED')
+
+        # Define the dictionary file path
+        dictionary_file = os.path.join(resources_dir, "dictionary.json")
 
         # Download dictionary.json from GitHub
         print('DOWNLOAD DICTIONARY FILE')
