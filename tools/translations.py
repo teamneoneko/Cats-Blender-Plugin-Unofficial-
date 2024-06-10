@@ -24,7 +24,7 @@ translations_dir = os.path.join(resources_dir, "translations")
 dictionary: dict[str, str] = dict()
 languages = []
 verbose = True
-dictionary_download_link = "https://raw.githubusercontent.com/Yusarina/Cats-Blender-Plugin-Unofficial-translations/3.6-4.0-translations/dictionary.json"
+dictionary_download_link = "https://raw.githubusercontent.com/unofficalcats/Cats-Blender-Plugin-Unofficial-translations/3.6-4.0-translations/dictionary.json"
 
 def load_translations():
     global dictionary, languages
