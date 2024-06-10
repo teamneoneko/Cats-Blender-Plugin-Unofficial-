@@ -151,7 +151,7 @@
         "CreditsPanel.desc4": "다음 분들께 특별한 감사를 전합니다:",
         "CreditsPanel.descContributors": "Feilen, Jordo, Ruubick, 989onan, triazo, Mysteryem",
         "CreditsPanel.descContributors2": "Shotariya와 Neitri",
-        "CreditsPanel.desc5": "비공식 유지관리자 - Yusarina",
+        "CreditsPanel.desc5": "비공식 유지관리자 - Yusarina and 989onan",
         "CreditsPanel.desc6": "도움이 필요하시거나 혹시 버그를 찾으셨나요?",
         "FixArmature.label": "MMD 모델 수정",
         "FixArmature.desc": "경고: 귀하가 아닌 이상 이것을 사용하지 마십시오\n새로운 MMD 모델 가져오기, 사용하지 마세요\n이미 설정된 모델에 대한 내용입니다.\n유니티와 VRCHAT!\n\n자동으로:\n- 부모 뼈\n- 불필요한 뼈, 개체, 그룹 및 제약 조건을 제거합니다.\n- 뼈와 물체를 번역하고 이름을 바꿉니다.\n- 웨이트 페인트 병합\n- 엉덩이를 바로잡는다\n- 모프를 모양으로 변환합니다.",
