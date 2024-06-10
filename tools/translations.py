@@ -137,7 +137,7 @@ class DownloadTranslations(bpy.types.Operator):
 
     def execute(self, context):
         # GitHub repository and folder information
-        repo_owner = "Yusarina"
+        repo_owner = "unofficalcats"
         repo_name = "Cats-Blender-Plugin-Unofficial-translations"
         branch = "4.1-translations"
         folder_path = "UI%20Tanslations"
