@@ -14,7 +14,7 @@ bl_info = {
 }
 
 
-dev_branch = True
+dev_branch = False
 
 
 import os
