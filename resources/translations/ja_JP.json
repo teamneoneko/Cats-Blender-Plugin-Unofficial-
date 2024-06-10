@@ -148,7 +148,7 @@
         "CreditsPanel.desc4": "特別な感謝: ShotariyaとNeitri",
         "CreditsPanel.descContributors": "Feilen、Jordo、Ruubick、989onan、triazo、Mysteryem",
         "CreditsPanel.descContributors2": "ShotariyaとNeitri",
-        "CreditsPanel.desc5": "非公式メンテナ - Yusarina",
+        "CreditsPanel.desc5": "非公式メンテナ - Yusarina and 989onan",
         "CreditsPanel.desc6": "助けが必要ですか、バグを見つけましたか?",
         "FixArmature.label": "MMDモデルを修正",
         "FixArmature.desc": "警告: そうでない場合はこれを使用しないでください。\n新しい MMD モデルをインポートしています。使用しないでください\nすでにセットアップされているモデルの場合はこちら\nユニティとVRCHAT！\n\n自動的に：\n- 親の骨\n- 不要なボーン、オブジェクト、グループ、コンストレイントを削除します\n- ボーンとオブジェクトの翻訳と名前変更\n- ウェイトペイントをマージします\n- ヒップを補正します\n- モーフをシェイプに変換します",
