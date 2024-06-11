@@ -23,6 +23,13 @@ from .translations import t
 
 current_blender_version = str(bpy.app.version[:2])[1:-1].replace(', ', '.')
 
+mmd_tools_local_installed = False
+try:
+    import mmd_tools_local
+    mmd_tools_local_installed = True
+except:
+    pass
+
 formats = '*.pmx;*.pmd;*.xps;*.mesh;*.ascii;*.smd;*.qc;*.qci;*.vta;*.dmx;*.fbx;*.dae;*.vrm;*.zip'
 format_list = formats.replace('*.', '').split(';')
 zip_files = {}
