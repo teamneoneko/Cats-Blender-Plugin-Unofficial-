@@ -1,18 +1,6 @@
 # MIT License
 
-bl_info = {
-    'name': 'Cats Blender Plugin',
-    'category': '3D View',
-    'author': 'GiveMeAllYourCats & Hotox, Unofficial version maintained by the Unoffical Cats Team.',
-    'location': 'View 3D > Tool Shelf > CATS',
-    'description': 'A tool designed to shorten steps needed to import and optimize models into VRChat',
-    'version': (4, 2, 1, 0),  # Has to be (x, x, x) not [x, x, x]!! Only change this version and the dev branch var right before publishing the new update!
-    'blender': (4, 2, 0),
-    'wiki_url': 'https://github.com/unofficalcats/Cats-Blender-Plugin-Unofficial-/wiki',
-    'tracker_url': 'https://github.com/unofficalcats/Cats-Blender-Plugin-Unofficial-/issues',
-    'warning': '',
-}
-
+CATS_VERSION = "4.2.0.0"
 dev_branch = True
 
 import os
@@ -185,37 +173,29 @@ def check_unsupported_blender_versions():
         sys.tracebacklimit = 0
         raise ImportError(t('Main.error.29unsupportedVersion'))
      
-    # Don't allow 4.2+
+    # Don't allow 4.3+
     if bpy.app.version >= (4, 3):
         sys.tracebacklimit = 0
         raise ImportError(t('Main.error.40unsupportedVersion'))
 
 def set_cats_version_string():
-    version = bl_info.get('version')
-    version_temp = []
-    version_str = ''
+    version_parts = CATS_VERSION.split(".")
 
-    for n in version:
-        version_temp.append(n)
+    # Convert version parts to integers
+    version_parts = [int(part) for part in version_parts]
 
-    if len(version_temp) > 0:
-        # if in dev version, increase version
-        if dev_branch:
-            version_temp[len(version_temp)-1] += 1
+    # Increment the last version component if in dev branch
+    if dev_branch:
+        version_parts[-1] += 1
 
-        # Convert version to string
-        version_str += str(version_temp[0])
-        for index, i in enumerate(version_temp):
-            if index == 0:
-                continue
-            version_str += '.' + str(version_temp[index])
+    # Convert version back to string
+    version_str = ".".join(str(part) for part in version_parts)
 
     # Add -dev if in dev version
     if dev_branch:
-        version_str += '-dev'
+        version_str += "-dev"
 
     return version_str
-
 
 def register():
     print("\n### Loading CATS...")
@@ -230,7 +210,7 @@ def register():
     version_str = set_cats_version_string()
 
     # Register Updater and check for CATS update
-    updater.register(bl_info, dev_branch, version_str)
+    updater.register(dev_branch, version_str)
 
     # Set some global settings, first allowed use of globs
     globs.dev_branch = dev_branch

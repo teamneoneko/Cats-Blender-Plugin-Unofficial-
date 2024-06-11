@@ -15,6 +15,7 @@ from collections import OrderedDict
 from bpy.app.handlers import persistent
 from .tools.translations import t
 from .tools.common import wrap_dynamic_enum_items
+from . import CATS_VERSION, dev_branch
 
 no_ver_check = False
 fake_update = False
@@ -929,7 +930,7 @@ to_register = [
 ]
 
 
-def register(bl_info, dev_branch, version_str):
+def register(dev_branch, version_str):
     # print('REGISTER CATS UPDATER')
     global current_version, fake_update, current_version_str
 
@@ -940,8 +941,10 @@ def register(bl_info, dev_branch, version_str):
 
     # Get current version
     current_version = []
-    for i in bl_info['version']:
-        current_version.append(i)
+    version_parts = CATS_VERSION.split(".")
+
+    for part in version_parts:
+        current_version.append(int(part))
 
     bpy.types.Scene.cats_updater_version_list = bpy.props.EnumProperty(
         name=t('bpy.types.Scene.cats_updater_version_list.label'),
