@@ -7,22 +7,23 @@ import logging
 import bpy
 from mathutils import Matrix
 
-from mmd_tools_local import bpyutils
-from mmd_tools_local.core import vmd, vpd
+import mmd_tools_local.core.vmd.importer
+import mmd_tools_local.core.vpd
+from mmd_tools_local.bpyutils import FnContext
 
 
 class VPDImporter:
     def __init__(self, filepath, scale=1.0, bone_mapper=None, use_pose_mode=False):
         self.__pose_name = bpy.path.display_name_from_filepath(filepath)
-        self.__vpd_file = vpd.File()
+        self.__vpd_file = mmd_tools_local.core.vpd.File()
         self.__vpd_file.load(filepath=filepath)
         self.__scale = scale
         self.__bone_mapper = bone_mapper
         if use_pose_mode:
-            self.__bone_util_cls = vmd.importer.BoneConverterPoseMode
+            self.__bone_util_cls = mmd_tools_local.core.vmd.importer.BoneConverterPoseMode
             self.__assignToArmature = self.__assignToArmaturePoseMode
         else:
-            self.__bone_util_cls = vmd.importer.BoneConverter
+            self.__bone_util_cls = mmd_tools_local.core.vmd.importer.BoneConverter
             self.__assignToArmature = self.__assignToArmatureSimple
         logging.info("Loaded %s", self.__vpd_file)
 
@@ -67,6 +68,7 @@ class VPDImporter:
 
         frames = [m.frame for m in armObj.pose_library.pose_markers]
         frame_max = max(frames) if len(frames) else 0
+        # FIXME: poselib.pose_add is deprecated, use animation_data instead
         bpy.ops.poselib.pose_add(frame=frame_max + 1, name=self.__pose_name)
 
     def __assignToMesh(self, meshObj):
@@ -90,7 +92,11 @@ class VPDImporter:
         if obj is None:
             return
         if obj.type == "ARMATURE":
-            with bpyutils.select_object(obj):
+            with FnContext.temp_override_objects(
+                FnContext.ensure_context(),
+                active_object=obj,
+                selected_objects=[obj],
+            ):
                 bpy.ops.object.mode_set(mode="POSE")
                 self.__assignToArmature(obj)
         elif obj.type == "MESH":

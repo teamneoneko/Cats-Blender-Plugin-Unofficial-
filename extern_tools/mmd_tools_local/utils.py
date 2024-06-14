@@ -9,7 +9,7 @@ from typing import Callable, Optional, Set
 
 import bpy
 
-from mmd_tools_local.bpyutils import SceneOp
+from mmd_tools_local.bpyutils import FnContext
 
 
 ## 指定したオブジェクトのみを選択状態かつアクティブにする
@@ -19,7 +19,7 @@ def selectAObject(obj):
     except Exception:
         pass
     bpy.ops.object.select_all(action="DESELECT")
-    SceneOp(bpy.context).active_object = obj
+    FnContext.set_active_object(FnContext.ensure_context(), obj)
 
 
 ## 現在のモードを指定したオブジェクトのEdit Modeに変更する
@@ -31,7 +31,7 @@ def enterEditMode(obj):
 
 def setParentToBone(obj, parent, bone_name):
     selectAObject(obj)
-    SceneOp(bpy.context).active_object = parent
+    FnContext.set_active_object(FnContext.ensure_context(), parent)
     bpy.ops.object.mode_set(mode="POSE")
     parent.data.bones.active = parent.data.bones[bone_name]
     bpy.ops.object.parent_set(type="BONE", xmirror=False, keep_transform=False)
@@ -45,7 +45,7 @@ def selectSingleBone(context, armature, bone_name, reset_pose=False):
         pass
     for i in context.selected_objects:
         i.select_set(False)
-    SceneOp(context).active_object = armature
+    FnContext.set_active_object(context, armature)
     bpy.ops.object.mode_set(mode="POSE")
     if reset_pose:
         for p_bone in armature.pose.bones:

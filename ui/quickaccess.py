@@ -30,7 +30,7 @@ class QuickAccessPanel(ToolPanel, bpy.types.Panel):
 
         col = box.column(align=True)
 
-        if bpy.app.version < (4, 0, 0):
+        if bpy.app.version < (4, 1, 0):
             col.separator()
             row = col.row(align=True)
             row.scale_y = 0.75
@@ -44,7 +44,7 @@ class QuickAccessPanel(ToolPanel, bpy.types.Panel):
             col.separator()
             col.separator()
 
-        if bpy.app.version > (4, 1, 99):
+        if bpy.app.version > (4, 2, 99):
             col.separator()
             row = col.row(align=True)
             row.scale_y = 0.75

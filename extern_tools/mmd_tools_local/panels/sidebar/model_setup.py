@@ -6,93 +6,19 @@ import time
 
 import bpy
 
-from mmd_tools_local.core import model
+from mmd_tools_local.core.model import FnModel
 from mmd_tools_local.core.sdef import FnSDEF
+from mmd_tools_local.panels.sidebar import PT_PanelBase
 
 
-class MMDToolsSceneSetupPanel(bpy.types.Panel):
-    bl_idname = "OBJECT_PT_mmd_tools_local_scene_setup"
-    bl_label = "Scene Setup"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_category = "MMD"
-
-    __LANGUAGE_MANUAL_URL = {
-        "ja_JP": "https://mmd-blender.fandom.com/ja/wiki/mmd_tools_local/%E3%83%9E%E3%83%8B%E3%83%A5%E3%82%A2%E3%83%AB",
-    }
-
-    def draw(self, context: bpy.types.Context):
-        self.layout.row(align=True).operator("wm.url_open", text="MMD Tools/Manual", icon="URL").url = self.__LANGUAGE_MANUAL_URL.get(context.preferences.view.language, "https://mmd-blender.fandom.com/wiki/mmd_tools_local/Manual")
-
-        self.draw_io()
-        self.draw_timeline(context)
-        self.draw_rigid_body(context)
-
-    def draw_io(self):
-        row = self.layout.row()
-        col = row.column(align=True)
-        col.label(text="Model:", icon="OUTLINER_OB_ARMATURE")
-        col.operator("mmd_tools_local.import_model", text="Import")
-        col.operator("mmd_tools_local.export_pmx", text="Export")
-
-        col = row.column(align=True)
-        col.label(text="Motion:", icon="ANIM")
-        col.operator("mmd_tools_local.import_vmd", text="Import")
-        col.operator("mmd_tools_local.export_vmd", text="Export")
-
-        col = row.column(align=True)
-        col.label(text="Pose:", icon="POSE_HLT")
-        col.operator("mmd_tools_local.import_vpd", text="Import")
-        col.operator("mmd_tools_local.export_vpd", text="Export")
-
-    def draw_timeline(self, context):
-        col = self.layout.column(align=True)
-        row = col.row(align=False)
-        row.label(text="Timeline:", icon="TIME")
-        row.prop(context.scene, "frame_current")
-        row = col.row(align=True)
-        row.prop(context.scene, "frame_start", text="Start")
-        row.prop(context.scene, "frame_end", text="End")
-
-    def draw_rigid_body(self, context):
-        rigidbody_world = context.scene.rigidbody_world
-
-        layout = self.layout
-        col = layout.column(align=True)
-        row = col.row(align=False)
-        row.label(text="Rigid Body Physics:", icon="PHYSICS")
-        row.row().operator("mmd_tools_local.rigid_body_world_update", text="Update World", icon="NONE" if getattr(rigidbody_world, "substeps_per_frame", 0) == 1 else "ERROR")
-
-        if rigidbody_world:
-            row = col.row(align=True)
-            row.prop(rigidbody_world, "substeps_per_frame", text="Substeps")
-            row.prop(rigidbody_world, "solver_iterations", text="Iterations")
-
-            point_cache = rigidbody_world.point_cache
-
-            col = layout.column(align=True)
-            row = col.row(align=True)
-            row.enabled = not point_cache.is_baked
-            row.prop(point_cache, "frame_start")
-            row.prop(point_cache, "frame_end")
-
-            row = col.row(align=True)
-            if point_cache.is_baked is True:
-                row.operator("mmd_tools_local.ptcache_rigid_body_delete_bake", text="Delete Bake")
-            else:
-                row.operator("mmd_tools_local.ptcache_rigid_body_bake", text="Bake")
-
-
-class MMDToolsModelSetupPanel(bpy.types.Panel):
+class MMDToolsModelSetupPanel(PT_PanelBase, bpy.types.Panel):
     bl_idname = "OBJECT_PT_mmd_tools_local_model_setup"
     bl_label = "Model Setup"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_category = "MMD"
+    bl_order = 2
 
     def draw(self, context: bpy.types.Context):
         active_object: bpy.types.Object = context.active_object
-        mmd_root_object = model.Model.findRoot(active_object)
+        mmd_root_object = FnModel.find_root_object(active_object)
 
         if mmd_root_object is None:
             self.layout.label(text="Select a MMD Model")
@@ -173,7 +99,7 @@ class MMDToolsModelSetupPanel(bpy.types.Panel):
 
         self.__toggle_items_ttl = time.time() + 10
         self.__toggle_items_cache = []
-        armature_object = model.FnModel.find_armature_object(mmd_root_object)
+        armature_object = FnModel.find_armature_object(mmd_root_object)
         pose_bones = armature_object.pose.bones
         ik_map = {pose_bones[c.subtarget]: (b.bone, c.chain_count, not c.is_valid) for b in pose_bones for c in b.constraints if c.type == "IK" and c.subtarget in pose_bones}
 

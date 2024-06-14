@@ -377,8 +377,8 @@ class ModelsPopup(bpy.types.Operator):
 @register_wrap
 class ExporterModelsPopup(bpy.types.Operator):
     bl_idname = "cats_exporter.model_popup"
-    bl_label = t('ExporterModelsPopup.label')
-    bl_description = t('ExporterModelsPopup.desc')
+    bl_label = t('ExportModel.label')
+    bl_description = t('ExportModel.desc')
     bl_options = {'INTERNAL'}
 
     def execute(self, context):

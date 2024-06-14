@@ -8,18 +8,19 @@ import os
 import bpy
 from mathutils import Matrix
 
-from mmd_tools_local import bpyutils
-from mmd_tools_local.core import vmd, vpd
+import mmd_tools_local.core.vmd.importer
+import mmd_tools_local.core.vpd
+from mmd_tools_local.bpyutils import FnContext
 
 
 class VPDExporter:
     def __init__(self):
         self.__osm_name = None
         self.__scale = 1
-        self.__bone_util_cls = vmd.importer.BoneConverter
+        self.__bone_util_cls = mmd_tools_local.core.vmd.importer.BoneConverter
 
     def __exportVPDFile(self, filepath, bones=None, morphs=None):
-        vpd_file = vpd.File()
+        vpd_file = mmd_tools_local.core.vpd.File()
         vpd_file.osm_name = self.__osm_name
         if bones:
             vpd_file.bones = bones
@@ -54,13 +55,13 @@ class VPDExporter:
             location = converter.convert_location(b.location)
             w, x, y, z = b.matrix_basis.to_quaternion()
             w, x, y, z = converter.convert_rotation([x, y, z, w])
-            vpd_bones.append(vpd.VpdBone(bone_name, location, [x, y, z, w]))
+            vpd_bones.append(mmd_tools_local.core.vpd.VpdBone(bone_name, location, [x, y, z, w]))
         return vpd_bones
 
     def __exportPoseLib(self, armObj: bpy.types.Object, pose_type, filepath, use_pose_mode=False):
         if armObj is None:
             return None
-        # FIXME: armObj.pose_library is None when the armature is not in pose mode
+        # FIXME: armObj.pose_library is deprecated, use armObj.animation_data instead
         if armObj.pose_library is None:
             return None
 
@@ -84,7 +85,7 @@ class VPDExporter:
 
         try:
             pose_markers = armObj.pose_library.pose_markers
-            with bpyutils.select_object(armObj):
+            with FnContext.temp_override_objects(FnContext.ensure_context(), active_object=armObj, selected_objects=[armObj]):
                 bpy.ops.object.mode_set(mode="POSE")
                 if pose_type == "ACTIVE":
                     if 0 <= pose_markers.active_index < len(pose_markers):
@@ -108,7 +109,7 @@ class VPDExporter:
         for i in key_blocks.values():
             if i.value == 0:
                 continue
-            vpd_morphs.append(vpd.VpdMorph(i.name, i.value))
+            vpd_morphs.append(mmd_tools_local.core.vpd.VpdMorph(i.name, i.value))
         return vpd_morphs
 
     def export(self, **args):
@@ -126,7 +127,7 @@ class VPDExporter:
         elif pose_type in {"ACTIVE", "ALL"}:
             use_pose_mode = args.get("use_pose_mode", False)
             if use_pose_mode:
-                self.__bone_util_cls = vmd.importer.BoneConverterPoseMode
+                self.__bone_util_cls = mmd_tools_local.core.vmd.importer.BoneConverterPoseMode
             self.__exportPoseLib(armature, pose_type, filepath, use_pose_mode)
         else:
             raise ValueError('Unknown pose type "{pose_type}"')

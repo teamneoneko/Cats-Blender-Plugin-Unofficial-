@@ -4,15 +4,20 @@
 
 import logging
 import re
+from typing import TYPE_CHECKING, Tuple, cast
 
 import bpy
 
+import mmd_tools_local
 from mmd_tools_local import bpyutils
-from mmd_tools_local.bpyutils import ObjectOp, SceneOp, TransformConstraintOp
+from mmd_tools_local.bpyutils import FnContext, FnObject, TransformConstraintOp
+
+if TYPE_CHECKING:
+    import mmd_tools_local.core.model
 
 
 class FnMorph:
-    def __init__(self, morph, model):
+    def __init__(self, morph, model: "mmd_tools_local.core.model.Model"):
         self.__morph = morph
         self.__rig = model
 
@@ -20,7 +25,7 @@ class FnMorph:
     def storeShapeKeyOrder(cls, obj, shape_key_names):
         if len(shape_key_names) < 1:
             return
-        assert SceneOp(bpy.context).active_object == obj
+        assert FnContext.get_active_object(FnContext.ensure_context()) == obj
         if obj.data.shape_keys is None:
             bpy.ops.object.shape_key_add()
 
@@ -39,7 +44,7 @@ class FnMorph:
     def fixShapeKeyOrder(cls, obj, shape_key_names):
         if len(shape_key_names) < 1:
             return
-        assert SceneOp(bpy.context).active_object == obj
+        assert FnContext.get_active_object(FnContext.ensure_context()) == obj
         key_blocks = getattr(obj.data.shape_keys, "key_blocks", None)
         if key_blocks is None:
             return
@@ -85,22 +90,38 @@ class FnMorph:
                     cls.category_guess(item)
 
     @staticmethod
-    def remove_shape_key(obj, key_name):
-        key_blocks = getattr(obj.data.shape_keys, "key_blocks", None)
-        if key_blocks and key_name in key_blocks:
-            ObjectOp(obj).shape_key_remove(key_blocks[key_name])
+    def remove_shape_key(mesh_object: bpy.types.Object, shape_key_name: str):
+        assert isinstance(mesh_object.data, bpy.types.Mesh)
+
+        shape_keys = mesh_object.data.shape_keys
+        if shape_keys is None:
+            return
+
+        key_blocks = shape_keys.key_blocks
+        if key_blocks and shape_key_name in key_blocks:
+            FnObject.mesh_remove_shape_key(mesh_object, key_blocks[shape_key_name])
 
     @staticmethod
-    def copy_shape_key(obj, src_name, dest_name):
-        key_blocks = getattr(obj.data.shape_keys, "key_blocks", None)
-        if key_blocks and src_name in key_blocks:
-            if dest_name in key_blocks:
-                ObjectOp(obj).shape_key_remove(key_blocks[dest_name])
-            obj.active_shape_key_index = key_blocks.find(src_name)
-            obj.show_only_shape_key, last = True, obj.show_only_shape_key
-            obj.shape_key_add(name=dest_name, from_mix=True)
-            obj.show_only_shape_key = last
-            obj.active_shape_key_index = key_blocks.find(dest_name)
+    def copy_shape_key(mesh_object: bpy.types.Object, src_name: str, dest_name: str):
+        assert isinstance(mesh_object.data, bpy.types.Mesh)
+
+        shape_keys = mesh_object.data.shape_keys
+        if shape_keys is None:
+            return
+
+        key_blocks = shape_keys.key_blocks
+
+        if src_name not in key_blocks:
+            return
+
+        if dest_name in key_blocks:
+            FnObject.mesh_remove_shape_key(mesh_object, key_blocks[dest_name])
+
+        mesh_object.active_shape_key_index = key_blocks.find(src_name)
+        mesh_object.show_only_shape_key, last = True, mesh_object.show_only_shape_key
+        mesh_object.shape_key_add(name=dest_name, from_mix=True)
+        mesh_object.show_only_shape_key = last
+        mesh_object.active_shape_key_index = key_blocks.find(dest_name)
 
     @staticmethod
     def get_uv_morph_vertex_groups(obj, morph_name=None, offset_axes="XYZW"):
@@ -288,7 +309,7 @@ class FnMorph:
 
 
 class _MorphSlider:
-    def __init__(self, model):
+    def __init__(self, model: "mmd_tools_local.core.model.Model"):
         self.__rig = model
 
     def placeholder(self, create=False, binded=False):
@@ -299,7 +320,7 @@ class _MorphSlider:
             obj = bpy.data.objects.new(name=".placeholder", object_data=bpy.data.meshes.new(".placeholder"))
             obj.mmd_type = "PLACEHOLDER"
             obj.parent = root
-            SceneOp(bpy.context).link_object(obj)
+            FnContext.link_object(FnContext.ensure_context(), obj)
         if obj and obj.data.shape_keys is None:
             key = obj.shape_key_add(name="--- morph sliders ---")
             key.mute = True
@@ -319,7 +340,8 @@ class _MorphSlider:
             arm = bpy.data.objects.new(name=".dummy_armature", object_data=bpy.data.armatures.new(name=".dummy_armature"))
             arm.mmd_type = "PLACEHOLDER"
             arm.parent = obj
-            SceneOp(bpy.context).link_object(arm)
+            FnContext.link_object(FnContext.ensure_context(), arm)
+
             from mmd_tools_local.core.bone import FnBone
 
             FnBone.setup_special_bone_collections(arm)
@@ -391,23 +413,27 @@ class _MorphSlider:
         rig = self.__rig
         morph_sliders = self.placeholder()
         morph_sliders = morph_sliders.data.shape_keys.key_blocks if morph_sliders else {}
-        for mesh in rig.meshes():
-            for kb in getattr(mesh.data.shape_keys, "key_blocks", ()):
-                if kb.name not in names_in_use:
-                    if kb.name.startswith("mmd_bind"):
-                        kb.driver_remove("value")
-                        ms = morph_sliders[kb.relative_key.name]
-                        kb.relative_key.slider_min, kb.relative_key.slider_max = min(ms.slider_min, floor(ms.value)), max(ms.slider_max, ceil(ms.value))
-                        kb.relative_key.value = ms.value
-                        kb.relative_key.mute = False
-                        ObjectOp(mesh).shape_key_remove(kb)
-                    elif kb.name in morph_sliders and self.__shape_key_driver_check(kb):
-                        ms = morph_sliders[kb.name]
-                        kb.driver_remove("value")
-                        kb.slider_min, kb.slider_max = min(ms.slider_min, floor(kb.value)), max(ms.slider_max, ceil(kb.value))
-            for m in mesh.modifiers:  # uv morph
+        for mesh_object in rig.meshes():
+            for kb in getattr(mesh_object.data.shape_keys, "key_blocks", cast(Tuple[bpy.types.ShapeKey], ())):
+                if kb.name in names_in_use:
+                    continue
+
+                if kb.name.startswith("mmd_bind"):
+                    kb.driver_remove("value")
+                    ms = morph_sliders[kb.relative_key.name]
+                    kb.relative_key.slider_min, kb.relative_key.slider_max = min(ms.slider_min, floor(ms.value)), max(ms.slider_max, ceil(ms.value))
+                    kb.relative_key.value = ms.value
+                    kb.relative_key.mute = False
+                    FnObject.mesh_remove_shape_key(mesh_object, kb)
+
+                elif kb.name in morph_sliders and self.__shape_key_driver_check(kb):
+                    ms = morph_sliders[kb.name]
+                    kb.driver_remove("value")
+                    kb.slider_min, kb.slider_max = min(ms.slider_min, floor(kb.value)), max(ms.slider_max, ceil(kb.value))
+
+            for m in mesh_object.modifiers:  # uv morph
                 if m.name.startswith("mmd_bind") and m.name not in names_in_use:
-                    mesh.modifiers.remove(m)
+                    mesh_object.modifiers.remove(m)
 
         from mmd_tools_local.core.shader import _MaterialMorph
 
@@ -467,9 +493,9 @@ class _MorphSlider:
 
         shape_key_map = {}
         uv_morph_map = {}
-        for mesh in rig.meshes():
-            mesh.show_only_shape_key = False
-            key_blocks = getattr(mesh.data.shape_keys, "key_blocks", ())
+        for mesh_object in rig.meshes():
+            mesh_object.show_only_shape_key = False
+            key_blocks = getattr(mesh_object.data.shape_keys, "key_blocks", ())
             for kb in key_blocks:
                 kb_name = kb.name
                 if kb_name not in morph_sliders:
@@ -480,7 +506,7 @@ class _MorphSlider:
                 else:
                     name_bind = "mmd_bind%s" % hash(morph_sliders[kb_name])
                     if name_bind not in key_blocks:
-                        mesh.shape_key_add(name=name_bind, from_mix=False)
+                        mesh_object.shape_key_add(name=name_bind, from_mix=False)
                     kb_bind = key_blocks[name_bind]
                     kb_bind.relative_key = kb
                 kb_bind.slider_min = -10
@@ -491,20 +517,20 @@ class _MorphSlider:
                 shape_key_map.setdefault(name_bind, []).append((kb_bind, data_path, groups))
                 group_map.setdefault(("vertex_morphs", kb_name), []).append(groups)
 
-            uv_layers = [l.name for l in mesh.data.uv_layers if not l.name.startswith("_")]
+            uv_layers = [l.name for l in mesh_object.data.uv_layers if not l.name.startswith("_")]
             uv_layers += [""] * (5 - len(uv_layers))
-            for vg, morph_name, axis in FnMorph.get_uv_morph_vertex_groups(mesh):
+            for vg, morph_name, axis in FnMorph.get_uv_morph_vertex_groups(mesh_object):
                 morph = mmd_root.uv_morphs.get(morph_name, None)
                 if morph is None or morph.data_type != "VERTEX_GROUP":
                     continue
 
                 uv_layer = "_" + uv_layers[morph.uv_index] if axis[1] in "ZW" else uv_layers[morph.uv_index]
-                if uv_layer not in mesh.data.uv_layers:
+                if uv_layer not in mesh_object.data.uv_layers:
                     continue
 
                 name_bind = "mmd_bind%s" % hash(vg.name)
                 uv_morph_map.setdefault(name_bind, ())
-                mod = mesh.modifiers.get(name_bind, None) or mesh.modifiers.new(name=name_bind, type="UV_WARP")
+                mod = mesh_object.modifiers.get(name_bind, None) or mesh_object.modifiers.new(name=name_bind, type="UV_WARP")
                 mod.show_expanded = False
                 mod.vertex_group = vg.name
                 mod.axis_u, mod.axis_v = ("Y", "X") if axis[1] in "YW" else ("X", "Y")
@@ -691,6 +717,7 @@ class MigrationFnMorph:
             for mat_morph in root.mmd_root.material_morphs:
                 for morph_data in mat_morph.data:
                     if morph_data.material_data is not None:
+                        # SUPPORT_UNTIL: 5 LTS
                         # The material_id is also no longer used, but for compatibility with older version mmd_tools_local, keep it.
                         if "material_id" not in morph_data.material_data.mmd_material or "material_id" not in morph_data or morph_data.material_data.mmd_material["material_id"] == morph_data["material_id"]:
                             # In the new version, the related_mesh property is no longer used.

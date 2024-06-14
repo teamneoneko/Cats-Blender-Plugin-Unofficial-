@@ -8,6 +8,8 @@ import time
 import bpy
 from mathutils import Matrix, Vector
 
+from mmd_tools_local.bpyutils import FnObject
+
 
 def _hash(v):
     if isinstance(v, (bpy.types.Object, bpy.types.PoseBone)):
@@ -293,11 +295,9 @@ class FnSDEF:
 
     @classmethod
     def unbind(cls, obj):
-        from mmd_tools_local.bpyutils import ObjectOp
-
         if obj.data.shape_keys:
             if cls.SHAPEKEY_NAME in obj.data.shape_keys.key_blocks:
-                ObjectOp(obj).shape_key_remove(obj.data.shape_keys.key_blocks[cls.SHAPEKEY_NAME])
+                FnObject.mesh_remove_shape_key(obj, obj.data.shape_keys.key_blocks[cls.SHAPEKEY_NAME])
         for mod in obj.modifiers:
             if mod.type == "ARMATURE" and mod.vertex_group == cls.MASK_NAME:
                 mod.vertex_group = ""

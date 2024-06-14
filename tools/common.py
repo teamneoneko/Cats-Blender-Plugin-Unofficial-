@@ -37,10 +37,6 @@ from .translations import t
 from sys import intern
 
 from mmd_tools_local import utils
-from mmd_tools_local.panels import tool as mmd_tool
-from mmd_tools_local.panels import util_tools as mmd_util_tools
-from mmd_tools_local.panels import view_prop as mmd_view_prop
-
 
 def version_3_6_or_older():
     return bpy.app.version < (3, 7)
@@ -1914,46 +1910,6 @@ def fix_twist_bone_names(armature):
             bone_twist = armature.data.edit_bones.get(bone_type + 'Twist_' + suffix)
             if bone_twist:
                 bone_twist.name = 'z' + bone_twist.name
-
-
-def toggle_mmd_tabs_update(self, context):
-    toggle_mmd_tabs()
-
-
-def toggle_mmd_tabs(shutdown_plugin=False):
-    mmd_cls = [
-        mmd_tool.MMDDisplayItemsPanel,
-        mmd_tool.MMDMorphToolsPanel,
-        mmd_tool.MMDRigidbodySelectorPanel,
-        mmd_tool.MMDJointSelectorPanel,
-        mmd_util_tools.MMDMaterialSorter,
-        mmd_util_tools.MMDMeshSorter,
-        mmd_util_tools.MMDBoneOrder,
-    ]
-    mmd_cls_shading = [
-        mmd_view_prop.MMDViewPanel,
-        mmd_view_prop.MMDSDEFPanel,
-    ]
-
-    mmd_cls = mmd_cls + mmd_cls_shading
-
-    # If the plugin is shutting down, load the mmd_tools tabs before that, to avoid issues when unregistering mmd_tools
-    if bpy.context.scene.show_mmd_tabs or shutdown_plugin:
-        for cls in mmd_cls:
-            try:
-                bpy.utils.register_class(cls)
-            except:
-                pass
-    else:
-        for cls in reversed(mmd_cls):
-            try:
-                bpy.utils.unregister_class(cls)
-            except:
-                pass
-
-    if not shutdown_plugin:
-        Settings.update_settings(None, None)
-
 
 
 """

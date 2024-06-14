@@ -3,8 +3,8 @@
 # This file is part of MMD Tools.
 
 from typing import Optional, cast
+
 import bpy
-from bpy.types import Operator
 from mathutils import Quaternion, Vector
 
 import mmd_tools_local.core.model as mmd_model
@@ -49,7 +49,7 @@ def special_division(n1, n2):
     return n1 / n2
 
 
-class AddMorph(Operator):
+class AddMorph(bpy.types.Operator):
     bl_idname = "mmd_tools_local.morph_add"
     bl_label = "Add Morph"
     bl_description = "Add a morph item to active morph list"
@@ -68,7 +68,7 @@ class AddMorph(Operator):
         return {"FINISHED"}
 
 
-class RemoveMorph(Operator):
+class RemoveMorph(bpy.types.Operator):
     bl_idname = "mmd_tools_local.morph_remove"
     bl_label = "Remove Morph"
     bl_description = "Remove morph item(s) from the list"
@@ -102,7 +102,7 @@ class RemoveMorph(Operator):
         return {"FINISHED"}
 
 
-class MoveMorph(Operator, ItemMoveOp):
+class MoveMorph(bpy.types.Operator, ItemMoveOp):
     bl_idname = "mmd_tools_local.morph_move"
     bl_label = "Move Morph"
     bl_description = "Move active morph item up/down in the list"
@@ -120,7 +120,7 @@ class MoveMorph(Operator, ItemMoveOp):
         return {"FINISHED"}
 
 
-class CopyMorph(Operator):
+class CopyMorph(bpy.types.Operator):
     bl_idname = "mmd_tools_local.morph_copy"
     bl_label = "Copy Morph"
     bl_description = "Make a copy of active morph in the list"
@@ -155,7 +155,7 @@ class CopyMorph(Operator):
         return {"FINISHED"}
 
 
-class OverwriteBoneMorphsFromPoseLibrary(Operator):
+class OverwriteBoneMorphsFromPoseLibrary(bpy.types.Operator):
     bl_idname = "mmd_tools_local.morph_overwrite_from_active_pose_library"
     bl_label = "Overwrite Bone Morphs from active Pose Library"
     bl_options = {"REGISTER", "UNDO", "INTERNAL"}
@@ -175,7 +175,7 @@ class OverwriteBoneMorphsFromPoseLibrary(Operator):
         return {"FINISHED"}
 
 
-class AddMorphOffset(Operator):
+class AddMorphOffset(bpy.types.Operator):
     bl_idname = "mmd_tools_local.morph_offset_add"
     bl_label = "Add Morph Offset"
     bl_description = "Add a morph offset item to the list"
@@ -209,7 +209,7 @@ class AddMorphOffset(Operator):
         return {"FINISHED"}
 
 
-class RemoveMorphOffset(Operator):
+class RemoveMorphOffset(bpy.types.Operator):
     bl_idname = "mmd_tools_local.morph_offset_remove"
     bl_label = "Remove Morph Offset"
     bl_description = "Remove morph offset item(s) from the list"
@@ -252,7 +252,7 @@ class RemoveMorphOffset(Operator):
         return {"FINISHED"}
 
 
-class InitMaterialOffset(Operator):
+class InitMaterialOffset(bpy.types.Operator):
     bl_idname = "mmd_tools_local.material_morph_offset_init"
     bl_label = "Init Material Offset"
     bl_description = "Set all offset values to target value"
@@ -280,7 +280,7 @@ class InitMaterialOffset(Operator):
         return {"FINISHED"}
 
 
-class ApplyMaterialOffset(Operator):
+class ApplyMaterialOffset(bpy.types.Operator):
     bl_idname = "mmd_tools_local.apply_material_morph_offset"
     bl_label = "Apply Material Offset"
     bl_description = "Calculates the offsets and apply them, then the temporary material is removed"
@@ -342,7 +342,7 @@ class ApplyMaterialOffset(Operator):
         return {"FINISHED"}
 
 
-class CreateWorkMaterial(Operator):
+class CreateWorkMaterial(bpy.types.Operator):
     bl_idname = "mmd_tools_local.create_work_material"
     bl_label = "Create Work Material"
     bl_description = "Creates a temporary material to edit this offset"
@@ -408,7 +408,7 @@ class CreateWorkMaterial(Operator):
         return {"FINISHED"}
 
 
-class ClearTempMaterials(Operator):
+class ClearTempMaterials(bpy.types.Operator):
     bl_idname = "mmd_tools_local.clear_temp_materials"
     bl_label = "Clear Temp Materials"
     bl_description = "Clears all the temporary materials"
@@ -434,7 +434,7 @@ class ClearTempMaterials(Operator):
         return {"FINISHED"}
 
 
-class ViewBoneMorph(Operator):
+class ViewBoneMorph(bpy.types.Operator):
     bl_idname = "mmd_tools_local.view_bone_morph"
     bl_label = "View Bone Morph"
     bl_description = "View the result of active bone morph"
@@ -458,7 +458,7 @@ class ViewBoneMorph(Operator):
         return {"FINISHED"}
 
 
-class ClearBoneMorphView(Operator):
+class ClearBoneMorphView(bpy.types.Operator):
     bl_idname = "mmd_tools_local.clear_bone_morph_view"
     bl_label = "Clear Bone Morph View"
     bl_description = "Reset transforms of all bones to their default values"
@@ -474,7 +474,7 @@ class ClearBoneMorphView(Operator):
         return {"FINISHED"}
 
 
-class ApplyBoneMorph(Operator):
+class ApplyBoneMorph(bpy.types.Operator):
     bl_idname = "mmd_tools_local.apply_bone_morph"
     bl_label = "Apply Bone Morph"
     bl_description = "Apply current pose to active bone morph"
@@ -501,7 +501,7 @@ class ApplyBoneMorph(Operator):
         return {"FINISHED"}
 
 
-class SelectRelatedBone(Operator):
+class SelectRelatedBone(bpy.types.Operator):
     bl_idname = "mmd_tools_local.select_bone_morph_offset_bone"
     bl_label = "Select Related Bone"
     bl_description = "Select the bone assigned to this offset in the armature"
@@ -519,7 +519,7 @@ class SelectRelatedBone(Operator):
         return {"FINISHED"}
 
 
-class EditBoneOffset(Operator):
+class EditBoneOffset(bpy.types.Operator):
     bl_idname = "mmd_tools_local.edit_bone_morph_offset"
     bl_label = "Edit Related Bone"
     bl_description = "Applies the location and rotation of this offset to the bone"
@@ -541,7 +541,7 @@ class EditBoneOffset(Operator):
         return {"FINISHED"}
 
 
-class ApplyBoneOffset(Operator):
+class ApplyBoneOffset(bpy.types.Operator):
     bl_idname = "mmd_tools_local.apply_bone_morph_offset"
     bl_label = "Apply Bone Morph Offset"
     bl_description = "Stores the current bone location and rotation into this offset"
@@ -561,7 +561,7 @@ class ApplyBoneOffset(Operator):
         return {"FINISHED"}
 
 
-class ViewUVMorph(Operator):
+class ViewUVMorph(bpy.types.Operator):
     bl_idname = "mmd_tools_local.view_uv_morph"
     bl_label = "View UV Morph"
     bl_description = "View the result of active UV morph on current mesh object"
@@ -621,7 +621,7 @@ class ViewUVMorph(Operator):
         return {"FINISHED"}
 
 
-class ClearUVMorphView(Operator):
+class ClearUVMorphView(bpy.types.Operator):
     bl_idname = "mmd_tools_local.clear_uv_morph_view"
     bl_label = "Clear UV Morph View"
     bl_description = "Clear all temporary data of UV morphs"
@@ -658,7 +658,7 @@ class ClearUVMorphView(Operator):
         return {"FINISHED"}
 
 
-class EditUVMorph(Operator):
+class EditUVMorph(bpy.types.Operator):
     bl_idname = "mmd_tools_local.edit_uv_morph"
     bl_label = "Edit UV Morph"
     bl_description = "Edit UV morph on a temporary UV layer (use UV Editor to edit the result)"
@@ -701,7 +701,7 @@ class EditUVMorph(Operator):
         return {"FINISHED"}
 
 
-class ApplyUVMorph(Operator):
+class ApplyUVMorph(bpy.types.Operator):
     bl_idname = "mmd_tools_local.apply_uv_morph"
     bl_label = "Apply UV Morph"
     bl_description = "Calculate the UV offsets of selected vertices and apply to active UV morph"

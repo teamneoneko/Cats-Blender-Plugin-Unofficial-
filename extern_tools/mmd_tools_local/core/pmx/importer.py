@@ -6,12 +6,13 @@ import collections
 import logging
 import os
 import time
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Optional
 
 import bpy
 from mathutils import Matrix, Vector
 
 from mmd_tools_local import bpyutils, utils
+from mmd_tools_local.bpyutils import FnContext
 from mmd_tools_local.core import pmx
 from mmd_tools_local.core.bone import FnBone
 from mmd_tools_local.core.material import FnMaterial
@@ -19,11 +20,11 @@ from mmd_tools_local.core.model import FnModel, Model
 from mmd_tools_local.core.morph import FnMorph
 from mmd_tools_local.core.rigid_body import FnRigidBody
 from mmd_tools_local.core.vmd.importer import BoneConverter
-from mmd_tools_local.operators.display_item import DisplayItemQuickSetup
 from mmd_tools_local.operators.misc import MoveObject
 
 if TYPE_CHECKING:
     from mmd_tools_local.properties.pose_bone import MMDBone
+    from mmd_tools_local.properties.root import MMDRoot
 
 
 class PMXImporter:
@@ -47,13 +48,13 @@ class PMXImporter:
 
     def __init__(self):
         self.__model = None
-        self.__targetScene = bpyutils.SceneOp(bpy.context)
+        self.__targetContext = FnContext.ensure_context()
 
         self.__scale = None
 
-        self.__root = None
-        self.__armObj = None
-        self.__meshObj = None
+        self.__root: Optional[bpy.types.Object] = None
+        self.__armObj: Optional[bpy.types.Object] = None
+        self.__meshObj: Optional[bpy.types.Object] = None
 
         self.__vertexGroupTable = None
         self.__textureTable = None
@@ -84,7 +85,7 @@ class PMXImporter:
         obj_name = self.__safe_name(bpy.path.display_name(pmxModel.filepath), max_length=54)
         self.__rig = Model.create(pmxModel.name, pmxModel.name_e, self.__scale, obj_name)
         root = self.__rig.rootObject()
-        mmd_root = root.mmd_root
+        mmd_root: MMDRoot = root.mmd_root
         self.__root = root
         self.__armObj = self.__rig.armature()
 
@@ -101,14 +102,14 @@ class PMXImporter:
         model_name = self.__root.name
         self.__meshObj = bpy.data.objects.new(name=model_name + "_mesh", object_data=bpy.data.meshes.new(name=model_name))
         self.__meshObj.parent = self.__armObj
-        self.__targetScene.link_object(self.__meshObj)
+        FnContext.link_object(self.__targetContext, self.__meshObj)
 
     def __createBasisShapeKey(self):
         if self.__meshObj.data.shape_keys:
             assert len(self.__meshObj.data.vertices) > 0
             assert len(self.__meshObj.data.shape_keys.key_blocks) > 1
             return
-        self.__targetScene.active_object = self.__meshObj
+        FnContext.set_active_object(self.__targetContext, self.__meshObj)
         bpy.ops.object.shape_key_add()
 
     def __importVertexGroup(self):
@@ -129,7 +130,7 @@ class PMXImporter:
         if vertex_count < 1:
             return
 
-        mesh = self.__meshObj.data
+        mesh: bpy.types.Mesh = self.__meshObj.data
         mesh.vertices.add(count=vertex_count)
         mesh.vertices.foreach_set("co", tuple(i for pv in pmx_vertices for i in (Vector(pv.co).xzy * self.__scale)))
 
@@ -895,7 +896,7 @@ class PMXImporter:
 
         FnModel.change_mmd_ik_loop_factor(self.__root, args.get("ik_loop_factor", 1))
         # bpy.context.scene.gravity[2] = -9.81 * 10 * self.__scale
-        self.__targetScene.active_object = self.__root
+        FnContext.set_active_object(self.__targetContext, self.__root)
 
         logging.info(" Finished importing the model in %f seconds.", time.time() - start_time)
         logging.info("----------------------------------------")
