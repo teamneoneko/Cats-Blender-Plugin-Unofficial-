@@ -8,6 +8,8 @@ import time
 
 import bpy
 
+from mmd_tools_local.bpyutils import FnContext
+
 jp_half_to_full_tuples = (
     ("ｳﾞ", "ヴ"),
     ("ｶﾞ", "ガ"),
@@ -436,9 +438,7 @@ class DictionaryEnum:
 
         import os
 
-        from mmd_tools_local.bpyutils import addon_preferences
-
-        folder = addon_preferences("dictionary_folder", "")
+        folder = FnContext.get_addon_preferences_attribute(context, "dictionary_folder", "")
         if os.path.isdir(folder):
             for filename in sorted(x for x in os.listdir(folder) if x.lower().endswith(".csv")):
                 filepath = os.path.join(folder, filename)

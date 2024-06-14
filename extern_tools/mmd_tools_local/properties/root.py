@@ -7,7 +7,7 @@
 import bpy
 
 from mmd_tools_local import utils
-from mmd_tools_local.bpyutils import FnContext, activate_layer_collection
+from mmd_tools_local.bpyutils import FnContext
 from mmd_tools_local.core.material import FnMaterial
 from mmd_tools_local.core.model import FnModel
 from mmd_tools_local.core.sdef import FnSDEF
@@ -119,22 +119,22 @@ def _toggleVisibilityOfRigidBodies(self: "MMDRoot", context: bpy.types.Context):
 
 
 def _toggleVisibilityOfJoints(self: "MMDRoot", context):
-    root = self.id_data
+    root_object = self.id_data
     hide = not self.show_joints
-    for i in FnModel.iterate_joint_objects(root):
+    for i in FnModel.iterate_joint_objects(root_object):
         i.hide_set(hide)
     if hide and context.active_object is None:
-        FnContext.set_active_object(context, root)
+        FnContext.set_active_object(context, root_object)
 
 
 def _toggleVisibilityOfTemporaryObjects(self: "MMDRoot", context: bpy.types.Context):
-    root = self.id_data
+    root_object: bpy.types.Object = self.id_data
     hide = not self.show_temporary_objects
-    with activate_layer_collection(root):
-        for i in FnModel.iterate_temporary_objects(root):
+    with FnContext.temp_override_active_layer_collection(context, root_object):
+        for i in FnModel.iterate_temporary_objects(root_object):
             i.hide_set(hide)
     if hide and context.active_object is None:
-        FnContext.set_active_object(context, root)
+        FnContext.set_active_object(context, root_object)
 
 
 def _toggleShowNamesOfRigidBodies(self: "MMDRoot", _context):
@@ -171,7 +171,7 @@ def _getVisibilityOfMMDRigArmature(prop: "MMDRoot"):
 def _setActiveRigidbodyObject(prop: "MMDRoot", v: int):
     obj = FnContext.get_scene_objects(bpy.context)[v]
     if FnModel.is_rigid_body_object(obj):
-        FnContext.select_single_object(bpy.context, obj)
+        FnContext.set_active_and_select_single_object(bpy.context, obj)
     prop["active_rigidbody_object_index"] = v
 
 
@@ -186,7 +186,7 @@ def _getActiveRigidbodyObject(prop: "MMDRoot"):
 def _setActiveJointObject(prop: "MMDRoot", v: int):
     obj = FnContext.get_scene_objects(bpy.context)[v]
     if FnModel.is_joint_object(obj):
-        FnContext.select_single_object(bpy.context, obj)
+        FnContext.set_active_and_select_single_object(bpy.context, obj)
     prop["active_joint_object_index"] = v
 
 
@@ -213,7 +213,7 @@ def _getActiveMorph(prop: "MMDRoot"):
 def _setActiveMeshObject(prop: "MMDRoot", v: int):
     obj = FnContext.get_scene_objects(bpy.context)[v]
     if FnModel.is_mesh_object(obj):
-        FnContext.select_single_object(bpy.context, obj)
+        FnContext.set_active_and_select_single_object(bpy.context, obj)
     prop["active_mesh_index"] = v
 
 

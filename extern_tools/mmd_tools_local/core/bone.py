@@ -70,8 +70,8 @@ class FnBone:
     @staticmethod
     def __get_selected_pose_bones(armature_object: bpy.types.Object) -> Iterable[bpy.types.PoseBone]:
         if armature_object.mode == "EDIT":
-            with bpyutils.select_object(armature_object):  # update selected bones
-                bpy.ops.object.mode_set(mode="EDIT")  # back to edit mode
+            bpy.ops.object.mode_set(mode="OBJECT") # update selected bones
+            bpy.ops.object.mode_set(mode="EDIT")  # back to edit mode
         context_selected_bones = bpy.context.selected_pose_bones or bpy.context.selected_bones or []
         bones = armature_object.pose.bones
         return (bones[b.name] for b in context_selected_bones if not bones[b.name].is_mmd_shadow_bone)
@@ -105,24 +105,24 @@ class FnBone:
         return armature_object
 
     @staticmethod
-    def __is_mmd_tools_local_bone_collection(bone_collection) -> bool:
+    def __is_mmd_tools_local_bone_collection(bone_collection: bpy.types.BoneCollection) -> bool:
         return BONE_COLLECTION_CUSTOM_PROPERTY_NAME in bone_collection
 
     @staticmethod
-    def __is_special_bone_collection(bone_collection) -> bool:
+    def __is_special_bone_collection(bone_collection: bpy.types.BoneCollection) -> bool:
         return BONE_COLLECTION_CUSTOM_PROPERTY_VALUE_SPECIAL == bone_collection.get(BONE_COLLECTION_CUSTOM_PROPERTY_NAME)
 
     @staticmethod
-    def __set_bone_collection_to_special(bone_collection, is_visible: bool):
+    def __set_bone_collection_to_special(bone_collection: bpy.types.BoneCollection, is_visible: bool):
         bone_collection[BONE_COLLECTION_CUSTOM_PROPERTY_NAME] = BONE_COLLECTION_CUSTOM_PROPERTY_VALUE_SPECIAL
         bone_collection.is_visible = is_visible
 
     @staticmethod
-    def __is_normal_bone_collection(bone_collection) -> bool:
+    def __is_normal_bone_collection(bone_collection: bpy.types.BoneCollection) -> bool:
         return BONE_COLLECTION_CUSTOM_PROPERTY_VALUE_NORMAL == bone_collection.get(BONE_COLLECTION_CUSTOM_PROPERTY_NAME)
 
     @staticmethod
-    def __set_bone_collection_to_normal(bone_collection):
+    def __set_bone_collection_to_normal(bone_collection: bpy.types.BoneCollection):
         bone_collection[BONE_COLLECTION_CUSTOM_PROPERTY_NAME] = BONE_COLLECTION_CUSTOM_PROPERTY_VALUE_NORMAL
 
     @staticmethod
@@ -371,9 +371,10 @@ class FnBone:
         return False
 
     @staticmethod
-    def clean_additional_transformation(armature):
+    def clean_additional_transformation(armature_object: bpy.types.Object):
         # clean constraints
-        for p_bone in armature.pose.bones:
+        p_bone: bpy.types.PoseBone
+        for p_bone in armature_object.pose.bones:
             p_bone.mmd_bone.is_additional_transform_dirty = True
             constraints = p_bone.constraints
             remove_constraint(constraints, "mmd_additional_rotation")
@@ -391,9 +392,9 @@ class FnBone:
         def __is_at_shadow_bone(b):
             return b.is_mmd_shadow_bone and b.mmd_shadow_bone_type in shadow_bone_types
 
-        shadow_bone_names = [b.name for b in armature.pose.bones if __is_at_shadow_bone(b)]
+        shadow_bone_names = [b.name for b in armature_object.pose.bones if __is_at_shadow_bone(b)]
         if len(shadow_bone_names) > 0:
-            with bpyutils.edit_object(armature) as data:
+            with bpyutils.edit_object(armature_object) as data:
                 remove_edit_bones(data.edit_bones, shadow_bone_names)
 
     @staticmethod

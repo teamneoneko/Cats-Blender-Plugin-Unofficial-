@@ -425,6 +425,7 @@ def register_updater(bl_info, init_py_file):
     config.branches = ["blender-v4"]
     config.addon_directory = os.path.dirname(config.current_addon_path)
     config.min_release_version = (4, 0, 0)
+    config.max_release_version = (5, 0, 0)
     config.default_target_addon_path = "mmd_tools_local"
     config.target_addon_path = {}
     updater = AddonUpdaterManager.get_instance()

@@ -19,8 +19,8 @@
 bl_info = {
     "name": "mmd_tools_local",
     "author": "sugiany",
-    "version": (4, 1, 0),
-    "blender": (4, 1, 1),
+    "version": (4, 2, 1),
+    "blender": (4, 2, 0),
     "location": "View3D > Sidebar > MMD Panel",
     "description": "Utility tools for MMD model editing. (UuuNyaa's forked version)",
     "warning": "",
@@ -47,8 +47,8 @@ auto_load.init()
 def register():
     import bpy
 
-    import mmd_tools_local.operators.addon_updater
     import mmd_tools_local.handlers
+    import mmd_tools_local.operators.addon_updater
 
     mmd_tools_local.auto_load.register()
 
@@ -64,8 +64,8 @@ def register():
 def unregister():
     import bpy
 
-    import mmd_tools_local.operators.addon_updater
     import mmd_tools_local.handlers
+    import mmd_tools_local.operators.addon_updater
 
     mmd_tools_local.handlers.MMDHanders.unregister()
     mmd_tools_local.operators.addon_updater.unregister_updater()

@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Callable, Iterable, Optional, Tuple, cast
 import bpy
 from mathutils import Vector
 
-from mmd_tools_local.bpyutils import addon_preferences
+from mmd_tools_local.bpyutils import FnContext
 from mmd_tools_local.core.exceptions import MaterialNotFoundError
 from mmd_tools_local.core.shader import _NodeGroupUtils
 
@@ -171,7 +171,7 @@ class FnMaterial:
             return
         mmd_mat: MMDMaterial = self.__material.mmd_material
         if mmd_mat.is_shared_toon_texture:
-            shared_toon_folder = addon_preferences("shared_toon_folder", "")
+            shared_toon_folder = FnContext.get_addon_preferences_attribute(FnContext.ensure_context(), "shared_toon_folder", "")
             toon_path = os.path.join(shared_toon_folder, "toon%02d.bmp" % (mmd_mat.shared_toon_texture + 1))
             self.create_toon_texture(bpy.path.resolve_ncase(path=toon_path))
         elif mmd_mat.toon_texture != "":
@@ -432,7 +432,7 @@ class FnMaterial:
             active_render_engine = context.engine
             preferred_output_node_target = {
                 "CYCLES": "CYCLES",
-                "BLENDER_EEVEE": "EEVEE",
+                "BLENDER_EEVEE_NEXT": "EEVEE",
             }.get(active_render_engine, "ALL")
 
             tex_node = None

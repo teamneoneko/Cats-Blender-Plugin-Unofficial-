@@ -23,6 +23,13 @@ from .translations import t
 
 current_blender_version = str(bpy.app.version[:2])[1:-1].replace(', ', '.')
 
+mmd_tools_local_installed = False
+try:
+    import mmd_tools_local
+    mmd_tools_local_installed = True
+except:
+    pass
+
 formats = '*.pmx;*.pmd;*.xps;*.mesh;*.ascii;*.smd;*.qc;*.qci;*.vta;*.dmx;*.fbx;*.dae;*.vrm;*.zip'
 format_list = formats.replace('*.', '').split(';')
 zip_files = {}
@@ -370,8 +377,8 @@ class ModelsPopup(bpy.types.Operator):
 @register_wrap
 class ExporterModelsPopup(bpy.types.Operator):
     bl_idname = "cats_exporter.model_popup"
-    bl_label = t('ExporterModelsPopup.label')
-    bl_description = t('ExporterModelsPopup.desc')
+    bl_label = t('ExportModel.label')
+    bl_description = t('ExportModel.desc')
     bl_options = {'INTERNAL'}
 
     def execute(self, context):

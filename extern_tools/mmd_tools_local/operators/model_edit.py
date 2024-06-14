@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Set
 import bmesh
 import bpy
 
-from mmd_tools_local.bpyutils import activate_layer_collection, find_user_layer_collection
+from mmd_tools_local.bpyutils import FnContext
 from mmd_tools_local.core.model import FnModel, Model
 
 
@@ -71,7 +71,7 @@ class ModelJoinByBonesOperator(bpy.types.Operator):
         if parent_root_object is None or len(child_root_objects) == 0:
             raise MessageException("No MMD Models selected")
 
-        with activate_layer_collection(parent_root_object):
+        with FnContext.temp_override_active_layer_collection(context, parent_root_object):
             FnModel.join_models(parent_root_object, child_root_objects)
 
         bpy.ops.object.mode_set(mode="EDIT")
@@ -148,7 +148,7 @@ class ModelSeparateByBonesOperator(bpy.types.Operator):
 
         if self.include_descendant_bones:
             for edit_bone in root_bones:
-                with bpy.context.temp_override(active_bone=edit_bone):
+                with context.temp_override(active_bone=edit_bone):
                     bpy.ops.armature.select_similar(type="CHILDREN", threshold=0.1)
 
         separate_bones: Dict[str, bpy.types.EditBone] = {b.name: b for b in context.selected_bones}
@@ -213,14 +213,14 @@ class ModelSeparateByBonesOperator(bpy.types.Operator):
         separate_model_armature_object = separate_model.armature()
 
         if self.separate_armature:
-            with bpy.context.temp_override(
+            with context.temp_override(
                 active_object=separate_model_armature_object,
                 selected_editable_objects=[separate_model_armature_object, separate_armature_object],
             ):
                 bpy.ops.object.join()
 
         # add mesh
-        with bpy.context.temp_override(
+        with context.temp_override(
             object=separate_model_armature_object,
             selected_editable_objects=[separate_model_armature_object, *separate_mesh_objects],
         ):
@@ -234,21 +234,25 @@ class ModelSeparateByBonesOperator(bpy.types.Operator):
 
             armature_modifier.object = separate_model_armature_object
 
-        with bpy.context.temp_override(
+        with context.temp_override(
             object=separate_model.rigidGroupObject(),
             selected_editable_objects=[separate_model.rigidGroupObject(), *separate_rigid_bodies],
         ):
             bpy.ops.object.parent_set(type="OBJECT", keep_transform=True)
 
-        with bpy.context.temp_override(
+        with context.temp_override(
             object=separate_model.jointGroupObject(),
             selected_editable_objects=[separate_model.jointGroupObject(), *separate_joints],
         ):
             bpy.ops.object.parent_set(type="OBJECT", keep_transform=True)
 
         # move separate objects to new collection
-        mmd_layer_collection = find_user_layer_collection(mmd_root_object)
-        separate_layer_collection = find_user_layer_collection(separate_root_object)
+        mmd_layer_collection = FnContext.find_user_layer_collection_by_object(context, mmd_root_object)
+        assert mmd_layer_collection is not None
+
+        separate_layer_collection = FnContext.find_user_layer_collection_by_object(context, separate_root_object)
+        assert separate_layer_collection is not None
+
         if mmd_layer_collection.name != separate_layer_collection.name:
             for separate_object in itertools.chain(separate_mesh_objects, separate_rigid_bodies, separate_joints):
                 separate_layer_collection.collection.objects.link(separate_object)

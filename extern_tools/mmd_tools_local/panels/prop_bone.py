@@ -2,10 +2,10 @@
 # Copyright 2015 MMD Tools authors
 # This file is part of MMD Tools.
 
-from bpy.types import Panel
+import bpy
 
 
-class MMDBonePanel(Panel):
+class MMDBonePanel(bpy.types.Panel):
     bl_idname = "BONE_PT_mmd_tools_local_bone"
     bl_label = "MMD Bone Tools"
     bl_space_type = "PROPERTIES"
