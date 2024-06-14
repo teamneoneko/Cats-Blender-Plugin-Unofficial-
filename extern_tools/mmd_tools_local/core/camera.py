@@ -7,7 +7,7 @@ from typing import Optional
 
 import bpy
 
-from mmd_tools_local.bpyutils import Props, SceneOp
+from mmd_tools_local.bpyutils import FnContext, Props
 
 
 class FnCamera:
@@ -126,7 +126,7 @@ class MMDCamera:
             return MMDCamera(cameraObj)
 
         empty = bpy.data.objects.new(name="MMD_Camera", object_data=None)
-        SceneOp(bpy.context).link_object(empty)
+        FnContext.link_object(FnContext.ensure_context(), empty)
 
         cameraObj.parent = empty
         cameraObj.data.sensor_fit = "VERTICAL"
@@ -156,7 +156,7 @@ class MMDCamera:
     def newMMDCameraAnimation(cameraObj, cameraTarget=None, scale=1.0, min_distance=0.1):
         scene = bpy.context.scene
         mmd_cam = bpy.data.objects.new(name="Camera", object_data=bpy.data.cameras.new("Camera"))
-        SceneOp(bpy.context).link_object(mmd_cam)
+        FnContext.link_object(FnContext.ensure_context(), mmd_cam)
         MMDCamera.convertToMMDCamera(mmd_cam, scale=scale)
         mmd_cam_root = mmd_cam.parent
 

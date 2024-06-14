@@ -5,16 +5,15 @@
 import re
 
 import bpy
-from bpy.types import Operator
 
-from mmd_tools_local import utils
-from mmd_tools_local.bpyutils import ObjectOp
-from mmd_tools_local.core import model as mmd_model
+import mmd_tools_local.utils
+from mmd_tools_local.bpyutils import FnContext, FnObject
 from mmd_tools_local.core.bone import FnBone
+from mmd_tools_local.core.model import FnModel, Model
 from mmd_tools_local.core.morph import FnMorph
 
 
-class SelectObject(Operator):
+class SelectObject(bpy.types.Operator):
     bl_idname = "mmd_tools_local.object_select"
     bl_label = "Select Object"
     bl_description = "Select the object"
@@ -28,11 +27,11 @@ class SelectObject(Operator):
     )
 
     def execute(self, context):
-        utils.selectAObject(context.scene.objects[self.name])
+        mmd_tools_local.utils.selectAObject(context.scene.objects[self.name])
         return {"FINISHED"}
 
 
-class MoveObject(Operator, utils.ItemMoveOp):
+class MoveObject(bpy.types.Operator, mmd_tools_local.utils.ItemMoveOp):
     bl_idname = "mmd_tools_local.object_move"
     bl_label = "Move Object"
     bl_description = "Move active object up/down in the list"
@@ -44,7 +43,7 @@ class MoveObject(Operator, utils.ItemMoveOp):
     def set_index(cls, obj, index):
         m = cls.__PREFIX_REGEXP.match(obj.name)
         name = m.group("name") if m else obj.name
-        obj.name = "%s_%s" % (utils.int2base(index, 36, 3), name)
+        obj.name = "%s_%s" % (mmd_tools_local.utils.int2base(index, 36, 3), name)
 
     @classmethod
     def get_name(cls, obj, prefix=None):
@@ -81,9 +80,9 @@ class MoveObject(Operator, utils.ItemMoveOp):
                 self.insert(index_new, item)
 
         objects = []
-        root = mmd_model.Model.findRoot(obj)
+        root = FnModel.find_root_object(obj)
         if root:
-            rig = mmd_model.Model(root)
+            rig = Model(root)
             if obj.mmd_type == "NONE" and obj.type == "MESH":
                 objects = rig.meshes()
             elif obj.mmd_type == "RIGID_BODY":
@@ -93,7 +92,7 @@ class MoveObject(Operator, utils.ItemMoveOp):
         return __MovableList(objects)
 
 
-class CleanShapeKeys(Operator):
+class CleanShapeKeys(bpy.types.Operator):
     bl_idname = "mmd_tools_local.clean_shape_keys"
     bl_label = "Clean Shape Keys"
     bl_description = "Remove unused shape keys of selected mesh objects"
@@ -101,10 +100,7 @@ class CleanShapeKeys(Operator):
 
     @classmethod
     def poll(cls, context):
-        for obj in context.selected_objects:
-            if obj.type == "MESH":
-                return True
-        return False
+        return any(o.type == "MESH" for o in context.selected_objects)
 
     @staticmethod
     def __can_remove(key_block):
@@ -118,21 +114,22 @@ class CleanShapeKeys(Operator):
     def __shape_key_clean(self, obj, key_blocks):
         for kb in key_blocks:
             if self.__can_remove(kb):
-                obj.shape_key_remove(kb)
+                FnObject.mesh_remove_shape_key(obj, kb)
         if len(key_blocks) == 1:
-            obj.shape_key_remove(key_blocks[0])
+            FnObject.mesh_remove_shape_key(obj, key_blocks[0])
 
     def execute(self, context):
-        for ob in context.selected_objects:
-            if ob.type != "MESH" or ob.data.shape_keys is None:
+        obj: bpy.types.Object
+        for obj in context.selected_objects:
+            if obj.type != "MESH" or obj.data.shape_keys is None:
                 continue
-            if not ob.data.shape_keys.use_relative:
+            if not obj.data.shape_keys.use_relative:
                 continue  # not be considered yet
-            self.__shape_key_clean(ObjectOp(ob), ob.data.shape_keys.key_blocks)
+            self.__shape_key_clean(obj, obj.data.shape_keys.key_blocks)
         return {"FINISHED"}
 
 
-class SeparateByMaterials(Operator):
+class SeparateByMaterials(bpy.types.Operator):
     bl_idname = "mmd_tools_local.separate_by_materials"
     bl_label = "Separate By Materials"
     bl_options = {"REGISTER", "UNDO"}
@@ -149,13 +146,13 @@ class SeparateByMaterials(Operator):
         return obj and obj.type == "MESH"
 
     def __separate_by_materials(self, obj):
-        utils.separateByMaterials(obj)
+        mmd_tools_local.utils.separateByMaterials(obj)
         if self.clean_shape_keys:
             bpy.ops.mmd_tools_local.clean_shape_keys()
 
     def execute(self, context):
         obj = context.active_object
-        root = mmd_model.Model.findRoot(obj)
+        root = FnModel.find_root_object(obj)
         if root is None:
             self.__separate_by_materials(obj)
         else:
@@ -163,7 +160,7 @@ class SeparateByMaterials(Operator):
             bpy.ops.mmd_tools_local.clear_uv_morph_view()
 
             # Store the current material names
-            rig = mmd_model.Model(root)
+            rig = Model(root)
             mat_names = [getattr(mat, "name", None) for mat in rig.materials()]
             self.__separate_by_materials(obj)
             for mesh in rig.meshes():
@@ -175,11 +172,11 @@ class SeparateByMaterials(Operator):
 
             for morph in root.mmd_root.material_morphs:
                 FnMorph(morph, rig).update_mat_related_mesh()
-        utils.clearUnusedMeshes()
+        mmd_tools_local.utils.clearUnusedMeshes()
         return {"FINISHED"}
 
 
-class JoinMeshes(Operator):
+class JoinMeshes(bpy.types.Operator):
     bl_idname = "mmd_tools_local.join_meshes"
     bl_label = "Join Meshes"
     bl_description = "Join the Model meshes into a single one"
@@ -193,7 +190,7 @@ class JoinMeshes(Operator):
 
     def execute(self, context):
         obj = context.active_object
-        root = mmd_model.Model.findRoot(obj)
+        root = FnModel.find_root_object(obj)
         if root is None:
             self.report({"ERROR"}, "Select a MMD model")
             return {"CANCELLED"}
@@ -202,16 +199,15 @@ class JoinMeshes(Operator):
         bpy.ops.mmd_tools_local.clear_uv_morph_view()
 
         # Find all the meshes in mmd_root
-        rig = mmd_model.Model(root)
+        rig = Model(root)
         meshes_list = sorted(rig.meshes(), key=lambda x: x.name)
         if not meshes_list:
             self.report({"ERROR"}, "The model does not have any meshes")
             return {"CANCELLED"}
         active_mesh = meshes_list[0]
 
-        from mmd_tools_local import bpyutils
-
-        bpyutils.select_object(active_mesh, objects=meshes_list)
+        FnContext.select_objects(context, *meshes_list)
+        FnContext.set_active_object(context, active_mesh)
 
         # Store the current order of the materials
         for m in meshes_list[1:]:
@@ -227,11 +223,11 @@ class JoinMeshes(Operator):
             active_mesh.active_shape_key_index = 0
         for morph in root.mmd_root.material_morphs:
             FnMorph(morph, rig).update_mat_related_mesh(active_mesh)
-        utils.clearUnusedMeshes()
+        mmd_tools_local.utils.clearUnusedMeshes()
         return {"FINISHED"}
 
 
-class AttachMeshesToMMD(Operator):
+class AttachMeshesToMMD(bpy.types.Operator):
     bl_idname = "mmd_tools_local.attach_meshes"
     bl_label = "Attach Meshes to Model"
     bl_description = "Finds existing meshes and attaches them to the selected MMD model"
@@ -240,21 +236,21 @@ class AttachMeshesToMMD(Operator):
     add_armature_modifier: bpy.props.BoolProperty(default=True)
 
     def execute(self, context: bpy.types.Context):
-        root = mmd_model.FnModel.find_root_object(context.active_object)
+        root = FnModel.find_root_object(context.active_object)
         if root is None:
             self.report({"ERROR"}, "Select a MMD model")
             return {"CANCELLED"}
 
-        armObj = mmd_model.FnModel.find_armature_object(root)
+        armObj = FnModel.find_armature_object(root)
         if armObj is None:
             self.report({"ERROR"}, "Model Armature not found")
             return {"CANCELLED"}
 
-        mmd_model.FnModel.attach_mesh_objects(root, context.visible_objects, self.add_armature_modifier)
+        FnModel.attach_mesh_objects(root, context.visible_objects, self.add_armature_modifier)
         return {"FINISHED"}
 
 
-class ChangeMMDIKLoopFactor(Operator):
+class ChangeMMDIKLoopFactor(bpy.types.Operator):
     bl_idname = "mmd_tools_local.change_mmd_ik_loop_factor"
     bl_label = "Change MMD IK Loop Factor"
     bl_description = "Multiplier for all bones' IK iterations in Blender"
@@ -270,21 +266,21 @@ class ChangeMMDIKLoopFactor(Operator):
 
     @classmethod
     def poll(cls, context):
-        return mmd_model.FnModel.find_root_object(context.active_object) is not None
+        return FnModel.find_root_object(context.active_object) is not None
 
     def invoke(self, context, event):
-        root_object = mmd_model.FnModel.find_root_object(context.active_object)
+        root_object = FnModel.find_root_object(context.active_object)
         self.mmd_ik_loop_factor = root_object.mmd_root.ik_loop_factor
         vm = context.window_manager
         return vm.invoke_props_dialog(self)
 
     def execute(self, context):
-        root_object = mmd_model.FnModel.find_root_object(context.active_object)
-        mmd_model.FnModel.change_mmd_ik_loop_factor(root_object, self.mmd_ik_loop_factor)
+        root_object = FnModel.find_root_object(context.active_object)
+        FnModel.change_mmd_ik_loop_factor(root_object, self.mmd_ik_loop_factor)
         return {"FINISHED"}
 
 
-class RecalculateBoneRoll(Operator):
+class RecalculateBoneRoll(bpy.types.Operator):
     bl_idname = "mmd_tools_local.recalculate_bone_roll"
     bl_label = "Recalculate bone roll"
     bl_description = "Recalculate bone roll for arm related bones"

@@ -9,10 +9,10 @@ import bpy
 from mathutils import Euler, Vector
 
 from mmd_tools_local import utils
-from mmd_tools_local.bpyutils import FnContext, Props, activate_layer_collection
+from mmd_tools_local.bpyutils import FnContext, Props
 from mmd_tools_local.core import rigid_body
-from mmd_tools_local.core.rigid_body import FnRigidBody
 from mmd_tools_local.core.model import FnModel, Model
+from mmd_tools_local.core.rigid_body import FnRigidBody
 
 
 class SelectRigidBody(bpy.types.Operator):
@@ -304,7 +304,7 @@ class RigidBodyBake(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
     def execute(self, context: bpy.types.Context):
-        with bpy.context.temp_override(scene=context.scene, point_cache=context.scene.rigidbody_world.point_cache):
+        with context.temp_override(scene=context.scene, point_cache=context.scene.rigidbody_world.point_cache):
             bpy.ops.ptcache.bake("INVOKE_DEFAULT", bake=True)
 
         return {"FINISHED"}
@@ -316,7 +316,7 @@ class RigidBodyDeleteBake(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
     def execute(self, context: bpy.types.Context):
-        with bpy.context.temp_override(scene=context.scene, point_cache=context.scene.rigidbody_world.point_cache):
+        with context.temp_override(scene=context.scene, point_cache=context.scene.rigidbody_world.point_cache):
             bpy.ops.ptcache.free_bake("INVOKE_DEFAULT")
 
         return {"FINISHED"}
@@ -503,9 +503,8 @@ class UpdateRigidBodyWorld(bpy.types.Operator):
             rbw.constraints = bpy.data.collections.new("RigidBodyConstraints")
             rbw.constraints.use_fake_user = True
 
-        if hasattr(bpy.context.scene.rigidbody_world, "substeps_per_frame"):
-            bpy.context.scene.rigidbody_world.substeps_per_frame = 1
-            bpy.context.scene.rigidbody_world.solver_iterations = 60
+        bpy.context.scene.rigidbody_world.substeps_per_frame = 6
+        bpy.context.scene.rigidbody_world.solver_iterations = 10
 
         return rbw.collection.objects, rbw.constraints.objects
 
@@ -558,19 +557,19 @@ class UpdateRigidBodyWorld(bpy.types.Operator):
             if not _update_group(i, rbc_objs):
                 continue
 
-            rbc, root = i.rigid_body_constraint, FnModel.find_root_object(i)
-            rb_map = table.get(root, {})
+            rbc, root_object = i.rigid_body_constraint, FnModel.find_root_object(i)
+            rb_map = table.get(root_object, {})
             rbc.object1 = rb_map.get(rbc.object1, rbc.object1)
             rbc.object2 = rb_map.get(rbc.object2, rbc.object2)
 
         if need_rebuild_physics:
-            for root in scene.objects:
-                if root.mmd_type != "ROOT":
+            for root_object in scene.objects:
+                if root_object.mmd_type != "ROOT":
                     continue
-                if not root.mmd_root.is_built:
+                if not root_object.mmd_root.is_built:
                     continue
-                with activate_layer_collection(root):
-                    Model(root).build()
+                with FnContext.temp_override_active_layer_collection(context, root_object):
+                    Model(root_object).build()
                     # After rebuild. First play. Will be crash!
                     # But saved it before. Reload after crash. The play can be work.
 

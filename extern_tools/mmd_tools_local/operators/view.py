@@ -33,8 +33,8 @@ class _SetShadingBase:
                 s.material.use_nodes = False
                 s.material.use_shadeless = use_shadeless
 
-    def execute(self, context):  # TODO
-        context.scene.render.engine = "BLENDER_EEVEE"
+    def execute(self, context):
+        context.scene.render.engine = "BLENDER_EEVEE_NEXT"
 
         shading_mode = getattr(self, "_shading_mode", None)
         for space in self._get_view3d_spaces(context):

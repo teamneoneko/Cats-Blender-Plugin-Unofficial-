@@ -3,114 +3,55 @@
 # This file is part of MMD Tools.
 
 import bpy
-from bpy.types import Panel, UIList
 
-from mmd_tools_local.bpyutils import SceneOp
-from mmd_tools_local.core.model import FnModel, Model
-from mmd_tools_local.panels.tool import _PanelBase
+from mmd_tools_local.core.model import FnModel
+from mmd_tools_local.panels.sidebar import PT_ProductionPanelBase
 
 
-class mmd_tools_local_UL_Materials(UIList):
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        if self.layout_type in {"DEFAULT"}:
-            if item:
-                row = layout.row(align=True)
-                item_prop = getattr(item, "mmd_material")
-                row.prop(item_prop, "name_j", text="", emboss=False, icon="MATERIAL")
-                row.prop(item_prop, "name_e", text="", emboss=True)
-            else:
-                layout.label(text="UNSET", translate=False, icon="ERROR")
-        elif self.layout_type in {"COMPACT"}:
-            pass
-        elif self.layout_type in {"GRID"}:
-            layout.alignment = "CENTER"
-            layout.label(text="", icon_value=icon)
-
-    def draw_filter(self, context, layout):
-        layout.label(text="Use the arrows to sort", icon="INFO")
-
-
-class MMDMaterialSorter(_PanelBase, Panel):
-    bl_idname = "OBJECT_PT_mmd_tools_local_material_sorter"
-    bl_label = "Material Sorter"
-    bl_context = ""
+class MMDBoneOrder(PT_ProductionPanelBase, bpy.types.Panel):
+    bl_idname = "OBJECT_PT_mmd_tools_local_bone_order"
+    bl_label = "Bone Order"
     bl_options = {"DEFAULT_CLOSED"}
+    bl_order = 5
 
     def draw(self, context):
         layout = self.layout
         active_obj = context.active_object
-        if active_obj is None or active_obj.type != "MESH" or active_obj.mmd_type != "NONE":
-            layout.label(text="Select a mesh object")
-            return
-
-        col = layout.column(align=True)
-        row = col.row()
-        row.template_list("mmd_tools_local_UL_Materials", "", active_obj.data, "materials", active_obj, "active_material_index")
-        tb = row.column()
-        tb1 = tb.column(align=True)
-        tb1.operator("mmd_tools_local.move_material_up", text="", icon="TRIA_UP")
-        tb1.operator("mmd_tools_local.move_material_down", text="", icon="TRIA_DOWN")
-
-
-class mmd_tools_local_UL_ModelMeshes(UIList):
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        if self.layout_type in {"DEFAULT"}:
-            layout.label(text=item.name, translate=False, icon="OBJECT_DATA")
-        elif self.layout_type in {"COMPACT"}:
-            pass
-        elif self.layout_type in {"GRID"}:
-            layout.alignment = "CENTER"
-            layout.label(text="", icon_value=icon)
-
-    def draw_filter(self, context, layout):
-        layout.label(text="Use the arrows to sort", icon="INFO")
-
-    def filter_items(self, context, data, propname):
-        # We will use the filtering to sort the mesh objects to match the rig order
-        objects = getattr(data, propname)
-        flt_flags = [~self.bitflag_filter_item] * len(objects)
-        flt_neworder = list(range(len(objects)))
-
-        armature = Model(Model.findRoot(context.active_object)).armature()
-        __is_child_of_armature = lambda x: x.parent and (x.parent == armature or __is_child_of_armature(x.parent))
-
-        name_dict = {}
-        for i, obj in enumerate(objects):
-            if obj.type == "MESH" and obj.mmd_type == "NONE" and __is_child_of_armature(obj):
-                flt_flags[i] = self.bitflag_filter_item
-                name_dict[obj.name] = i
-
-        for new_index, name in enumerate(sorted(name_dict.keys())):
-            i = name_dict[name]
-            flt_neworder[i] = new_index
-
-        return flt_flags, flt_neworder
-
-
-class MMDMeshSorter(_PanelBase, Panel):
-    bl_idname = "OBJECT_PT_mmd_tools_local_meshes_sorter"
-    bl_label = "Meshes Sorter"
-    bl_context = ""
-    bl_options = {"DEFAULT_CLOSED"}
-
-    def draw(self, context):
-        layout = self.layout
-        active_obj = context.active_object
-        root = Model.findRoot(active_obj)
+        root = FnModel.find_root_object(active_obj)
         if root is None:
             layout.label(text="Select a MMD Model")
             return
 
+        armature = FnModel.find_armature_object(root)
+        if armature is None:
+            layout.label(text="The armature object of active MMD model can't be found", icon="ERROR")
+            return
+
+        bone_order_mesh_object = FnModel.find_bone_order_mesh_object(root)
+        bone_count = mmd_tools_local_UL_ModelBones.update_bone_tables(armature, bone_order_mesh_object)
+
         col = layout.column(align=True)
         row = col.row()
-        row.template_list("mmd_tools_local_UL_ModelMeshes", "", SceneOp(context).id_scene, "objects", root.mmd_root, "active_mesh_index")
-        tb = row.column()
-        tb1 = tb.column(align=True)
-        tb1.enabled = active_obj.type == "MESH" and active_obj.mmd_type == "NONE"
-        tb1.operator("mmd_tools_local.object_move", text="", icon="TRIA_UP_BAR").type = "TOP"
-        tb1.operator("mmd_tools_local.object_move", text="", icon="TRIA_UP").type = "UP"
-        tb1.operator("mmd_tools_local.object_move", text="", icon="TRIA_DOWN").type = "DOWN"
-        tb1.operator("mmd_tools_local.object_move", text="", icon="TRIA_DOWN_BAR").type = "BOTTOM"
+        if bone_order_mesh_object is None:
+            row.template_list("mmd_tools_local_UL_ModelBones", "", armature.pose, "bones", root.vertex_groups, "active_index")
+            col.operator("mmd_tools_local.object_select", text="(%d) %s" % (bone_count, armature.name), icon="OUTLINER_OB_ARMATURE", emboss=False).name = armature.name
+            col.label(text='No mesh object with "mmd_bone_order_override" modifier', icon="ERROR")
+        else:
+            row.template_list("mmd_tools_local_UL_ModelBones", "", bone_order_mesh_object, "vertex_groups", bone_order_mesh_object.vertex_groups, "active_index")
+
+            tb = row.column()
+            tb.enabled = bone_order_mesh_object == active_obj
+            tb1 = tb.column(align=True)
+            tb1.menu("OBJECT_MT_mmd_tools_local_bone_order_menu", text="", icon="DOWNARROW_HLT")
+            tb.separator()
+            tb1 = tb.column(align=True)
+            tb1.operator("object.vertex_group_move", text="", icon="TRIA_UP").direction = "UP"
+            tb1.operator("object.vertex_group_move", text="", icon="TRIA_DOWN").direction = "DOWN"
+
+            row = col.row()
+            row.operator("mmd_tools_local.object_select", text="(%d) %s" % (bone_count, armature.name), icon="OUTLINER_OB_ARMATURE", emboss=False).name = armature.name
+            row.label(icon="BACK")
+            row.operator("mmd_tools_local.object_select", text=bone_order_mesh_object.name, icon="OBJECT_DATA", emboss=False).name = bone_order_mesh_object.name
 
 
 class _DummyVertexGroup:
@@ -120,7 +61,7 @@ class _DummyVertexGroup:
         self.index = index
 
 
-class mmd_tools_local_UL_ModelBones(UIList):
+class mmd_tools_local_UL_ModelBones(bpy.types.UIList):
     _IK_MAP = {}
     _IK_BONES = {}
     _DUMMY_VERTEX_GROUPS = {}
@@ -294,49 +235,3 @@ class MMDBoneOrderMenu(bpy.types.Menu):
         layout.operator("object.vertex_group_sort", text="Sort by Bone Hierarchy", icon="BONE_DATA").sort_type = "BONE_HIERARCHY"
         layout.separator()
         layout.operator("mmd_tools_local.add_missing_vertex_groups_from_bones", icon="PRESET_NEW")
-
-
-class MMDBoneOrder(_PanelBase, Panel):
-    bl_idname = "OBJECT_PT_mmd_tools_local_bone_order"
-    bl_label = "Bone Order"
-    bl_context = ""
-    bl_options = {"DEFAULT_CLOSED"}
-
-    def draw(self, context):
-        layout = self.layout
-        active_obj = context.active_object
-        root = FnModel.find_root_object(active_obj)
-        if root is None:
-            layout.label(text="Select a MMD Model")
-            return
-
-        armature = FnModel.find_armature_object(root)
-        if armature is None:
-            layout.label(text="The armature object of active MMD model can't be found", icon="ERROR")
-            return
-
-        bone_order_mesh_object = FnModel.find_bone_order_mesh_object(root)
-        bone_count = mmd_tools_local_UL_ModelBones.update_bone_tables(armature, bone_order_mesh_object)
-
-        col = layout.column(align=True)
-        row = col.row()
-        if bone_order_mesh_object is None:
-            row.template_list("mmd_tools_local_UL_ModelBones", "", armature.pose, "bones", root.vertex_groups, "active_index")
-            col.operator("mmd_tools_local.object_select", text="(%d) %s" % (bone_count, armature.name), icon="OUTLINER_OB_ARMATURE", emboss=False).name = armature.name
-            col.label(text='No mesh object with "mmd_bone_order_override" modifier', icon="ERROR")
-        else:
-            row.template_list("mmd_tools_local_UL_ModelBones", "", bone_order_mesh_object, "vertex_groups", bone_order_mesh_object.vertex_groups, "active_index")
-
-            tb = row.column()
-            tb.enabled = bone_order_mesh_object == active_obj
-            tb1 = tb.column(align=True)
-            tb1.menu("OBJECT_MT_mmd_tools_local_bone_order_menu", text="", icon="DOWNARROW_HLT")
-            tb.separator()
-            tb1 = tb.column(align=True)
-            tb1.operator("object.vertex_group_move", text="", icon="TRIA_UP").direction = "UP"
-            tb1.operator("object.vertex_group_move", text="", icon="TRIA_DOWN").direction = "DOWN"
-
-            row = col.row()
-            row.operator("mmd_tools_local.object_select", text="(%d) %s" % (bone_count, armature.name), icon="OUTLINER_OB_ARMATURE", emboss=False).name = armature.name
-            row.label(icon="BACK")
-            row.operator("mmd_tools_local.object_select", text=bone_order_mesh_object.name, icon="OBJECT_DATA", emboss=False).name = bone_order_mesh_object.name
