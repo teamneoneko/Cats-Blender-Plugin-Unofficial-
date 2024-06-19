@@ -7,7 +7,7 @@ import copy
 import time
 import pathlib
 import collections
-from threading import Thread
+from threading import Thread, Event
 from datetime import datetime, timezone
 from collections import OrderedDict
 
@@ -24,6 +24,7 @@ settings_file = os.path.join(resources_dir, "settings.json")
 
 settings_data = None
 settings_data_unchanged = None
+settings_stop_event = Event()
 settings_threads = []
 
 # Settings name = [Default Value, Require Blender Restart]
@@ -189,19 +190,18 @@ def start_apply_settings_timer():
     settings_threads.append(thread)
     thread.start()
 
-
 def stop_apply_settings_threads():
-    global settings_threads
+    global settings_threads, settings_stop_event
 
     print("Stopping settings threads...")
+    settings_stop_event.set()
     for t in settings_threads:
         t.join()
     print("Settings threads stopped.")
 
-
 def apply_settings():
     applied = False
-    while not applied:
+    while not applied and not settings_stop_event.is_set():
         if hasattr(bpy.context, 'scene'):
             try:
                 settings_to_reset = []
@@ -225,7 +225,6 @@ def apply_settings():
     # Unlock settings
     global lock_settings
     lock_settings = False
-
 
 def settings_changed():
     for setting, value in settings_default.items():
