@@ -8,8 +8,8 @@ bl_info = {
     'description': 'A tool designed to shorten steps needed to import and optimize models into VRChat',
     'version': (4, 1, 1, 3),  # Has to be (x, x, x) not [x, x, x]!! Only change this version and the dev branch var right before publishing the new update!
     'blender': (4, 1, 0),
-    'wiki_url': 'https://github.com/unofficalcats/Cats-Blender-Plugin-Unofficial-/wiki',
-    'tracker_url': 'https://github.com/unofficalcats/Cats-Blender-Plugin-Unofficial-/issues',
+    'wiki_url': 'https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-/wiki',
+    'tracker_url': 'https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-/issues',
     'warning': '',
 }
 

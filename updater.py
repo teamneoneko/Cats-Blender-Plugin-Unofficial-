@@ -379,7 +379,7 @@ def check_for_update():
     print('Checking for Cats update...')
 
     # Get all releases from Github
-    if not get_github_releases('Darkblader24') and not get_github_releases('unofficalcats'):
+    if not get_github_releases('teamneoneko'):
         finish_update_checking(error=t('check_for_update.cantCheck'))
         return
 
@@ -531,7 +531,7 @@ def update_now(version=None, latest=False, dev=False):
         return
     if dev:
         print('UPDATE TO DEVELOPMENT')
-        update_link = 'https://github.com/unofficalcats/Cats-Blender-Plugin-Unofficial-/archive/blender-41-dev.zip'
+        update_link = 'https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-/archive/blender-41-dev.zip'
     elif latest or not version:
         print('UPDATE TO ' + latest_version_str)
         update_link = version_list.get(latest_version_str)[0]
