@@ -5,7 +5,7 @@
 
 #### Struggling to find the correct version of Cats for your Blender version? then use our website to find the correct version: https://catsblenderplugin.xyz/
 
-The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat. Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
+The non official version of Cats Blender Plugin which is maintained by Tean Neoneko, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat. Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more
 
 With Cats it takes only a few minutes to upload your model into VRChat.
 All the hours long processes of fixing your models are compressed into a few functions!
@@ -14,20 +14,14 @@ All the hours long processes of fixing your models are compressed into a few fun
 
 #### Warning, Cats has changed UI wise, please [click here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Features) to see the new UI features.
 
-You can find both 3.6 and 4.1 blender releases [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases), ensure you are using the one for your blender version!  
+You can find both 3.6, 4.1 and 4.2 blender releases [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases), ensure you are using the one for your blender version!  
 
 - You can find the development version for Blender 3.6 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-36-dev).
 - You can find the development version for Blender 4.1 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-41-dev).
 - You can find the development version for Blender 4.2 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-42-dev).
 
-### Warning for Blender 4.1 users:
-Although we have updated Cats to work with Blender 4.1, please note that there are still some issues with MMD Tools which may break some plugin functionality. This is not a Cats issue, so please redirect those issues to MMD Tools. Blender 4.1 is not our priority and will be behind the Blender 3.6 version. We HIGHLY recommend using Blender 3.6 for the time being unless you REALLY need the new features in 4.1, which, if you're just making VRChat models or doing MMD stuff, you most likely don't.
-
-Blender 4.1 is also buggy and does have issues as well. We won't be recommending the use of Blender 4.x until the first LTS comes out later this year.
-
 ### Warning for Blender 4.2 users:
-Blender 4.2 is in an Alpha state, and this also applies to the Cats Plugin. We will not accept any issues on Blender 4.2 until the first full release of Cats is out. Please use Blender 3.6 LTS for a stable experience for the time being!
-
+Blender 4.2 is in an Beta state, and this also applies to the Cats Plugin. We will not accept any issues on Blender 4.2 until the first full release of Cats is out. Please use Blender 3.6 LTS for a stable experience for the time being!
 
 ## Blender version support policies.
 
@@ -42,7 +36,6 @@ Please [Click Here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/
 
 - Blender 3.6 or above (run as administrator is recommended) (Please note some features may not work in version below 3.6).
    - Blender 3.6 is Recommended as this is the latest LTS.
-   - Though I have updated CATS to Blender 4.1, I do not currently recommend using 4.1 as there multiple issues with MDD Tools and Blender 4.1 which cats uses.
 - Anything older then 3.6 is not supported and no longer works.
 - If you have custom Python installed which Blender might use, you need to have Numpy installed
 - Note to Windows Store users: Though Cats seems to work on Windows Store these days no support will be given if there are any issues as the Unofficial cats does not support Windows store due to issues Windows Store versions of Blender have given in the past. 
