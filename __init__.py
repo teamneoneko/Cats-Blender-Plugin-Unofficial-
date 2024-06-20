@@ -1,6 +1,6 @@
 # MIT License
 
-CATS_VERSION = "4.2.0.1"
+CATS_VERSION = "4.2.0.2"
 dev_branch = True
 
 
