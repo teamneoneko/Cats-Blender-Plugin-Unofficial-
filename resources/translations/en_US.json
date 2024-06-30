@@ -421,7 +421,7 @@
         "ErrorDisplay.meshes1": "Meshes not joined!",
         "ErrorDisplay.meshes2": "This model has {number} meshes!",
         "ErrorDisplay.meshes3": "It is not very optimized and might cause lag for you and others!",
-        "ErrorDisplay.meshes3_alt": "It is extremely unoptimized and will cause laugh for you and others!",
+        "ErrorDisplay.meshes3_alt": "It is extremely unoptimized and will cause lagg for you and others!",
         "ErrorDisplay.meshes4": "You should always join your meshes, it's very easy:",
         "ErrorDisplay.JoinMeshes.label": "Join Meshes",
         "ErrorDisplay.brokenShapekeys1": "Broken shapekeys!",
