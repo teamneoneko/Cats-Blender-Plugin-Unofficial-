@@ -981,24 +981,23 @@ def save_shapekey_order(mesh_name):
 def repair_shapekey_order(mesh_name):
     # Get current custom data
     armature = get_armature()
-    custom_data = armature.get('CUSTOM')
-    if not custom_data:
-        custom_data = {}
+    custom_data = armature.get('CUSTOM', {})
 
-    # Extract shape keys from string
-    shape_key_order = custom_data.get('shape_key_order')
+    # Extract shape keys from string, using an empty list as default
+    shape_key_order = custom_data.get('shape_key_order', [])
+
     if not shape_key_order:
         custom_data['shape_key_order'] = []
         armature['CUSTOM'] = custom_data
-
-    if type(shape_key_order) is str:
-        shape_key_order_temp = []
-        for shape_name in shape_key_order.split(',,,'):
-            shape_key_order_temp.append(shape_name)
+    elif isinstance(shape_key_order, str):
+        shape_key_order_temp = shape_key_order.split(',,,')
         custom_data['shape_key_order'] = shape_key_order_temp
         armature['CUSTOM'] = custom_data
 
-    sort_shape_keys(mesh_name, custom_data['shape_key_order'])
+    # Only call sort_shape_keys if shape_key_order is not empty
+    if custom_data.get('shape_key_order'):
+        sort_shape_keys(mesh_name, custom_data['shape_key_order'])
+
 
 
 def update_shapekey_orders():
@@ -1029,13 +1028,12 @@ def update_shapekey_orders():
 
 
 def sort_shape_keys(mesh_name, shape_key_order=None):
-    mesh = get_objects()[mesh_name]
-    if not has_shapekeys(mesh):
+    mesh = get_objects().get(mesh_name)
+    if not mesh or not has_shapekeys(mesh):
         return
     set_active(mesh)
 
-    if not shape_key_order:
-        shape_key_order = []
+    shape_key_order = shape_key_order or []
 
     order = [
         'Basis',
