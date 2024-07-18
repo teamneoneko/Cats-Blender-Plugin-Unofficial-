@@ -448,7 +448,85 @@ class ShapeKeyApplier(bpy.types.Operator):
         data.shape_keys.reference_key.data.foreach_get('co', temp_co_array)
         data.vertices.foreach_set('co', temp_co_array)
 
+@register_wrap
+class ShapeKeyPruner(bpy.types.Operator):
+
+    # Removes shapekeys where no vertex is meaningfully moved
+    bl_idname = "cats_shapekey.shape_key_prune"
+    bl_label = t('ShapeKeyPruner.label')
+    bl_description = t('ShapeKeyPruner.desc')
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
+
+    # Tolerance for small differences
+    TOLERANCE = 0.001
+
+    @classmethod
+    def poll(cls, context):
+        return (context.mode == 'OBJECT' and
+                context.object and
+                # Skip non-mesh objects
+                context.object.type == 'MESH' and
+                # Skip objects without shape keys
+                context.object.data.shape_keys and
+                # Skip objects that don't use relative shape keys
+                context.object.data.shape_keys.use_relative)
+
+    def execute(self, context):
+
+        mesh = context.object
+
+        report_messages = []
+
+        shape_keys = mesh.data.shape_keys.key_blocks
+        num_vertices = len(mesh.data.vertices)
+        shape_keys_to_delete = []
+
+        # Cache locations for relative keys to optimize performance
+        relative_key_cache = {}
+
+        # Array to store vertex locations
+        vertex_locations = np.empty(3 * num_vertices, dtype=np.float32)
+
+        for shape_key in shape_keys:
+            # Skip the basis key
+            if shape_key == shape_key.relative_key:
+                continue
+
+            # Get the vertex coordinates for the current shape key
+            shape_key.data.foreach_get("co", vertex_locations)
+
+            # Cache the coordinates of the relative key if not already cached
+            if shape_key.relative_key.name not in relative_key_cache:
+                relative_locations = np.empty(3 * num_vertices, dtype=np.float32)
+                shape_key.relative_key.data.foreach_get("co", relative_locations)
+                relative_key_cache[shape_key.relative_key.name] = relative_locations
+
+            relative_locations = relative_key_cache[shape_key.relative_key.name]
+
+            vertex_locations -= relative_locations
+
+            # Check if all differences are within the specified tolerance
+            if (np.abs(vertex_locations) < ShapeKeyPruner.TOLERANCE).all():
+                # don't remove the silence viseme
+                if ('vrc.v_sil' not in shape_key.name):
+                    shape_keys_to_delete.append(shape_key.name)
+
+        if (len(shape_keys_to_delete) > 0):
+            report_messages.append(t('ShapeKeyPruner.removedPrefix'))
+        
+            # Remove redundant shape keys
+            for keyblock_name in shape_keys_to_delete:
+                mesh.shape_key_remove(mesh.data.shape_keys.key_blocks[keyblock_name])
+                report_messages.append(keyblock_name)
+
+        else:
+            report_messages.append(t('ShapeKeyPruner.nothingRemoved'))
+
+        self.report({'INFO'}, " \n".join(report_messages))
+        return {'FINISHED'}
+
 
 def addToShapekeyMenu(self, context):
     self.layout.separator()
     self.layout.operator(ShapeKeyApplier.bl_idname, text=t('addToShapekeyMenu.ShapeKeyApplier.label'), icon="KEY_HLT")
+    self.layout.operator(ShapeKeyPruner.bl_idname, text=t('addToShapekeyMenu.ShapeKeyPruner.label'), icon="KEY_DEHLT")
