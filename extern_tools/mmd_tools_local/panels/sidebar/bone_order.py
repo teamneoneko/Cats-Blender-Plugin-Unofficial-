@@ -28,16 +28,16 @@ class MMDBoneOrder(PT_ProductionPanelBase, bpy.types.Panel):
             return
 
         bone_order_mesh_object = FnModel.find_bone_order_mesh_object(root)
-        bone_count = mmd_tools_local_UL_ModelBones.update_bone_tables(armature, bone_order_mesh_object)
+        bone_count = MMD_TOOLS_LOCAL_UL_ModelBones.update_bone_tables(armature, bone_order_mesh_object)
 
         col = layout.column(align=True)
         row = col.row()
         if bone_order_mesh_object is None:
-            row.template_list("mmd_tools_local_UL_ModelBones", "", armature.pose, "bones", root.vertex_groups, "active_index")
+            row.template_list("MMD_TOOLS_LOCAL_UL_ModelBones", "", armature.pose, "bones", root.vertex_groups, "active_index")
             col.operator("mmd_tools_local.object_select", text="(%d) %s" % (bone_count, armature.name), icon="OUTLINER_OB_ARMATURE", emboss=False).name = armature.name
             col.label(text='No mesh object with "mmd_bone_order_override" modifier', icon="ERROR")
         else:
-            row.template_list("mmd_tools_local_UL_ModelBones", "", bone_order_mesh_object, "vertex_groups", bone_order_mesh_object.vertex_groups, "active_index")
+            row.template_list("MMD_TOOLS_LOCAL_UL_ModelBones", "", bone_order_mesh_object, "vertex_groups", bone_order_mesh_object.vertex_groups, "active_index")
 
             tb = row.column()
             tb.enabled = bone_order_mesh_object == active_obj
@@ -61,7 +61,7 @@ class _DummyVertexGroup:
         self.index = index
 
 
-class mmd_tools_local_UL_ModelBones(bpy.types.UIList):
+class MMD_TOOLS_LOCAL_UL_ModelBones(bpy.types.UIList):
     _IK_MAP = {}
     _IK_BONES = {}
     _DUMMY_VERTEX_GROUPS = {}
