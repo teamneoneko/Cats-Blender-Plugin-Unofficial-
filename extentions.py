@@ -388,26 +388,6 @@ def register():
             ("BONEMERGING", t('Scene.optimize_mode.bonemerging.label'), t('Scene.optimize_mode.bonemerging.desc')),
         ]
     )
-
-    # Atlas
-    # Material.add_to_atlas = BoolProperty(
-    #     description=t('Add this material to the atlas'),
-    #     default=False
-    # )
-
-    # Scene.material_list_index = IntProperty(
-    #     default=0
-    # )
-
-    # Scene.material_list = CollectionProperty(
-    #     type=Atlas.MaterialsGroup
-    # )
-
-    # Scene.clear_materials = BoolProperty(
-    #     description=t('Clear materials checkbox'),
-    #     default=True
-    # )
-
     # Bone Merging
     Scene.merge_ratio = FloatProperty(
         name=t('Scene.merge_ratio.label'),
@@ -438,12 +418,6 @@ def register():
     Scene.embed_textures = BoolProperty(
         name=t('Scene.embed_textures.label'),
         description=t('Scene.embed_textures.desc'),
-        default=False,
-        update=Settings.update_settings
-    )
-    Scene.use_custom_mmd_tools = BoolProperty(
-        name=t('Scene.use_custom_mmd_tools.label'),
-        description=t('Scene.use_custom_mmd_tools.desc'),
         default=False,
         update=Settings.update_settings
     )
