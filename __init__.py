@@ -1,7 +1,8 @@
 # MIT License
 
 CATS_VERSION = "4.2.1.1"
-dev_branch = False
+dev_branch = True
+
 
 import os
 import sys
