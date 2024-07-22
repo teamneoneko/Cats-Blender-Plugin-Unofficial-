@@ -20,9 +20,6 @@ You can find both 3.6, 4.1 and 4.2 blender releases [here](https://github.com/Yu
 - You can find the development version for Blender 4.1 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-41-dev).
 - You can find the development version for Blender 4.2 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-42-dev).
 
-### Warning for Blender 4.2 users:
-Blender 4.2 is in an Beta state, and this also applies to the Cats Plugin. We will not accept any issues on Blender 4.2 until the first full release of Cats is out. Please use Blender 3.6 LTS for a stable experience for the time being!
-
 ## Blender version support policies.
 
 Please [Click Here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Blender-Version-Support-Policies) to view which versions of blender we support.
@@ -35,7 +32,7 @@ Please [Click Here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/
 ## Requirements
 
 - Blender 3.6 or above (run as administrator is recommended) (Please note some features may not work in version below 3.6).
-   - Blender 3.6 is Recommended as this is the latest LTS.
+   - Blender 4.2 is Recommended as this is the latest LTS.
 - Anything older then 3.6 is not supported and no longer works.
 - If you have custom Python installed which Blender might use, you need to have Numpy installed
 - Note to Windows Store users: Though Cats seems to work on Windows Store these days no support will be given if there are any issues as the Unofficial cats does not support Windows store due to issues Windows Store versions of Blender have given in the past. 
