@@ -31,8 +31,11 @@ def load_translations():
     dictionary = dict()
     languages = ["auto"]
 
+    print("Loading translations")
+    
     # Check the settings which translation to load
     language = get_language_from_settings()
+    print(f"Selected language: {language}")
     
     # Set default language to "en_US" if language is None
     if language is None:
@@ -41,19 +44,24 @@ def load_translations():
     # Get all current languages
     for i in os.listdir(translations_dir):
         languages.append(i.split(".")[0])
+    print(f"Available languages: {languages}")
     
     # Load the translation file
     translation_file = os.path.join(translations_dir, language + ".json")
     if os.path.exists(translation_file):
+        print(f"Loading translation file: {translation_file}")
         with open(translation_file, 'r') as file:
             dictionary = json.load(fp=file)["messages"]
+        print(f"Loaded {len(dictionary)} translations")
     else:
         print(f"Translation file not found for language: {language}")
         # Load the default "en_US" translation file
         default_file = os.path.join(translations_dir, "en_US.json")
         if os.path.exists(default_file):
+            print(f"Loading default translation file: {default_file}")
             with open(default_file, 'r') as file:
                 dictionary = json.load(fp=file)["messages"]
+            print(f"Loaded {len(dictionary)} translations")
         else:
             print("Default translation file 'en_US.json' not found.")
     
@@ -90,8 +98,12 @@ def get_languages_list(self, context):
 
 
 def update_ui(self, context):
+    print("update_ui function called")
     if settings.update_settings_core(None, None):
-        reload_scripts()
+        print("Reloading scripts")
+        bpy.ops.script.reload()
+    else:
+        print("Settings not updated, scripts not reloaded")
 
 
 def get_language_from_settings():
@@ -115,18 +127,6 @@ def get_language_from_settings():
         return locale
 
     return lang
-
-
-def reload_scripts():
-    for mod in addon_utils.modules():
-        if mod.bl_info['name'] == 'Cats Blender Plugin':
-            # importlib.reload(mod)
-            # bpy.ops.wm.addon_enable(module=mod.__name__)
-            # bpy.ops.preferences.addon_disable(module=mod.__name__)
-            # bpy.ops.preferences.addon_enable(module=mod.__name__)
-            bpy.ops.script.reload()
-            break
-
 
 @register_wrap
 class DownloadTranslations(bpy.types.Operator):
@@ -193,7 +193,7 @@ class DownloadTranslations(bpy.types.Operator):
             return {'CANCELLED'}
         print('DICTIONARY DOWNLOAD FINISHED')
 
-        reload_scripts()
+        bpy.ops.script.reload()
 
         self.report({'INFO'}, "Successfully downloaded the translations and dictionary")
         return {'FINISHED'}
