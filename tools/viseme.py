@@ -180,24 +180,27 @@ class AutoVisemeButton(bpy.types.Operator):
         # Rename shapes back
         if shapes[0] not in mesh.data.shape_keys.key_blocks:
             shapekey = mesh.data.shape_keys.key_blocks.get(renamed_shapes[0])
-            shapekey.name = shapes[0]
-            if renamed_shapes[2] == renamed_shapes[0]:
-                renamed_shapes[2] = shapes[0]
-            if renamed_shapes[1] == renamed_shapes[0]:
-                renamed_shapes[1] = shapes[0]
-            renamed_shapes[0] = shapes[0]
+            if shapekey:
+                shapekey.name = shapes[0]
+                if renamed_shapes[2] == renamed_shapes[0]:
+                    renamed_shapes[2] = shapes[0]
+                if renamed_shapes[1] == renamed_shapes[0]:
+                    renamed_shapes[1] = shapes[0]
+                renamed_shapes[0] = shapes[0]
 
         if shapes[1] not in mesh.data.shape_keys.key_blocks:
             shapekey = mesh.data.shape_keys.key_blocks.get(renamed_shapes[1])
-            shapekey.name = shapes[1]
-            if renamed_shapes[2] == renamed_shapes[1]:
-                renamed_shapes[2] = shapes[1]
-            renamed_shapes[1] = shapes[1]
+            if shapekey:
+                shapekey.name = shapes[1]
+                if renamed_shapes[2] == renamed_shapes[1]:
+                    renamed_shapes[2] = shapes[1]
+                renamed_shapes[1] = shapes[1]
 
         if shapes[2] not in mesh.data.shape_keys.key_blocks:
             shapekey = mesh.data.shape_keys.key_blocks.get(renamed_shapes[2])
-            shapekey.name = shapes[2]
-            renamed_shapes[2] = shapes[2]
+            if shapekey:
+                shapekey.name = shapes[2]
+                renamed_shapes[2] = shapes[2]
 
         # Reset context scenes
         try:

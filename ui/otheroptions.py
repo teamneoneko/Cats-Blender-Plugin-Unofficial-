@@ -8,6 +8,7 @@ from .main import layout_split, add_button_with_small_button
 from ..tools import translate as Translate
 from ..tools import common as Common
 from ..tools import armature_manual as Armature_manual
+from ..tools import shapekey as Shapekey
 from ..tools.register import register_wrap
 from ..tools.translations import t
 
@@ -72,7 +73,9 @@ class OtherOptionsPanel(ToolPanel, bpy.types.Panel):
 
             add_button_with_small_button(col, Armature_manual.ApplyTransformations.bl_idname, 'OUTLINER_DATA_ARMATURE',
                                               Armature_manual.ApplyAllTransformations.bl_idname, globs.ICON_ALL, scale=button_height)
-
+            row = col.row(align=True)
+            row.scale_y = button_height
+            row.operator(Shapekey.ShapeKeyPruner.bl_idname, icon='SHAPEKEY_DATA')
             row = col.row(align=True)
             row.scale_y = button_height
             row.operator(Armature_manual.RepairShapekeys.bl_idname, icon='MESH_DATA')
