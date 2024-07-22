@@ -429,8 +429,8 @@ def get_github_releases(repo):
     if not data:
         return False
     
-    if bpy.app.version >= (4, 2) and bpy.app.version < (4, 3):
-        tag_prefix = "4.2."
+    if bpy.app.version >= (4, 3) and bpy.app.version < (4, 4):
+        tag_prefix = "4.3."
 
     for version in data:
         full_tag = version.get('tag_name')
@@ -532,7 +532,7 @@ def update_now(version=None, latest=False, dev=False):
         return
     if dev:
         print('UPDATE TO DEVELOPMENT')
-        update_link = 'https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-/archive/blender-42-dev.zip'
+        update_link = 'https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-/archive/blender-43-dev.zip'
     elif latest or not version:
         print('UPDATE TO ' + latest_version_str)
         update_link = version_list.get(latest_version_str)[0]
