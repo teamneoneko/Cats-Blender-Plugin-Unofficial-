@@ -484,7 +484,7 @@
         "ShapeKeyApplier.successRemoved": "Successfully removed shapekey \"{name}\" from the Basis.",
         "ShapeKeyApplier.successSet": "Successfully applied shapekey \"{name}\" to the Basis.",
         "ShapeKeyPruner.label": "Remove Unused Shapekeys",
-        "ShapeKeyPruner.desc": "Removes unused shapekeys that don't affect the mesh",
+        "ShapeKeyPruner.desc": "Removes unused shapekeys that don't affect the mesh, must select the mesh before use.",
         "ShapeKeyPruner.removedPrefix": "Removed:",
         "ShapeKeyPruner.nothingRemoved": "No shapekeys were removed.",
         "addToShapekeyMenu.ShapeKeyApplier.label": "Apply Selected Shapekey to Basis",
