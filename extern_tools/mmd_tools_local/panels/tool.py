@@ -274,7 +274,7 @@ class MMDDisplayItemsPanel(_PanelBase, Panel):
 
 from mmd_tools_local.properties.morph import MaterialMorph
 
-class mmd_tools_local_UL_Morphs(UIList):
+class MMD_TOOLS_LOCAL_UL_Morphs(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         mmd_root = data
         if self.layout_type in {'DEFAULT'}:
@@ -300,7 +300,7 @@ class mmd_tools_local_UL_Morphs(UIList):
             layout.alignment = 'CENTER'
             layout.label(text="", icon_value=icon)
 
-class mmd_tools_local_UL_MaterialMorphOffsets(UIList):
+class MMD_TOOLS_LOCAL_UL_MaterialMorphOffsets(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {'DEFAULT'}:
             material = item.material
@@ -311,7 +311,7 @@ class mmd_tools_local_UL_MaterialMorphOffsets(UIList):
             layout.alignment = 'CENTER'
             layout.label(text="", icon_value=icon)
 
-class mmd_tools_local_UL_UVMorphOffsets(UIList):
+class MMD_TOOLS_LOCAL_UL_UVMorphOffsets(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {'DEFAULT'}:
             layout.label(text=str(item.index), translate=False, icon='MESH_DATA')
@@ -322,7 +322,7 @@ class mmd_tools_local_UL_UVMorphOffsets(UIList):
             layout.alignment = 'CENTER'
             layout.label(text="", icon_value=icon)
 
-class mmd_tools_local_UL_BoneMorphOffsets(UIList):
+class MMD_TOOLS_LOCAL_UL_BoneMorphOffsets(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {'DEFAULT'}:
             layout.prop(item, 'bone', text='', emboss=False, icon='BONE_DATA')
@@ -333,7 +333,7 @@ class mmd_tools_local_UL_BoneMorphOffsets(UIList):
             layout.alignment = 'CENTER'
             layout.label(text="", icon_value=icon)
 
-class mmd_tools_local_UL_GroupMorphOffsets(UIList):
+class MMD_TOOLS_LOCAL_UL_GroupMorphOffsets(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {'DEFAULT'}:
             row = _layout_split(layout, factor=0.5, align=True)
@@ -390,7 +390,7 @@ class MMDMorphToolsPanel(_PanelBase, Panel):
         c = col.column(align=True)
         row = c.row()
         row.template_list(
-            "mmd_tools_local_UL_Morphs", "",
+            "MMD_TOOLS_LOCAL_UL_Morphs", "",
             mmd_root, morph_type,
             mmd_root, "active_morph"
             )
@@ -457,7 +457,7 @@ class MMDMorphToolsPanel(_PanelBase, Panel):
 
     def _draw_material_data(self, context, rig, col, morph):
         col.label(text=bpy.app.translations.pgettext_iface('Material Offsets (%d)')%len(morph.data))
-        data = self._template_morph_offset_list(col, morph, 'mmd_tools_local_UL_MaterialMorphOffsets')
+        data = self._template_morph_offset_list(col, morph, 'MMD_TOOLS_LOCAL_UL_MaterialMorphOffsets')
         if data is None:
             return
 
@@ -540,7 +540,7 @@ class MMDMorphToolsPanel(_PanelBase, Panel):
         row.operator(operators.morph.ClearBoneMorphView.bl_idname, text='Clear')
 
         col.label(text=bpy.app.translations.pgettext_iface('Bone Offsets (%d)')%len(morph.data))
-        data = self._template_morph_offset_list(col, morph, 'mmd_tools_local_UL_BoneMorphOffsets')
+        data = self._template_morph_offset_list(col, morph, 'MMD_TOOLS_LOCAL_UL_BoneMorphOffsets')
         if data is None:
             return
 
@@ -574,13 +574,13 @@ class MMDMorphToolsPanel(_PanelBase, Panel):
             row.prop(morph, 'vertex_group_scale', text='Scale')
         else:
             row.label(text=bpy.app.translations.pgettext_iface('UV Offsets (%d)')%len(morph.data))
-            #self._template_morph_offset_list(c, morph, 'mmd_tools_local_UL_UVMorphOffsets')
+            #self._template_morph_offset_list(c, morph, 'MMD_TOOLS_LOCAL_UL_UVMorphOffsets')
         row.prop(morph, 'uv_index')
         row.operator('mmd_tools_local.morph_offset_remove', text='', icon='X').all = True
 
     def _draw_group_data(self, context, rig, col, morph):
         col.label(text=bpy.app.translations.pgettext_iface('Group Offsets (%d)')%len(morph.data))
-        item = self._template_morph_offset_list(col, morph, 'mmd_tools_local_UL_GroupMorphOffsets')
+        item = self._template_morph_offset_list(col, morph, 'MMD_TOOLS_LOCAL_UL_GroupMorphOffsets')
         if item is None:
             return
 
@@ -648,7 +648,7 @@ class UL_ObjectsMixIn(object):
             flt_neworder[i_orig] = i_new
         return flt_flags, flt_neworder
 
-class mmd_tools_local_UL_rigidbodies(UIList, UL_ObjectsMixIn):
+class MMD_TOOLS_LOCAL_UL_rigidbodies(UIList, UL_ObjectsMixIn):
     mmd_type = 'RIGID_BODY'
     icon = 'MESH_ICOSPHERE'
     prop_name = 'mmd_rigid'
@@ -700,7 +700,7 @@ class MMDRigidbodySelectorPanel(_PanelBase, Panel):
         c = col.column(align=True)
         row = c.row()
         row.template_list(
-            "mmd_tools_local_UL_rigidbodies",
+            "MMD_TOOLS_LOCAL_UL_rigidbodies",
             "",
             SceneOp(context).id_scene, 'objects',
             root.mmd_root, 'active_rigidbody_index',
@@ -717,7 +717,7 @@ class MMDRigidbodySelectorPanel(_PanelBase, Panel):
         tb1.operator('mmd_tools_local.object_move', text='', icon='TRIA_DOWN').type = 'DOWN'
 
 
-class mmd_tools_local_UL_joints(UIList, UL_ObjectsMixIn):
+class MMD_TOOLS_LOCAL_UL_joints(UIList, UL_ObjectsMixIn):
     mmd_type = 'JOINT'
     icon = 'CONSTRAINT'
     prop_name = 'mmd_joint'
@@ -758,7 +758,7 @@ class MMDJointSelectorPanel(_PanelBase, Panel):
 
         row = c.row()
         row.template_list(
-            "mmd_tools_local_UL_joints",
+            "MMD_TOOLS_LOCAL_UL_joints",
             "",
             SceneOp(context).id_scene, 'objects',
             root.mmd_root, 'active_joint_index',

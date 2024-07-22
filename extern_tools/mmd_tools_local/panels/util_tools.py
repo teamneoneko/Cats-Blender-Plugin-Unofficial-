@@ -15,7 +15,7 @@ if bpy.app.version < (2, 71, 0):
     ICON_APPEND_MOVE, ICON_APPEND_ROT, ICON_APPEND_MOVE_ROT = 'NDOF_TRANS', 'NDOF_TURN', 'FORCE_MAGNETIC'
 
 
-class mmd_tools_local_UL_Materials(UIList):
+class MMD_TOOLS_LOCAL_UL_Materials(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {'DEFAULT'}:
             if item:
@@ -50,7 +50,7 @@ class MMDMaterialSorter(_PanelBase, Panel):
 
         col = layout.column(align=True)
         row = col.row()
-        row.template_list("mmd_tools_local_UL_Materials", "",
+        row.template_list("MMD_TOOLS_LOCAL_UL_Materials", "",
                           active_obj.data, "materials",
                           active_obj, "active_material_index")
         tb = row.column()
@@ -58,7 +58,7 @@ class MMDMaterialSorter(_PanelBase, Panel):
         tb1.operator('mmd_tools_local.move_material_up', text='', icon='TRIA_UP')
         tb1.operator('mmd_tools_local.move_material_down', text='', icon='TRIA_DOWN')
 
-class mmd_tools_local_UL_ModelMeshes(UIList):
+class MMD_TOOLS_LOCAL_UL_ModelMeshes(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         if self.layout_type in {'DEFAULT'}:
             layout.label(text=item.name, translate=False, icon='OBJECT_DATA')
@@ -108,7 +108,7 @@ class MMDMeshSorter(_PanelBase, Panel):
 
         col = layout.column(align=True)
         row = col.row()
-        row.template_list("mmd_tools_local_UL_ModelMeshes", "",
+        row.template_list("MMD_TOOLS_LOCAL_UL_ModelMeshes", "",
                           SceneOp(context).id_scene, 'objects',
                           root.mmd_root, "active_mesh_index")
         tb = row.column()
@@ -124,7 +124,7 @@ class _DummyVertexGroup:
     def __init__(self, index):
         self.index = index
 
-class mmd_tools_local_UL_ModelBones(UIList):
+class MMD_TOOLS_LOCAL_UL_ModelBones(UIList):
     _IK_MAP = {}
     _IK_BONES = {}
     _DUMMY_VERTEX_GROUPS = {}
@@ -318,18 +318,18 @@ class MMDBoneOrder(_PanelBase, Panel):
             return
 
         bone_order_mesh_object = FnModel.find_bone_order_mesh_object(root)
-        bone_count = mmd_tools_local_UL_ModelBones.update_bone_tables(armature, bone_order_mesh_object)
+        bone_count = MMD_TOOLS_LOCAL_UL_ModelBones.update_bone_tables(armature, bone_order_mesh_object)
 
         col = layout.column(align=True)
         row = col.row()
         if bone_order_mesh_object is None:
-            row.template_list("mmd_tools_local_UL_ModelBones", "",
+            row.template_list("MMD_TOOLS_LOCAL_UL_ModelBones", "",
                               armature.pose, 'bones',
                               root.vertex_groups, 'active_index')
             col.operator('mmd_tools_local.object_select', text='(%d) %s'%(bone_count, armature.name), icon='OUTLINER_OB_ARMATURE', emboss=False).name = armature.name
             col.label(text='No mesh object with "mmd_bone_order_override" modifier', icon='ERROR')
         else:
-            row.template_list("mmd_tools_local_UL_ModelBones", "",
+            row.template_list("MMD_TOOLS_LOCAL_UL_ModelBones", "",
                               bone_order_mesh_object, 'vertex_groups',
                               bone_order_mesh_object.vertex_groups, 'active_index')
 
