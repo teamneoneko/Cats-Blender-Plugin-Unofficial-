@@ -7,13 +7,14 @@ import copy
 import time
 import pathlib
 import collections
+import threading
 from threading import Thread, Event
 from datetime import datetime, timezone
 from collections import OrderedDict
+from contextlib import contextmanager
 
 from .. import globs
 from ..tools.register import register_wrap
-# from ..googletrans import Translator  # Todo Remove this
 from ..extern_tools.google_trans_new.google_trans_new import google_translator
 from . import translate as Translate
 from .translations import t
@@ -29,13 +30,19 @@ settings_threads = []
 
 # Settings name = [Default Value, Require Blender Restart]
 settings_default = OrderedDict()
-settings_default['show_mmd_tabs'] = [True, False]
 settings_default['embed_textures'] = [False, False]
 settings_default['ui_lang'] = ["auto", False]
-# settings_default['use_custom_mmd_tools'] = [False, True]
 
 lock_settings = False
 
+@contextmanager
+def settings_lock_context():
+    global lock_settings
+    lock_settings = True
+    try:
+        yield
+    finally:
+        lock_settings = False
 
 @register_wrap
 class RevertChangesButton(bpy.types.Operator):
@@ -51,7 +58,6 @@ class RevertChangesButton(bpy.types.Operator):
         self.report({'INFO'}, t('RevertChangesButton.success'))
         return {'FINISHED'}
 
-
 @register_wrap
 class ResetGoogleDictButton(bpy.types.Operator):
     bl_idname = 'cats_settings.reset_google_dict'
@@ -64,7 +70,6 @@ class ResetGoogleDictButton(bpy.types.Operator):
         Translate.load_translations()
         self.report({'INFO'}, t('ResetGoogleDictButton.resetInfo'))
         return {'FINISHED'}
-
 
 @register_wrap
 class DebugTranslations(bpy.types.Operator):
@@ -85,16 +90,12 @@ class DebugTranslations(bpy.types.Operator):
         self.report({'INFO'}, t('DebugTranslations.success'))
         return {'FINISHED'}
 
-
 def load_settings():
-    # print('READING SETTINGS FILE')
     global settings_data, settings_data_unchanged
 
-    # Load settings file and reset it if errors are found
     try:
         with open(settings_file, encoding="utf8") as file:
             settings_data = json.load(file, object_pairs_hook=collections.OrderedDict)
-            # print('SETTINGS LOADED!')
     except FileNotFoundError:
         print("SETTINGS FILE NOT FOUND!")
         reset_settings(full_reset=True)
@@ -111,19 +112,16 @@ def load_settings():
 
     to_reset_settings = []
 
-    # Check for missing entries, reset if necessary
     for setting in ['last_supporter_update']:
         if setting not in settings_data and setting not in to_reset_settings:
             to_reset_settings.append(setting)
             print('RESET SETTING', setting)
 
-    # Check for other missing entries, reset if necessary
     for setting in settings_default.keys():
         if setting not in settings_data and setting not in to_reset_settings:
             to_reset_settings.append(setting)
             print('RESET SETTING', setting)
 
-    # Check if timestamps are correct
     utc_now = datetime.strptime(datetime.now(timezone.utc).strftime(globs.time_format), globs.time_format)
     for setting in ['last_supporter_update']:
         if setting not in to_reset_settings and settings_data.get(setting):
@@ -134,28 +132,20 @@ def load_settings():
                 print('RESET TIME', setting)
                 continue
 
-            # If timestamp is in future
             time_delta = (utc_now - timestamp).total_seconds()
             if time_delta < 0:
                 to_reset_settings.append(setting)
                 print('TIME', setting, 'IN FUTURE!', time_delta)
-            else:
-                pass
-                # print('TIME', setting, 'IN PAST!', time_delta)
 
-    # If there are settings to reset, reset them
     if to_reset_settings:
         reset_settings(to_reset_settings=to_reset_settings)
         return
 
-    # Save the settings into the unchanged settings in order to know if the settings changed later
     settings_data_unchanged = copy.deepcopy(settings_data)
-
 
 def save_settings():
     with open(settings_file, 'w', encoding="utf8") as outfile:
         json.dump(settings_data, outfile, ensure_ascii=False, indent=4)
-
 
 def reset_settings(full_reset=False, to_reset_settings=None):
     if not to_reset_settings:
@@ -182,22 +172,26 @@ def reset_settings(full_reset=False, to_reset_settings=None):
     settings_data_unchanged = copy.deepcopy(settings_data)
     print('SETTINGS RESET')
 
-
 def start_apply_settings_timer():
-    global lock_settings, settings_threads
-    lock_settings = True
-    thread = Thread(target=apply_settings, args=[])
+    global settings_threads
+    thread = Thread(target=apply_settings_with_timeout, args=[])
     settings_threads.append(thread)
     thread.start()
 
-def stop_apply_settings_threads():
-    global settings_threads, settings_stop_event
+def apply_settings_with_timeout():
+    timeout = 5  # 5 seconds timeout
+    timer = threading.Timer(timeout, release_lock)
+    timer.start()
+    try:
+        with settings_lock_context():
+            apply_settings()
+    finally:
+        timer.cancel()
 
-    print("Stopping settings threads...")
-    settings_stop_event.set()
-    for t in settings_threads:
-        t.join()
-    print("Settings threads stopped.")
+def release_lock():
+    global lock_settings
+    print("Settings lock timed out, releasing lock")
+    lock_settings = False
 
 def apply_settings():
     applied = False
@@ -218,13 +212,18 @@ def apply_settings():
                 continue
 
             applied = True
-            # print('Refreshed Settings!')
+            print('Settings applied successfully')
         else:
             time.sleep(0.3)
 
-    # Unlock settings
-    global lock_settings
-    lock_settings = False
+def stop_apply_settings_threads():
+    global settings_threads, settings_stop_event
+
+    print("Stopping settings threads...")
+    settings_stop_event.set()
+    for t in settings_threads:
+        t.join()
+    print("Settings threads stopped.")
 
 def settings_changed():
     for setting, value in settings_default.items():
@@ -232,37 +231,39 @@ def settings_changed():
             return True
     return False
 
-
 def update_settings(self, context):
     update_settings_core(self, context)
 
-
 def update_settings_core(self, context):
-    # Use False and None for this variable, because Blender would complain otherwise
-    # None means that the settings did change
+    print("update_settings_core function called")
     settings_changed_tmp = False
     if lock_settings:
+        print("Settings are locked, returning")
         return settings_changed_tmp
 
-    for setting in settings_default.keys():
-        old = settings_data[setting]
-        new = getattr(bpy.context.scene, setting)
-        if old != new:
-            settings_data[setting] = getattr(bpy.context.scene, setting)
-            settings_changed_tmp = True
+    with settings_lock_context():
+        for setting in settings_default.keys():
+            old = settings_data[setting]
+            new = getattr(bpy.context.scene, setting)
+            print(f"Checking setting: {setting}")
+            print(f"Old value: {old}")
+            print(f"New value: {new}")
+            if old != new:
+                print(f"Setting {setting} changed")
+                settings_data[setting] = new
+                settings_changed_tmp = True
 
-    if settings_changed_tmp:
-        save_settings()
+        if settings_changed_tmp:
+            print("Settings changed, saving settings")
+            save_settings()
+        else:
+            print("No settings changed")
 
     return settings_changed_tmp
-
-def get_use_custom_mmd_tools():
-    return settings_data.get('use_custom_mmd_tools')
-
 
 def get_embed_textures():
     return settings_data.get('embed_textures')
 
-
 def get_ui_lang():
     return settings_data.get('ui_lang')
+

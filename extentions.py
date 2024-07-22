@@ -441,12 +441,6 @@ def register():
         default=False,
         update=Settings.update_settings
     )
-    Scene.use_custom_mmd_tools = BoolProperty(
-        name=t('Scene.use_custom_mmd_tools.label'),
-        description=t('Scene.use_custom_mmd_tools.desc'),
-        default=False,
-        update=Settings.update_settings
-    )
     Scene.ui_lang = EnumProperty(
         name=t('Scene.ui_lang.label'),
         description=t('Scene.ui_lang.desc'),

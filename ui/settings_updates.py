@@ -54,10 +54,6 @@ class UpdaterPanel(ToolPanel, bpy.types.Panel):
 
         col.separator()
 
-        # row = col.row(align=True)
-        # row.prop(context.scene, 'use_custom_mmd_tools')
-        # row = col.row(align=True)
-        # row.prop(context.scene, 'disable_vrchat_features')
         row = col.row(align=True)
         row.scale_y = 0.8
         row.operator(Settings.ResetGoogleDictButton.bl_idname, icon='X')
