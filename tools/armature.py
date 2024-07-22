@@ -1152,14 +1152,6 @@ class FixArmature(bpy.types.Operator):
         
         fixed_uv_coords = False
 
-        # Fix shading (check for runtime error because of ci tests)
-        if not source_engine:
-            try:
-                bpy.ops.mmd_tools_local.set_shadeless_glsl_shading()
-                Common.set_material_shading()
-            except RuntimeError:
-                pass
-
         armature.show_in_front = False
         wm.progress_end()
 
