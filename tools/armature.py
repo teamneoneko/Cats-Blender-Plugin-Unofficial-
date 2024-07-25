@@ -39,6 +39,15 @@ class FixArmature(bpy.types.Operator):
     def execute(self, context):
         saved_data = Common.SavedData()
 
+        meshes_to_check = Common.get_meshes_objects()
+        for mesh in meshes_to_check:
+            if mesh.data.users > 1:
+                Common.show_error(4, [t('JoinMeshes.error.not_single_user'),
+                                      t('JoinMeshes.error.make_single_user'),
+                                      t('JoinMeshes.error.make_single_user1'),
+                                      t('JoinMeshes.error.make_single_user2')])
+                return {'CANCELLED'}
+
         is_vrm = False
         if len(Common.get_meshes_objects()) == 0:
             for mesh in Common.get_meshes_objects(mode=2):
@@ -299,7 +308,7 @@ class FixArmature(bpy.types.Operator):
 
         # Apply transforms of this model
         Common.apply_transforms()
-        
+
         # Puts all meshes into a list and joins them if selected
         if context.scene.join_meshes:
             meshes = [Common.join_meshes()]
