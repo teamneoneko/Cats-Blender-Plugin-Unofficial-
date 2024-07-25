@@ -670,6 +670,15 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
     if not meshes_to_join:
         return None
 
+    # Check if all meshes are single user
+    for mesh in meshes_to_join:
+        if mesh.data.users > 1:
+            show_error(4, [t('JoinMeshes.error.not_single_user'),
+                           t('JoinMeshes.error.make_single_user'),
+                           t('JoinMeshes.error.make_single_user1'),
+                           t('JoinMeshes.error.make_single_user2')])
+            return None
+
     set_default_stage()
     unselect_all()
 
