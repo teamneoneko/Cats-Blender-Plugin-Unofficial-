@@ -707,6 +707,15 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
     if not meshes_to_join:
         return None
 
+    # Check if all meshes are single user
+    for mesh in meshes_to_join:
+        if mesh.data.users > 1:
+            show_error(4, [t('JoinMeshes.error.not_single_user'),
+                           t('JoinMeshes.error.make_single_user'),
+                           t('JoinMeshes.error.make_single_user1'),
+                           t('JoinMeshes.error.make_single_user2')])
+            return None
+
     set_default_stage()
     unselect_all()
 
@@ -738,10 +747,8 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
                 if not has_shapekeys(mesh):
                     apply_modifier(mod)
 
-
         if mesh.data.uv_layers:
             mesh.data.uv_layers[0].name = 'UVMap'
-            
 
     # Get the name of the active mesh in order to check if it was deleted later
     active_mesh_name = context.view_layer.objects.active.name
@@ -751,7 +758,6 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
         bpy.ops.object.join()
     else:
         print('NO MESH COMBINED!')
-        
 
     # Delete meshes that somehow weren't deleted. Both pre and post join mesh deletion methods are needed!
     for mesh in get_meshes_objects(armature_name=armature_name):
@@ -778,7 +784,6 @@ def join_meshes(armature_name=None, mode=0, apply_transformations=True, repair_s
     update_material_list()
 
     return mesh
-
 
 def repair_mesh(mesh, armature_name):
     mesh.parent_type = 'OBJECT'
