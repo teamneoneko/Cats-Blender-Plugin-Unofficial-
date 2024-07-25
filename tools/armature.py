@@ -299,10 +299,30 @@ class FixArmature(bpy.types.Operator):
 
         # Apply transforms of this model
         Common.apply_transforms()
+        
+        # Puts all meshes into a list and joins them if selected
+        if context.scene.join_meshes:
+            meshes = [Common.join_meshes()]
+        else:
+            meshes = Common.get_meshes_objects()
+
+        for mesh in meshes:
+            Common.unselect_all()
+            Common.set_active(mesh)
+
+            # Unlock all mesh transforms
+            for i in range(0, 3):
+                mesh.lock_location[i] = False
+                mesh.lock_rotation[i] = False
+                mesh.lock_scale[i] = False
+
+            # Set layer of mesh to 0
+            if hasattr(mesh, 'layers'):
+                mesh.layers[0] = True
 
             # Fix Source Shapekeys
-        if source_engine and Common.has_shapekeys(mesh):
-            mesh.data.shape_keys.key_blocks[0].name = "Basis"
+            if source_engine and Common.has_shapekeys(mesh):
+                mesh.data.shape_keys.key_blocks[0].name = "Basis"
 
             # Fix VRM shapekeys
             if is_vrm and Common.has_shapekeys(mesh):
