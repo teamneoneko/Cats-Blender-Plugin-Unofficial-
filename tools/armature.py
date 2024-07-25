@@ -39,6 +39,16 @@ class FixArmature(bpy.types.Operator):
     def execute(self, context):
         saved_data = Common.SavedData()
 
+        # Check if all meshes are single user
+        meshes_to_check = Common.get_meshes_objects()
+        for mesh in meshes_to_check:
+            if mesh.data.users > 1:
+                Common.show_error(4, [t('JoinMeshes.error.not_single_user'),
+                                      t('JoinMeshes.error.make_single_user'),
+                                      t('JoinMeshes.error.make_single_user1'),
+                                      t('JoinMeshes.error.make_single_user2')])
+                return {'CANCELLED'}
+
         is_vrm = False
         if len(Common.get_meshes_objects()) == 0:
             for mesh in Common.get_meshes_objects(mode=2):
@@ -300,9 +310,29 @@ class FixArmature(bpy.types.Operator):
         # Apply transforms of this model
         Common.apply_transforms()
 
+        # Puts all meshes into a list and joins them if selected
+        if context.scene.join_meshes:
+            meshes = [Common.join_meshes()]
+        else:
+            meshes = Common.get_meshes_objects()
+
+        for mesh in meshes:
+            Common.unselect_all()
+            Common.set_active(mesh)
+
+            # Unlock all mesh transforms
+            for i in range(0, 3):
+                mesh.lock_location[i] = False
+                mesh.lock_rotation[i] = False
+                mesh.lock_scale[i] = False
+
+            # Set layer of mesh to 0
+            if hasattr(mesh, 'layers'):
+                mesh.layers[0] = True
+
             # Fix Source Shapekeys
-        if source_engine and Common.has_shapekeys(mesh):
-            mesh.data.shape_keys.key_blocks[0].name = "Basis"
+            if source_engine and Common.has_shapekeys(mesh):
+                mesh.data.shape_keys.key_blocks[0].name = "Basis"
 
             # Fix VRM shapekeys
             if is_vrm and Common.has_shapekeys(mesh):
@@ -1151,14 +1181,6 @@ class FixArmature(bpy.types.Operator):
         Common.fix_armature_names()
         
         fixed_uv_coords = False
-
-        # Fix shading (check for runtime error because of ci tests)
-        if not source_engine:
-            try:
-                bpy.ops.mmd_tools_local.set_shadeless_glsl_shading()
-                Common.set_material_shading()
-            except RuntimeError:
-                pass
 
         armature.show_in_front = False
         wm.progress_end()
