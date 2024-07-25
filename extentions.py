@@ -81,6 +81,12 @@ def register():
         default=True
     )
 
+    Scene.join_meshes = BoolProperty(
+        name=t('Scene.join_meshes.label'),
+        description=t('Scene.join_meshes.desc'),
+        default=True
+    )
+
     Scene.connect_bones = BoolProperty(
         name=t('Scene.connect_bones.label'),
         description=t('Scene.connect_bones.desc'),

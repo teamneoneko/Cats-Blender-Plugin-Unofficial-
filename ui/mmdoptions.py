@@ -129,6 +129,8 @@ class ModelSettings(bpy.types.Operator):
         row = col.row(align=True)
         row.prop(context.scene, 'fix_twist_bones')
         row = col.row(align=True)
+        row.prop(context.scene, 'join_meshes')
+        row = col.row(align=True)
         row.prop(context.scene, 'connect_bones')
         row = col.row(align=True)
         row.prop(context.scene, 'remove_zero_weight')
