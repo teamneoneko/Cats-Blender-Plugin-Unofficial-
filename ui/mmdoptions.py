@@ -42,7 +42,7 @@ class MMDOptions(ToolPanel, bpy.types.Panel):
         split = col.row(align=True)
         row = split.row(align=True)
         row.scale_y = 1.5
-        row.operator(Armature.FixArmature.bl_idname, icon=globs.ICON_FIX_MODEL)
+        row.operator(FixArmatureWarning.bl_idname, icon=globs.ICON_FIX_MODEL)
         row = split.row(align=True)
         row.alignment = 'RIGHT'
         row.scale_y = 1.5
@@ -148,3 +148,26 @@ class ModelSettings(bpy.types.Operator):
         row.scale_y = 0.7
         row.label(text=t('ModelSettings.warn.fbtFix3'), icon_value=Iconloader.preview_collections["custom_icons"]["empty"].icon_id)
         col.separator()
+
+@register_wrap
+class FixArmatureWarning(bpy.types.Operator):
+    bl_idname = "cats_armature.fix_armature_warning"
+    bl_label = t('FixArmature.label')
+    bl_description = t('FixArmature.description')
+    bl_options = {'REGISTER', 'INTERNAL', 'UNDO'}
+
+    def execute(self, context):
+        return Armature.FixArmature.execute(self, context)
+
+    def invoke(self, context, event):
+        dpi_value = Common.get_user_preferences().system.dpi
+        return context.window_manager.invoke_props_dialog(self, width=int(dpi_value * 5.2))
+
+    def draw(self, context):
+        layout = self.layout
+        col = layout.column(align=True)
+        col.label(text=t('FixArmature.warning.line1'))
+        col.label(text=t('FixArmature.warning.line2'))
+        col.label(text=t('FixArmature.warning.line3'))
+        col.label(text=t('FixArmature.warning.line4'))
+        col.label(text=t('FixArmature.warning.line5'))
