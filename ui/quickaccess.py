@@ -30,6 +30,32 @@ class QuickAccessPanel(ToolPanel, bpy.types.Panel):
 
         col = box.column(align=True)
 
+        if bpy.app.version >= (4, 1) and bpy.app.version < (4, 2):
+            col.separator()
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.label(text=t('QuickAccess.warn.eol1'), icon='ERROR')
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.label(text=t('QuickAccess.warn.eol2'), icon='BLANK1')
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.label(text=t('QuickAccess.warn.eol3'), icon='BLANK1')
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.label(text=t('QuickAccess.warn.eol4'), icon='BLANK1')
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.label(text=t('QuickAccess.warn.eol5'), icon='BLANK1')
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.label(text=t('QuickAccess.warn.eol6'), icon='BLANK1')
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.label(text=t('QuickAccess.warn.eol7'), icon='BLANK1')
+            col.separator()
+            col.separator()
+
         if bpy.app.version < (4, 0, 0):
             col.separator()
             row = col.row(align=True)
