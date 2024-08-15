@@ -1,5 +1,7 @@
 # Cats Blender Plugin Unofficial.
 
+#### Note to steam users: If you are using blender 4.2 and cats is crashing blender, please use the version from blenders website, for some reason the steam version has issues. 
+
 ### DO NOT ASK FOR HELP IN THE OFFICIAL CATS DISCORD SERVER, PLEASE READ BELOW!
 #### PLEASE DO NOT ASK FOR HELP FOR THIS VERSION OF CATS IN THE OFFICIAL CATS DISCORD. THIS CATS IS NOT THE OFFICIAL VERSION SO SUPPORT MAY NOT BE GIVEN IN THEIR DISCORD SERVER. IF YOU HAVE A BUG OR NEED HELP PLEASE START AN [ISSUE](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/issues) OR JOIN MY OWN [DISCORD](https://discord.catsblenderplugin.xyz) SERVER.
 
