@@ -1536,7 +1536,7 @@ def fix_zero_length_bones(armature: bpy.types.Object):
         tail_rounded = [round(x, 4) for x in bone.tail]
 
         if head_rounded == tail_rounded:
-            bone.tail.translate(Vector((0, 0, 0.1)))
+            bone.tail += Vector((0, 0, 0.1))
 
 def fix_bone_orientations(armature):
     # Connect all bones with their children if they have exactly one
