@@ -9,7 +9,6 @@ from . import armature_bones as Bones
 from .register import register_wrap
 from .translations import t
 
-
 @register_wrap
 class MergeArmature(bpy.types.Operator):
     bl_idname = 'cats_custom.merge_armatures'
@@ -22,12 +21,16 @@ class MergeArmature(bpy.types.Operator):
         return len(Common.get_armature_objects()) > 1
 
     def execute(self, context):
+        wm = context.window_manager
+        wm.progress_begin(0, 100)
+
         saved_data = Common.SavedData()
 
         # Set default stage
         Common.set_default_stage()
         Common.remove_rigidbodies_global()
         Common.unselect_all()
+        wm.progress_update(10)
 
         # Get both armatures
         base_armature_name = bpy.context.scene.merge_armature_into
@@ -35,6 +38,7 @@ class MergeArmature(bpy.types.Operator):
         base_armature = Common.get_objects()[base_armature_name]
         merge_armature = Common.get_objects()[merge_armature_name]
         armature = Common.set_default_stage()
+        wm.progress_update(20)
 
         #Remove Rigid Bodies and Joints as there won't merge.    
         to_delete = []
@@ -48,6 +52,7 @@ class MergeArmature(bpy.types.Operator):
             Common.switch('EDIT')
             Common.switch('OBJECT')
             Common.delete_hierarchy(bpy.data.objects[obj_name])
+        wm.progress_update(30)
 
         if len(armature.children) > 1:
             for child in armature.children:
@@ -62,13 +67,16 @@ class MergeArmature(bpy.types.Operator):
         Common.unselect_all()
         Common.remove_empty()
         Common.remove_unused_objects()
+        wm.progress_update(40)
 
         if not merge_armature:
             saved_data.load()
+            wm.progress_end()
             Common.show_error(5.2, [t('MergeArmature.error.notFound', name=merge_armature_name)])
             return {'CANCELLED'}
         if not base_armature:
             saved_data.load()
+            wm.progress_end()
             Common.show_error(5.2, [t('MergeArmature.error.notFound', name=base_armature_name)])
             return {'CANCELLED'}
 
@@ -79,30 +87,37 @@ class MergeArmature(bpy.types.Operator):
                 if merge_parent:
                     for i in [0, 1, 2]:
                         if merge_parent.scale[i] != 1 or merge_parent.location[i] != 0 or merge_parent.rotation_euler[i] != 0:
-                            saved_data.load()
-                            Common.show_error(6.5, t('MergeArmature.error.checkTransforms'))
-                            return {'CANCELLED'}
+                            if not Common.show_warning(6.5, t('MergeArmature.warning.nonStandardArmature')):
+                                saved_data.load()
+                                wm.progress_end()
+                                return {'CANCELLED'}
                     Common.delete(merge_armature.parent)
 
                 if base_parent:
                     for i in [0, 1, 2]:
                         if base_parent.scale[i] != 1 or base_parent.location[i] != 0 or base_parent.rotation_euler[i] != 0:
-                            saved_data.load()
-                            Common.show_error(6.5, t('MergeArmature.error.checkTransforms'))
-                            return {'CANCELLED'}
+                            if not Common.show_warning(6.5, t('MergeArmature.warning.nonStandardArmature')):
+                                saved_data.load()
+                                wm.progress_end()
+                                return {'CANCELLED'}
                     Common.delete(base_armature.parent)
             else:
-                saved_data.load()
-                Common.show_error(6.2, t('MergeArmature.error.pleaseFix'))
-                return {'CANCELLED'}
+                if not Common.show_warning(6.2, t('MergeArmature.warning.nonStandardArmature')):
+                    saved_data.load()
+                    wm.progress_end()
+                    return {'CANCELLED'}
+        wm.progress_update(50)
 
         merge_armatures(base_armature_name, merge_armature_name, False, merge_same_bones=context.scene.merge_same_bones)
+        wm.progress_update(90)
 
         saved_data.load()
+        wm.progress_update(100)
+
+        wm.progress_end()
 
         self.report({'INFO'}, t('MergeArmature.success'))
         return {'FINISHED'}
-
 
 @register_wrap
 class AttachMesh(bpy.types.Operator):
@@ -116,12 +131,16 @@ class AttachMesh(bpy.types.Operator):
         return len(Common.get_armature_objects()) > 0 and len(Common.get_meshes_objects(mode=1, check=False)) > 0
 
     def execute(self, context):
+        wm = context.window_manager
+        wm.progress_begin(0, 100)
+
         saved_data = Common.SavedData()
 
         # Set default stage
         Common.set_default_stage()
         Common.remove_rigidbodies_global()
         Common.unselect_all()
+        wm.progress_update(10)
 
         # Get armature and mesh
         mesh_name = bpy.context.scene.attach_mesh
@@ -129,18 +148,22 @@ class AttachMesh(bpy.types.Operator):
         attach_bone_name = bpy.context.scene.attach_to_bone
         mesh = Common.get_objects()[mesh_name]
         armature = Common.get_objects()[base_armature_name]
+        wm.progress_update(20)
 
         # Reparent mesh to target armature
         mesh.parent = armature
         mesh.parent_type = 'OBJECT'
+        wm.progress_update(30)
 
         # Applies transforms of the armature and new mesh
         Common.apply_transforms(armature_name=base_armature_name)
+        wm.progress_update(40)
 
         # Switch mesh to edit mode
         Common.unselect_all()
         Common.set_active(mesh)
         Common.switch('EDIT')
+        wm.progress_update(50)
 
         # Delete all previous vertex groups
         if mesh.vertex_groups:
@@ -150,6 +173,7 @@ class AttachMesh(bpy.types.Operator):
         bpy.ops.mesh.select_all(action='SELECT')
         mesh.vertex_groups.new(name=mesh_name)
         bpy.ops.object.vertex_group_assign()
+        wm.progress_update(60)
 
         Common.switch('OBJECT')
 
@@ -157,6 +181,7 @@ class AttachMesh(bpy.types.Operator):
         Common.unselect_all()
         Common.set_active(armature)
         Common.switch('EDIT')
+        wm.progress_update(70)
 
         # Create bone in target armature and reparent it to the target bone
         attach_to_bone = armature.data.edit_bones.get(attach_bone_name)
@@ -167,6 +192,7 @@ class AttachMesh(bpy.types.Operator):
         mesh_bone.head = Common.find_center_vector_of_vertex_group(mesh, mesh_name)
         mesh_bone.tail = mesh_bone.head
         mesh_bone.tail[2] += 0.1
+        wm.progress_update(80)
 
         # Switch armature back to object mode
         Common.switch('OBJECT')
@@ -179,11 +205,15 @@ class AttachMesh(bpy.types.Operator):
         # Create new armature modifier
         mod = mesh.modifiers.new('Armature', 'ARMATURE')
         mod.object = armature
+        wm.progress_update(90)
 
         # Put the attach bone field back to it's original state
         bpy.context.scene.attach_to_bone = attach_bone_name
 
         saved_data.load()
+        wm.progress_update(100)
+
+        wm.progress_end()
 
         self.report({'INFO'}, t('AttachMesh.success'))
         return {'FINISHED'}

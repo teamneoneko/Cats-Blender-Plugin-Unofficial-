@@ -542,7 +542,7 @@
         "Scene.optimize_mode.desc": "방법",
         "CreateEyesButton.error.noVertex": "뼈 \"{bone}\"에는 기존 정점 그룹이 없거나 정점이 할당되지 않았습니다.\n잘못된 메쉬 나 잘못된 뼈를 선택했기 때문일 수 있습니다.\n또한 선택한 눈 뼈가 실제로 포즈 모드에서 눈을 움직여야합니다.",
         "ImportXPS.label": "Xnalara",
-        "MergeArmature.error.pleaseFix": "선택한 무기에서 먼저 \"고정 모델\"기능을 사용하십시오!\n\"수정 모델\"버튼 위에 수정하려는 전기자를 선택하십시오!\n그 후 메쉬 (전기자가 아닌) 만 원하는 위치로 만 움직입니다.",
+        "MergeArmature.warning.nonStandardArmature": "비표준 아마추어가 감지되었습니다. 이것이 MMD/VRM 모델이거나 Unity용으로 설정되지 않은 모델인 경우 'MMD 모델 수정' 기능을 사용하는 것을 고려해 보세요. 그렇지 않다면 확인을 눌러 병합을 계속하세요. 단, 병합이 제대로 작동한다고 보장할 수 없습니다. 나중에 메시가 올바른 위치에 있지 않다면 아마추어가 아닌 메시만 원하는 위치로 이동해 주세요.",
         "bpy.types.Scene.cats_updater_version_list.desc": "설치하려는 버전을 선택하십시오",
         "ConfirmUpdatePanel.warn.dev4": "이 버전은 매우 불안정하고 일부 기능 일 수 있습니다",
         "download_file.cantFindCATS": "다운로드 된 지퍼에서 고양이를 찾을 수 없었습니다",
