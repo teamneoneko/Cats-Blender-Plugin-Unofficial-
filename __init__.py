@@ -3,7 +3,6 @@
 CATS_VERSION = "4.2.1.3"
 dev_branch = True
 
-
 import os
 import sys
 
