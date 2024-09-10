@@ -30,7 +30,7 @@ class QuickAccessPanel(ToolPanel, bpy.types.Panel):
 
         col = box.column(align=True)
 
-        if bpy.app.version < (4, 1, 0):
+        if bpy.app.version < (4, 2, 0):
             col.separator()
             row = col.row(align=True)
             row.scale_y = 0.75
@@ -44,7 +44,7 @@ class QuickAccessPanel(ToolPanel, bpy.types.Panel):
             col.separator()
             col.separator()
 
-        if bpy.app.version > (4, 2, 99):
+        if bpy.app.version > (4, 3, 99):
             col.separator()
             row = col.row(align=True)
             row.scale_y = 0.75
@@ -55,6 +55,20 @@ class QuickAccessPanel(ToolPanel, bpy.types.Panel):
             row = col.row(align=True)
             row.scale_y = 0.75
             row.label(text=t('QuickAccess.warn.newBlender3'), icon='BLANK1')
+            col.separator()
+            col.separator()
+
+        if bpy.app.version > (4, 2, 99):
+            col.separator()
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.label(text=t('QuickAccess.warn.Alpha1'), icon='ERROR')
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.label(text=t('QuickAccess.warn.Alpha2'), icon='BLANK1')
+            row = col.row(align=True)
+            row.scale_y = 0.75
+            row.label(text=t('QuickAccess.warn.Alpha3'), icon='BLANK1')
             col.separator()
             col.separator()
 
