@@ -61,6 +61,8 @@
         "OtherOptionsPanel.fbtFix": "풀바디 트래킹 수정:",
         "OtherOptionsPanel.FixFBTButton.label": "추가",
         "OtherOptionsPanel.RemoveFBTButton.label": "제거",
+        "ResetEyeTrackingButton.label": "눈 추적 패널 초기화",
+        "ResetEyeTrackingButton.desc": "눈 추적 패널을 초기화하려면 이것을 사용하세요.",
         "cats_twist.tutorial_button.label": "트위스트 본 튜토리얼",
         "ScalingPanel.label": "모델 스케일링",
         "ScalingPanel.imscaleDisabled1": "Immersive Scaler가 활성화되지 않았습니다!",
