@@ -288,6 +288,10 @@ class Av3EyeTrackingPanel(ToolPanel, bpy.types.Panel):
                 row = col.row(align=True)
                 row.scale_y = 1.5
                 row.operator(Eyetracking.StartTestingButton.bl_idname, icon='TRIA_RIGHT')
+
+                row = col.row(align=True)
+                row.scale_y = 1.2
+                row.operator(Eyetracking.ResetEyeTrackingButton.bl_idname, icon='FILE_REFRESH')
             else:
                 # col.separator()
                 # row = col.row(align=True)
@@ -363,3 +367,7 @@ class Av3EyeTrackingPanel(ToolPanel, bpy.types.Panel):
                 row = col.row(align=True)
                 row.scale_y = 1.5
                 row.operator(Eyetracking.StopTestingButton.bl_idname, icon='PAUSE')
+
+                row = col.row(align=True)
+                row.scale_y = 1.2
+                row.operator(Eyetracking.ResetEyeTrackingButton.bl_idname, icon='FILE_REFRESH')

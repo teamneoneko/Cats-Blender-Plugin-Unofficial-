@@ -55,6 +55,8 @@
         "OtherOptionsPanel.fbtFix": "풀바디 트래킹 수정:",
         "OtherOptionsPanel.FixFBTButton.label": "추가",
         "OtherOptionsPanel.RemoveFBTButton.label": "제거",
+        "ResetEyeTrackingButton.label": "눈 추적 패널 초기화",
+        "ResetEyeTrackingButton.desc": "눈 추적 패널을 초기화하려면 이것을 사용하세요.",
         "CustomPanel.label": "커스텀 모델 제작",
         "CustomPanel.mergeArmatures": "뼈대(Armature) 통합:",
         "CustomPanel.warn.twoArmatures": "두개의 뼈대(Armature)가 필요합니다!",
