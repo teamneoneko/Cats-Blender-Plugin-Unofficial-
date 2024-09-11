@@ -64,6 +64,8 @@
         "OtherOptionsPanel.fbtFix": "Full Body Tracking Fix:",
         "OtherOptionsPanel.FixFBTButton.label": "Add",
         "OtherOptionsPanel.RemoveFBTButton.label": "Remove",
+        "ResetEyeTrackingButton.label": "Reset Eye Tracking Panel",
+        "ResetEyeTrackingButton.desc": "Use this to reset the eye tracking panel.",
         "CustomPanel.label": "Custom Model Creation",
         "CustomPanel.mergeArmatures": "Merge Armatures:",
         "CustomPanel.warn.twoArmatures": "Two armatures are required!",

@@ -970,3 +970,17 @@ class ResetBlinkTest(bpy.types.Operator):
         context.scene.eye_lowerlid_shape = 1
 
         return {'FINISHED'}
+
+@register_wrap
+class ResetEyeTrackingButton(bpy.types.Operator):
+    bl_idname = 'cats_eyes.reset_eye_tracking'
+    bl_label = t('ResetEyeTrackingButton.label')
+    bl_description = t('ResetEyeTrackingButton.desc')
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
+
+    def execute(self, context):
+        global eye_left, eye_right, eye_left_data, eye_right_data, eye_left_rot, eye_right_rot
+        eye_left = eye_right = eye_left_data = eye_right_data = None
+        eye_left_rot = eye_right_rot = []
+        context.scene.eye_mode = 'CREATION'
+        return {'FINISHED'}
