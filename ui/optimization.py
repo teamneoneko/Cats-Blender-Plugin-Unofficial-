@@ -220,13 +220,24 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
             if len(Common.get_meshes_objects(check=False)) > 1:
                 row = box.row(align=True)
                 row.prop(context.scene, 'merge_mesh')
+            
+            # Load Bones button
             row = box.row(align=True)
+            row.scale_y = 1.1
+            row.operator('cats_bonemerge.load_bones', text="Load Bones", icon='BONE_DATA')
+            
+            # Bone selection and ratio controls - disabled until bones are loaded
+            row = box.row(align=True)
+            row.enabled = bool(globs.root_bones.get(context.scene.merge_bone))
             row.prop(context.scene, 'merge_bone')
+            
             row = box.row(align=True)
+            row.enabled = bool(globs.root_bones.get(context.scene.merge_bone))
             row.prop(context.scene, 'merge_ratio')
+            
+            # Refresh and Merge buttons - disabled until bones are loaded
             row = box.row(align=True)
-            col.separator()
-            row.operator(Rootbone.RefreshRootButton.bl_idname, icon='FILE_REFRESH')
+            row.enabled = bool(globs.root_bones.get(context.scene.merge_bone))
             row.operator(Bonemerge.BoneMergeButton.bl_idname, icon='AUTOMERGE_ON')
             
             col.separator()

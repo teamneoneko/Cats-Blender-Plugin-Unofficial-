@@ -7,10 +7,34 @@ from .register import register_wrap
 from .. import globs
 from .translations import t
 
-# wm = bpy.context.window_manager
-# wm.progress_begin(0, len(bone_merge))
-# wm.progress_update(index)
-# wm.progress_end()
+from .rootbone import get_parent_root_bones
+@register_wrap
+class LoadBonesButton(bpy.types.Operator):
+    bl_idname = 'cats_bonemerge.load_bones'
+    bl_label = t('LoadBonesButton.label')
+    bl_description = t('LoadBonesButton.desc')
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
+    @classmethod
+    def poll(cls, context):
+        return Common.get_armature() is not None
+    def execute(self, context):
+        armature = Common.get_armature()
+        
+        globs.root_bones_choices = {}
+        choices = get_parent_root_bones(self, context)
+        
+        # Use the wrap_dynamic_enum_items helper
+        wrapped_items = Common.wrap_dynamic_enum_items(
+            lambda s, c: choices,
+            'merge_bone'
+        )
+        
+        bpy.types.Scene.merge_bone = bpy.props.EnumProperty(
+            name=t('Scene.merge_bone.label'),
+            description=t('Scene.merge_bone.desc'),
+            items=wrapped_items
+        )
+        return {'FINISHED'}
 
 
 @register_wrap
@@ -23,6 +47,18 @@ class BoneMergeButton(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return Common.is_enum_non_empty(context.scene.merge_mesh) and Common.is_enum_non_empty(context.scene.merge_bone)
+
+@register_wrap
+class BoneMergeButton(bpy.types.Operator):
+    bl_idname = 'cats_bonemerge.merge_bones'
+    bl_label = t('BoneMergeButton.label')
+    bl_description = t('BoneMergeButton.desc')
+    bl_options = {'REGISTER', 'UNDO', 'INTERNAL'}
+
+    @classmethod
+    def poll(cls, context):
+        return (context.scene.merge_bone in globs.root_bones and 
+                Common.is_enum_non_empty(context.scene.merge_mesh))
 
     def execute(self, context):
         saved_data = Common.SavedData()
@@ -93,15 +129,7 @@ class BoneMergeButton(bpy.types.Operator):
             if bone.parent is not None:
                 parent_name = bone.parent.name
 
-                print('Merging ' + bone_name + ' into ' + parent_name+ ' with ratio ' + str(i) )
-
-                # # Set new parent bone position
-                # armature = Common.set_default_stage()
-                # Common.switch('EDIT')
-                #
-                # child = armature.data.edit_bones.get(bone_name)
-                # parent = armature.data.edit_bones.get(parent_name)
-                # parent.tail = child.tail
+                print('Merging ' + bone_name + ' into ' + parent_name+ ' with ratio ' + str(i))
 
                 # Mix the weights
                 Common.set_default_stage()

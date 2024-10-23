@@ -432,12 +432,11 @@ def register():
         # get_meshes is used elsewhere than for EnumProperty items so must contain the sorting itself
         items=wrap_dynamic_enum_items(Common.get_meshes, 'merge_mesh', sort=False),
     )
-
+    
     Scene.merge_bone = EnumProperty(
         name=t('Scene.merge_bone.label'),
         description=t('Scene.merge_bone.desc'),
-        # Root bone choices get cached, so we don't want to fix them in-place, otherwise the cache would get modified
-        items=wrap_dynamic_enum_items(Rootbone.get_parent_root_bones, 'merge_bone', sort=False, in_place=False),
+        items=[],  # Start with an empty list to prevent auto-population
     )
 
     # Settings
