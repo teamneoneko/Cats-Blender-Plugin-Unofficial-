@@ -53,6 +53,8 @@
         "OtherOptionsPanel.fbtFix": "フル ボディ トラッキングの修正:",
         "OtherOptionsPanel.FixFBTButton.label": "追加",
         "OtherOptionsPanel.RemoveFBTButton.label": "削除",
+        "ResetEyeTrackingButton.label": "アイトラッキングパネルをリセット",
+        "ResetEyeTrackingButton.desc": "アイトラッキングパネルをリセットするにはこれを使用してください。",
         "CustomPanel.label": "カスタム モデルの作成",
         "CustomPanel.mergeArmatures": "マージアーマチュア:",
         "CustomPanel.warn.twoArmatures": "2つのアーマチュアが必要です!",
