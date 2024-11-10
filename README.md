@@ -24,11 +24,11 @@ You can find both 3.6, 4.1 and 4.2 blender releases [here](https://github.com/Yu
 
 ## Blender version support policies.
 
-Please [Click Here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Blender-Version-Support-Policies) to view which versions of blender we support.
+Please [Click Here](https://catsblenderplugin.xyz/wiki.html#what-are-the-current-supported-blender-versions) to view which versions of blender we support.
 
 ## Features
 
-Please [Click Here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Features) to view the features of cats.
+Please [Click Here](https://catsblenderplugin.xyz/wiki.html#quick-access) to view the features of cats.
 
 
 ## Requirements
@@ -47,11 +47,12 @@ Some features of Cat's need additional plugins to work, you can find them here:
 
 ## Installation
 
-Please [Click Here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/How-to-Install%3F) to see how to install.
+Please [Click Here](https://catsblenderplugin.xyz/wiki.html#how-do-i-install-cats-blender-plugin-blender-42) to see how to install for Blender 4.2+
+Please [Click here](https://catsblenderplugin.xyz/wiki.html#how-do-i-install-cats-blender-plugin-blender-36-and-older) to see how to install for older versions of Blender.
 
 ## Help
 
-If you need help with Cat's you can check the wiki [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki).
+If you need help with Cat's you can check the wiki [here](https://catsblenderplugin.xyz/wiki.html#quick-access).
 You can also see the the following video tutorials as well (Please note these videos may become outdated over time).
 
 [![VRCHAT Avatar Setup - Blender CATS Plugin](https://i.ytimg.com/vi/2fJMaxbBewg/0.jpg)](https://www.youtube.com/watch?v=2fJMaxbBewg)
