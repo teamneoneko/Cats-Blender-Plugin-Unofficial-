@@ -14,8 +14,6 @@ All the hours long processes of fixing your models are compressed into a few fun
 
 - Join the unoffical Cats Discord!: https://discord.catsblenderplugin.xyz
 
-#### Warning, Cats has changed UI wise, please [click here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/wiki/Features) to see the new UI features.
-
 You can find both 3.6, 4.1 and 4.2 blender releases [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases), ensure you are using the one for your blender version!  
 
 - You can find the development version for Blender 3.6 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-36-dev).
