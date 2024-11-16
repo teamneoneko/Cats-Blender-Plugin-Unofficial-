@@ -317,27 +317,29 @@ def find_center_vector_of_vertex_group(mesh, vertex_group):
     verts = data.vertices
     verts_in_group = []
 
+    # Ensure the vertex group exists
+    vg = mesh.vertex_groups.get(vertex_group)
+    if vg is None:
+        return None  # Vertex group doesn't exist
+
     for vert in verts:
         i = vert.index
         try:
-            if mesh.vertex_groups[vertex_group].weight(i) > 0:
+            if vg.weight(i) > 0:
                 verts_in_group.append(vert)
         except RuntimeError:
-            # vertex is not in the group
+            # Vertex is not in the group
             pass
 
-    # Find the average vector point of the vertex cluster
-    divide_by = len(verts_in_group)
+    if not verts_in_group:
+        return None  # No vertices in the group
+
+    # Calculate the average position
     total = Vector()
-
-    if divide_by == 0:
-        return False
-
     for vert in verts_in_group:
         total += vert.co
 
-    average = total / divide_by
-
+    average = total / len(verts_in_group)
     return average
 
 
