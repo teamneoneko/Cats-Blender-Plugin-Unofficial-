@@ -171,11 +171,25 @@ class AttachMesh(bpy.types.Operator):
 
         # Select and assign all vertices to new vertex group
         bpy.ops.mesh.select_all(action='SELECT')
-        mesh.vertex_groups.new(name=mesh_name)
+        vg = mesh.vertex_groups.new(name=mesh_name)
         bpy.ops.object.vertex_group_assign()
         wm.progress_update(60)
 
         Common.switch('OBJECT')
+
+        # Verify that the vertex group has vertices assigned
+        verts_in_group = []
+        for v in mesh.data.vertices:
+            for group in v.groups:
+                if group.group == vg.index:
+                    verts_in_group.append(v)
+                    break
+
+        if not verts_in_group:
+            self.report({'ERROR'}, f"Vertex group '{mesh_name}' is empty or does not exist.")
+            saved_data.load()
+            wm.progress_end()
+            return {'CANCELLED'}
 
         # Switch armature to edit mode
         Common.unselect_all()
@@ -185,12 +199,25 @@ class AttachMesh(bpy.types.Operator):
 
         # Create bone in target armature and reparent it to the target bone
         attach_to_bone = armature.data.edit_bones.get(attach_bone_name)
+        if not attach_to_bone:
+            self.report({'ERROR'}, f"Attach bone '{attach_bone_name}' not found in armature.")
+            saved_data.load()
+            wm.progress_end()
+            return {'CANCELLED'}
         mesh_bone = armature.data.edit_bones.new(mesh_name)
         mesh_bone.parent = attach_to_bone
 
-        # Put new bone in center of mesh
-        mesh_bone.head = Common.find_center_vector_of_vertex_group(mesh, mesh_name)
-        mesh_bone.tail = mesh_bone.head
+        # Compute the center vector
+        center_vector = Common.find_center_vector_of_vertex_group(mesh, mesh_name)
+        if center_vector is None:
+            self.report({'ERROR'}, f"Unable to find center of vertex group '{mesh_name}'.")
+            saved_data.load()
+            wm.progress_end()
+            return {'CANCELLED'}
+
+        # Set bone head and tail positions
+        mesh_bone.head = center_vector
+        mesh_bone.tail = center_vector.copy()
         mesh_bone.tail[2] += 0.1
         wm.progress_update(80)
 
@@ -207,27 +234,14 @@ class AttachMesh(bpy.types.Operator):
         mod.object = armature
         wm.progress_update(90)
 
-        # Put the attach bone field back to it's original state
+        # Restore the attach bone field
         bpy.context.scene.attach_to_bone = attach_bone_name
 
         saved_data.load()
         wm.progress_update(100)
-
         wm.progress_end()
 
         self.report({'INFO'}, t('AttachMesh.success'))
-        return {'FINISHED'}
-
-@register_wrap
-class CustomModelTutorialButton(bpy.types.Operator):
-    bl_idname = 'cats_custom.tutorial'
-    bl_label = t('CustomModelTutorialButton.label')
-    bl_options = {'INTERNAL'}
-
-    def execute(self, context):
-        webbrowser.open(t('CustomModelTutorialButton.URL'))
-
-        self.report({'INFO'}, t('CustomModelTutorialButton.success'))
         return {'FINISHED'}
 
 
