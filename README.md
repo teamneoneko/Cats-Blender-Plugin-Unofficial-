@@ -1,7 +1,5 @@
 # Cats Blender Plugin Unofficial.
 
-#### WE CURRENTLY RECOMEND USING BLENDER 3.6 or 4.1, Blender 4.2 is supported but is not recomended as it's currently very buggy and cuasing issues.
-
 ### DO NOT ASK FOR HELP IN THE OFFICIAL CATS DISCORD SERVER, PLEASE READ BELOW!
 #### PLEASE DO NOT ASK FOR HELP FOR THIS VERSION OF CATS IN THE OFFICIAL CATS DISCORD. THIS CATS IS NOT THE OFFICIAL VERSION SO SUPPORT MAY NOT BE GIVEN IN THEIR DISCORD SERVER. IF YOU HAVE A BUG OR NEED HELP PLEASE START AN [ISSUE](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/issues) OR JOIN MY OWN [DISCORD](https://discord.catsblenderplugin.xyz) SERVER.
 
@@ -32,7 +30,7 @@ Please [Click Here](https://catsblenderplugin.xyz/wiki.html#quick-access) to vie
 ## Requirements
 
 - Blender 3.6 or above (run as administrator is recommended) (Please note some features may not work in version below 3.6).
-   - Blender 4.1 is Recommended as this is the latest Stabel release (4.2 is very unstable and cuases alot of issues).
+   - Blender 4.2 is Recommended as this is the latest Stabel release.
 - Anything older then 3.6 is not supported and no longer works.
 - If you have custom Python installed which Blender might use, you need to have Numpy installed
 - Note to Windows Store users: Though Cats seems to work on Windows Store these days no support will be given if there are any issues as the Unofficial cats does not support Windows store due to issues Windows Store versions of Blender have given in the past. 
