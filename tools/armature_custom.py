@@ -92,6 +92,56 @@ def process_bone_rolls(armature: bpy.types.Object, bone_map: Dict[str, str]):
         if merge_bone and base_bone:
             merge_bone.roll = base_bone.roll
 
+def validate_mesh_transforms(mesh: bpy.types.Object, tolerance: float = 0.001) -> Tuple[bool, str]:
+    """Checks for invalid transforms and scales on mesh."""
+    for i in range(3):
+        if abs(mesh.scale[i] - 1.0) > tolerance:
+            return False, f"Non-uniform scale detected on mesh {mesh.name}"
+        if abs(mesh.rotation_euler[i]) > tolerance:
+            return False, f"Rotation detected on mesh {mesh.name}"
+    return True, ""
+
+def validate_mesh_name(armature: bpy.types.Object, mesh_name: str) -> Tuple[bool, str]:
+    """Validates mesh name doesn't conflict with existing bones."""
+    if mesh_name in armature.data.bones:
+        return False, f"Mesh name '{mesh_name}' conflicts with existing bone"
+    return True, ""
+
+def cache_vertex_groups(mesh: bpy.types.Object) -> Dict:
+    """Caches vertex group data for potential undo."""
+    cached_groups = {}
+    for vg in mesh.vertex_groups:
+        weights = []
+        for vert in mesh.data.vertices:
+            for g in vert.groups:
+                if g.group == vg.index:
+                    weights.append((vert.index, g.weight))
+        cached_groups[vg.name] = weights
+    return cached_groups
+
+def calculate_bone_orientation(mesh: bpy.types.Object, vertices: List[bpy.types.MeshVertex]) -> Tuple[Vector, float]:
+    """Calculates optimal bone orientation and length based on mesh bounds."""
+    # Calculate mesh bounds
+    bounds_min = Vector((float('inf'),) * 3)
+    bounds_max = Vector((float('-inf'),) * 3)
+    
+    for v in vertices:
+        for i in range(3):
+            bounds_min[i] = min(bounds_min[i], v.co[i])
+            bounds_max[i] = max(bounds_max[i], v.co[i])
+            
+    # Calculate primary axis and length
+    dimensions = bounds_max - bounds_min
+    primary_axis_idx = max(range(3), key=lambda i: dimensions[i])
+    bone_length = dimensions[primary_axis_idx]
+    
+    # Calculate roll angle based on mesh orientation
+    roll_angle = 0.0  # Default roll
+    if primary_axis_idx == 0:  # X-axis
+        roll_angle = 1.5708  # 90 degrees
+        
+    return dimensions, roll_angle
+
 @register_wrap
 class MergeArmature(bpy.types.Operator):
     bl_idname = 'cats_custom.merge_armatures'
@@ -431,109 +481,130 @@ class AttachMesh(bpy.types.Operator):
     def execute(self, context):
         wm = context.window_manager
         wm.progress_begin(0, 100)
-
+        
         saved_data = Common.SavedData()
 
         # Set default stage
         Common.set_default_stage()
         Common.remove_rigidbodies_global()
         Common.unselect_all()
-        wm.progress_update(10)
+        wm.progress_update(5)
 
         # Get armature and mesh
-        mesh_name = bpy.context.scene.attach_mesh
-        base_armature_name = bpy.context.scene.merge_armature_into
-        attach_bone_name = bpy.context.scene.attach_to_bone
+        mesh_name = context.scene.attach_mesh
+        base_armature_name = context.scene.merge_armature_into
+        attach_bone_name = context.scene.attach_to_bone
         mesh = Common.get_objects()[mesh_name]
         armature = Common.get_objects()[base_armature_name]
+        wm.progress_update(10)
+
+        # Validate mesh transforms
+        is_valid, error_msg = validate_mesh_transforms(mesh)
+        if not is_valid:
+            self.report({'ERROR'}, error_msg)
+            saved_data.load()
+            wm.progress_end()
+            return {'CANCELLED'}
+        wm.progress_update(15)
+
+        # Validate mesh name
+        is_valid, error_msg = validate_mesh_name(armature, mesh_name)
+        if not is_valid:
+            self.report({'ERROR'}, error_msg)
+            saved_data.load()
+            wm.progress_end()
+            return {'CANCELLED'}
         wm.progress_update(20)
 
-        # Reparent mesh to target armature
+        # Cache existing vertex groups
+        vertex_groups_cache = cache_vertex_groups(mesh)
+        wm.progress_update(25)
+
+        # Parent mesh to armature
         mesh.parent = armature
         mesh.parent_type = 'OBJECT'
         wm.progress_update(30)
 
-        # Applies transforms of the armature and new mesh
+        # Apply transforms
         Common.apply_transforms(armature_name=base_armature_name)
-        wm.progress_update(40)
+        wm.progress_update(35)
 
-        # Switch mesh to edit mode
+        # Setup mesh editing
         Common.unselect_all()
         Common.set_active(mesh)
         Common.switch('EDIT')
-        wm.progress_update(50)
+        wm.progress_update(40)
 
-        # Delete all previous vertex groups
+        # Handle vertex groups
         if mesh.vertex_groups:
             bpy.ops.object.vertex_group_remove(all=True)
+        wm.progress_update(45)
 
-        # Select and assign all vertices to new vertex group
+        # Create new vertex group
         bpy.ops.mesh.select_all(action='SELECT')
         vg = mesh.vertex_groups.new(name=mesh_name)
         bpy.ops.object.vertex_group_assign()
-        wm.progress_update(60)
+        wm.progress_update(50)
 
         Common.switch('OBJECT')
 
-        # Verify that the vertex group has vertices assigned
-        verts_in_group = []
-        for v in mesh.data.vertices:
-            for group in v.groups:
-                if group.group == vg.index:
-                    verts_in_group.append(v)
-                    break
-
+        # Verify vertex group
+        verts_in_group = [v for v in mesh.data.vertices 
+                         for g in v.groups if g.group == vg.index]
+        
         if not verts_in_group:
-            self.report({'ERROR'}, f"Vertex group '{mesh_name}' is empty or does not exist.")
+            self.report({'ERROR'}, f"Vertex group '{mesh_name}' is empty")
             saved_data.load()
             wm.progress_end()
             return {'CANCELLED'}
+        wm.progress_update(60)
 
-        # Switch armature to edit mode
+        # Setup armature editing
         Common.unselect_all()
         Common.set_active(armature)
         Common.switch('EDIT')
         wm.progress_update(70)
 
-        # Create bone in target armature and reparent it to the target bone
+        # Create and setup bone
         attach_to_bone = armature.data.edit_bones.get(attach_bone_name)
         if not attach_to_bone:
-            self.report({'ERROR'}, f"Attach bone '{attach_bone_name}' not found in armature.")
+            self.report({'ERROR'}, f"Attach bone '{attach_bone_name}' not found")
             saved_data.load()
             wm.progress_end()
             return {'CANCELLED'}
+
         mesh_bone = armature.data.edit_bones.new(mesh_name)
         mesh_bone.parent = attach_to_bone
+        wm.progress_update(75)
 
-        # Compute the center vector
+        # Calculate optimal bone placement
         center_vector = Common.find_center_vector_of_vertex_group(mesh, mesh_name)
         if center_vector is None:
-            self.report({'ERROR'}, f"Unable to find center of vertex group '{mesh_name}'.")
+            self.report({'ERROR'}, f"Unable to find center of vertex group")
             saved_data.load()
             wm.progress_end()
             return {'CANCELLED'}
 
-        # Set bone head and tail positions
+        dimensions, roll_angle = calculate_bone_orientation(mesh, verts_in_group)
+        
+        # Set bone position and orientation
         mesh_bone.head = center_vector
-        mesh_bone.tail = center_vector.copy()
-        mesh_bone.tail[2] += 0.1
+        mesh_bone.tail = center_vector + Vector((0, 0, max(0.1, dimensions.z)))
+        mesh_bone.roll = roll_angle
         wm.progress_update(80)
 
-        # Switch armature back to object mode
+        # Setup armature modifier
         Common.switch('OBJECT')
-
-        # Remove previous armature modifiers
         for mod in mesh.modifiers:
             if mod.type == 'ARMATURE':
                 mesh.modifiers.remove(mod)
-
-        # Create new armature modifier
+                
         mod = mesh.modifiers.new('Armature', 'ARMATURE')
         mod.object = armature
         wm.progress_update(90)
 
         # Restore the attach bone field
-        bpy.context.scene.attach_to_bone = attach_bone_name
+        context.scene.attach_to_bone = attach_bone_name
 
         saved_data.load()
         wm.progress_update(100)
