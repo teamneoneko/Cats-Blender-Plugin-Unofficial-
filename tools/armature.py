@@ -38,6 +38,29 @@ class FixArmature(bpy.types.Operator):
 
     def execute(self, context):
         saved_data = Common.SavedData()
+        armature = Common.get_armature()
+        
+        # Check for Rigify/Metarig
+        is_rigify = False
+        rigify_bones = {'brow.B.L', 'lip.B.R', 'lip.T.R', 'lip.B.L', 'lip.T.L'}
+        
+        if armature.name.lower() == 'metarig':
+            is_rigify = True
+        
+        if not is_rigify:
+            for bone in armature.data.bones:
+                if bone.name.startswith(('DEF-', 'MCH-', 'ORG-')) or bone.name in rigify_bones:
+                    is_rigify = True
+                    break
+                
+        if is_rigify:
+            Common.show_error(3, ["Rigify and Metarig armatures are not", 
+                                "supported. Please use Rigify to Unity", 
+                                "plugin instead.",
+                                "If you think this is a error, then make sure your",
+                                "bones and amrature do not have metarig", 
+                                "names or Rigify names."])
+            return {'CANCELLED'}
 
         # Check if all meshes are single user
         meshes_to_check = Common.get_meshes_objects()
