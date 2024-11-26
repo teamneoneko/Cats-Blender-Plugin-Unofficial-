@@ -12,11 +12,11 @@ All the hours long processes of fixing your models are compressed into a few fun
 
 - Join the unoffical Cats Discord!: https://discord.catsblenderplugin.xyz
 
-You can find both 3.6, 4.1 and 4.2 blender releases [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases), ensure you are using the one for your blender version!  
+You can releases [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases), ensure you are using the one for your blender version!  
 
-- You can find the development version for Blender 3.6 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-36-dev).
-- You can find the development version for Blender 4.1 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-41-dev).
 - You can find the development version for Blender 4.2 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-42-dev).
+- You can find the development version for Blender 4.3 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-43-dev).
+- You can find the development version for Blender 4.4 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-44-dev).  
 
 ## Blender version support policies.
 
@@ -29,11 +29,12 @@ Please [Click Here](https://catsblenderplugin.xyz/wiki.html#quick-access) to vie
 
 ## Requirements
 
-- Blender 3.6 or above (run as administrator is recommended) (Please note some features may not work in version below 3.6).
+- Blender 3.6 or above (run as administrator is recommended).
    - Blender 4.2 is Recommended as this is the latest Stabel release.
 - Anything older then 3.6 is not supported and no longer works.
 - If you have custom Python installed which Blender might use, you need to have Numpy installed
-- Note to Windows Store users: Though Cats seems to work on Windows Store these days no support will be given if there are any issues as the Unofficial cats does not support Windows store due to issues Windows Store versions of Blender have given in the past. 
+- Note to Windows Store users: Though Cats seems to work on Windows Store these days no support will be given if there are any issues as the Unofficial cats does not support Windows store due to issues Windows Store versions of Blender have given in the past.
+- Note to Steam users, for some reason the steam version can do some werid errors, If you have issues please download blender from the blender.org website. 
 
 #### Additional Plugins Requirements.
 Some features of Cat's need additional plugins to work, you can find them here:
