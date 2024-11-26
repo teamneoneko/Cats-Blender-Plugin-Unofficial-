@@ -26,67 +26,79 @@ class MMDOptions(ToolPanel, bpy.types.Panel):
         scene = context.scene
         layout = self.layout
         box = layout.box()
-        col = box.column(align=True)
 
-        sub = col.column(align=True)
-        sub.scale_y = 0.75
-        sub.label(text=t("MMDOptions.info1"), icon='INFO')
-        sub.label(text=t("MMDOptions.info2"), icon='NONE')
-        sub.label(text=t("MMDOptions.info3"), icon='NONE')
-        sub.label(text=t("MMDOptions.info4"), icon='NONE')
-        sub.label(text=t("MMDOptions.info5"), icon='NONE')
-        sub.label(text=t("MMDOptions.info6"), icon='NONE')
-        col.separator()
-        col.separator()
+        # Info section
+        info_box = box.box()
+        info_box.separator(factor=0.2)
+        
+        info_col = info_box.column(align=True)
+        info_col.scale_y = 0.75
+        info_col.label(text=t("MMDOptions.info1"), icon='INFO')
+        info_col.label(text=t("MMDOptions.info2"), icon='BLANK1')
+        info_col.label(text=t("MMDOptions.info3"), icon='BLANK1')
+        info_col.label(text=t("MMDOptions.info4"), icon='BLANK1')
+        info_col.label(text=t("MMDOptions.info5"), icon='BLANK1')
+        info_col.label(text=t("MMDOptions.info6"), icon='BLANK1')
+        
+        info_box.separator(factor=0.5)
 
-        split = col.row(align=True)
-        row = split.row(align=True)
+        # Fix Model section
+        model_box = box.box()
+        model_col = model_box.column(align=True)
+        
+        row = model_col.row(align=True)
         row.scale_y = 1.5
-        row.operator(FixArmatureWarning.bl_idname, icon=globs.ICON_FIX_MODEL)
-        row = split.row(align=True)
-        row.alignment = 'RIGHT'
-        row.scale_y = 1.5
-        row.operator(ModelSettings.bl_idname, text="", icon='MODIFIER')
-        col.separator()
-        col.separator()
-        split = col.row(align=True)
-        row = split.row(align=True)
+        split = row.split(factor=0.85, align=True)
+        split.operator(FixArmatureWarning.bl_idname, icon=globs.ICON_FIX_MODEL)
+        split.operator(ModelSettings.bl_idname, text="", icon='MODIFIER')
+
+        # Material section
+        material_box = box.box()
+        material_col = material_box.column(align=True)
+        
+        row = material_col.row(align=True)
         row.scale_y = 1.5
         row.operator(Material.CombineMaterialsButton.bl_idname, icon='MATERIAL')
-        col.separator()
-        col.separator()
-        sub = col.column(align=True)
-        sub.scale_y = 0.75
-        sub.label(text=t("MMDOptions.FixMaterialinfo1"), icon='INFO')
-        sub.label(text=t("MMDOptions.FixMaterialinfo2"), icon='NONE')
-        col.separator()
-        split = col.row(align=True)
-        row = split.row(align=True)
+
+        material_col.separator(factor=1.5)
+        
+        # Material Fix Info
+        mat_info_col = material_col.column(align=True)
+        mat_info_col.scale_y = 0.75
+        mat_info_col.label(text=t("MMDOptions.FixMaterialinfo1"), icon='INFO')
+        mat_info_col.label(text=t("MMDOptions.FixMaterialinfo2"), icon='BLANK1')
+        
+        material_col.separator(factor=1.5)
+
+        row = material_col.row(align=True)
         row.scale_y = 1.5
         row.operator(Material.FixMaterialsButton.bl_idname, text=t('mmdoptions.FixMaterialsButton.label'), icon='NODE_MATERIAL')
-        col.separator()
-        col.separator()
-        sub = col.column(align=True)
-        sub.scale_y = 0.75
-        sub.label(text=t("MMDOptions.RemoveRigidBodiesManaulInfo1"), icon='INFO')
-        sub.label(text=t("MMDOptions.RemoveRigidBodiesManaulInfo2"), icon='NONE')
-        col.separator()
-        split = col.row(align=True)
-        row = split.row(align=True)
+
+        # Rigidbodies section
+        rigid_box = box.box()
+        rigid_col = rigid_box.column(align=True)
+        
+        rigid_col.separator(factor=1.5)
+        
+        info_col = rigid_col.column(align=True)
+        info_col.scale_y = 0.75
+        info_col.label(text=t("MMDOptions.RemoveRigidBodiesManaulInfo1"), icon='INFO')
+        info_col.label(text=t("MMDOptions.RemoveRigidBodiesManaulInfo2"), icon='BLANK1')
+        
+        rigid_col.separator(factor=1.5)
+
+        row = rigid_col.row(align=True)
         row.scale_y = 1.5
         row.operator(Armature_manual.RemoveRigidbodiesJointsOperator.bl_idname, icon='RIGID_BODY')
-        col.separator()
-        col.separator()
-              
-        split = col.row(align=True)
-        row = split.row(align=True)
+
+        # Help section
+        help_box = box.box()
+        help_col = help_box.column(align=True)
+        
+        row = help_col.row(align=True)
         row.scale_y = 1.5
         row.operator(MMDOptionswiki.bl_idname, icon_value=Iconloader.preview_collections["custom_icons"]["help1"].icon_id)
-        
-        col.separator()
-        col.separator()
-        
-        
+
 @register_wrap
 class MMDOptionswiki(bpy.types.Operator):
     bl_idname = 'mmdoptionwiki_read.help'
@@ -95,7 +107,6 @@ class MMDOptionswiki(bpy.types.Operator):
 
     def execute(self, context):
         webbrowser.open(t('MMDOptionswiki.URL'))
-
         self.report({'INFO'}, t('MMDOptionswiki.success'))
         return {'FINISHED'}
 
@@ -112,42 +123,32 @@ class ModelSettings(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(self, width=int(dpi_value * 3.25))
 
     def check(self, context):
-        # Important for changing options
         return True
 
     def draw(self, context):
         layout = self.layout
         col = layout.column(align=True)
 
-        row = col.row(align=True)
-        row.active = context.scene.remove_zero_weight
-        row.prop(context.scene, 'keep_end_bones')
-        row = col.row(align=True)
-        row.prop(context.scene, 'keep_upper_chest')
-        row = col.row(align=True)
-        row.prop(context.scene, 'keep_twist_bones')
-        row = col.row(align=True)
-        row.prop(context.scene, 'fix_twist_bones')
-        row = col.row(align=True)
-        row.prop(context.scene, 'join_meshes')
-        row = col.row(align=True)
-        row.prop(context.scene, 'connect_bones')
-        row = col.row(align=True)
-        row.prop(context.scene, 'remove_zero_weight')
-        row = col.row(align=True)
-        row.prop(context.scene, 'remove_rigidbodies_joints')
+        settings_col = col.column(align=True)
+        settings_col.scale_y = 1.0
+        settings_col.active = context.scene.remove_zero_weight
+        settings_col.prop(context.scene, 'keep_end_bones')
+        settings_col.prop(context.scene, 'keep_upper_chest')
+        settings_col.prop(context.scene, 'keep_twist_bones')
+        settings_col.prop(context.scene, 'fix_twist_bones')
+        settings_col.prop(context.scene, 'join_meshes')
+        settings_col.prop(context.scene, 'connect_bones')
+        settings_col.prop(context.scene, 'remove_zero_weight')
+        settings_col.prop(context.scene, 'remove_rigidbodies_joints')
 
-        col.separator()
-        row = col.row(align=True)
-        row.scale_y = 0.7
-        row.label(text=t('ModelSettings.warn.fbtFix1'), icon='INFO')
-        row = col.row(align=True)
-        row.scale_y = 0.7
-        row.label(text=t('ModelSettings.warn.fbtFix2'), icon_value=Iconloader.preview_collections["custom_icons"]["empty"].icon_id)
-        row = col.row(align=True)
-        row.scale_y = 0.7
-        row.label(text=t('ModelSettings.warn.fbtFix3'), icon_value=Iconloader.preview_collections["custom_icons"]["empty"].icon_id)
-        col.separator()
+        col.separator(factor=1.5)
+
+        # Warning text
+        warning_col = col.column(align=True)
+        warning_col.scale_y = 0.7
+        warning_col.label(text=t('ModelSettings.warn.fbtFix1'), icon='INFO')
+        warning_col.label(text=t('ModelSettings.warn.fbtFix2'), icon_value=Iconloader.preview_collections["custom_icons"]["empty"].icon_id)
+        warning_col.label(text=t('ModelSettings.warn.fbtFix3'), icon_value=Iconloader.preview_collections["custom_icons"]["empty"].icon_id)
 
 @register_wrap
 class FixArmatureWarning(bpy.types.Operator):
@@ -166,8 +167,11 @@ class FixArmatureWarning(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
         col = layout.column(align=True)
-        col.label(text=t('FixArmature.warning.line1'))
-        col.label(text=t('FixArmature.warning.line2'))
-        col.label(text=t('FixArmature.warning.line3'))
-        col.label(text=t('FixArmature.warning.line4'))
-        col.label(text=t('FixArmature.warning.line5'))
+        
+        warning_col = col.column(align=True)
+        warning_col.scale_y = 1.0
+        warning_col.label(text=t('FixArmature.warning.line1'))
+        warning_col.label(text=t('FixArmature.warning.line2'))
+        warning_col.label(text=t('FixArmature.warning.line3'))
+        warning_col.label(text=t('FixArmature.warning.line4'))
+        warning_col.label(text=t('FixArmature.warning.line5'))

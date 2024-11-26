@@ -2,6 +2,8 @@
 
 # (global-set-key (kbd "C-c m") (lambda () (interactive) (shell-command "zip -r ../../cats-dev.zip ../../cats-blender-plugin")))
 
+# MIT License
+
 import bpy
 import addon_utils
 from importlib import import_module
@@ -31,22 +33,16 @@ def check_for_imscale():
     # Check if it's present in blender anyway (installed separately)
     for mod in addon_utils.modules():
         if mod.bl_info['name'] == "Immersive Scaler":
-            # print(mod.__name__, mod.bl_info['version'])
-            # print(addon_utils.check(mod.__name__))
             if mod.bl_info['version'] < (0, 2, 7):
                 old_imscale_version = True
-                # print('TOO OLD!')
                 continue
             if not addon_utils.check(mod.__name__)[0]:
                 imscale_is_disabled = True
-                # print('DISABLED!')
                 continue
 
-            # print('FOUND!')
             old_imscale_version = False
             imscale_is_disabled = False
             draw_imscale_ui = getattr(import_module(mod.__name__ + '.ui'), 'draw_ui')
-
             break
 
 @register_wrap
@@ -57,68 +53,73 @@ class ScalingPanel(ToolPanel, bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-
         box = layout.box()
-        col = box.column(align=True)
-        row = col.row(align=True)
-        row.operator(Scaler.ImmersiveScalerHelpButton.bl_idname, icon='QUESTION')
 
-        # Installed but disabled
+        # Help button section
+        help_box = box.box()
+        help_col = help_box.column(align=True)
+        help_col.scale_y = 1.2
+        help_col.operator(Scaler.ImmersiveScalerHelpButton.bl_idname, icon='QUESTION')
+
+        # Status section
         if imscale_is_disabled:
-            box = layout.box()
-            col = box.column(align=True)
-            row = col.row(align=True)
+            self.draw_disabled_message(box)
+        elif old_imscale_version:
+            self.draw_outdated_message(box)
+        elif not draw_imscale_ui:
+            self.draw_not_installed_message(box)
+        else:
+            return draw_imscale_ui(context, layout)
 
-            row.scale_y = 0.75
-            row.label(text=t('ScalingPanel.imscaleDisabled1'))
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('ScalingPanel.imscaleDisabled2'))
-            col.separator()
-            row = col.row(align=True)
-            row.operator(Scaler.EnableIMScale.bl_idname, icon='CHECKBOX_HLT')
-            check_for_imscale()
-            return None
+        check_for_imscale()
 
-        # Currently, instructions for an old version are the same as
-        # it not being installed - a manual install either way.
-        if old_imscale_version:
-            box = layout.box()
-            col = box.column(align=True)
-            row = col.row(align=True)
+    def draw_disabled_message(self, box):
+        message_box = box.box()
+        message_col = message_box.column(align=True)
+        
+        message_col.separator(factor=1.5)
+        
+        info_col = message_col.column(align=True)
+        info_col.scale_y = 0.75
+        info_col.label(text=t('ScalingPanel.imscaleDisabled1'), icon='ERROR')
+        info_col.label(text=t('ScalingPanel.imscaleDisabled2'), icon='BLANK1')
+        
+        message_col.separator(factor=1.5)
+        
+        row = message_col.row(align=True)
+        row.scale_y = 1.2
+        row.operator(Scaler.EnableIMScale.bl_idname, icon='CHECKBOX_HLT')
 
-            row.scale_y = 0.75
-            row.label(text=t('ScalingPanel.imscaleOldVersion1'))
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('ScalingPanel.imscaleNotInstalled2'))
-            col.separator()
-            row = col.row(align=True)
-            row.operator(Scaler.ImmersiveScalerButton.bl_idname, icon='CHECKBOX_HLT')
+    def draw_outdated_message(self, box):
+        message_box = box.box()
+        message_col = message_box.column(align=True)
+        
+        message_col.separator(factor=1.5)
+        
+        info_col = message_col.column(align=True)
+        info_col.scale_y = 0.75
+        info_col.label(text=t('ScalingPanel.imscaleOldVersion1'), icon='ERROR')
+        info_col.label(text=t('ScalingPanel.imscaleNotInstalled2'), icon='BLANK1')
+        
+        message_col.separator(factor=1.5)
+        
+        row = message_col.row(align=True)
+        row.scale_y = 1.2
+        row.operator(Scaler.ImmersiveScalerButton.bl_idname, icon='CHECKBOX_HLT')
 
-            check_for_imscale()
-            return None
-
-        # Imscale is not found
-        if not draw_imscale_ui:
-            box = layout.box()
-            col = box.column(align=True)
-            row = col.row(align=True)
-
-            row.scale_y = 0.75
-            row.label(text=t('ScalingPanel.imscaleNotInstalled1'))
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('ScalingPanel.imscaleNotInstalled2'))
-            col.separator()
-            row = col.row(align=True)
-            row.operator(Scaler.ImmersiveScalerButton.bl_idname, icon='CHECKBOX_HLT')
-            check_for_imscale()
-            return None
-
-            check_for_imscale()
-            return None
-
-
-        # imscale = __import__('immersive_scaler')
-        return draw_imscale_ui(context, layout)
+    def draw_not_installed_message(self, box):
+        message_box = box.box()
+        message_col = message_box.column(align=True)
+        
+        message_col.separator(factor=1.5)
+        
+        info_col = message_col.column(align=True)
+        info_col.scale_y = 0.75
+        info_col.label(text=t('ScalingPanel.imscaleNotInstalled1'), icon='ERROR')
+        info_col.label(text=t('ScalingPanel.imscaleNotInstalled2'), icon='BLANK1')
+        
+        message_col.separator(factor=1.5)
+        
+        row = message_col.row(align=True)
+        row.scale_y = 1.2
+        row.operator(Scaler.ImmersiveScalerButton.bl_idname, icon='CHECKBOX_HLT')
