@@ -57,6 +57,16 @@ def register():
         default=True
     )
 
+    Scene.eye_tracking_mode = EnumProperty(
+        name=t('Scene.eye_tracking_mode.label'),
+        description=t('Scene.eye_tracking_mode.desc'),
+        items=[
+            ('SDK3', t('Scene.eye_tracking_mode.sdk3.label'), t('Scene.eye_tracking_mode.sdk3.desc')),
+            ('LEGACY', t('Scene.eye_tracking_mode.legacy.label'), t('Scene.eye_tracking_mode.legacy.desc'))
+        ],
+        default='SDK3'
+    )
+
     Scene.remove_zero_weight = BoolProperty(
         name=t('Scene.remove_zero_weight.label'),
         description=t('Scene.remove_zero_weight.desc'),
