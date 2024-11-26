@@ -25,140 +25,113 @@ class QuickAccessPanel(ToolPanel, bpy.types.Panel):
         layout = self.layout
         box = layout.box()
 
+        # Update notifications section
         updater.check_for_update_background(check_on_startup=True)
         updater.draw_update_notification_panel(box)
 
-        col = box.column(align=True)
+        # Version warnings section
+        version_box = box.box()
+        col = version_box.column(align=True)
+        self.draw_version_warnings(col, context)
 
-        if bpy.app.version < (4, 2, 0):
-            col.separator()
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('QuickAccess.warn.oldBlender1'), icon='ERROR')
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('QuickAccess.warn.oldBlender2'), icon='BLANK1')
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('QuickAccess.warn.oldBlender3'), icon='BLANK1')
-            col.separator()
-            col.separator()
+        # Main actions section
+        actions_box = box.box()
+        col = actions_box.column(align=True)
+        
+        # Import/Export row
+        row = col.row(align=True)
+        row.scale_y = 1.2
+        split = row.split(factor=0.85, align=True)
+        sub_row = split.row(align=True)
+        sub_row.operator(Importer.ImportAnyModel.bl_idname, 
+                        text=t('QuickAccess.ImportAnyModel.label'), 
+                        icon='ARMATURE_DATA')
+        if len(Common.get_armature_objects()) > 0:
+            sub_row.operator(Importer.ExporterModelsPopup.bl_idname, 
+                           icon='ARMATURE_DATA')
+        split.operator(Importer.ModelsPopup.bl_idname, text="", icon='COLLAPSEMENU')
 
-        if bpy.app.version > (4, 3, 99):
-            col.separator()
+        # Armature selector
+        if len(Common.get_armature_objects()) > 1:
+            col.separator(factor=1.5)
             row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('QuickAccess.warn.newBlender1'), icon='ERROR')
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('QuickAccess.warn.newBlender2'), icon='BLANK1')
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('QuickAccess.warn.newBlender3'), icon='BLANK1')
-            col.separator()
-            col.separator()
-
-        if bpy.app.version > (4, 2, 99):
-            col.separator()
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('QuickAccess.warn.Alpha1'), icon='ERROR')
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('QuickAccess.warn.Alpha2'), icon='BLANK1')
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('QuickAccess.warn.Alpha3'), icon='BLANK1')
-            col.separator()
-            col.separator()
-
-        if not globs.dict_found:
-            col.separator()
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('QuickAccess.warn.noDict1'), icon='INFO')
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('QuickAccess.warn.noDict2'), icon='BLANK1')
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('QuickAccess.warn.noDict3'), icon='BLANK1')
-            col.separator()
-            col.separator()
-
-        arm_count = len(Common.get_armature_objects())
-        if arm_count == 0:
-            split = col.row(align=True)
-            row = split.row(align=True)
-            row.scale_y = 1.7
-            row.operator(Importer.ImportAnyModel.bl_idname, text=t('QuickAccess.ImportAnyModel.label'), icon='ARMATURE_DATA')
-            row = split.row(align=True)
-            row.alignment = 'RIGHT'
-            row.scale_y = 1.7
-            row.operator(Importer.ModelsPopup.bl_idname, text="", icon='COLLAPSEMENU')
-            return
-        else:
-            split = col.row(align=True)
-            row = split.row(align=True)
-            row.scale_y = 1.4
-            row.operator(Importer.ImportAnyModel.bl_idname, text=t('QuickAccess.ImportAnyModel.label'), icon='ARMATURE_DATA')
-            row.operator(Importer.ExporterModelsPopup.bl_idname, icon='ARMATURE_DATA')
-            row = split.row(align=True)
-            row.scale_y = 1.4
-            row.operator(Importer.ModelsPopup.bl_idname, text="", icon='COLLAPSEMENU')
-
-        if arm_count > 1:
-            col.separator()
-            col.separator()
-            col.separator()
-            row = col.row(align=True)
-            row.scale_y = 1.1
+            row.scale_y = 1.0
             row.prop(context.scene, 'armature', icon='ARMATURE_DATA')
 
+        # Quick actions section
+        col.separator(factor=2.0)
+        quick_box = col.box()
+        quick_col = quick_box.column(align=True)
+        
+        # Info text
+        info_col = quick_col.column(align=True)
+        info_col.scale_y = 0.9
+        info_col.label(text=t("FixLegacy.info1"), icon='INFO')
+        info_col.label(text=t("FixLegacy.info2"), icon='BLANK1')
+
+        quick_col.separator(factor=1.0)
+
+        # Material and mesh buttons
+        row = quick_col.row(align=True)
+        row.scale_y = 1.2
+        row.operator(Material.CombineMaterialsButton.bl_idname, 
+                    text=t('QuickAccess.CombineMats.label'), 
+                    icon='MATERIAL')
+        row.operator(Armature_manual.JoinMeshes.bl_idname,
+                    text=t('QuickAccess.JoinMeshes.label'),
+                    icon_value=Iconloader.preview_collections["custom_icons"]["mesh"].icon_id)
+
+        # Pose mode section
+        col.separator(factor=1.5)
+        pose_box = col.box()
+        self.draw_pose_section(pose_box, context)
+
+    def draw_version_warnings(self, col, context):
+        if bpy.app.version < (4, 2, 0):
+            self.draw_warning(col, "QuickAccess.warn.oldBlender", 3)
+            
+        if bpy.app.version > (4, 3, 99):
+            self.draw_warning(col, "QuickAccess.warn.newBlender", 3)
+            
+        if bpy.app.version > (4, 2, 99):
+            self.draw_warning(col, "QuickAccess.warn.Alpha", 3)
+            
+        if not globs.dict_found:
+            self.draw_warning(col, "QuickAccess.warn.noDict", 3)
+
+    def draw_warning(self, col, text_key, lines):
         col.separator()
+        warning_col = col.column(align=True)
+        warning_col.scale_y = 0.75
+        
+        row = warning_col.row(align=True)
+        row.label(text=t(f'{text_key}1'), icon='ERROR')
+        
+        for i in range(2, lines + 1):
+            row = warning_col.row(align=True)
+            row.label(text=t(f'{text_key}{i}'), icon='BLANK1')
+            
         col.separator()
 
-        split = col.row(align=True)
-        row = split.row(align=True)
-        sub = col.column(align=True)
-        sub.scale_y = 0.75
-        sub.label(text=t("FixLegacy.info1"), icon='INFO')
-        sub.label(text=t("FixLegacy.info2"), icon='BLANK1')
-        row.scale_y = 1.5
-        col.separator()
-        col.separator()
-        split = col.row(align=True)
-        row = split.row(align=True)
-        row.scale_y = 1.1
-        row.operator(Material.CombineMaterialsButton.bl_idname, text=t('QuickAccess.CombineMats.label'), icon='MATERIAL')
-        row.operator(Armature_manual.JoinMeshes.bl_idname, text=t('QuickAccess.JoinMeshes.label'), icon_value=Iconloader.preview_collections["custom_icons"]["mesh"].icon_id)
-        col.separator()
-        col.separator()
-
+    def draw_pose_section(self, box, context):
+        col = box.column(align=True)
         armature_obj = Common.get_armature()
+        
         if not armature_obj or armature_obj.mode != 'POSE':
-            split = col.row(align=True)
-            row = split.row(align=True)
-            row.scale_y = 1.1
-            row.operator(Armature_manual.StartPoseMode.bl_idname, icon='POSE_HLT')
-            row = split.row(align=True)
-            row.alignment = 'RIGHT'
-            row.scale_y = 1.1
-            row.operator(Armature_manual.StartPoseModeNoReset.bl_idname, text="", icon='POSE_HLT')
+            row = col.row(align=True)
+            row.scale_y = 1.2
+            split = row.split(factor=0.85, align=True)
+            split.operator(Armature_manual.StartPoseMode.bl_idname, icon='POSE_HLT')
+            split.operator(Armature_manual.StartPoseModeNoReset.bl_idname, text="", icon='POSE_HLT')
         else:
-            split = col.row(align=True)
-            row = split.row(align=True)
-            row.scale_y = 1.1
-            row.operator(Armature_manual.StopPoseMode.bl_idname, icon=globs.ICON_POSE_MODE)
-            row = split.row(align=True)
-            row.alignment = 'RIGHT'
-            row.scale_y = 1.1
-            row.operator(Armature_manual.StopPoseModeNoReset.bl_idname, text='', icon=globs.ICON_POSE_MODE)
-            if armature_obj or armature_obj.mode != 'POSE':
-                row = col.row(align=True)
-                row.scale_y = 0.9
-                row.operator(Armature_manual.PoseToShape.bl_idname, icon='SHAPEKEY_DATA')
-                row = col.row(align=True)
-                row.scale_y = 0.9
-                row.operator(Armature_manual.PoseToRest.bl_idname, icon='POSE_HLT')
+            row = col.row(align=True)
+            row.scale_y = 1.2
+            split = row.split(factor=0.85, align=True)
+            split.operator(Armature_manual.StopPoseMode.bl_idname, icon=globs.ICON_POSE_MODE)
+            split.operator(Armature_manual.StopPoseModeNoReset.bl_idname, text="", icon=globs.ICON_POSE_MODE)
 
+            if armature_obj or armature_obj.mode != 'POSE':
+                pose_actions = col.column(align=True)
+                pose_actions.scale_y = 1.0
+                pose_actions.operator(Armature_manual.PoseToShape.bl_idname, icon='SHAPEKEY_DATA')
+                pose_actions.operator(Armature_manual.PoseToRest.bl_idname, icon='POSE_HLT')
