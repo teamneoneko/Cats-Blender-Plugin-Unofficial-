@@ -36,24 +36,18 @@ def check_for_smc():
                 found_very_old_smc = True
             continue
         if mod.bl_info['name'] == "Shotariya's Material Combiner":
-            # print(mod.__name__, mod.bl_info['version'])
-            # print(addon_utils.check(mod.__name__))
             if mod.bl_info['version'] < (2, 1, 2, 6):
                 old_smc_version = True
-                # print('TOO OLD!')
                 continue
             if not addon_utils.check(mod.__name__)[0]:
                 smc_is_disabled = True
-                # print('DISABLED!')
                 continue
 
-            # print('FOUND!')
             old_smc_version = False
             smc_is_disabled = False
             found_very_old_smc = False
             draw_smc_ui = getattr(import_module(mod.__name__ + '.operators.ui.include'), 'draw_ui')
             break
-            
 
 @register_wrap
 class OptimizePanel(ToolPanel, bpy.types.Panel):
@@ -62,227 +56,200 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
-
         layout = self.layout
         box = layout.box()
-        col = box.column(align=True)
 
+        # Mode selector section
+        mode_box = box.box()
+        col = mode_box.column(align=True)
         row = col.row(align=True)
+        row.scale_y = 1.2
         row.prop(context.scene, 'optimize_mode', expand=True)
 
+        # Content section based on mode
+        content_box = box.box()
         if context.scene.optimize_mode == 'ATLAS':
-
-            col.label(text="For PBR/Normal maps, use Tuxedo Blender Plugin.", icon='INFO')
-
-            col.separator()
-            col = box.column(align=True)
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.label(text=t('OptimizePanel.atlasDesc'))
-
-            split = col.row(align=True)
-            row = split.row(align=True)
-            row.scale_y = 0.9
-            row.label(text=t('OptimizePanel.atlasAuthor'), icon_value=Iconloader.preview_collections["custom_icons"]["heart1"].icon_id)
-            row = split.row(align=True)
-            row.alignment = 'RIGHT'
-            row.scale_y = 0.9
-            row.operator(Atlas.AtlasHelpButton.bl_idname, text="", icon='QUESTION')
-            col.separator()
-
-            # If supported version is outdated
-            if smc_is_disabled:
-                col.separator()
-                box = col.box()
-                col = box.column(align=True)
-
-                row = col.row(align=True)
-                row.scale_y = 0.75
-                row.label(text=t('OptimizePanel.matCombDisabled1'))
-                row = col.row(align=True)
-                row.scale_y = 0.75
-                row.label(text=t('OptimizePanel.matCombDisabled2'))
-                col.separator()
-                row = col.row(align=True)
-                row.operator(Atlas.EnableSMC.bl_idname, icon='CHECKBOX_HLT')
-
-                check_for_smc()
-                return
-
-            # If old version is installed
-            if old_smc_version:
-                col.separator()
-                box = col.box()
-                col = box.column(align=True)
-
-                row = col.row(align=True)
-                row.scale_y = 0.75
-                row.label(text=t('OptimizePanel.matCombOutdated1'))
-                row = col.row(align=True)
-                row.scale_y = 0.75
-                row.label(text=t('OptimizePanel.matCombOutdated2'))
-
-                col.separator()
-                row = col.row(align=True)
-                row.scale_y = 0.75
-                row.label(text=t('OptimizePanel.matCombOutdated3'))
-                row = col.row(align=True)
-                row.scale_y = 0.75
-                row.label(text=t('OptimizePanel.matCombOutdated4', location=t('OptimizePanel.matCombOutdated5_2.8')))
-
-                col.separator()
-                row = col.row(align=True)
-                row.scale_y = 0.75
-                row.label(text=t('OptimizePanel.matCombOutdated6'))
-                col.separator()
-                row = col.row(align=True)
-                row.operator(Atlas.ShotariyaButton.bl_idname, icon=globs.ICON_URL)
-
-                check_for_smc()
-                return
-
-            # Found very old v1.0 mat comb
-            if found_very_old_smc:
-                col.separator()
-                box = col.box()
-                col = box.column(align=True)
-
-                row = col.row(align=True)
-                row.scale_y = 0.75
-                row.label(text=t('OptimizePanel.matCombOutdated1'))
-                row = col.row(align=True)
-                row.scale_y = 0.75
-                row.label(text=t('OptimizePanel.matCombOutdated2'))
-                row = col.row(align=True)
-                row.scale_y = 0.75
-                row.label(text=t('OptimizePanel.matCombOutdated6_alt'))
-                col.separator()
-                row = col.row(align=True)
-                row.operator(Atlas.ShotariyaButton.bl_idname, icon=globs.ICON_URL)
-
-                check_for_smc()
-                return
-
-            # If no matcomb is found
-            if not draw_smc_ui:
-                col.separator()
-                box = col.box()
-                col = box.column(align=True)
-
-                row = col.row(align=True)
-                row.scale_y = 0.75
-                row.label(text=t('OptimizePanel.matCombNotInstalled'))
-                row = col.row(align=True)
-                row.scale_y = 0.75
-                row.label(text=t('OptimizePanel.matCombOutdated6_alt'))
-                col.separator()
-                row = col.row(align=True)
-                row.operator(Atlas.ShotariyaButton.bl_idname, icon=globs.ICON_URL)
-
-                check_for_smc()
-                return
-
-            if not hasattr(bpy.context.scene, 'smc_ob_data'):
-                check_for_smc()
-                return
-
-            draw_smc_ui(context, col)
-
+            self.draw_atlas_section(content_box, context)
         elif context.scene.optimize_mode == 'MATERIAL':
-
-            col = box.column(align=True)
-            row = col.row(align=True)
-            row.scale_y = 1.1
-            row.operator(Material.CombineMaterialsButton.bl_idname, icon='MATERIAL')
-            col.separator()
-            row = col.row(align=True)
-            row.scale_y = 1.1
-            row.operator(Material.ConvertAllToPngButton.bl_idname, icon='IMAGE_RGB_ALPHA')
-            col.separator()
-            col.separator()
-            col = box.column(align=True)
-            row = col.row(align=True)
-            row.scale_y = 1.1
-            row.label(text=t('OtherOptionsPanel.joinMeshes'), icon='AUTOMERGE_ON')
-            col = box.column(align=True)
-            row = col.row(align=True)
-            row.scale_y = 1.1
-            row.operator(Armature_manual.JoinMeshes.bl_idname, text=t('OtherOptionsPanel.JoinMeshes.label'))
-            row.operator(Armature_manual.JoinMeshesSelected.bl_idname, text=t('OtherOptionsPanel.JoinMeshesSelected.label'))
-            col.separator()
-            
-            col = box.column(align=True)
-            row = col.row(align=True)
-            row.scale_y = 1.1
-            row.operator(Armature_manual.RemoveDoubles.bl_idname, icon='X')
-
+            self.draw_material_section(content_box)
         elif context.scene.optimize_mode == 'BONEMERGING':
-            if len(Common.get_meshes_objects(check=False)) > 1:
-                row = box.row(align=True)
-                row.prop(context.scene, 'merge_mesh')
-            
-            # Load Bones button
-            row = box.row(align=True)
-            row.scale_y = 1.1
-            row.operator('cats_bonemerge.load_bones', text="Load Bones", icon='BONE_DATA')
-            
-            # Bone selection and ratio controls - disabled until bones are loaded
-            row = box.row(align=True)
-            row.enabled = bool(globs.root_bones.get(context.scene.merge_bone))
-            row.prop(context.scene, 'merge_bone')
-            
-            row = box.row(align=True)
-            row.enabled = bool(globs.root_bones.get(context.scene.merge_bone))
-            row.prop(context.scene, 'merge_ratio')
-            
-            # Refresh and Merge buttons - disabled until bones are loaded
-            row = box.row(align=True)
-            row.enabled = bool(globs.root_bones.get(context.scene.merge_bone))
-            row.operator(Bonemerge.BoneMergeButton.bl_idname, icon='AUTOMERGE_ON')
-            
-            col.separator()
-            col.separator()
-            col = box.column(align=True)
-            row = col.row(align=True)
-            row.scale_y = 1.1
-            row.label(text=t('OtherOptionsPanel.mergeWeights'), icon='BONE_DATA')
-            col = box.column(align=True)
-            row = col.row(align=True)
-            row.scale_y = 1.1
-            row.operator(Armature_manual.MergeWeights.bl_idname, text=t('OtherOptionsPanel.MergeWeights.label'))
-            row.operator(Armature_manual.MergeWeightsToActive.bl_idname, text=t('OtherOptionsPanel.MergeWeightsToActive.label'))
-            
-            col.separator()
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.prop(context.scene, 'keep_merged_bones')
-            row = col.row(align=True)
-            row.scale_y = 0.75
-            row.prop(context.scene, 'merge_visible_meshes_only')
-            
-            col.separator()
-            col = box.column(align=True)
-            row = col.row(align=True)
-            row.scale_y = 1.1
-            row.label(text=t('OtherOptionsPanel.delete'), icon='X')
-            col = box.column(align=True)
-            row = col.row(align=True)
-            row.scale_y = 1.1
-            row.operator(Armature_manual.RemoveZeroWeightBones.bl_idname, text=t('OtherOptionsPanel.RemoveZeroWeightBones.label'))
-            row.operator(Armature_manual.RemoveConstraints.bl_idname, text=t('OtherOptionsPanel.RemoveConstraints'))
-            row.operator(Armature_manual.RemoveZeroWeightGroups.bl_idname, text=t('OtherOptionsPanel.RemoveZeroWeightGroups'))
-            col = box.column(align=True)
-            row = col.row(align=True)
-            row.scale_y = 1.1
-            col.separator()
-            row.prop(context.scene, "delete_zero_weight_keep_twists")
+            self.draw_bone_merging_section(content_box, context)
 
+    def draw_atlas_section(self, box, context):
+        col = box.column(align=True)
+        
+        # PBR Info
+        info_col = col.column(align=True)
+        info_col.scale_y = 0.9
+        info_col.label(text="For PBR/Normal maps, use Tuxedo Blender Plugin.", icon='INFO')
+
+        col.separator(factor=1.5)
+
+        # Atlas description
+        desc_col = col.column(align=True)
+        desc_col.scale_y = 0.75
+        desc_col.label(text=t('OptimizePanel.atlasDesc'))
+
+        # Author credit
+        author_box = col.box()
+        author_col = author_box.column(align=True)
+        row = author_col.row(align=True)
+        row.scale_y = 0.9
+        split = row.split(factor=0.7)
+        split.label(text=t('OptimizePanel.atlasAuthor'), 
+                   icon_value=Iconloader.preview_collections["custom_icons"]["heart1"].icon_id)
+        split.operator(Atlas.AtlasHelpButton.bl_idname, text="", icon='QUESTION')
+
+        col.separator(factor=1.5)
+
+        # SMC Status section
+        status_box = col.box()
+        if smc_is_disabled:
+            self.draw_smc_message(status_box, 'disabled')
+        elif old_smc_version:
+            self.draw_smc_message(status_box, 'outdated')
+        elif found_very_old_smc:
+            self.draw_smc_message(status_box, 'very_old')
+        elif not draw_smc_ui:
+            self.draw_smc_message(status_box, 'not_installed')
+        elif hasattr(bpy.context.scene, 'smc_ob_data'):
+            draw_smc_ui(context, status_box.column(align=True))
+
+        check_for_smc()
+
+    def draw_material_section(self, box):
+        # Material operations
+        mat_box = box.box()
+        mat_col = mat_box.column(align=True)
+        mat_col.scale_y = 1.2
+        mat_col.operator(Material.CombineMaterialsButton.bl_idname, icon='MATERIAL')
+        mat_col.operator(Material.ConvertAllToPngButton.bl_idname, icon='IMAGE_RGB_ALPHA')
+        
+        # Mesh operations
+        mesh_box = box.box()
+        mesh_col = mesh_box.column(align=True)
+        
+        header_row = mesh_col.row(align=True)
+        header_row.scale_y = 1.1
+        header_row.label(text=t('OtherOptionsPanel.joinMeshes'), icon='AUTOMERGE_ON')
+        
+        ops_row = mesh_col.row(align=True)
+        ops_row.scale_y = 1.2
+        ops_row.operator(Armature_manual.JoinMeshes.bl_idname, text=t('OtherOptionsPanel.JoinMeshes.label'))
+        ops_row.operator(Armature_manual.JoinMeshesSelected.bl_idname, text=t('OtherOptionsPanel.JoinMeshesSelected.label'))
+        
+        # Cleanup
+        cleanup_box = box.box()
+        cleanup_col = cleanup_box.column(align=True)
+        cleanup_col.scale_y = 1.2
+        cleanup_col.operator(Armature_manual.RemoveDoubles.bl_idname, icon='X')
+
+    def draw_bone_merging_section(self, box, context):
+        # Settings box
+        settings_box = box.box()
+        settings_col = settings_box.column(align=True)
+        
+        if len(Common.get_meshes_objects(check=False)) > 1:
+            row = settings_col.row(align=True)
+            row.scale_y = 1.0
+            row.prop(context.scene, 'merge_mesh')
+        
+        settings_col.prop(context.scene, 'merge_bone')
+        settings_col.prop(context.scene, 'merge_ratio')
+        
+        # Actions row
+        actions_row = settings_col.row(align=True)
+        actions_row.scale_y = 1.2
+        actions_row.operator(Rootbone.RefreshRootButton.bl_idname, icon='FILE_REFRESH')
+        actions_row.operator(Bonemerge.BoneMergeButton.bl_idname, icon='AUTOMERGE_ON')
+        
+        # Weights box
+        weights_box = box.box()
+        weights_col = weights_box.column(align=True)
+        
+        header_row = weights_col.row(align=True)
+        header_row.scale_y = 1.1
+        header_row.label(text=t('OtherOptionsPanel.mergeWeights'), icon='BONE_DATA')
+        
+        ops_row = weights_col.row(align=True)
+        ops_row.scale_y = 1.2
+        ops_row.operator(Armature_manual.MergeWeights.bl_idname, text=t('OtherOptionsPanel.MergeWeights.label'))
+        ops_row.operator(Armature_manual.MergeWeightsToActive.bl_idname, text=t('OtherOptionsPanel.MergeWeightsToActive.label'))
+        
+        # Options
+        options_col = weights_col.column(align=True)
+        options_col.scale_y = 0.75
+        options_col.separator()
+        options_col.prop(context.scene, 'keep_merged_bones')
+        options_col.prop(context.scene, 'merge_visible_meshes_only')
+        
+        # Delete operations box
+        delete_box = box.box()
+        delete_col = delete_box.column(align=True)
+        
+        header_row = delete_col.row(align=True)
+        header_row.scale_y = 1.1
+        header_row.label(text=t('OtherOptionsPanel.delete'), icon='X')
+        
+        ops_col = delete_col.column(align=True)
+        ops_col.scale_y = 1.2
+        row = ops_col.row(align=True)
+        row.operator(Armature_manual.RemoveZeroWeightBones.bl_idname, text=t('OtherOptionsPanel.RemoveZeroWeightBones.label'))
+        row.operator(Armature_manual.RemoveConstraints.bl_idname, text=t('OtherOptionsPanel.RemoveConstraints'))
+        row.operator(Armature_manual.RemoveZeroWeightGroups.bl_idname, text=t('OtherOptionsPanel.RemoveZeroWeightGroups'))
+        
+        options_col = delete_col.column(align=True)
+        options_col.scale_y = 0.75
+        options_col.separator()
+        options_col.prop(context.scene, "delete_zero_weight_keep_twists")
+        
+        # Extra operations box
+        extra_box = box.box()
+        extra_col = extra_box.column(align=True)
+        extra_col.scale_y = 1.2
+        extra_col.operator(Armature_manual.DuplicateBonesButton.bl_idname, icon='GROUP_BONE')
+        extra_col.operator(Armature_manual.ConnectBonesButton.bl_idname, icon='CONSTRAINT_BONE')
+
+
+    def draw_smc_message(self, box, message_type):
+        col = box.column(align=True)
+        
+        message_col = col.column(align=True)
+        message_col.scale_y = 0.75
+        
+        if message_type == 'disabled':
+            message_col.label(text=t('OptimizePanel.matCombDisabled1'), icon='ERROR')
+            message_col.label(text=t('OptimizePanel.matCombDisabled2'), icon='BLANK1')
             col.separator()
-            col = box.column(align=True)
             row = col.row(align=True)
-            row.scale_y = 1.1
-            row.operator(Armature_manual.DuplicateBonesButton.bl_idname, icon='GROUP_BONE')
-            col = box.column(align=True)
+            row.scale_y = 1.2
+            row.operator(Atlas.EnableSMC.bl_idname, icon='CHECKBOX_HLT')
+            
+        elif message_type == 'outdated':
+            message_col.label(text=t('OptimizePanel.matCombOutdated1'), icon='ERROR')
+            message_col.label(text=t('OptimizePanel.matCombOutdated2'), icon='BLANK1')
+            message_col.label(text=t('OptimizePanel.matCombOutdated3'), icon='BLANK1')
+            message_col.label(text=t('OptimizePanel.matCombOutdated4', location=t('OptimizePanel.matCombOutdated5_2.8')), icon='BLANK1')
+            message_col.label(text=t('OptimizePanel.matCombOutdated6'), icon='BLANK1')
+            col.separator()
             row = col.row(align=True)
-            row.scale_y = 1.1
-            row.operator(Armature_manual.ConnectBonesButton.bl_idname, icon='CONSTRAINT_BONE')
+            row.scale_y = 1.2
+            row.operator(Atlas.ShotariyaButton.bl_idname, icon=globs.ICON_URL)
+            
+        elif message_type == 'very_old':
+            message_col.label(text=t('OptimizePanel.matCombOutdated1'), icon='ERROR')
+            message_col.label(text=t('OptimizePanel.matCombOutdated2'), icon='BLANK1')
+            message_col.label(text=t('OptimizePanel.matCombOutdated6_alt'), icon='BLANK1')
+            col.separator()
+            row = col.row(align=True)
+            row.scale_y = 1.2
+            row.operator(Atlas.ShotariyaButton.bl_idname, icon=globs.ICON_URL)
+            
+        elif message_type == 'not_installed':
+            message_col.label(text=t('OptimizePanel.matCombNotInstalled'), icon='ERROR')
+            message_col.label(text=t('OptimizePanel.matCombOutdated6_alt'), icon='BLANK1')
+            col.separator()
+            row = col.row(align=True)
+            row.scale_y = 1.2
+            row.operator(Atlas.ShotariyaButton.bl_idname, icon=globs.ICON_URL)
+
