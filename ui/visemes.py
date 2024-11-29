@@ -122,6 +122,7 @@ class VisemePanel(ToolPanel, bpy.types.Panel):
             row.operator(Viseme.VisemePreviewOperator.bl_idname, text="Preview Visemes", icon='PLAY')
         
         preview_col.separator()
+        settings_col.separator(factor=1.0)
 
         # Mouth A
         row = settings_col.row(align=True)

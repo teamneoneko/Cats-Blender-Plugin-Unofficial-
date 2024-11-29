@@ -90,6 +90,8 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
         desc_col.scale_y = 0.75
         desc_col.label(text=t('OptimizePanel.atlasDesc'))
 
+        col.separator(factor=1.0)
+
         # Author credit
         author_box = col.box()
         author_col = author_box.column(align=True)
