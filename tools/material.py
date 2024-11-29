@@ -128,7 +128,7 @@ class CombineMaterialsButton(bpy.types.Operator):
             self.report({'INFO'}, t('CombineMaterialsButton.success', number=str(total_combined)))
 
         return {'FINISHED'}
-        
+
 @register_wrap
 class FixMaterialsButton(bpy.types.Operator):
     bl_idname = 'cats_material.fix'

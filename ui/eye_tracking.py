@@ -210,12 +210,29 @@ class EyeTrackingPanel(ToolPanel, bpy.types.Panel):
         
         info_box.separator(factor=0.5)
 
+        # Troubleshooting Guide
+        help_box = box.box()
+        help_col = help_box.column(align=True)
+        help_col.scale_y = 0.8
+        help_col.label(text="Quick Troubleshooting Guide:", icon='QUESTION')
+        help_col.label(text="• Verify mesh has eye vertex groups", icon='GROUP_VERTEX')
+        help_col.label(text="• Check shape keys are named correctly", icon='SHAPEKEY_DATA')
+        help_col.label(text="• Ensure eye bones are properly weighted", icon='BONE_DATA')
+        help_col.label(text="• Confirm armature is in rest position", icon='ARMATURE_DATA')
+        help_box.separator(factor=0.5)
+
         # Main content section
         content_box = box.box()
         if context.scene.eye_mode == 'CREATION':
             self.draw_creation_mode(context, content_box)
         else:
             self.draw_testing_mode(context, content_box)
+
+        # Progress Indicator (when operations are running)
+        if hasattr(context.scene, "progress_update"):
+            progress_box = box.box()
+            progress_box.label(text="Operation Progress:", icon='TIME')
+            progress_box.prop(context.scene, "progress_update", text="")
 
     def draw_creation_mode(self, context, box):
         col = box.column(align=True)
@@ -377,6 +394,28 @@ class EyeTrackingPanel(ToolPanel, bpy.types.Panel):
         row = col.row(align=True)
         row.scale_y = 1.2
         row.operator(Eyetracking.ResetEyeTrackingButton.bl_idname, icon='FILE_REFRESH')
+
+        # Eye Movement Preview at bottom
+        preview_box = col.box()
+        preview_box.label(text="Eye Movement Preview:", icon='PREVIEW_RANGE')
+        
+        row = preview_box.row(align=True)
+        row.prop(context.scene, "eye_rotation_x", text="Vertical Range")
+        row.prop(context.scene, "eye_rotation_y", text="Horizontal Range")
+        
+        # Visual indicator for current eye rotation
+        indicator_row = preview_box.row()
+        indicator_row.scale_y = 2.0
+        indicator_row.alignment = 'CENTER'
+        
+        current_x = context.scene.eye_rotation_x
+        current_y = context.scene.eye_rotation_y
+        direction = "●"  # Center point
+        
+        if abs(current_x) > 15 or abs(current_y) > 15:
+            direction = "◎"  # Warning indicator for extreme angles
+        
+        indicator_row.label(text=direction)
 
     def draw_testing_warnings(self, context, col, armature):
         if armature.name != 'Armature':

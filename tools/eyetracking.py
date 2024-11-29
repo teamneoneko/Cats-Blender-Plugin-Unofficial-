@@ -1,10 +1,12 @@
 # MIT License
 
+import os
 import bpy
 import copy
 import math
 import bmesh
 import mathutils
+from typing import Optional, Dict, Tuple, Set
 
 from collections import OrderedDict
 from random import random
@@ -14,6 +16,174 @@ from . import common as Common
 from . import armature as Armature
 from .register import register_wrap
 from .translations import t
+
+VALID_EYE_NAMES = {
+    'left': ['LeftEye', 'Eye_L', 'eye_L', 'eye.L', 'EyeLeft', 'left_eye', 'l_eye'],
+    'right': ['RightEye', 'Eye_R', 'eye_R', 'eye.R', 'EyeRight', 'right_eye', 'r_eye']
+}
+
+class EyeTrackingBackup:
+    def __init__(self):
+        self.backup_path = os.path.join(bpy.app.tempdir, "eye_tracking_backup.json")
+        self.bone_positions: Dict[str, Dict[str, Tuple[float, float, float]]] = {}
+        
+    def store_bone_positions(self, armature) -> bool:
+        try:
+            self.bone_positions = {
+                'LeftEye': {
+                    'head': tuple(armature.data.bones['LeftEye'].head_local),
+                    'tail': tuple(armature.data.bones['LeftEye'].tail_local)
+                },
+                'RightEye': {
+                    'head': tuple(armature.data.bones['RightEye'].head_local),
+                    'tail': tuple(armature.data.bones['RightEye'].tail_local)
+                }
+            }
+            
+            with open(self.backup_path, 'w') as f:
+                json.dump(self.bone_positions, f)
+            return True
+        except Exception as e:
+            print(f"Backup failed: {str(e)}")
+            return False
+            
+    def restore_bone_positions(self, armature) -> bool:
+        try:
+            if not os.path.exists(self.backup_path):
+                return False
+                
+            with open(self.backup_path, 'r') as f:
+                backup_data = json.load(f)
+                
+            Common.switch('EDIT')
+            
+            for bone_name, positions in backup_data.items():
+                if bone_name in armature.data.edit_bones:
+                    bone = armature.data.edit_bones[bone_name]
+                    bone.head = positions['head']
+                    bone.tail = positions['tail']
+                    
+            return True
+        except Exception as e:
+            print(f"Restore failed: {str(e)}")
+            return False
+
+class EyeTrackingValidator:
+    @staticmethod
+    def find_eye_vertex_groups(mesh_name: str) -> Tuple[str, str]:
+        """Find eye vertex groups using multiple naming conventions"""
+        mesh = Common.get_objects().get(mesh_name)
+        if not mesh:
+            return None, None
+            
+        left_group = None
+        right_group = None
+        
+        for group in mesh.vertex_groups:
+            if any(name.lower() in group.name.lower() for name in VALID_EYE_NAMES['left']):
+                left_group = group.name
+            if any(name.lower() in group.name.lower() for name in VALID_EYE_NAMES['right']):
+                right_group = group.name
+                
+        return left_group, right_group
+
+    @staticmethod
+    def validate_setup(context, mesh_name: str) -> Tuple[bool, str]:
+        """Validate the complete eye tracking setup"""
+        # Validate armature
+        armature = Common.get_armature()
+        if not armature:
+            return False, t('EyeTrackingValidator.error.noArmature')
+            
+        # Validate mesh
+        mesh = Common.get_objects().get(mesh_name)
+        if not mesh:
+            return False, t('EyeTrackingValidator.error.noMesh', mesh=mesh_name)
+            
+        # Validate shape keys
+        if not Common.has_shapekeys(mesh):
+            return False, t('EyeTrackingValidator.error.noShapekeys')
+            
+        # Validate vertex groups
+        left_group, right_group = EyeTrackingValidator.find_eye_vertex_groups(mesh_name)
+        missing_groups = []
+        
+        if not left_group:
+            missing_groups.append(t('EyeTrackingValidator.error.leftEye'))
+        if not right_group:
+            missing_groups.append(t('EyeTrackingValidator.error.rightEye'))
+            
+        if missing_groups:
+            return False, t('EyeTrackingValidator.error.missingGroups', groups=', '.join(missing_groups))
+            
+        # Validate bone structure
+        required_bones = [context.scene.head, context.scene.eye_left, context.scene.eye_right]
+        missing_bones = [bone for bone in required_bones if bone not in armature.data.bones]
+        
+        if missing_bones:
+            return False, t('EyeTrackingValidator.error.missingBones', bones=', '.join(missing_bones))
+            
+        return True, t('EyeTrackingValidator.success')
+
+    @staticmethod
+    def validate_weights(mesh_name: str, vertex_group: str) -> bool:
+        """Validate that vertex groups have proper weight assignments"""
+        mesh = Common.get_objects().get(mesh_name)
+        if not mesh:
+            return False
+            
+        group = mesh.vertex_groups.get(vertex_group)
+        if not group:
+            return False
+            
+        for vertex in mesh.data.vertices:
+            for group_element in vertex.groups:
+                if group_element.group == group.index and group_element.weight > 0:
+                    return True
+                    
+        return False
+
+    @staticmethod
+    def get_eye_bone_names(armature) -> Dict[str, str]:
+        """Get standardized eye bone names based on armature"""
+        eye_bones = {'left': None, 'right': None}
+        
+        for bone in armature.data.bones:
+            if any(name.lower() in bone.name.lower() for name in VALID_EYE_NAMES['left']):
+                eye_bones['left'] = bone.name
+            if any(name.lower() in bone.name.lower() for name in VALID_EYE_NAMES['right']):
+                eye_bones['right'] = bone.name
+                
+        return eye_bones
+
+
+class VertexGroupCache:
+    _cache = {}
+    
+    @classmethod
+    def get_vertex_indices(cls, mesh_name: str, group_name: str) -> Optional[set]:
+        cache_key = f"{mesh_name}_{group_name}"
+        
+        if cache_key in cls._cache:
+            return cls._cache[cache_key]
+            
+        mesh = Common.get_objects().get(mesh_name)
+        if not mesh:
+            return None
+            
+        group = mesh.vertex_groups.get(group_name)
+        if not group:
+            return None
+            
+        indices = {v.index for v in mesh.data.vertices
+                  if any(g.group == group.index for g in v.groups)}
+                  
+        cls._cache[cache_key] = indices
+        return indices
+    
+    @classmethod
+    def clear_cache(cls):
+        cls._cache.clear()
 
 
 @register_wrap
@@ -163,10 +333,6 @@ class CreateEyesButton(bpy.types.Operator):
                 or Common.is_enum_empty(context.scene.eye_right):
             return False
 
-        # if not context.scene.disable_eye_blinking:
-        #     if context.scene.wink_left == 'Basis' or context.scene.wink_right == 'Basis':
-        #         return False
-
         if context.scene.disable_eye_blinking and context.scene.disable_eye_movement:
             return False
 
@@ -174,203 +340,161 @@ class CreateEyesButton(bpy.types.Operator):
 
     def execute(self, context):
         wm = bpy.context.window_manager
+        wm.progress_begin(0, 100)
 
-        saved_data = Common.SavedData()
-
-        # Set the stage
-        armature = Common.set_default_stage()
-        Common.switch('EDIT')
-
-        mesh_name = context.scene.mesh_name_eye
-        self.mesh = Common.get_objects().get(mesh_name)
-
-        # Set up old bones
-        head = armature.data.edit_bones.get(context.scene.head)
-        old_eye_left = armature.data.edit_bones.get(context.scene.eye_left)
-        old_eye_right = armature.data.edit_bones.get(context.scene.eye_right)
-
-        # Check for errors
-        if not context.scene.disable_eye_blinking and (Common.is_enum_empty(context.scene.wink_left)
-                                                       or Common.is_enum_empty(context.scene.wink_right)
-                                                       or Common.is_enum_empty(context.scene.lowerlid_left)
-                                                       or Common.is_enum_empty(context.scene.lowerlid_right)):
-            saved_data.load()
-            self.report({'ERROR'}, t('CreateEyesButton.error.noShapeSelected'))
+        # Validate setup
+        validator = EyeTrackingValidator()
+        is_valid, message = validator.validate_setup(context, context.scene.mesh_name_eye)
+        if not is_valid:
+            self.report({'ERROR'}, message)
+            wm.progress_end()
             return {'CANCELLED'}
 
-        if head is None:
-            saved_data.load()
-            self.report({'ERROR'}, t('CreateEyesButton.error.missingBone', bone=context.scene.head))
-            return {'CANCELLED'}
+        # Create backup
+        backup = EyeTrackingBackup()
+        if not backup.store_bone_positions(Common.get_armature()):
+            self.report({'WARNING'}, "Failed to create backup")
 
-        if not old_eye_left:
-            saved_data.load()
-            self.report({'ERROR'}, t('CreateEyesButton.error.missingBone', bone=context.scene.eye_left))
-            return {'CANCELLED'}
+        try:
+            saved_data = Common.SavedData()
+            wm.progress_update(10)
 
-        if not old_eye_right:
-            saved_data.load()
-            self.report({'ERROR'}, t('CreateEyesButton.error.missingBone', bone=context.scene.eye_right))
-            return {'CANCELLED'}
+            # Set the stage
+            armature = Common.set_default_stage()
+            Common.switch('EDIT')
+            wm.progress_update(20)
 
-        if not context.scene.disable_eye_movement:
-            eye_name = ""
-            # Find the existing vertex group of the eye bones
-            if not self.vertex_group_exists(old_eye_left.name):
-                eye_name = context.scene.eye_left
-            elif not self.vertex_group_exists(old_eye_right.name):
-                eye_name = context.scene.eye_right
+            mesh_name = context.scene.mesh_name_eye
+            self.mesh = Common.get_objects().get(mesh_name)
 
-            if eye_name:
-                saved_data.load()
-                self.report({'ERROR'}, t('CreateEyesButton.error.noVertex', bone=eye_name))
-                return {'CANCELLED'}
+            # Set up old bones
+            head = armature.data.edit_bones.get(context.scene.head)
+            old_eye_left = armature.data.edit_bones.get(context.scene.eye_left)
+            old_eye_right = armature.data.edit_bones.get(context.scene.eye_right)
 
-        # Find existing LeftEye/RightEye and rename or delete
-        if 'LeftEye' in armature.data.edit_bones:
-            if old_eye_left.name == 'LeftEye':
-                saved_data.load()
-                self.report({'ERROR'}, t('CreateEyesButton.error.dontUse', eyeName='LeftEye', eyeNameShort='Eye_L'))
-                return {'CANCELLED'}
+            # Validation checks with proper error messages
+            if not context.scene.disable_eye_blinking:
+                if any(Common.is_enum_empty(getattr(context.scene, attr)) for attr in 
+                      ['wink_left', 'wink_right', 'lowerlid_left', 'lowerlid_right']):
+                    saved_data.load()
+                    self.report({'ERROR'}, t('CreateEyesButton.error.noShapeSelected'))
+                    return {'CANCELLED'}
+
+            # Use cached vertex groups for performance
+            VertexGroupCache.clear_cache()
+            left_eye_verts = VertexGroupCache.get_vertex_indices(mesh_name, 'LeftEye')
+            right_eye_verts = VertexGroupCache.get_vertex_indices(mesh_name, 'RightEye')
+            wm.progress_update(30)
+
+            # Create the new eye bones
+            new_left_eye = bpy.context.object.data.edit_bones.new('LeftEye')
+            new_right_eye = bpy.context.object.data.edit_bones.new('RightEye')
+            wm.progress_update(40)
+
+            # Parent them correctly
+            new_left_eye.parent = head
+            new_right_eye.parent = head
+            wm.progress_update(50)
+
+            # Calculate their new positions
+            fix_eye_position(context, old_eye_left, new_left_eye, head, False)
+            fix_eye_position(context, old_eye_right, new_right_eye, head, True)
+            wm.progress_update(60)
+
+            # Store names before mode switch
+            new_right_eye_name = new_right_eye.name
+            old_eye_left_name = old_eye_left.name
+            old_eye_right_name = old_eye_right.name
+            head_name = head.name
+
+            # Switch to mesh
+            Common.set_active(self.mesh)
+            Common.switch('OBJECT')
+            wm.progress_update(70)
+
+            # Fix shape key bug
+            bpy.context.object.show_only_shape_key = False
+
+            # Handle vertex groups
+            if not context.scene.disable_eye_movement:
+                self.copy_vertex_group(old_eye_left_name, 'LeftEye')
+                self.copy_vertex_group(old_eye_right_name, 'RightEye')
             else:
-                armature.data.edit_bones.remove(armature.data.edit_bones.get('LeftEye'))
+                for bone in ['LeftEye', 'RightEye']:
+                    group = self.mesh.vertex_groups.get(bone)
+                    if group is not None:
+                        self.mesh.vertex_groups.remove(group)
+            wm.progress_update(80)
 
-        if 'RightEye' in armature.data.edit_bones:
-            if old_eye_right.name == 'RightEye':
-                saved_data.load()
-                self.report({'ERROR'}, t('CreateEyesButton.error.dontUse', eyeName='RightEye', eyeNameShort='Eye_R'))
-                return {'CANCELLED'}
+            # Handle shape keys
+            shapes = [context.scene.wink_left, context.scene.wink_right, 
+                     context.scene.lowerlid_left, context.scene.lowerlid_right]
+            new_shapes = ['vrc.blink_left', 'vrc.blink_right', 
+                         'vrc.lowerlid_left', 'vrc.lowerlid_right']
+
+            # Remove existing shapekeys efficiently
+            for new_shape in new_shapes:
+                for index, shapekey in enumerate(self.mesh.data.shape_keys.key_blocks):
+                    if shapekey.name == new_shape and new_shape not in shapes:
+                        bpy.context.active_object.active_shape_key_index = index
+                        bpy.ops.object.shape_key_remove()
+                        break
+            wm.progress_update(85)
+
+            # Copy shape keys with progress updates
+            shapes[0] = self.copy_shape_key(context, shapes[0], new_shapes, 1)
+            wm.progress_update(88)
+            shapes[1] = self.copy_shape_key(context, shapes[1], new_shapes, 2)
+            wm.progress_update(91)
+            shapes[2] = self.copy_shape_key(context, shapes[2], new_shapes, 3)
+            wm.progress_update(94)
+            shapes[3] = self.copy_shape_key(context, shapes[3], new_shapes, 4)
+            wm.progress_update(97)
+
+            Common.sort_shape_keys(mesh_name)
+
+            # Reset the scenes
+            context.scene.head = head_name
+            context.scene.eye_left = old_eye_left_name
+            context.scene.eye_right = old_eye_right_name
+            context.scene.wink_left = shapes[0]
+            context.scene.wink_right = shapes[1]
+            context.scene.lowerlid_left = shapes[2]
+            context.scene.lowerlid_right = shapes[3]
+
+            # Cleanup
+            Common.set_default_stage()
+            Common.remove_rigidbodies_global()
+            Common.remove_empty()
+            Common.fix_armature_names()
+            wm.progress_update(100)
+
+            # Verify hierarchy
+            is_correct = Armature.check_hierarchy(True, [['Hips', 'Spine', 'Chest', 'Neck', 'Head']])
+
+            if context.scene.disable_eye_movement:
+                repair_shapekeys_mouth(mesh_name)
             else:
-                armature.data.edit_bones.remove(armature.data.edit_bones.get('RightEye'))
+                repair_shapekeys(mesh_name, new_right_eye_name)
 
-        # Find existing LeftEye/RightEye and rename or delete
-        vg_left = self.mesh.vertex_groups.get('LeftEye')
-        vg_right = self.mesh.vertex_groups.get('RightEye')
-        if vg_left:
-            self.mesh.vertex_groups.remove(vg_left)
-        if vg_right:
-            self.mesh.vertex_groups.remove(vg_right)
+            saved_data.load()
+            wm.progress_end()
 
-        if not Common.has_shapekeys(self.mesh):
-            self.mesh.shape_key_add(name='Basis', from_mix=False)
+            if not is_correct['result']:
+                self.report({'ERROR'}, is_correct['message'])
+                self.report({'ERROR'}, t('CreateEyesButton.error.hierarchy'))
+            else:
+                context.scene.eye_mode = 'TESTING'
+                self.report({'INFO'}, t('CreateEyesButton.success'))
 
-        # Set head roll to 0 degrees
-        bpy.context.object.data.edit_bones[context.scene.head].roll = 0
+            return {'FINISHED'}
 
-        # Create the new eye bones
-        new_left_eye = bpy.context.object.data.edit_bones.new('LeftEye')
-        new_right_eye = bpy.context.object.data.edit_bones.new('RightEye')
-
-        # Parent them correctly
-        new_left_eye.parent = bpy.context.object.data.edit_bones[context.scene.head]
-        new_right_eye.parent = bpy.context.object.data.edit_bones[context.scene.head]
-
-        # Calculate their new positions
-        fix_eye_position(context, old_eye_left, new_left_eye, head, False)
-        fix_eye_position(context, old_eye_right, new_right_eye, head, True)
-
-        # The names may be needed later, but references to edit bones become invalid once EDIT mode has been left, so
-        # the names need to be assigned to variables before switching to OBJECT mode
-        new_right_eye_name = new_right_eye.name
-        old_eye_left_name = old_eye_left.name
-        old_eye_right_name = old_eye_right.name
-        head_name = head.name
-        # Delete the variables that are about to become invalid to guarantee that they aren't accidentally still used
-        del new_right_eye, new_left_eye, old_eye_right, old_eye_left, head
-
-        # Switch to mesh
-        Common.set_active(self.mesh)
-        Common.switch('OBJECT')
-
-        # Fix a small bug
-        bpy.context.object.show_only_shape_key = False
-
-        # Copy the existing eye vertex group to the new one if eye movement is activated
-        if not context.scene.disable_eye_movement:
-            self.copy_vertex_group(old_eye_left_name, 'LeftEye')
-            self.copy_vertex_group(old_eye_right_name, 'RightEye')
-        else:
-            # Remove the vertex groups if no blink is enabled
-            bones = ['LeftEye', 'RightEye']
-            for bone in bones:
-                group = self.mesh.vertex_groups.get(bone)
-                if group is not None:
-                    self.mesh.vertex_groups.remove(group)
-
-        # Store shape keys to ignore changes during copying
-        shapes = [context.scene.wink_left, context.scene.wink_right, context.scene.lowerlid_left, context.scene.lowerlid_right]
-        new_shapes = ['vrc.blink_left', 'vrc.blink_right', 'vrc.lowerlid_left', 'vrc.lowerlid_right']
-
-        # Remove existing shapekeys
-        for new_shape in new_shapes:
-            for index, shapekey in enumerate(self.mesh.data.shape_keys.key_blocks):
-                if shapekey.name == new_shape and new_shape not in shapes:
-                    bpy.context.active_object.active_shape_key_index = index
-                    bpy.ops.object.shape_key_remove()
-                    break
-
-        # Copy shape key mixes from user defined shape keys and rename them to the correct liking of VRC
-        wm.progress_begin(0, 4)
-        shapes[0] = self.copy_shape_key(context, shapes[0], new_shapes, 1)
-        wm.progress_update(1)
-        shapes[1] = self.copy_shape_key(context, shapes[1], new_shapes, 2)
-        wm.progress_update(2)
-        shapes[2] = self.copy_shape_key(context, shapes[2], new_shapes, 3)
-        wm.progress_update(3)
-        shapes[3] = self.copy_shape_key(context, shapes[3], new_shapes, 4)
-        wm.progress_update(4)
-
-        Common.sort_shape_keys(mesh_name)
-
-        # Reset the scenes in case they were changed
-        context.scene.head = head_name
-        context.scene.eye_left = old_eye_left_name
-        context.scene.eye_right = old_eye_right_name
-        context.scene.wink_left = shapes[0]
-        context.scene.wink_right = shapes[1]
-        context.scene.lowerlid_left = shapes[2]
-        context.scene.lowerlid_right = shapes[3]
-
-        # Remove empty objects
-        Common.set_default_stage()  # Fixes an error apparently
-        Common.remove_rigidbodies_global()
-        Common.remove_empty()
-
-        # Fix armature name
-        Common.fix_armature_names()
-
-        # Check for correct bone hierarchy
-        is_correct = Armature.check_hierarchy(True, [['Hips', 'Spine', 'Chest', 'Neck', 'Head']])
-
-        if context.scene.disable_eye_movement:
-            # print('Repair with mouth.')
-            repair_shapekeys_mouth(mesh_name)
-            # repair_shapekeys_mouth(mesh_name, context.scene.wink_left)  # TODO
-        else:
-            # print('Repair normal "' + new_right_eye_name + '".')
-            repair_shapekeys(mesh_name, new_right_eye_name)
-
-        # deleted = []
-        # # deleted = checkshapekeys()
-        #
-        # if len(deleted) > 0:
-        #     text = 'Following shape keys get deleted: '
-        #     for key in deleted:
-        #         text += key + ', '
-        #     self.report({'WARNING'}, text)
-
-        saved_data.load()
-
-        wm.progress_end()
-
-        if not is_correct['result']:
-            self.report({'ERROR'}, is_correct['message'])
-            self.report({'ERROR'}, t('CreateEyesButton.error.hierarchy'))
-        else:
-            context.scene.eye_mode = 'TESTING'
-            self.report({'INFO'}, t('CreateEyesButton.success'))
-
-        return {'FINISHED'}
+        except Exception as e:
+            self.report({'ERROR'}, f"Setup failed: {str(e)}")
+            if backup.restore_bone_positions(Common.get_armature()):
+                self.report({'WARNING'}, "Restored from backup")
+            wm.progress_end()
+            return {'CANCELLED'}
 
     def copy_vertex_group(self, vertex_group, rename_to):
         # iterate through the vertex group
@@ -697,23 +821,30 @@ class StopTestingButton(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
 # This gets called by the eye testing sliders
 def set_rotation(self, context):
-    global eye_left, eye_right
+    global eye_left, eye_right, eye_left_rot, eye_right_rot
 
-    if not eye_left:
-        StopTestingButton.execute(self, context)
-        self.report({'ERROR'}, t('StopTestingButton.error.tryAgain'))
+    # Initialize testing mode if not already set up
+    if not eye_left or not eye_right:
+        StartTestingButton.execute(StartTestingButton, context)
         return None
 
+    # Apply rotations
     eye_left.rotation_mode = 'XYZ'
-    eye_left.rotation_euler[0] = eye_left_rot[0] + math.radians(context.scene.eye_rotation_x)
-    eye_left.rotation_euler[1] = eye_left_rot[1] + math.radians(context.scene.eye_rotation_y)
-
     eye_right.rotation_mode = 'XYZ'
-    eye_right.rotation_euler[0] = eye_right_rot[0] + math.radians(context.scene.eye_rotation_x)
-    eye_right.rotation_euler[1] = eye_right_rot[1] + math.radians(context.scene.eye_rotation_y)
+
+    # Store and print values for debugging
+    x_rotation = math.radians(context.scene.eye_rotation_x)
+    y_rotation = math.radians(context.scene.eye_rotation_y)
+    
+    # Apply rotations with initial offset
+    eye_left.rotation_euler[0] = eye_left_rot[0] + x_rotation
+    eye_left.rotation_euler[1] = eye_left_rot[1] + y_rotation
+
+    eye_right.rotation_euler[0] = eye_right_rot[0] + x_rotation
+    eye_right.rotation_euler[1] = eye_right_rot[1] + y_rotation
+
     return None
 
 
