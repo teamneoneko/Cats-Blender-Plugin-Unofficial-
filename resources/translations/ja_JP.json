@@ -757,7 +757,32 @@
         "DecimationPanel.preset.quest.label": "クエスト",
         "DecimationPanel.preset.quest.description": "クエストアバター用の推奨トリス数。",
         "RemoveRigidbodiesJointsOperator.label": "剛体とジョイントを削除",
-        "RemoveRigidbodiesJointsOperator.description": "剛体とジョイントは MMD ソフトウェアによって物理シミュレーションを行います。\nVRChat では役に立たないため、VRChat ユーザーにはこれらを削除することをお勧めします！"
+        "RemoveRigidbodiesJointsOperator.description": "剛体とジョイントは MMD ソフトウェアによって物理シミュレーションを行います。\nVRChat では役に立たないため、VRChat ユーザーにはこれらを削除することをお勧めします！",
+        "FixFBTButton.label": "フルボディトラッキング修正を追加",
+        "FixFBTButton.desc": "追加の足のボーンを作成してモデルにフルボディトラッキング修正を追加します",
+        "RemoveFBTButton.label": "フルボディトラッキング修正を削除", 
+        "RemoveFBTButton.desc": "フルボディトラッキング修正で追加された足のボーンを削除します",
+        "LoadBonesButton.label": "ルートボーンを読み込む",
+        "LoadBonesButton.desc": "親子付けできるボーンのリストを読み込みます",
+        "Importer.export_resonite.label": "Resonite用にエクスポート",
+        "Importer.export_resonite.desc": "このモデルをResoniteで使用するためにエクスポートします",
+        "VisemePreviewOperator.label": "口形素をプレビュー",
+        "VisemePreviewOperator.desc": "ゲーム内での口形素の見た目をプレビューします",
+        "FixArmature.description": "アーマチュアを自動的に修正します:\n- ボーンの親子付けを修正\n- 不要なボーンを削除\n- ボーン名を翻訳\n- ウェイトをマージ\n- 腰を修正\n- モーフをシェイプキーに変換",
+        "Scene.eye_tracking_mode.label": "視線追従モード",
+        "Scene.eye_tracking_mode.desc": "使用する視線追従システムを選択",
+        "Scene.eye_tracking_mode.sdk3.label": "VRChat SDK3",
+        "Scene.eye_tracking_mode.sdk3.desc": "VRChat SDK3用の視線追従設定",
+        "Scene.eye_tracking_mode.legacy.label": "レガシー",
+        "Scene.eye_tracking_mode.legacy.desc": "他のプラットフォーム用のレガシー視線追従システム",
+        "Scene.viseme_preview_mode.label": "プレビューモード",
+        "Scene.viseme_preview_mode.desc": "口形素シェイプのプレビューモードを有効化",
+        "Scene.viseme_preview_selection.label": "プレビューシェイプ",
+        "Scene.viseme_preview_selection.desc": "プレビューする口形素シェイプを選択",
+        "Scene.viseme_validate_deformation.label": "変形を検証",
+        "Scene.viseme_validate_deformation.desc": "シェイプキーの変形が適切な範囲内かチェック",
+        "Scene.remove_doubles_threshold.label": "しきい値",
+        "Scene.remove_doubles_threshold.desc": "重複頂点を削除する距離のしきい値"
     }
 }
 
