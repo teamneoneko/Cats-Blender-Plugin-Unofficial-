@@ -787,7 +787,10 @@
         "Scene.remove_doubles_threshold.label": "しきい値",
         "Scene.remove_doubles_threshold.desc": "重複頂点を削除する距離のしきい値",
         "Scene.generate_twistbones_upper.label": "上半身",
-        "Scene.generate_twistbones_upper.desc": "上半身のツイストボーンを生成（背骨、首）"    
+        "Scene.generate_twistbones_upper.desc": "上半身のツイストボーンを生成（背骨、首）",
+        "RemoveDoubles.warning.shapekeys": "このメッシュには影響を受ける可能性のあるシェイプキーがあります",
+        "RemoveDoubles.warning.shapekeys.impact": "重複を削除すると、シェイプキーの変形に影響を与える可能性があります",
+        "RemoveDoubles.warning.shapekeys.continue": "続行しますか？" 
     }
 }
 
