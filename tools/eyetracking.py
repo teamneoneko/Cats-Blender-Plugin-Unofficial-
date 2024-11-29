@@ -358,11 +358,13 @@ class CreateEyesButton(bpy.types.Operator):
         try:
             saved_data = Common.SavedData()
             wm.progress_update(10)
+            context.scene.progress_update = 10
 
             # Set the stage
             armature = Common.set_default_stage()
             Common.switch('EDIT')
             wm.progress_update(20)
+            context.scene.progress_update = 20
 
             mesh_name = context.scene.mesh_name_eye
             self.mesh = Common.get_objects().get(mesh_name)
@@ -385,21 +387,25 @@ class CreateEyesButton(bpy.types.Operator):
             left_eye_verts = VertexGroupCache.get_vertex_indices(mesh_name, 'LeftEye')
             right_eye_verts = VertexGroupCache.get_vertex_indices(mesh_name, 'RightEye')
             wm.progress_update(30)
+            context.scene.progress_update = 30
 
             # Create the new eye bones
             new_left_eye = bpy.context.object.data.edit_bones.new('LeftEye')
             new_right_eye = bpy.context.object.data.edit_bones.new('RightEye')
             wm.progress_update(40)
+            context.scene.progress_update = 40
 
             # Parent them correctly
             new_left_eye.parent = head
             new_right_eye.parent = head
             wm.progress_update(50)
+            context.scene.progress_update = 50
 
             # Calculate their new positions
             fix_eye_position(context, old_eye_left, new_left_eye, head, False)
             fix_eye_position(context, old_eye_right, new_right_eye, head, True)
             wm.progress_update(60)
+            context.scene.progress_update = 60
 
             # Store names before mode switch
             new_right_eye_name = new_right_eye.name
@@ -411,6 +417,7 @@ class CreateEyesButton(bpy.types.Operator):
             Common.set_active(self.mesh)
             Common.switch('OBJECT')
             wm.progress_update(70)
+            context.scene.progress_update = 70
 
             # Fix shape key bug
             bpy.context.object.show_only_shape_key = False
@@ -425,6 +432,7 @@ class CreateEyesButton(bpy.types.Operator):
                     if group is not None:
                         self.mesh.vertex_groups.remove(group)
             wm.progress_update(80)
+            context.scene.progress_update = 80
 
             # Handle shape keys
             shapes = [context.scene.wink_left, context.scene.wink_right, 
@@ -440,16 +448,21 @@ class CreateEyesButton(bpy.types.Operator):
                         bpy.ops.object.shape_key_remove()
                         break
             wm.progress_update(85)
+            context.scene.progress_update = 85
 
             # Copy shape keys with progress updates
             shapes[0] = self.copy_shape_key(context, shapes[0], new_shapes, 1)
             wm.progress_update(88)
+            context.scene.progress_update = 88
             shapes[1] = self.copy_shape_key(context, shapes[1], new_shapes, 2)
             wm.progress_update(91)
+            context.scene.progress_update = 91
             shapes[2] = self.copy_shape_key(context, shapes[2], new_shapes, 3)
             wm.progress_update(94)
+            context.scene.progress_update = 94
             shapes[3] = self.copy_shape_key(context, shapes[3], new_shapes, 4)
             wm.progress_update(97)
+            context.scene.progress_update = 97
 
             Common.sort_shape_keys(mesh_name)
 
@@ -468,6 +481,7 @@ class CreateEyesButton(bpy.types.Operator):
             Common.remove_empty()
             Common.fix_armature_names()
             wm.progress_update(100)
+            context.scene.progress_update = 100
 
             # Verify hierarchy
             is_correct = Armature.check_hierarchy(True, [['Hips', 'Spine', 'Chest', 'Neck', 'Head']])

@@ -798,6 +798,11 @@
         "SupportButton.success": "Support page opened",
         "PatchnotesButton.label": "Latest Patchnotes",
         "PatchnotesButton.URL": "https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-/releases",
-        "PatchnotesButton.success": "Patchnotes opened" 
+        "PatchnotesButton.success": "Patchnotes opened",
+        "EyeTrackingPanel.troubleshooting.title": "Quick Troubleshooting Guide:",
+        "EyeTrackingPanel.troubleshooting.vertexGroups": "• Verify mesh has eye vertex groups",
+        "EyeTrackingPanel.troubleshooting.shapeKeys": "• Check shape keys are named correctly", 
+        "EyeTrackingPanel.troubleshooting.boneWeights": "• Ensure eye bones are properly weighted",
+        "EyeTrackingPanel.troubleshooting.restPosition": "• Confirm armature is in rest position"
     }
 }
