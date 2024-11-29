@@ -33,6 +33,12 @@ def register():
         default = default_exports_dir
     )
 
+    Scene.generate_twistbones_upper = BoolProperty(
+        name=t('Scene.generate_twistbones_upper.label'),
+        description=t('Scene.generate_twistbones_upper.desc'),
+        default=True
+    )
+
     Scene.export_translate_csv = BoolProperty(
         name=t('Scene.shapekeycsv.label'),
         description=t('Scene.shapekeycsv.desc'),
