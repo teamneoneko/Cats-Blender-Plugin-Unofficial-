@@ -794,6 +794,8 @@
         "Scene.viseme_validate_deformation.label": "Validate Deformations",
         "Scene.viseme_validate_deformation.desc": "Check if shape key deformations are within reasonable ranges",
         "Scene.remove_doubles_threshold.label": "Threshold",
-        "Scene.remove_doubles_threshold.desc": "Distance threshold for removing duplicate vertices"
+        "Scene.remove_doubles_threshold.desc": "Distance threshold for removing duplicate vertices",
+        "Scene.generate_twistbones_upper.label": "Upper Body",
+        "Scene.generate_twistbones_upper.desc": "Generate twist bones for the upper body (spine, neck)"    
     }
 }
