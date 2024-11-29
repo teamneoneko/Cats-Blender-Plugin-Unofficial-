@@ -33,6 +33,15 @@ def register():
         default = default_exports_dir
     )
 
+    Scene.progress_update = FloatProperty(
+        name=t('Scene.progress_update.label'),
+        description=t('Scene.progress_update.desc'), 
+        default=0.0,
+        min=0.0,
+        max=100.0,
+        subtype='PERCENTAGE'
+    )
+
     Scene.generate_twistbones_upper = BoolProperty(
         name=t('Scene.generate_twistbones_upper.label'),
         description=t('Scene.generate_twistbones_upper.desc'),
