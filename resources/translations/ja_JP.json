@@ -799,6 +799,11 @@
         "SupportButton.success": "サポートページが開かれました",
         "PatchnotesButton.label": "最新のパッチノート",
         "PatchnotesButton.URL": "https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-/releases",
-        "PatchnotesButton.success": "パッチノートが開かれました"
+        "PatchnotesButton.success": "パッチノートが開かれました",
+        "EyeTrackingPanel.troubleshooting.title": "クイックトラブルシューティングガイド:",
+        "EyeTrackingPanel.troubleshooting.vertexGroups": "• メッシュに目の頂点グループがあることを確認",
+        "EyeTrackingPanel.troubleshooting.shapeKeys": "• シェイプキーの名前が正しく付けられていることを確認",
+        "EyeTrackingPanel.troubleshooting.boneWeights": "• 目のボーンが適切にウェイト付けされていることを確認",
+        "EyeTrackingPanel.troubleshooting.restPosition": "• アーマチュアが静止位置にあることを確認"
     }
 }
