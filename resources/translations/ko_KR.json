@@ -801,6 +801,11 @@
         "SupportButton.success": "후원 페이지가 열렸습니다",
         "PatchnotesButton.label": "최신 패치노트",
         "PatchnotesButton.URL": "https://github.com/teamneoneko/Cats-Blender-Plugin-Unofficial-/releases",
-        "PatchnotesButton.success": "패치노트가 열렸습니다"
+        "PatchnotesButton.success": "패치노트가 열렸습니다",
+        "EyeTrackingPanel.troubleshooting.title": "빠른 문제 해결 가이드:",
+        "EyeTrackingPanel.troubleshooting.vertexGroups": "• 메시에 눈 버텍스 그룹이 있는지 확인",
+        "EyeTrackingPanel.troubleshooting.shapeKeys": "• 쉐이프 키의 이름이 올바른지 확인",
+        "EyeTrackingPanel.troubleshooting.boneWeights": "• 눈 본이 올바르게 가중치가 적용되어 있는지 확인",
+        "EyeTrackingPanel.troubleshooting.restPosition": "• 아마추어가 기본 자세에 있는지 확인"
     }
 }
