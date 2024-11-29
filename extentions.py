@@ -39,7 +39,8 @@ def register():
         default=0.0,
         min=0.0,
         max=100.0,
-        subtype='PERCENTAGE'
+        subtype='PERCENTAGE',
+        options={'HIDDEN'}
     )
 
     Scene.generate_twistbones_upper = BoolProperty(

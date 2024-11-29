@@ -207,6 +207,8 @@ class EyeTrackingPanel(ToolPanel, bpy.types.Panel):
         info_col.label(text=t("LegacyEyeTrackingPanel.info1"), icon='INFO')
         info_col.label(text=t("LegacyEyeTrackingPanel.info2"), icon='BLANK1')
         info_col.label(text=t("LegacyEyeTrackingPanel.info3"), icon='BLANK1')
+        info_col.label(text=t("LegacyEyeTrackingPanel.info4"), icon='BLANK1')
+        info_col.label(text=t("LegacyEyeTrackingPanel.info5"), icon='BLANK1')
         
         info_box.separator(factor=0.5)
 
@@ -214,11 +216,11 @@ class EyeTrackingPanel(ToolPanel, bpy.types.Panel):
         help_box = box.box()
         help_col = help_box.column(align=True)
         help_col.scale_y = 0.8
-        help_col.label(text="Quick Troubleshooting Guide:", icon='QUESTION')
-        help_col.label(text="• Verify mesh has eye vertex groups", icon='GROUP_VERTEX')
-        help_col.label(text="• Check shape keys are named correctly", icon='SHAPEKEY_DATA')
-        help_col.label(text="• Ensure eye bones are properly weighted", icon='BONE_DATA')
-        help_col.label(text="• Confirm armature is in rest position", icon='ARMATURE_DATA')
+        help_col.label(text=t('EyeTrackingPanel.troubleshooting.title'), icon='QUESTION')
+        help_col.label(text=t('EyeTrackingPanel.troubleshooting.vertexGroups'), icon='GROUP_VERTEX')
+        help_col.label(text=t('EyeTrackingPanel.troubleshooting.shapeKeys'), icon='SHAPEKEY_DATA')
+        help_col.label(text=t('EyeTrackingPanel.troubleshooting.boneWeights'), icon='BONE_DATA')
+        help_col.label(text=t('EyeTrackingPanel.troubleshooting.restPosition'), icon='ARMATURE_DATA')
         help_box.separator(factor=0.5)
 
         # Main content section
@@ -264,12 +266,6 @@ class EyeTrackingPanel(ToolPanel, bpy.types.Panel):
     def draw_no_meshes_warning(self, col):
         col.separator()
         sub = col.column(align=True)
-        sub.scale_y = 0.75
-        sub.label(text=t("LegacyEyeTrackingPanel.info1"), icon='INFO')
-        sub.label(text=t("LegacyEyeTrackingPanel.info2"), icon='BLANK1')
-        sub.label(text=t("LegacyEyeTrackingPanel.info3"), icon='BLANK1')
-        sub.label(text=t("LegacyEyeTrackingPanel.info4"), icon='BLANK1')
-        sub.label(text=t("LegacyEyeTrackingPanel.info5"), icon='BLANK1')
         row = col.row(align=True)
         row.scale_y = 1.1
         row.label(text=t('EyeTrackingPanel.error.noMesh'), icon='ERROR')
@@ -278,12 +274,6 @@ class EyeTrackingPanel(ToolPanel, bpy.types.Panel):
         col.separator()
         col.separator()
         sub = col.column(align=True)
-        sub.scale_y = 0.75
-        sub.label(text=t("LegacyEyeTrackingPanel.info1"), icon='INFO')
-        sub.label(text=t("LegacyEyeTrackingPanel.info2"), icon='BLANK1')
-        sub.label(text=t("LegacyEyeTrackingPanel.info3"), icon='BLANK1')
-        sub.label(text=t("LegacyEyeTrackingPanel.info4"), icon='BLANK1')
-        sub.label(text=t("LegacyEyeTrackingPanel.info5"), icon='BLANK1')
         row = col.row(align=True)
         row.scale_y = 1.1
         row.prop(context.scene, 'mesh_name_eye', icon='MESH_DATA')
