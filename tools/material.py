@@ -23,131 +23,112 @@ class CombineMaterialsButton(bpy.types.Operator):
             return False
         return len(Common.get_meshes_objects(check=False)) > 0
 
-    def assignmatslots(self, ob, matlist):
-        context = bpy.context
-        scn = bpy.context.scene
-        ob_active = context.view_layer.objects.active
-        Common.set_active(ob)
+    def hash_material(self, material):
+        if not material or not material.node_tree:
+            return 'empty'
+        
+        ignore_nodes = {'Material Output', 'mmd_tex_uv', 'Cats Export Shader'}
+        hash_components = []
+        
+        for node in material.node_tree.nodes:
+            if node.name in ignore_nodes or node.label in ignore_nodes:
+                continue
 
-        for s in ob.material_slots:
-            bpy.ops.object.material_slot_remove()
+            if node.type == 'TEX_IMAGE':
+                if any(x in node.name.lower() for x in ['toon', 'sphere']):
+                    continue
+                if node.image:
+                    hash_components.append(f"{node.name}{node.image.name}")
+                continue
 
-        i = 0
-        for m in matlist:
-            mat = bpy.data.materials[m]
-            ob.data.materials.append(mat)
-            i += 1
+            if node.name == 'mmd_shader' and node.inputs:
+                diffuse = tuple(node.inputs['Diffuse Color'].default_value[:])
+                alpha = node.inputs['Alpha'].default_value
+                hash_components.append(f"mmd_shader{diffuse}{alpha}")
+                continue
 
-        Common.set_active(ob_active)
+            if node.inputs:
+                node_data = [node.name]
+                for input in node.inputs:
+                    if hasattr(input, 'default_value'):
+                        try:
+                            node_data.append(str(tuple(input.default_value[:])))
+                        except TypeError:
+                            node_data.append(str(input.default_value))
+                    else:
+                        node_data.append(input.name)
+                hash_components.append(''.join(node_data))
 
-    def cleanmatslots(self):
-        objs = bpy.context.selected_editable_objects
-
-        for ob in objs:
-            if ob.type == 'MESH':
-                Common.set_active(ob)
-                bpy.ops.object.material_slot_remove_unused()
+        return hash(''.join(hash_components))
 
     def generate_combined_tex(self):
         self.combined_tex = {}
+        material_data = {}
+        
+        # Fast material hashing
         for ob in Common.get_meshes_objects():
             for index, mat_slot in enumerate(ob.material_slots):
-                hash_this = ''
-                ignore_nodes = ['Material Output', 'mmd_tex_uv', 'Cats Export Shader']
+                hash_val = self.hash_material(mat_slot.material)
+                if hash_val not in material_data:
+                    material_data[hash_val] = []
+                material_data[hash_val].append({'mat': mat_slot.name, 'index': index})
+        
+        # Filter single materials
+        self.combined_tex = {k: v for k, v in material_data.items() if len(v) > 1}
 
-                if mat_slot.material and mat_slot.material.node_tree:
-                    nodes = mat_slot.material.node_tree.nodes
-                    for node in nodes:
-
-                        if node.name in ignore_nodes or node.label in ignore_nodes:
-                            continue
-
-                        if node.type == 'TEX_IMAGE':
-                            image = node.image
-                            if 'toon' in node.name or 'sphere' in node.name:
-                                nodes.remove(node)
-                                continue
-                            if not image:
-                                nodes.remove(node)
-                                continue
-                            hash_this += node.name + image.name
-                            continue
-                        if not node.inputs:
-                            continue
-
-                        if node.name == 'mmd_shader':
-                            hash_this += node.name\
-                                         + str(node.inputs['Diffuse Color'].default_value[:])\
-                                         + str(node.inputs['Alpha'].default_value)
-                            continue
-
-                        hash_this += node.name
-                        for input, value in node.inputs.items():
-                            if hasattr(value, 'default_value'):
-                                try:
-                                    hash_this += str(value.default_value[:])
-                                except TypeError:
-                                    hash_this += str(value.default_value)
-                            else:
-                                hash_this += value.name
-
-                if hash_this not in self.combined_tex:
-                    self.combined_tex[hash_this] = []
-                self.combined_tex[hash_this].append({'mat': mat_slot.name, 'index': index})
+    def batch_assign_materials(self, mesh, material_groups):
+        Common.switch('EDIT')
+        for materials in material_groups:
+            bpy.ops.mesh.select_all(action='DESELECT')
+            for mat in materials:
+                mesh.active_material_index = mat['index']
+                bpy.ops.object.material_slot_select()
+            bpy.ops.object.material_slot_assign()
 
     def execute(self, context):
         print('COMBINE MATERIALS!')
         saved_data = Common.SavedData()
-
+        
+        # Setup
         Common.set_default_stage()
         Common.remove_rigidbodies_global()
         self.generate_combined_tex()
         Common.switch('OBJECT')
-        i = 0
+        
+        total_combined = 0
+        wm = context.window_manager
+        meshes = Common.get_meshes_objects()
+        wm.progress_begin(0, len(meshes))
 
-        for index, mesh in enumerate(Common.get_meshes_objects()):
-
+        for index, mesh in enumerate(meshes):
             Common.unselect_all()
             Common.set_active(mesh)
-            for file in self.combined_tex:  
-                combined_textures = self.combined_tex[file]
 
-                if len(combined_textures) <= 1:
-                    continue
-                i += len(combined_textures)
+            # Process material groups
+            material_groups = list(self.combined_tex.values())
+            if material_groups:
+                self.batch_assign_materials(mesh, material_groups)
+                total_combined += sum(len(group) for group in material_groups)
 
-                Common.switch('EDIT')
-                bpy.ops.mesh.select_all(action='DESELECT')
-
-                for mat in mesh.material_slots:  
-                    for tex in combined_textures:
-                        if mat.name == tex['mat']:
-                            mesh.active_material_index = tex['index']
-                            bpy.ops.object.material_slot_select()
-
-                bpy.ops.object.material_slot_assign()
-                bpy.ops.mesh.select_all(action='DESELECT')
-
-            Common.unselect_all()
-            Common.set_active(mesh)
+            # Cleanup
             Common.switch('OBJECT')
-            self.cleanmatslots()
-
+            bpy.ops.object.material_slot_remove_unused()
             Common.clean_material_names(mesh)
+            
+            wm.progress_update(index)
 
-
+        wm.progress_end()
         Common.update_material_list()
-
         saved_data.load()
 
-        if i == 0:
+        # Report results
+        if total_combined == 0:
             self.report({'INFO'}, t('CombineMaterialsButton.error.noChanges'))
         else:
-            self.report({'INFO'}, t('CombineMaterialsButton.success', number=str(i)))
+            self.report({'INFO'}, t('CombineMaterialsButton.success', number=str(total_combined)))
 
         return {'FINISHED'}
-
-
+        
 @register_wrap
 class FixMaterialsButton(bpy.types.Operator):
     bl_idname = 'cats_material.fix'
