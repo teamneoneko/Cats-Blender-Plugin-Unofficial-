@@ -5,6 +5,7 @@ import operator
 import math
 import webbrowser
 import numpy as np
+import bmesh
 from mathutils.geometry import intersect_point_line
 
 from . import common as Common
@@ -1146,7 +1147,6 @@ class FlipNormals(bpy.types.Operator):
         self.report({'INFO'}, t('FlipNormals.success'))
         return {'FINISHED'}
 
-
 @register_wrap
 class RemoveDoubles(bpy.types.Operator):
     bl_idname = 'cats_manual.remove_doubles'
@@ -1159,32 +1159,131 @@ class RemoveDoubles(bpy.types.Operator):
         obj = context.active_object
         if obj and obj.type == 'MESH':
             return True
-
         meshes = Common.get_meshes_objects(check=False)
         return meshes
 
-    def execute(self, context):
-        saved_data = Common.SavedData()
+    def check_shapekeys_impact(self, mesh, context):
+        if not Common.has_shapekeys(mesh):
+            return False
+            
+        # Optimized shape key checking using numpy
+        basis = np.array([v.co for v in mesh.data.shape_keys.key_blocks[0].data])
+        threshold = context.scene.remove_doubles_threshold
+        
+        for shape in mesh.data.shape_keys.key_blocks[1:]:
+            shape_verts = np.array([v.co for v in shape.data])
+            distances = np.linalg.norm(basis - shape_verts, axis=1)
+            if np.any(distances > threshold):
+                return True
+        return False
 
-        removed_tris = 0
+    def process_mesh(self, mesh, context):
+        threshold = context.scene.remove_doubles_threshold
+        try:
+            # Create BMesh
+            bm = bmesh.new()
+            bm.from_mesh(mesh.data)
+            
+            # Store initial triangle count
+            initial_tris = len(bm.faces)
+            
+            # Optimize BMesh operations
+            bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=threshold)
+            
+            # Remove loose vertices
+            bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context='VERTS')
+            
+            # Update mesh
+            bm.to_mesh(mesh.data)
+            mesh.data.update()
+            bm.free()
+            
+            return initial_tris - len(mesh.data.polygons)
+            
+        except Exception as e:
+            raise ValueError(f"Failed to process mesh {mesh.name}: {str(e)}")
+
+    def invoke(self, context, event):
         meshes = Common.get_meshes_objects(mode=3)
         if not meshes:
             meshes = [Common.get_meshes_objects()[0]]
 
-        Common.set_default_stage()
-        Common.remove_rigidbodies_global()
-
+        # Check for shape keys impact first
         for mesh in meshes:
-            removed_tris += Common.remove_doubles(mesh, 0.00002, save_shapes=True)
+            if self.check_shapekeys_impact(mesh, context):
+                return context.window_manager.invoke_props_dialog(self)
+        
+        # If no shape keys affected, proceed directly
+        return self.execute(context)
 
-        Common.set_default_stage()
-        Common.remove_rigidbodies_global()
+    def draw(self, context):
+        layout = self.layout
+        col = layout.column(align=True)
+        col.label(text=t('RemoveDoubles.warning.shapekeys'))
+        col.label(text=t('RemoveDoubles.warning.shapekeys.impact'))
+        col.label(text=t('RemoveDoubles.warning.shapekeys.continue'))
 
-        saved_data.load()
+    def execute(self, context):
+        try:
+            saved_data = Common.SavedData()
+            removed_tris = 0
+            
+            meshes = Common.get_meshes_objects(mode=3)
+            if not meshes:
+                meshes = [Common.get_meshes_objects()[0]]
 
-        self.report({'INFO'}, t('RemoveDoubles.success', number=str(removed_tris)))
-        return {'FINISHED'}
+            Common.set_default_stage()
+            Common.remove_rigidbodies_global()
 
+            # Progress reporting
+            wm = context.window_manager
+            wm.progress_begin(0, len(meshes))
+
+            # Process meshes with optimized handling
+            for i, mesh in enumerate(meshes):
+                try:
+                    # Save shape keys state
+                    if Common.has_shapekeys(mesh):
+                        Common.save_shapekey_order(mesh.name)
+                    
+                    # Process mesh with optimized method
+                    removed = self.process_mesh(mesh, context)
+                    removed_tris += removed
+                    
+                    # Validate result
+                    if not mesh.data.vertices or not mesh.data.polygons:
+                        raise ValueError("Mesh data became invalid")
+                        
+                    # Repair shape keys if needed
+                    if Common.has_shapekeys(mesh):
+                        Common.repair_shapekey_order(mesh.name)
+                        
+                except Exception as e:
+                    Common.show_error(4, [
+                        t('RemoveDoubles.error.failed'),
+                        str(e),
+                        t('RemoveDoubles.error.mesh', mesh=mesh.name)
+                    ])
+                    continue
+                finally:
+                    wm.progress_update(i)
+
+            wm.progress_end()
+            Common.set_default_stage()
+            Common.remove_rigidbodies_global()
+            saved_data.load()
+
+            self.report({'INFO'}, t('RemoveDoubles.success', number=str(removed_tris)))
+            return {'FINISHED'}
+
+        except Exception as e:
+            if 'wm' in locals():
+                wm.progress_end()
+            Common.show_error(4, [
+                t('RemoveDoubles.error.unexpected'),
+                str(e)
+            ])
+            return {'CANCELLED'}
 
 @register_wrap
 class OptimizeStaticShapekeys(bpy.types.Operator):
