@@ -1,14 +1,11 @@
 # MIT License
 
 import bpy
-
 from .main import ToolPanel
 from ..tools import common as Common
 from ..tools import viseme as Viseme
-
 from ..tools.register import register_wrap
 from ..tools.translations import t
-
 
 @register_wrap
 class SearchMenuOperatorMouthA(bpy.types.Operator):
@@ -112,6 +109,20 @@ class VisemePanel(ToolPanel, bpy.types.Panel):
         settings_box = box.box()
         settings_col = settings_box.column(align=True)
 
+        # Preview section
+        preview_box = settings_col.box()
+        preview_col = preview_box.column(align=True)
+        
+        row = preview_col.row(align=True)
+        if context.scene.viseme_preview_mode:
+            row.operator(Viseme.VisemePreviewOperator.bl_idname, text="Stop Preview", icon='PAUSE')
+            row = preview_col.row(align=True)
+            row.prop(context.scene, "viseme_preview_selection", text="")
+        else:
+            row.operator(Viseme.VisemePreviewOperator.bl_idname, text="Preview Visemes", icon='PLAY')
+        
+        preview_col.separator()
+
         # Mouth A
         row = settings_col.row(align=True)
         row.scale_y = 1.1
@@ -146,4 +157,3 @@ class VisemePanel(ToolPanel, bpy.types.Panel):
         row = settings_col.row(align=True)
         row.scale_y = 1.2
         row.operator(Viseme.AutoVisemeButton.bl_idname, icon='TRIA_RIGHT')
-
