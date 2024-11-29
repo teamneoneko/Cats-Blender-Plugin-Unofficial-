@@ -793,6 +793,9 @@
         "Scene.remove_doubles_threshold.label": "Threshold",
         "Scene.remove_doubles_threshold.desc": "Distance threshold for removing duplicate vertices",
         "Scene.generate_twistbones_upper.label": "Upper Body",
-        "Scene.generate_twistbones_upper.desc": "Generate twist bones for the upper body (spine, neck)"    
+        "Scene.generate_twistbones_upper.desc": "Generate twist bones for the upper body (spine, neck)",
+        "RemoveDoubles.warning.shapekeys": "This mesh has shape keys that could be affected",
+        "RemoveDoubles.warning.shapekeys.impact": "Removing doubles may impact shape key deformations",
+        "RemoveDoubles.warning.shapekeys.continue": "Do you want to continue?"
     }
 }

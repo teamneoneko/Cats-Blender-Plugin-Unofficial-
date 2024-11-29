@@ -793,6 +793,9 @@
         "Scene.remove_doubles_threshold.label": "임계값",
         "Scene.remove_doubles_threshold.desc": "중복 정점을 제거할 거리 임계값",
         "Scene.generate_twistbones_upper.label": "상체",
-        "Scene.generate_twistbones_upper.desc": "상체 트위스트 본 생성 (척추, 목)"
+        "Scene.generate_twistbones_upper.desc": "상체 트위스트 본 생성 (척추, 목)",
+        "RemoveDoubles.warning.shapekeys": "이 메시에는 영향을 받을 수 있는 쉐이프 키가 있습니다",
+        "RemoveDoubles.warning.shapekeys.impact": "더블 제거는 쉐이프 키 변형에 영향을 줄 수 있습니다",
+        "RemoveDoubles.warning.shapekeys.continue": "계속하시겠습니까?"
     }
 }
