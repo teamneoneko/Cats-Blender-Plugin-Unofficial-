@@ -9,8 +9,6 @@ from .translations import t
 
 from .rootbone import get_parent_root_bones
 
-from .rootbone import get_parent_root_bones
-
 @register_wrap
 class LoadBonesButton(bpy.types.Operator):
     bl_idname = 'cats_bonemerge.load_bones'

@@ -307,6 +307,7 @@ def remove_unused_vertex_groups(ignore_main_bones=False):
                 remove_count += 1
     return remove_count
 
+
 def find_center_vector_of_vertex_group(mesh, vertex_group):
     data = mesh.data
     verts = data.vertices
@@ -336,6 +337,7 @@ def find_center_vector_of_vertex_group(mesh, vertex_group):
 
     average = total / len(verts_in_group)
     return average
+
 
 def vertex_group_exists(mesh_name, bone_name):
     mesh = get_objects()[mesh_name]

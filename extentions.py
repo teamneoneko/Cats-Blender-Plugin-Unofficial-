@@ -11,6 +11,7 @@ from .tools import settings as Settings
 from .tools import importer as Importer
 from .tools import translations as Translations
 from .tools.translations import t
+from .tools import viseme as Viseme
 
 from bpy.types import Scene
 from bpy.props import BoolProperty, EnumProperty, FloatProperty, IntProperty, StringProperty
@@ -55,6 +56,16 @@ def register():
         name=t('Scene.keep_upper_chest.label'),
         description=t('Scene.keep_upper_chest.desc'),
         default=True
+    )
+
+    Scene.eye_tracking_mode = EnumProperty(
+        name=t('Scene.eye_tracking_mode.label'),
+        description=t('Scene.eye_tracking_mode.desc'),
+        items=[
+            ('SDK3', t('Scene.eye_tracking_mode.sdk3.label'), t('Scene.eye_tracking_mode.sdk3.desc')),
+            ('LEGACY', t('Scene.eye_tracking_mode.legacy.label'), t('Scene.eye_tracking_mode.legacy.desc'))
+        ],
+        default='SDK3'
     )
 
     Scene.remove_zero_weight = BoolProperty(
@@ -416,7 +427,8 @@ def register():
     Scene.merge_bone = EnumProperty(
         name=t('Scene.merge_bone.label'),
         description=t('Scene.merge_bone.desc'),
-        items=[],  # Start with an empty list to prevent auto-population
+        # Root bone choices get cached, so we don't want to fix them in-place, otherwise the cache would get modified
+        items=wrap_dynamic_enum_items(Rootbone.get_parent_root_bones, 'merge_bone', sort=False, in_place=False),
     )
 
     # Settings
@@ -436,4 +448,40 @@ def register():
         name=t('Scene.debug_translations.label'),
         description=t('Scene.debug_translations.desc'),
         default=False
+    )
+
+    # Viseme Properties
+    Scene.viseme_preview_mode = BoolProperty(
+        name=t('Scene.viseme_preview_mode.label'),
+        description=t('Scene.viseme_preview_mode.desc'),
+        default=False
+    )
+    
+    Scene.viseme_preview_selection = EnumProperty(
+        name=t('Scene.viseme_preview_selection.label'),
+        description=t('Scene.viseme_preview_selection.desc'),
+        items=[
+            ('vrc.v_aa', 'A', 'Viseme A sound'),
+            ('vrc.v_ch', 'CH', 'Viseme CH sound'),
+            ('vrc.v_dd', 'DD', 'Viseme DD sound'),
+            ('vrc.v_e', 'E', 'Viseme E sound'),
+            ('vrc.v_ff', 'FF', 'Viseme FF sound'),
+            ('vrc.v_ih', 'IH', 'Viseme IH sound'),
+            ('vrc.v_kk', 'KK', 'Viseme KK sound'),
+            ('vrc.v_nn', 'NN', 'Viseme NN sound'),
+            ('vrc.v_oh', 'OH', 'Viseme OH sound'),
+            ('vrc.v_ou', 'OU', 'Viseme OU sound'),
+            ('vrc.v_pp', 'PP', 'Viseme PP sound'),
+            ('vrc.v_rr', 'RR', 'Viseme RR sound'),
+            ('vrc.v_sil', 'SIL', 'Viseme SIL sound'),
+            ('vrc.v_ss', 'SS', 'Viseme SS sound'),
+            ('vrc.v_th', 'TH', 'Viseme TH sound'),
+        ],
+        update=lambda self, context: Viseme.VisemePreview.update_preview(context)
+    )
+
+    Scene.viseme_validate_deformation = BoolProperty(
+        name=t('Scene.viseme_validate_deformation.label'),
+        description=t('Scene.viseme_validate_deformation.desc'),
+        default=True
     )
