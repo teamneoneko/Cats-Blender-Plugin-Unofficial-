@@ -71,7 +71,7 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
         if context.scene.optimize_mode == 'ATLAS':
             self.draw_atlas_section(content_box, context)
         elif context.scene.optimize_mode == 'MATERIAL':
-            self.draw_material_section(content_box)
+            self.draw_material_section(content_box, context)
         elif context.scene.optimize_mode == 'BONEMERGING':
             self.draw_bone_merging_section(content_box, context)
 
@@ -117,7 +117,7 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
 
         check_for_smc()
 
-    def draw_material_section(self, box):
+    def draw_material_section(self, box, context):
         # Material operations
         mat_box = box.box()
         mat_col = mat_box.column(align=True)
@@ -142,6 +142,12 @@ class OptimizePanel(ToolPanel, bpy.types.Panel):
         cleanup_box = box.box()
         cleanup_col = cleanup_box.column(align=True)
         cleanup_col.scale_y = 1.2
+
+        header_row = cleanup_col.row(align=True)
+        header_row.scale_y = 1.1
+        header_row.label(text="Remove Doubles", icon='X')
+
+        cleanup_col.prop(context.scene, 'remove_doubles_threshold')
         cleanup_col.operator(Armature_manual.RemoveDoubles.bl_idname, icon='X')
 
     def draw_bone_merging_section(self, box, context):
