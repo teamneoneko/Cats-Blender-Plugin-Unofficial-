@@ -485,3 +485,13 @@ def register():
         description=t('Scene.viseme_validate_deformation.desc'),
         default=True
     )
+
+    Scene.remove_doubles_threshold = FloatProperty(
+        name=t('Scene.remove_doubles_threshold.label'),
+        description=t('Scene.remove_doubles_threshold.desc'),
+        default=0.00002,
+        min=0.00001,
+        max=0.01,
+        precision=6,
+        step=0.00001
+    )
