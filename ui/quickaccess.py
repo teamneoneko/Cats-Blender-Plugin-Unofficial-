@@ -93,7 +93,7 @@ class QuickAccessPanel(ToolPanel, bpy.types.Panel):
         if bpy.app.version > (4, 3, 99):
             self.draw_warning(col, "QuickAccess.warn.newBlender", 3)
             
-        if bpy.app.version > (4, 2, 99):
+        if bpy.app.version > (4, 3, 99):
             self.draw_warning(col, "QuickAccess.warn.Alpha", 3)
             
         if not globs.dict_found:
