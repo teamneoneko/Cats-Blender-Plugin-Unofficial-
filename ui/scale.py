@@ -33,7 +33,7 @@ def check_for_imscale():
     # Check if it's present in blender anyway (installed separately)
     for mod in addon_utils.modules():
         if mod.bl_info['name'] == "Immersive Scaler":
-            if mod.bl_info['version'] < (0, 2, 7):
+            if mod.bl_info['version'] < (0, 5, 2):
                 old_imscale_version = True
                 continue
             if not addon_utils.check(mod.__name__)[0]:
