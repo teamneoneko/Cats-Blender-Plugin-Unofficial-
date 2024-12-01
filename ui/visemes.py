@@ -1,14 +1,11 @@
 # MIT License
 
 import bpy
-
 from .main import ToolPanel
 from ..tools import common as Common
 from ..tools import viseme as Viseme
-
 from ..tools.register import register_wrap
 from ..tools.translations import t
-
 
 @register_wrap
 class SearchMenuOperatorMouthA(bpy.types.Operator):
@@ -16,7 +13,7 @@ class SearchMenuOperatorMouthA(bpy.types.Operator):
     bl_idname = "scene.search_menu_mouth_a"
     bl_label = ""
     bl_property = "my_enum"
-    #default, change after making operator in UI like shown below.7
+    
     my_enum: bpy.props.EnumProperty(
         name="shapekeys",
         description=t('Scene.mouth_a.desc'),
@@ -39,7 +36,7 @@ class SearchMenuOperatorMouthO(bpy.types.Operator):
     bl_idname = "scene.search_menu_mouth_o"
     bl_label = ""
     bl_property = "my_enum"
-    #default, change after making operator in UI like shown below.7
+    
     my_enum: bpy.props.EnumProperty(
         name="shapekeys",
         description=t('Scene.mouth_o.desc'),
@@ -62,7 +59,7 @@ class SearchMenuOperatorMouthCH(bpy.types.Operator):
     bl_idname = "scene.search_menu_mouth_ch"
     bl_label = ""
     bl_property = "my_enum"
-    #default, change after making operator in UI like shown below.7
+    
     my_enum: bpy.props.EnumProperty(
         name="shapekeys",
         description=t('Scene.mouth_ch.desc'),
@@ -88,40 +85,76 @@ class VisemePanel(ToolPanel, bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         box = layout.box()
-        col = box.column(align=True)
 
+        # Mesh selection section
         mesh_count = len(Common.get_meshes_objects(check=False))
         if mesh_count == 0:
-            row = col.row(align=True)
+            mesh_box = box.box()
+            mesh_col = mesh_box.column(align=True)
+            mesh_col.separator(factor=1.5)
+            row = mesh_col.row(align=True)
             row.scale_y = 1.1
             row.label(text=t('VisemePanel.error.noMesh'), icon='ERROR')
-            col.separator()
+            mesh_col.separator(factor=1.5)
         elif mesh_count > 1:
-            row = col.row(align=True)
+            mesh_box = box.box()
+            mesh_col = mesh_box.column(align=True)
+            mesh_col.separator(factor=1.5)
+            row = mesh_col.row(align=True)
             row.scale_y = 1.1
             row.prop(context.scene, 'mesh_name_viseme', icon='MESH_DATA')
-            col.separator()
+            mesh_col.separator(factor=1.5)
 
-        row = col.row(align=True)
+        # Viseme settings section
+        settings_box = box.box()
+        settings_col = settings_box.column(align=True)
+
+        # Preview section
+        preview_box = settings_col.box()
+        preview_col = preview_box.column(align=True)
+        
+        row = preview_col.row(align=True)
+        if context.scene.viseme_preview_mode:
+            row.operator(Viseme.VisemePreviewOperator.bl_idname, text="Stop Preview", icon='PAUSE')
+            row = preview_col.row(align=True)
+            row.prop(context.scene, "viseme_preview_selection", text="")
+        else:
+            row.operator(Viseme.VisemePreviewOperator.bl_idname, text="Preview Visemes", icon='PLAY')
+        
+        preview_col.separator()
+        settings_col.separator(factor=1.0)
+
+        # Mouth A
+        row = settings_col.row(align=True)
         row.scale_y = 1.1
         row.label(text=t('Scene.mouth_a.label')+":")
         mouth_a_text = 'None' if Common.is_enum_empty(context.scene.mouth_a) else context.scene.mouth_a
         row.operator(SearchMenuOperatorMouthA.bl_idname, text=mouth_a_text, icon='SHAPEKEY_DATA')
-        row = col.row(align=True)
+
+        # Mouth O
+        row = settings_col.row(align=True)
         row.scale_y = 1.1
         row.label(text=t('Scene.mouth_o.label')+":")
         mouth_o_text = 'None' if Common.is_enum_empty(context.scene.mouth_o) else context.scene.mouth_o
         row.operator(SearchMenuOperatorMouthO.bl_idname, text=mouth_o_text, icon='SHAPEKEY_DATA')
-        row = col.row(align=True)
+
+        # Mouth CH
+        row = settings_col.row(align=True)
         row.scale_y = 1.1
         row.label(text=t('Scene.mouth_ch.label')+":")
         mouth_ch_text = 'None' if Common.is_enum_empty(context.scene.mouth_ch) else context.scene.mouth_ch
         row.operator(SearchMenuOperatorMouthCH.bl_idname, text=mouth_ch_text, icon='SHAPEKEY_DATA')
 
-        col.separator()
-        row = col.row(align=True)
+        settings_col.separator(factor=1.5)
+
+        # Shape intensity
+        row = settings_col.row(align=True)
+        row.scale_y = 1.1
         row.prop(context.scene, 'shape_intensity')
 
-        col.separator()
-        row = col.row(align=True)
+        settings_col.separator(factor=1.5)
+
+        # Auto viseme button
+        row = settings_col.row(align=True)
+        row.scale_y = 1.2
         row.operator(Viseme.AutoVisemeButton.bl_idname, icon='TRIA_RIGHT')
