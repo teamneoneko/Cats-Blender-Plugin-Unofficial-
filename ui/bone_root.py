@@ -13,7 +13,7 @@ from ..tools.common import wrap_dynamic_enum_items
 class SearchMenuOperator_root_bone(bpy.types.Operator):
     bl_description = t('Scene.root_bone.desc')
     bl_idname = "scene.search_menu_root_bone"
-    bl_label = ""#t('Scene.root_bone.label')
+    bl_label = ""
     bl_property = "my_enum"
 
     my_enum: bpy.props.EnumProperty(
@@ -45,8 +45,21 @@ class BoneRootPanel(ToolPanel, bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         box = layout.box()
-        row = box.row(align=True)
-        row.operator(SearchMenuOperator_root_bone.bl_idname, text = context.scene.root_bone, icon='BONE_DATA')
-        row = box.row(align=True)
+
+        # Root bone selection
+        selection_box = box.box()
+        selection_col = selection_box.column(align=True)
+        
+        row = selection_col.row(align=True)
+        row.scale_y = 1.2
+        row.operator(SearchMenuOperator_root_bone.bl_idname, text=context.scene.root_bone, icon='BONE_DATA')
+
+        # Action buttons
+        actions_box = box.box()
+        actions_col = actions_box.column(align=True)
+        
+        row = actions_col.row(align=True)
+        row.scale_y = 1.2
         row.operator(Rootbone.RefreshRootButton.bl_idname, icon='FILE_REFRESH')
         row.operator(Rootbone.RootButton.bl_idname, icon='TRIA_RIGHT')
+

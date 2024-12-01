@@ -18,60 +18,77 @@ class UpdaterPanel(ToolPanel, bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         box = layout.box()
-        col = box.column(align=True)
 
-        row = col.row(align=True)
-        row.scale_y = 0.8
-        row.label(text=t('UpdaterPanel.name'), icon=globs.ICON_SETTINGS)
-        col.separator()
+        # Settings section
+        settings_box = box.box()
+        settings_col = settings_box.column(align=True)
+        
+        header_row = settings_col.row(align=True)
+        header_row.scale_y = 0.8
+        header_row.label(text=t('UpdaterPanel.name'), icon=globs.ICON_SETTINGS)
+        
+        settings_col.separator()
 
-        row = col.row(align=True)
+        # General settings
+        row = settings_col.row(align=True)
         row.prop(context.scene, 'embed_textures')
-        row = col.row(align=True)
+        
+        row = settings_col.row(align=True)
         row.prop(context.scene, 'remove_rigidbodies_joints_global')
-        row = col.row(align=True)
+        
+        row = settings_col.row(align=True)
         row.prop(context.scene, "export_translate_csv")
-        row = col.row(align=True)
-        path = context.scene.custom_translate_csv_export_dir
-        if path:
-            custom_translate_csv_export_dir = path
-        else:
-            custom_translate_csv_export_dir = default_cats_dir
+        
+        row = settings_col.row(align=True)
+        path = context.scene.custom_translate_csv_export_dir if context.scene.custom_translate_csv_export_dir else default_cats_dir
         row.prop(context.scene, "custom_translate_csv_export_dir")
 
-        col.separator()
+        settings_col.separator()
 
-        row = col.row(align=True)
-        row = layout_split(row, factor=0.56)
-        row.label(text=t('Scene.ui_lang.label') + ':')
-        row.prop(context.scene, 'ui_lang', text='')
+        # Language settings
+        lang_row = settings_col.row(align=True)
+        lang_split = layout_split(lang_row, factor=0.56)
+        lang_split.label(text=t('Scene.ui_lang.label') + ':')
+        lang_split.prop(context.scene, 'ui_lang', text='')
 
-        # Only show this in the dev branch
+        # Dev branch options
         if globs.dev_branch:
-            col.separator()
-            row = col.row(align=True)
+            settings_col.separator()
+            row = settings_col.row(align=True)
             row.operator(DownloadTranslations.bl_idname)
 
-        col.separator()
+        settings_col.separator()
 
-        row = col.row(align=True)
+        # Debug options
+        debug_box = box.box()
+        debug_col = debug_box.column(align=True)
+        
+        row = debug_col.row(align=True)
         row.scale_y = 0.8
         row.operator(Settings.ResetGoogleDictButton.bl_idname, icon='X')
+        
         if globs.dev_branch:
-            row = col.row(align=True)
+            row = debug_col.row(align=True)
             row.scale_y = 0.8
             row.operator(Settings.DebugTranslations.bl_idname, icon='X')
 
+        # Settings changed warning
         if Settings.settings_changed():
-            col.separator()
-            row = col.row(align=True)
+            warning_box = box.box()
+            warning_col = warning_box.column(align=True)
+            
+            row = warning_col.row(align=True)
             row.scale_y = 0.8
             row.label(text=t('UpdaterPanel.requireRestart1'), icon='ERROR')
-            row = col.row(align=True)
+            
+            row = warning_col.row(align=True)
             row.scale_y = 0.8
             row.label(text=t('UpdaterPanel.requireRestart2'), icon='BLANK1')
-            row = col.row(align=True)
+            
+            row = warning_col.row(align=True)
             row.operator(Settings.RevertChangesButton.bl_idname, icon='RECOVER_LAST')
 
-        col.separator()
-        updater.draw_updater_panel(context, box)
+        # Updater section
+        updater_box = box.box()
+        updater.draw_updater_panel(context, updater_box)
+
