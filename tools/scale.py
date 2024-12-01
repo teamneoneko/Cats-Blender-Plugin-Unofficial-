@@ -27,7 +27,7 @@ class EnableIMScale(bpy.types.Operator):
         # disable all wrong versions
         for mod in addon_utils.modules():
             if mod.bl_info['name'] == "Immersive Scaler":
-                if mod.bl_info['version'] < (0, 2, 7) and addon_utils.check(mod.__name__)[0]:
+                if mod.bl_info['version'] < (0, 5, 2) and addon_utils.check(mod.__name__)[0]:
                     try:
                         bpy.ops.preferences.addon_disable(module=mod.__name__)
                     except:
@@ -37,7 +37,7 @@ class EnableIMScale(bpy.types.Operator):
         # then enable correct version
         for mod in addon_utils.modules():
             if mod.bl_info['name'] == "Immersive Scaler":
-                if mod.bl_info['version'] < (0, 2, 7):
+                if mod.bl_info['version'] < (0, 5, 2):
                     continue
                 if not addon_utils.check(mod.__name__)[0]:
                     bpy.ops.preferences.addon_enable(module=mod.__name__)
