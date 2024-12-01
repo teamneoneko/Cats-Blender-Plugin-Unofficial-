@@ -364,35 +364,56 @@ def process_bones(base_armature: bpy.types.Object, merge_armature: bpy.types.Obj
                  bone_map: Dict[str, str], mesh_only: bool, merge_same_bones: bool) -> None:
     """Processes and merges bones between armatures."""
     
-    # Store bone data before joining
+    # Store complete bone data including hierarchy
     merge_bone_data = {}
+    hierarchy_data = {}
+    
     for bone in merge_armature.data.edit_bones:
         merge_bone_data[bone.name] = {
             'head': bone.head.copy(),
             'tail': bone.tail.copy(),
-            'roll': bone.roll
+            'roll': bone.roll,
+            'parent': bone.parent.name if bone.parent else None
         }
+        if bone.parent:
+            hierarchy_data[bone.name] = bone.parent.name
 
     Common.unselect_all()
     Common.set_active(base_armature)
     Common.select(merge_armature)
 
-    # Join the armatures
     if bpy.ops.object.join.poll():
         bpy.ops.object.join()
 
     if not mesh_only:
+        # Process all bones when merge_same_bones is True
         if merge_same_bones:
-            # This is where we need to add the bone comparison logic
             for bone_name, bone_data in merge_bone_data.items():
-                base_name = bone_name.replace('.merge', '')
-                if base_name in base_armature.data.edit_bones:
-                    merged_bone = base_armature.data.edit_bones.get(bone_name)
-                    if merged_bone:
-                        merged_bone.head = bone_data['head']
-                        merged_bone.tail = bone_data['tail']
-                        merged_bone.roll = bone_data['roll']
-                        merged_bone.parent = base_armature.data.edit_bones[base_name]
+                clean_name = bone_name.replace('.merge', '').split('.')[0]
+                merged_bone = base_armature.data.edit_bones.get(bone_name)
+                base_bone = base_armature.data.edit_bones.get(clean_name)
+                
+                if merged_bone and base_bone:
+                    # Transfer transforms
+                    merged_bone.head = base_bone.head
+                    merged_bone.tail = base_bone.tail
+                    merged_bone.roll = base_bone.roll
+                    
+                    # Handle parenting
+                    if bone_data['parent']:
+                        parent_name = bone_data['parent'].replace('.merge', '').split('.')[0]
+                        if parent_name in base_armature.data.edit_bones:
+                            merged_bone.parent = base_armature.data.edit_bones[parent_name]
+                    
+                    # Update bone mapping
+                    bone_map[bone_name] = clean_name
+                    
+                    # Transfer children
+                    for child in merged_bone.children:
+                        child.parent = base_bone
+                    
+                    # Remove duplicate
+                    base_armature.data.edit_bones.remove(merged_bone)
         else:
             handle_bone_merging(base_armature, merge_bone_data, bone_map, merge_same_bones)
     else:
@@ -414,25 +435,86 @@ def finalize_merge(armature: bpy.types.Object, mesh_name: Optional[str], mesh_on
         cleanup_unused_data(armature)
     Common.correct_bone_positions(armature_name=armature.name)
 
-def handle_bone_merging(base_armature: bpy.types.Object, merge_bone_data: Dict[str, Dict], 
-                       bone_map: Dict[str, str], merge_same_bones: bool) -> None:
-    """Handles the merging of bones between armatures."""
+def handle_bone_merging(base_armature: bpy.types.Object, merge_bone_data: Dict[str, Dict],
+                        bone_map: Dict[str, str], merge_same_bones: bool) -> None:
+    """Handles the merging of bones between armatures, ensuring parent relationships are preserved."""
+
+    # Reparent the bones specified in bones_to_merge
     bones_to_merge = copy.deepcopy(Bones.dont_delete_these_main_bones)
-    
-    if merge_same_bones:
-        merge_matching_bones(base_armature, merge_bone_data, bone_map)
-    else:
-        merge_custom_bones(base_armature, merge_bone_data, bone_map, bones_to_merge)
+    for bone_name in bones_to_merge:
+        old_name = f"{bone_name}.merge"
+        if old_name in base_armature.data.edit_bones and bone_name in base_armature.data.edit_bones:
+            merge_bone = base_armature.data.edit_bones[old_name]
+            base_bone = base_armature.data.edit_bones[bone_name]
+            merge_bone.parent = base_bone
+
+    # Handle parenting for all other bones
+    for bone_name, bone_data in merge_bone_data.items():
+        if bone_name in bones_to_merge:
+            continue  # Skip bones already handled
+
+        merge_bone = base_armature.data.edit_bones.get(bone_name)
+        if not merge_bone:
+            continue
+
+        parent_name = bone_data['parent']
+        if parent_name:
+            # Map parent name if it was renamed during the merge
+            mapped_parent_name = bone_map.get(parent_name, parent_name)
+            parent_bone = base_armature.data.edit_bones.get(mapped_parent_name)
+            if parent_bone:
+                merge_bone.parent = parent_bone
+            else:
+                # Default to 'Hips' if parent not found
+                default_parent = base_armature.data.edit_bones.get('Hips')
+                merge_bone.parent = default_parent
+        else:
+            # Assign 'Hips' as parent if no parent exists
+            default_parent = base_armature.data.edit_bones.get('Hips')
+            merge_bone.parent = default_parent
 
 def merge_matching_bones(base_armature: bpy.types.Object, merge_bone_data: Dict[str, Dict], 
                         bone_map: Dict[str, str]) -> None:
-    """Merges bones that match between armatures."""
+    """Merges all bones between armatures with complete hierarchy preservation."""
+    
+    # First pass: Direct name matches and hierarchy preservation
     for bone_name, bone_data in merge_bone_data.items():
         base_name = bone_name.replace('.merge', '')
-        if base_name in base_armature.data.edit_bones:
-            merged_bone = base_armature.data.edit_bones.get(bone_name)
-            if merged_bone:
-                merged_bone.parent = base_armature.data.edit_bones[base_name]
+        merged_bone = base_armature.data.edit_bones.get(bone_name)
+        base_bone = base_armature.data.edit_bones.get(base_name)
+        
+        if merged_bone and base_bone:
+            # Transfer transforms
+            merged_bone.head = base_bone.head
+            merged_bone.tail = base_bone.tail
+            merged_bone.roll = base_bone.roll
+            
+            # Set parent
+            merged_bone.parent = base_bone.parent
+            
+            # Transfer children to base bone
+            for child in merged_bone.children:
+                child.parent = base_bone
+            
+            # Update bone map
+            bone_map[bone_name] = base_name
+            
+            # Remove duplicate bone
+            base_armature.data.edit_bones.remove(merged_bone)
+            
+            # Transfer weights for this bone
+            for mesh in Common.get_meshes_objects(armature_name=base_armature.name):
+                Common.mix_weights(mesh, bone_name, base_name)
+    
+    # Second pass: Handle remaining bones and maintain hierarchy
+    for bone in base_armature.data.edit_bones:
+        if '.merge' in bone.name:
+            original_name = bone.name.replace('.merge', '')
+            if bone.parent and '.merge' in bone.parent.name:
+                parent_base_name = bone.parent.name.replace('.merge', '')
+                if parent_base_name in base_armature.data.edit_bones:
+                    bone.parent = base_armature.data.edit_bones[parent_base_name]
+            bone.name = original_name
 
 def merge_custom_bones(base_armature: bpy.types.Object, merge_armature: bpy.types.Object, 
                       bone_map: Dict[str, str], bones_to_merge: List[str]) -> None:
