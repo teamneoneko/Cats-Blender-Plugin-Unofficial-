@@ -382,7 +382,19 @@ def process_bones(base_armature: bpy.types.Object, merge_armature: bpy.types.Obj
         bpy.ops.object.join()
 
     if not mesh_only:
-        handle_bone_merging(base_armature, merge_bone_data, bone_map, merge_same_bones)
+        if merge_same_bones:
+            # This is where we need to add the bone comparison logic
+            for bone_name, bone_data in merge_bone_data.items():
+                base_name = bone_name.replace('.merge', '')
+                if base_name in base_armature.data.edit_bones:
+                    merged_bone = base_armature.data.edit_bones.get(bone_name)
+                    if merged_bone:
+                        merged_bone.head = bone_data['head']
+                        merged_bone.tail = bone_data['tail']
+                        merged_bone.roll = bone_data['roll']
+                        merged_bone.parent = base_armature.data.edit_bones[base_name]
+        else:
+            handle_bone_merging(base_armature, merge_bone_data, bone_map, merge_same_bones)
     else:
         rename_mesh_only_bones(base_armature)
 
