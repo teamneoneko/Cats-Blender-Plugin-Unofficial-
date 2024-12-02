@@ -474,6 +474,17 @@ def merge_armatures(
     # Process vertex groups to merge or rename '.merge' groups
     if not mesh_only:
         process_vertex_groups(meshes_merged)
+        
+        # Remove zero weight bones after vertex groups are processed
+        if bpy.context.scene.merge_armatures_remove_zero_weight_bones:
+            for mesh in meshes_merged:
+                Common.remove_unused_vertex_groups(ignore_main_bones=True)
+            if Common.get_meshes_objects(armature_name=base_armature_name):
+                Common.delete_zero_weight(armature_name=base_armature_name)
+                
+            # Clean up the scene
+            Common.set_default_stage()
+            Common.remove_rigidbodies_global()
 
     # Remove any remaining '.merge' bones
     Common.unselect_all()
