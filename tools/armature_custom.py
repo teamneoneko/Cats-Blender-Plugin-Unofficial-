@@ -24,12 +24,16 @@ class MergeArmature(bpy.types.Operator):
         return len(Common.get_armature_objects()) > 1
 
     def execute(self, context):
+        wm = context.window_manager
+        wm.progress_begin(0, 100)
+        
         saved_data = Common.SavedData()
 
         # Set default stage
         Common.set_default_stage()
         Common.remove_rigidbodies_global()
         Common.unselect_all()
+        wm.progress_update(10)
 
         # Get both armatures
         base_armature_name = bpy.context.scene.merge_armature_into
@@ -37,26 +41,32 @@ class MergeArmature(bpy.types.Operator):
         base_armature = Common.get_objects().get(base_armature_name)
         merge_armature = Common.get_objects().get(merge_armature_name)
         armature = Common.set_default_stage()
+        wm.progress_update(20)
 
         if not base_armature or not merge_armature:
             saved_data.load()
+            wm.progress_end()
             Common.show_error(5.2, [t('MergeArmature.error.notFound', name=merge_armature_name)])
             return {'CANCELLED'}
 
-        # Remove Rigid Bodies and Joints as they won't merge
+        # Remove Rigid Bodies and Joints
         delete_rigidbodies_and_joints(base_armature)
         delete_rigidbodies_and_joints(merge_armature)
+        wm.progress_update(40)
 
-        # Set default stage
+        # Set default stage and cleanup
         Common.set_default_stage()
         Common.unselect_all()
         Common.remove_empty()
         Common.remove_unused_objects()
+        wm.progress_update(60)
 
         # Check parents and transformations
         if not validate_parents_and_transforms(merge_armature, base_armature, context):
             saved_data.load()
+            wm.progress_end()
             return {'CANCELLED'}
+        wm.progress_update(80)
 
         # Merge armatures
         merge_armatures(
@@ -65,8 +75,11 @@ class MergeArmature(bpy.types.Operator):
             mesh_only=False,
             merge_same_bones=context.scene.merge_same_bones
         )
+        wm.progress_update(90)
 
         saved_data.load()
+        wm.progress_update(100)
+        wm.progress_end()
 
         self.report({'INFO'}, t('MergeArmature.success'))
         return {'FINISHED'}
