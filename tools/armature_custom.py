@@ -383,7 +383,7 @@ def merge_armatures(
         return
 
     # Check transforms early
-    if not validate_merge_armature_transforms(merge_armature, None, tolerance):
+    if not validate_merge_armature_transforms(base_armature, merge_armature, None, tolerance):
         if not bpy.context.scene.apply_transforms:
             Common.show_error(7.5, t('merge_armatures.error.mustapplytransforms'))
             return
@@ -404,13 +404,14 @@ def merge_armatures(
     meshes_base = [mesh for mesh in meshes_base if mesh]
     meshes_merge = [mesh for mesh in meshes_merge if mesh]
 
-    # Apply transforms to base armature
-    Common.apply_transforms(armature_name=base_armature_name)
+    # Apply transforms to base armature only if user requests it
+    if bpy.context.scene.apply_transforms:
+        Common.apply_transforms(armature_name=base_armature_name)
 
     # Handle transforms for merge armature based on checkbox
     if len(meshes_merge) == 1:
         mesh_merge = meshes_merge[0]
-        if not validate_merge_armature_transforms(merge_armature, mesh_merge, tolerance):
+        if not validate_merge_armature_transforms(base_armature, merge_armature, mesh_merge, tolerance):
             if not bpy.context.scene.apply_transforms:
                 Common.show_error(7.5, t('merge_armatures.error.mustapplytransforms'))
                 return
@@ -528,18 +529,22 @@ def merge_armatures(
     Common.fix_armature_names(armature_name=base_armature_name)
 
 def validate_merge_armature_transforms(
-    merge_armature: bpy.types.Object,
+    base_armature: bpy.types.Object,
+    merge_armature: bpy.types.Object, 
     mesh_merge: Optional[bpy.types.Object],
     tolerance: float
 ) -> bool:
-    """Validate transforms of the merge armature and mesh."""
+    """Validate transforms of both armatures and mesh."""
+    # Check if both armatures have the same scale values
     for i in [0, 1, 2]:
-        if abs(merge_armature.rotation_euler[i]) > tolerance:
+        if abs(base_armature.scale[i] - merge_armature.scale[i]) > tolerance:
             return False
-        if mesh_merge and abs(mesh_merge.rotation_euler[i]) > tolerance:
+            
+        # Check rotations
+        if abs(merge_armature.rotation_euler[i]) > tolerance or \
+           (mesh_merge and abs(mesh_merge.rotation_euler[i]) > tolerance):
             return False
-        if abs(merge_armature.scale[i] - 1.0) > tolerance:
-            return False
+            
     return True
 
 def adjust_merge_armature_transforms(
