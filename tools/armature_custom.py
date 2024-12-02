@@ -412,6 +412,12 @@ def merge_armatures(
         adjust_merge_armature_transforms(merge_armature, mesh_merge)
         Common.apply_transforms(armature_name=merge_armature_name)
 
+    # Track original parent relationships
+    original_parents = {bone.name: bone.parent.name if bone.parent else None for bone in merge_armature.data.bones}
+
+    # Get names of bones in the base armature
+    base_bone_names = set(bone.name for bone in base_armature.data.bones)
+
     # Switch to edit mode on merge armature to prepare for merging
     Common.unselect_all()
     Common.set_active(merge_armature)
@@ -420,7 +426,8 @@ def merge_armatures(
     # Rename bones in merge armature to avoid name conflicts
     bones_to_rename = list(merge_armature.data.edit_bones)
     for bone in bones_to_rename:
-        bone.name += '.merge'
+        if bone.name in base_bone_names:
+            bone.name += '.merge'
 
     Common.set_default_stage()
     Common.remove_rigidbodies_global()
@@ -434,6 +441,18 @@ def merge_armatures(
 
     # Update references after joining
     armature = base_armature
+
+    # Re-establish parent relationships
+    Common.unselect_all()
+    Common.set_active(armature)
+    Common.switch('EDIT')
+    for bone in armature.data.edit_bones:
+        original_parent_name = original_parents.get(bone.name.replace('.merge', ''), None)
+        if original_parent_name and original_parent_name in armature.data.edit_bones:
+            bone.parent = armature.data.edit_bones[original_parent_name]
+        elif original_parent_name is None:
+            bone.parent = None
+    Common.switch('OBJECT')
 
     # Clean up shape keys if needed
     if bpy.context.scene.merge_armatures_cleanup_shape_keys:
