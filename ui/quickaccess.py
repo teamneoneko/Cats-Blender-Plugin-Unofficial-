@@ -30,9 +30,14 @@ class QuickAccessPanel(ToolPanel, bpy.types.Panel):
         updater.draw_update_notification_panel(box)
 
         # Version warnings section
-        version_box = box.box()
-        col = version_box.column(align=True)
-        self.draw_version_warnings(col, context)
+        has_warnings = (bpy.app.version < (4, 2, 0) or 
+                        bpy.app.version > (4, 3, 99) or 
+                        not globs.dict_found)
+
+        if has_warnings:
+            version_box = box.box()
+            col = version_box.column(align=True)
+            self.draw_version_warnings(col, context)
 
         # Main actions section
         actions_box = box.box()
