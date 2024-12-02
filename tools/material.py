@@ -163,7 +163,6 @@ class FixMaterialsButton(bpy.types.Operator):
             Common.fix_vrm_shader(mesh)
             Common.add_principled_shader(mesh)
             for mat_slot in mesh.material_slots:  # Fix transparency per polygon and general garbage look in blender. Asthetic purposes to fix user complaints.
-                mat_slot.material.shadow_method = "HASHED"
                 mat_slot.material.blend_method = "HASHED"
         
         materials = set() 
