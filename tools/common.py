@@ -1478,25 +1478,36 @@ def clean_material_names(mesh):
             mesh.active_material_index = j
             mesh.active_material.name = mat.name[:-len(mat.name.rstrip('0')) - 1]
 
-
-def mix_weights(mesh, vg_from, vg_to, mix_strength=1.0, mix_mode='ADD', delete_old_vg=True):
+def mix_weights(mesh, vg_from, vg_to, mix_strength=1.0, mix_mode='ADD', mix_set='ALL', delete_old_vg=True):
     """Mix the weights of two vertex groups on the mesh, optionally removing the vertex group named vg_from.
 
-    Note that as of Blender 3.0+, existing references to vertex groups become invalid when applying certain modifiers,
-    including 'VERTEX_WEIGHT_MIX'. Keeping reference to the vertex groups' attributes such as their names seems ok
-    though. More information on this issue can be found in https://developer.blender.org/T93896"""
+    This function uses the Vertex Weight Mix modifier to efficiently mix vertex group weights.
+    """
+    # Ensure the correct shape key is active
     mesh.active_shape_key_index = 0
-    mod = mesh.modifiers.new("VertexWeightMix", 'VERTEX_WEIGHT_MIX')
+
+    # Create the Vertex Weight Mix modifier
+    mod = mesh.modifiers.new(name="VertexWeightMix_" + vg_from + "_into_" + vg_to, type='VERTEX_WEIGHT_MIX')
     mod.vertex_group_a = vg_to
     mod.vertex_group_b = vg_from
     mod.mix_mode = mix_mode
-    mod.mix_set = 'B'
-    mod.mask_constant = mix_strength
-    apply_modifier(mod)
-    if delete_old_vg:
-        mesh.vertex_groups.remove(mesh.vertex_groups.get(vg_from))
-    mesh.active_shape_key_index = 0  # This line fixes a visual bug in 2.80 which causes random weights to be stuck after being merged
+    mod.mix_set = mix_set  # Use 'ALL' to include all vertices
+    mod.mask_constant = mix_strength  # Strength of the mix
 
+    # Apply the modifier to the mesh
+    # Depending on your Blender version, you may need to adjust how the modifier is applied.
+    if bpy.ops.object.modifier_apply.poll():
+        mesh.modifiers.active = mod
+        bpy.ops.object.modifier_apply(modifier=mod.name)
+
+    # Optionally remove the source vertex group
+    if delete_old_vg:
+        vg_from_group = mesh.vertex_groups.get(vg_from)
+        if vg_from_group:
+            mesh.vertex_groups.remove(vg_from_group)
+
+    # Reset the active shape key index
+    mesh.active_shape_key_index = 0
 
 def get_user_preferences():
     return bpy.context.user_preferences if hasattr(bpy.context, 'user_preferences') else bpy.context.preferences
@@ -2287,3 +2298,10 @@ def set_material_shading():
                     space.shading.studiolight_background_alpha = 0.0
                     if bpy.app.version >= (2, 82):
                         space.shading.render_pass = 'COMBINED'
+
+def clear_unused_data():
+    """
+    Clear unused data blocks to improve memory usage.
+    """
+    # Purge orphan data blocks
+    bpy.ops.outliner.orphans_purge(do_local_ids=True, do_linked_ids=True, do_recursive=True)
