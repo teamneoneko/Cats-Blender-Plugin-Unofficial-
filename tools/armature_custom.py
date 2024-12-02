@@ -412,8 +412,10 @@ def merge_armatures(
         adjust_merge_armature_transforms(merge_armature, mesh_merge)
         Common.apply_transforms(armature_name=merge_armature_name)
 
-    # Track original parent relationships
-    original_parents = {bone.name: bone.parent.name if bone.parent else None for bone in merge_armature.data.bones}
+    # Track original parent relationships for both armatures
+    original_parents = {}
+    for bone in merge_armature.data.bones:
+        original_parents[bone.name] = bone.parent.name if bone.parent else None
 
     # Get names of bones in the base armature
     base_bone_names = set(bone.name for bone in base_armature.data.bones)
@@ -447,11 +449,14 @@ def merge_armatures(
     Common.set_active(armature)
     Common.switch('EDIT')
     for bone in armature.data.edit_bones:
-        original_parent_name = original_parents.get(bone.name.replace('.merge', ''), None)
-        if original_parent_name and original_parent_name in armature.data.edit_bones:
-            bone.parent = armature.data.edit_bones[original_parent_name]
-        elif original_parent_name is None:
-            bone.parent = None
+        base_name = bone.name.replace('.merge', '')
+        if base_name in original_parents:
+            parent_name = original_parents[base_name]
+            if parent_name:
+                parent_bone = armature.data.edit_bones.get(parent_name)
+                if parent_bone:
+                    bone.parent = parent_bone
+
     Common.switch('OBJECT')
 
     # Clean up shape keys if needed
@@ -512,6 +517,7 @@ def merge_armatures(
 
     # Fix armature names
     Common.fix_armature_names(armature_name=base_armature_name)
+
 
 def validate_merge_armature_transforms(
     merge_armature: bpy.types.Object,
