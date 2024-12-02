@@ -382,6 +382,12 @@ def merge_armatures(
         Common.show_error(5.2, [t('MergeArmature.error.notFound', name=merge_armature_name)])
         return
 
+    # Check transforms early
+    if not validate_merge_armature_transforms(merge_armature, None, tolerance):
+        if not bpy.context.scene.apply_transforms:
+            Common.show_error(7.5, t('merge_armatures.error.mustapplytransforms'))
+            return
+
     # Fix zero-length bones
     Common.fix_zero_length_bones(base_armature)
     Common.fix_zero_length_bones(merge_armature)
@@ -398,18 +404,21 @@ def merge_armatures(
     meshes_base = [mesh for mesh in meshes_base if mesh]
     meshes_merge = [mesh for mesh in meshes_merge if mesh]
 
-    # Apply transforms
+    # Apply transforms to base armature
     Common.apply_transforms(armature_name=base_armature_name)
 
-    if (len(meshes_merge) != 1 or not bpy.context.scene.merge_armatures_join_meshes or bpy.context.scene.apply_transforms) and not mesh_only:
-        Common.apply_transforms(armature_name=merge_armature_name)
-    else:
+    # Handle transforms for merge armature based on checkbox
+    if len(meshes_merge) == 1:
         mesh_merge = meshes_merge[0]
         if not validate_merge_armature_transforms(merge_armature, mesh_merge, tolerance):
-            Common.show_error(7.5, t('merge_armatures.error.transformReset'))
-            return
-
-        adjust_merge_armature_transforms(merge_armature, mesh_merge)
+            if not bpy.context.scene.apply_transforms:
+                Common.show_error(7.5, t('merge_armatures.error.mustapplytransforms'))
+                return
+            Common.apply_transforms(armature_name=merge_armature_name)
+        else:
+            adjust_merge_armature_transforms(merge_armature, mesh_merge)
+            Common.apply_transforms(armature_name=merge_armature_name)
+    elif bpy.context.scene.apply_transforms:
         Common.apply_transforms(armature_name=merge_armature_name)
 
     # Track original parent relationships for both armatures
@@ -518,15 +527,18 @@ def merge_armatures(
     # Fix armature names
     Common.fix_armature_names(armature_name=base_armature_name)
 
-
 def validate_merge_armature_transforms(
     merge_armature: bpy.types.Object,
-    mesh_merge: bpy.types.Object,
+    mesh_merge: Optional[bpy.types.Object],
     tolerance: float
 ) -> bool:
     """Validate transforms of the merge armature and mesh."""
     for i in [0, 1, 2]:
-        if abs(merge_armature.rotation_euler[i]) > tolerance or abs(mesh_merge.rotation_euler[i]) > tolerance:
+        if abs(merge_armature.rotation_euler[i]) > tolerance:
+            return False
+        if mesh_merge and abs(mesh_merge.rotation_euler[i]) > tolerance:
+            return False
+        if abs(merge_armature.scale[i] - 1.0) > tolerance:
             return False
     return True
 
