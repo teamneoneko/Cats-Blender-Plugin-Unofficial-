@@ -1,7 +1,5 @@
 # Cats Blender Plugin Blender 4.3 Dev.
-
-### WARNING CATS FOR BLENDER 4.3 IS IN BETA AND WILL HAVE ISSUES, UNTO THERE IS AN RELEASED VERSION WE ARE NOT ACCEPTING ISSUES FOR THE TIME BEING!
-## WARNING THIS IS ONLY FOR BLENDER 4.3 - MMD TOOLS HAS NOT BEEN UPDATED AND BLENDER 4.3 IS USING A HOTFIXED VERSION WE MADE, THERE WILL BE ISSUES.
+.
 ### This is the DEV version for blender 4.3 only! this version could be unstable or have issues, please use an released version if you encounter issues.
 
 The non official version of Cats Blender Plugin which is maintained by Yusarina, Cats is an tool designed to shorten steps needed to import and optimize models into VRChat. Compatible models are: MMD, XNALara, Mixamo, Source Engine, Unreal Engine, DAZ/Poser, Blender Rigify, Sims 2, Motion Builder, 3DS Max and potentially more.
