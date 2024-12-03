@@ -44,7 +44,7 @@ Some features of Cat's need additional plugins to work, you can find them here:
 
 ## Installation
 
-- Please [Click Here](https://catsblenderplugin.xyz/wiki.html?version=current#what-features-are-available-in-the-quick-access-panel) to see how to install for Blender 4.2+
+- Please [Click Here](https://catsblenderplugin.xyz/wiki.html?version=current#how-do-i-install-cats-blender-plugin) to see how to install for Blender 4.2+
 
 ## Help
 
