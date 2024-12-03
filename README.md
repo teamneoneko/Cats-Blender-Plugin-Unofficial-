@@ -12,7 +12,7 @@ All the hours long processes of fixing your models are compressed into a few fun
 
 - Join the unoffical Cats Discord!: https://discord.catsblenderplugin.xyz
 
-You can releases [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases), ensure you are using the one for your blender version!  
+You can find releases [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/releases), ensure you are using the one for your blender version!  
 
 - You can find the development version for Blender 4.2 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-42-dev).
 - You can find the development version for Blender 4.3 [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unofficial-/tree/blender-43-dev).
@@ -20,11 +20,11 @@ You can releases [here](https://github.com/Yusarina/Cats-Blender-Plugin-Unoffici
 
 ## Blender version support policies.
 
-Please [Click Here](https://catsblenderplugin.xyz/wiki.html#what-are-the-current-supported-blender-versions) to view which versions of blender we support.
+Please [Click Here](https://catsblenderplugin.xyz/wiki.html?version=current#what-versions-of-blender-are-currently-supported) to view which versions of blender we support.
 
 ## Features
 
-Please [Click Here](https://catsblenderplugin.xyz/wiki.html#quick-access) to view the features of cats.
+Please [Click Here](https://catsblenderplugin.xyz/wiki.html?version=current#what-features-are-available-in-the-quick-access-panel) to view the features of cats.
 
 
 ## Requirements
@@ -44,8 +44,7 @@ Some features of Cat's need additional plugins to work, you can find them here:
 
 ## Installation
 
-- Please [Click Here](https://catsblenderplugin.xyz/wiki.html#how-do-i-install-cats-blender-plugin-blender-42) to see how to install for Blender 4.2+
-- Please [Click here](https://catsblenderplugin.xyz/wiki.html#how-do-i-install-cats-blender-plugin-blender-36-and-older) to see how to install for older versions of Blender.
+- Please [Click Here](https://catsblenderplugin.xyz/wiki.html?version=current#what-features-are-available-in-the-quick-access-panel) to see how to install for Blender 4.2+
 
 ## Help
 
