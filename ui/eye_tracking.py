@@ -11,14 +11,20 @@ from ..tools.translations import t
 
 @register_wrap
 class SearchMenuOperatorBoneHead(bpy.types.Operator):
-    bl_description = t('Scene.head.desc')
     bl_idname = "scene.search_menu_head"
     bl_label = ""
     bl_property = "my_enum"
 
-    my_enum: bpy.props.EnumProperty(name="shapekeys", items=Common.get_bones_head)
+    def items_callback(self, context):
+        items = Common.get_bones_head(self, context)
+        print("Debug bone names:", [item[0] for item in items])
+        return items
+
+    my_enum: bpy.props.EnumProperty(name="shapekeys", items=items_callback)
+
 
     def execute(self, context):
+        print("Selected bone name:", self.my_enum)
         context.scene.head = self.my_enum
         return {'FINISHED'}
 
@@ -179,16 +185,12 @@ class EyeTrackingPanel(ToolPanel, bpy.types.Panel):
         row = bones_col.row(align=True)
         row.scale_y = 1.1
         row.label(text=t('Scene.eye_left.label') + ":")
-        row.operator(SearchMenuOperatorBoneEyeLeft.bl_idname,
-                    text=context.scene.eye_left, 
-                    icon='BONE_DATA')
+        row.prop_search(context.scene, "eye_left", context.active_object.data, "bones", text="")
         
         row = bones_col.row(align=True)
         row.scale_y = 1.1
         row.label(text=t('Scene.eye_right.label') + ":")
-        row.operator(SearchMenuOperatorBoneEyeRight.bl_idname,
-                    text=context.scene.eye_right, 
-                    icon='BONE_DATA')
+        row.prop_search(context.scene, "eye_right", context.active_object.data, "bones", text="")
 
         # Actions section
         actions_box = box.box()
@@ -196,6 +198,7 @@ class EyeTrackingPanel(ToolPanel, bpy.types.Panel):
         row = actions_col.row(align=True)
         row.scale_y = 1.2
         row.operator(Eyetracking.RotateEyeBonesForAv3Button.bl_idname, icon='CON_ROTLIMIT')
+
 
     def draw_legacy_section(self, box, context):
         # Info section
@@ -283,19 +286,20 @@ class EyeTrackingPanel(ToolPanel, bpy.types.Panel):
         row = col.row(align=True)
         row.scale_y = 1.1
         row.label(text=t('Scene.head.label')+":")
-        row.operator(SearchMenuOperatorBoneHead.bl_idname, text=context.scene.head, icon='BONE_DATA')
+        row.prop_search(context.scene, "head", context.active_object.data, "bones", text="")
 
         row = col.row(align=True)
         row.scale_y = 1.1
         row.active = not context.scene.disable_eye_movement
         row.label(text=t('Scene.eye_left.label')+":")
-        row.operator(SearchMenuOperatorBoneEyeLeft.bl_idname, text=context.scene.eye_left, icon='BONE_DATA')
+        row.prop_search(context.scene, "eye_left", context.active_object.data, "bones", text="")
 
         row = col.row(align=True)
         row.scale_y = 1.1
         row.active = not context.scene.disable_eye_movement
         row.label(text=t('Scene.eye_right.label')+":")
-        row.operator(SearchMenuOperatorBoneEyeRight.bl_idname, text=context.scene.eye_right, icon='BONE_DATA')
+        row.prop_search(context.scene, "eye_right", context.active_object.data, "bones", text="")
+
 
     def draw_shapekey_selection(self, context, col):
         col.separator()
