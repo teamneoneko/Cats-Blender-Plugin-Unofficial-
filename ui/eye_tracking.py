@@ -300,22 +300,38 @@ class EyeTrackingPanel(ToolPanel, bpy.types.Panel):
         row.label(text=t('Scene.eye_right.label')+":")
         row.prop_search(context.scene, "eye_right", context.active_object.data, "bones", text="")
 
-
     def draw_shapekey_selection(self, context, col):
         col.separator()
         active = not context.scene.disable_eye_blinking
+        mesh = Common.get_objects()[context.scene.mesh_name_eye]
 
-        for shape_key in [
-            ('wink_left', SearchMenuOperatorShapekeyWinkLeft),
-            ('wink_right', SearchMenuOperatorShapekeyWinkRight),
-            ('lowerlid_left', SearchMenuOperatorShapekeyLowerLidLeft),
-            ('lowerlid_right', SearchMenuOperatorShapekeyLowerLidRight)
-        ]:
-            row = col.row(align=True)
-            row.scale_y = 1.1
-            row.active = active
-            row.label(text=t(f'Scene.{shape_key[0]}.label')+":")
-            row.operator(shape_key[1].bl_idname, text=getattr(context.scene, shape_key[0]), icon='SHAPEKEY_DATA')
+        # Wink Left
+        row = col.row(align=True)
+        row.scale_y = 1.1
+        row.active = active
+        row.label(text=t('Scene.wink_left.label')+":")
+        row.prop_search(context.scene, "wink_left", mesh.data.shape_keys, "key_blocks", text="")
+
+        # Wink Right  
+        row = col.row(align=True)
+        row.scale_y = 1.1
+        row.active = active
+        row.label(text=t('Scene.wink_right.label')+":")
+        row.prop_search(context.scene, "wink_right", mesh.data.shape_keys, "key_blocks", text="")
+
+        # Lower Lid Left
+        row = col.row(align=True)
+        row.scale_y = 1.1
+        row.active = active
+        row.label(text=t('Scene.lowerlid_left.label')+":")
+        row.prop_search(context.scene, "lowerlid_left", mesh.data.shape_keys, "key_blocks", text="")
+
+        # Lower Lid Right
+        row = col.row(align=True)
+        row.scale_y = 1.1
+        row.active = active
+        row.label(text=t('Scene.lowerlid_right.label')+":")
+        row.prop_search(context.scene, "lowerlid_right", mesh.data.shape_keys, "key_blocks", text="")
 
     def draw_options(self, context, col):
         col.separator()
