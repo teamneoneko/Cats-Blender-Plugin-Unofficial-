@@ -2,6 +2,7 @@
 
 CATS_VERSION = "4.3.1.1"
 dev_branch = True
+dev_branch = False
 
 
 import os
