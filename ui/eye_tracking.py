@@ -182,15 +182,21 @@ class EyeTrackingPanel(ToolPanel, bpy.types.Panel):
         bones_box = box.box()
         bones_col = bones_box.column(align=True)
         
+        # Get armature and verify it exists
+        armature = Common.get_armature()
+        if not armature:
+            bones_col.label(text=t('EyeTrackingPanel.error.noArm'), icon='ERROR')
+            return
+            
         row = bones_col.row(align=True)
         row.scale_y = 1.1
         row.label(text=t('Scene.eye_left.label') + ":")
-        row.prop_search(context.scene, "eye_left", context.active_object.data, "bones", text="")
+        row.prop_search(context.scene, "eye_left", armature.data, "bones", text="")
         
         row = bones_col.row(align=True)
         row.scale_y = 1.1
         row.label(text=t('Scene.eye_right.label') + ":")
-        row.prop_search(context.scene, "eye_right", context.active_object.data, "bones", text="")
+        row.prop_search(context.scene, "eye_right", armature.data, "bones", text="")
 
         # Actions section
         actions_box = box.box()
@@ -462,4 +468,3 @@ class EyeTrackingPanel(ToolPanel, bpy.types.Panel):
         row.label(text=t('EyeTrackingPanel.warn.assignEyes1'), icon='INFO')
         row = col.row(align=True)
         row.label(text=t('EyeTrackingPanel.warn.assignEyes2'))
-
