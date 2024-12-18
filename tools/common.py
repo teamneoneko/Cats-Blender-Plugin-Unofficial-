@@ -814,44 +814,33 @@ def separate_by_loose_parts(context, mesh):
     # This essentially does nothing but merges the extremely small parts together.
     remove_doubles(mesh, 0, save_shapes=True)
 
-    utils.separateByMaterials(mesh)
+    # Switch to edit mode and select all vertices
+    set_active(mesh)
+    switch('EDIT')
+    bpy.ops.mesh.select_all(action='SELECT')
+
+    # Separate by loose parts using Blender's built-in operator
+    bpy.ops.mesh.separate(type='LOOSE')
 
     meshes = []
-    for ob in context.selected_objects:
-        if ob.type == 'MESH':
-            hide(ob, False)
-            meshes.append(ob)
+    for obj in context.selected_objects:
+        if obj.type == 'MESH':
+            hide(obj, False)
+            meshes.append(obj)
 
     wm = bpy.context.window_manager
     current_step = 0
     wm.progress_begin(current_step, len(meshes))
 
     for mesh in meshes:
-        unselect_all()
-        set_active(mesh)
-        bpy.ops.mesh.separate(type='LOOSE')
-
-        meshes2 = []
-        for ob in context.selected_objects:
-            if ob.type == 'MESH':
-                meshes2.append(ob)
-
-        ## This crashes blender, but would be better
-        # unselect_all()
-        # for mesh2 in meshes2:
-        #     if len(mesh2.data.vertices) <= 3:
-        #         select(mesh2)
-        #     elif bpy.ops.object.join.poll():
-        #         bpy.ops.object.join()
-        #         unselect_all()
-
-        for mesh2 in meshes2:
-            clean_shapekeys(mesh2)
-
+        clean_shapekeys(mesh)
         current_step += 1
         wm.progress_update(current_step)
 
     wm.progress_end()
+
+    # Switch back to object mode
+    switch('OBJECT')
 
     utils.clearUnusedMeshes()
 
